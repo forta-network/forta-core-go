@@ -12,9 +12,9 @@ import (
 
 	backoff "github.com/cenkalti/backoff/v4"
 
-	"forta-protocol/forta-core-go/clients/health"
-	"forta-protocol/forta-core-go/domain"
-	"forta-protocol/forta-core-go/utils"
+	"github.com/forta-protocol/forta-core-go/clients/health"
+	"github.com/forta-protocol/forta-core-go/domain"
+	"github.com/forta-protocol/forta-core-go/utils"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/core/types"

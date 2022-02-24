@@ -9,10 +9,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"forta-protocol/forta-core-go/clients/health"
-	"forta-protocol/forta-core-go/domain"
-	"forta-protocol/forta-core-go/ethereum"
-	"forta-protocol/forta-core-go/utils"
+	"github.com/forta-protocol/forta-core-go/clients/health"
+	"github.com/forta-protocol/forta-core-go/domain"
+	"github.com/forta-protocol/forta-core-go/ethereum"
+	"github.com/forta-protocol/forta-core-go/utils"
 )
 
 var ErrEndBlockReached = errors.New("end block reached")

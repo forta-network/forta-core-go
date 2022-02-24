@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"forta-protocol/forta-core-go/utils"
+	"github.com/forta-protocol/forta-core-go/utils"
 )
 
 // Status represents status of a component.

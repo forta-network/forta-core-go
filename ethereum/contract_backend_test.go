@@ -7,7 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	mock_ethereum "forta-protocol/forta-core-go/ethereum/mocks"
+	mock_ethereum "github.com/forta-protocol/forta-core-go/ethereum/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )

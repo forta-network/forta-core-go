@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"forta-protocol/forta-core-go/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -48,7 +47,7 @@ func CheckerFrom(summarizer Summarizer, reporters ...Reporter) HealthChecker {
 func StartServer(ctx context.Context, healthChecker HealthChecker) {
 	Handle(healthChecker)
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%s", config.DefaultHealthPort),
+		Addr: "8090",
 	}
 	go func() {
 		server.ListenAndServe()

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"forta-protocol/forta-core-go/protocol"
+	"github.com/forta-protocol/forta-core-go/protocol"
 	"github.com/golang/protobuf/proto"
 )
 

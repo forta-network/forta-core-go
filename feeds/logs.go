@@ -4,9 +4,9 @@ import (
 	"context"
 	"math/big"
 
-	"forta-protocol/forta-core-go/domain"
+	"github.com/forta-protocol/forta-core-go/domain"
 
-	"forta-protocol/forta-core-go/utils"
+	"github.com/forta-protocol/forta-core-go/utils"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
-	eth "forta-protocol/forta-core-go/ethereum"
+	eth "github.com/forta-protocol/forta-core-go/ethereum"
 )
 
 type logFeed struct {

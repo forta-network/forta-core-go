@@ -5,10 +5,10 @@ import (
 	"math/big"
 	"testing"
 
-	"forta-protocol/forta-core-go/domain"
+	"github.com/forta-protocol/forta-core-go/domain"
 
-	mocks "forta-protocol/forta-core-go/ethereum/mocks"
-	"forta-protocol/forta-core-go/testutils"
+	mocks "github.com/forta-protocol/forta-core-go/ethereum/mocks"
+	"github.com/forta-protocol/forta-core-go/testutils"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/golang/mock/gomock"

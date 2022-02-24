@@ -1,6 +1,6 @@
 package domain
 
-import "forta-protocol/forta-core-go/protocol"
+import "github.com/forta-protocol/forta-core-go/protocol"
 
 type AlertBatch struct {
 	Scanner     string                     `json:"scanner"`
