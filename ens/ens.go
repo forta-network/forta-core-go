@@ -1,4 +1,4 @@
-package store
+package ens
 
 import (
 	"bytes"
@@ -9,6 +9,12 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/wealdtech/go-ens/v3"
+)
+
+const (
+	DispatchContract        = "dispatch.forta.eth"
+	AgentRegistryContract   = "agents.registries.forta.eth"
+	ScannerRegistryContract = "scanners.registries.forta.eth"
 )
 
 // ENS resolves inputs.
