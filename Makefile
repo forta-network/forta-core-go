@@ -8,7 +8,9 @@ mocks:
 	mockgen -source ethereum/client.go -destination ethereum/mocks/mock_client.go
 	mockgen -source feeds/interfaces.go -destination feeds/mocks/mock_feeds.go
 	mockgen -source ethereum/contract_backend.go -destination ethereum/mocks/mock_ethclient.go
-	mockgen -source clients/interfaces.go -destination clients/mocks/mock_clients.go
+	mockgen -source registry/client.go -destination registry/mocks/mock_client.go
+	mockgen -source ipfs/client.go -destination ipfs/mocks/mock_client.go
+	mockgen -source release/client.go -destination release/mocks/mock_client.go
 
 test:
 	go test -v -count=1 ./...
