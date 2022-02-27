@@ -2,11 +2,11 @@ package feeds
 
 import (
 	"context"
+
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/forta-protocol/forta-core-go/contracts/contract_alerts"
 	"github.com/forta-protocol/forta-core-go/domain"
-
-	"github.com/forta-protocol/forta-core-go/contracts"
 
 	"github.com/ethereum/go-ethereum/core/types"
 )
@@ -22,10 +22,10 @@ type alertFeed struct {
 }
 
 //ForEachAlert wraps a LogFeed.ForEachLog invocation and parses out the alert object
-func (af *alertFeed) ForEachAlert(handler func(blk *domain.Block, batch *contracts.AlertsAlertBatch) error, finishBlockHandler func(blk *domain.Block) error) error {
+func (af *alertFeed) ForEachAlert(handler func(blk *domain.Block, batch *contract_alerts.AlertsAlertBatch) error, finishBlockHandler func(blk *domain.Block) error) error {
 
 	// cache by address so we don't over-allocate
-	filterers := make(map[string]*contracts.AlertsFilterer)
+	filterers := make(map[string]*contract_alerts.AlertsFilterer)
 	return af.lf.ForEachLog(func(blk *domain.Block, logEntry types.Log) error {
 		if af.ctx.Err() != nil {
 			return af.ctx.Err()
@@ -33,7 +33,7 @@ func (af *alertFeed) ForEachAlert(handler func(blk *domain.Block, batch *contrac
 
 		// filterers are per-contract address, this cache prevents overallocation
 		if _, ok := filterers[logEntry.Address.Hex()]; !ok {
-			f, err := contracts.NewAlertsFilterer(logEntry.Address, nil)
+			f, err := contract_alerts.NewAlertsFilterer(logEntry.Address, nil)
 			if err != nil {
 				return err
 			}

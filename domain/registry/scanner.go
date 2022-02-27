@@ -3,7 +3,7 @@ package registry
 import (
 	"fmt"
 
-	"github.com/forta-protocol/forta-core-go/contracts"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-protocol/forta-core-go/utils"
 	"github.com/goccy/go-json"
 )
@@ -43,7 +43,7 @@ func ParseScannerMessage(msg string) (*ScannerMessage, error) {
 	return &m, nil
 }
 
-func NewScannerMessage(evt *contracts.ScannerRegistryScannerEnabled) *ScannerMessage {
+func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnabled) *ScannerMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	evtName := DisableScanner
 	if evt.Enabled {
@@ -57,7 +57,7 @@ func NewScannerMessage(evt *contracts.ScannerRegistryScannerEnabled) *ScannerMes
 	}
 }
 
-func NewScannerSaveMessage(evt *contracts.ScannerRegistryScannerUpdated) *ScannerSaveMessage {
+func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScannerUpdated) *ScannerSaveMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{

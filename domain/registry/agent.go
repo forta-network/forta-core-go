@@ -5,7 +5,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/forta-protocol/forta-core-go/contracts"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-protocol/forta-core-go/utils"
 )
 
@@ -49,7 +49,7 @@ func ParseAgentMessage(msg string) (*AgentMessage, error) {
 	return &m, nil
 }
 
-func NewAgentMessage(evt *contracts.AgentRegistryAgentEnabled) *AgentMessage {
+func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled) *AgentMessage {
 	agentID := utils.Hex(evt.AgentId)
 	evtName := DisableAgent
 	if evt.Enabled {
@@ -64,7 +64,7 @@ func NewAgentMessage(evt *contracts.AgentRegistryAgentEnabled) *AgentMessage {
 	}
 }
 
-func NewAgentSaveMessage(evt *contracts.AgentRegistryAgentUpdated) *AgentSaveMessage {
+func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated) *AgentSaveMessage {
 	agentID := utils.Hex(evt.AgentId)
 	return &AgentSaveMessage{
 		AgentMessage: AgentMessage{

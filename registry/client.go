@@ -8,7 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/forta-protocol/forta-core-go/contracts"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-protocol/forta-core-go/ens"
 	"github.com/forta-protocol/forta-core-go/ethereum"
 	"github.com/forta-protocol/forta-core-go/utils"
@@ -45,9 +47,9 @@ type client struct {
 	// call PegLatestBlock to peg the context to the latest block
 	opts *bind.CallOpts
 
-	ar *contracts.AgentRegistryCaller
-	sr *contracts.ScannerRegistryCaller
-	dp *contracts.DispatchCaller
+	ar *contract_agent_registry.AgentRegistryCaller
+	sr *contract_scanner_registry.ScannerRegistryCaller
+	dp *contract_dispatch.DispatchCaller
 }
 
 type ClientConfig struct {
@@ -90,17 +92,17 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}
 	ec := ethclient.NewClient(rpc)
 
-	ar, err := contracts.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
+	ar, err := contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	sr, err := contracts.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
+	sr, err := contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	dp, err := contracts.NewDispatchCaller(regContracts.Dispatch, ec)
+	dp, err := contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
