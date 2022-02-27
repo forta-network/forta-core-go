@@ -5,7 +5,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/forta-protocol/forta-core-go/contracts"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_dispatch"
 	"github.com/forta-protocol/forta-core-go/utils"
 )
 
@@ -30,7 +30,7 @@ func ParseDispatchMessage(msg string) (*DispatchMessage, error) {
 	return &m, nil
 }
 
-func NewDispatchMessage(evt *contracts.DispatchLink) *DispatchMessage {
+func NewDispatchMessage(evt *contract_dispatch.DispatchLink) *DispatchMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	agentID := utils.Hex(evt.AgentId)
 	evtName := Unlink

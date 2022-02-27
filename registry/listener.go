@@ -8,7 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/forta-protocol/forta-core-go/contracts"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-protocol/forta-core-go/domain"
 	"github.com/forta-protocol/forta-core-go/domain/registry"
 	"github.com/forta-protocol/forta-core-go/ens"
@@ -25,9 +27,9 @@ type listener struct {
 	agentAddr    string
 	dispatchAddr string
 
-	scannerFilterer  *contracts.ScannerRegistryFilterer
-	agentsFilterer   *contracts.AgentRegistryFilterer
-	dispatchFilterer *contracts.DispatchFilterer
+	scannerFilterer  *contract_scanner_registry.ScannerRegistryFilterer
+	agentsFilterer   *contract_agent_registry.AgentRegistryFilterer
+	dispatchFilterer *contract_dispatch.DispatchFilterer
 }
 
 type Handlers struct {
@@ -163,17 +165,17 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 
 	regContracts, err := ensStore.ResolveRegistryContracts()
 
-	sf, err := contracts.NewScannerRegistryFilterer(regContracts.ScannerRegistry, nil)
+	sf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	af, err := contracts.NewAgentRegistryFilterer(regContracts.AgentRegistry, nil)
+	af, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	df, err := contracts.NewDispatchFilterer(regContracts.Dispatch, nil)
+	df, err := contract_dispatch.NewDispatchFilterer(regContracts.Dispatch, nil)
 	if err != nil {
 		return nil, err
 	}
