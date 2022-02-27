@@ -1,4 +1,4 @@
-package manifest
+package release
 
 import (
 	"context"
@@ -6,19 +6,19 @@ import (
 )
 
 type Client interface {
-	GetAgentManifest(ctx context.Context, reference string) (*SignedAgentManifest, error)
+	GetReleaseManifest(ctx context.Context, reference string) (*ReleaseManifest, error)
 }
 
 type client struct {
 	ic ipfs.Client
 }
 
-func (c *client) GetManifest(ctx context.Context, reference string) (*SignedAgentManifest, error) {
-	var m SignedAgentManifest
-	if err := c.ic.UnmarshalJson(ctx, reference, &m); err != nil {
+func (c *client) GetReleaseManifest(ctx context.Context, reference string) (*ReleaseManifest, error) {
+	var rm ReleaseManifest
+	if err := c.ic.UnmarshalJson(ctx, reference, &rm); err != nil {
 		return nil, err
 	}
-	return &m, nil
+	return &rm, nil
 }
 
 func NewClient(ipfsGateway string) (*client, error) {
