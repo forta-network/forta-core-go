@@ -7,15 +7,19 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	
+
 	"github.com/forta-protocol/forta-core-go/contracts"
 	"github.com/forta-protocol/forta-core-go/ens"
 	"github.com/forta-protocol/forta-core-go/ethereum"
 	"github.com/forta-protocol/forta-core-go/utils"
 )
 
+//Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
+	// PegLatestBlock will set the opts so that every call uses same block
 	PegLatestBlock() error
+
+	//ResetOpts unsets the options for the store
 	ResetOpts()
 
 	// GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
@@ -24,7 +28,10 @@ type Client interface {
 	// ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
 	ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error
 
+	// IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
+
+	// GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
 }
 
@@ -198,6 +205,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 	}
 	return nil
 }
+
 func isZeroAddress(address common.Address) bool {
 	return 0 == common.HexToHash(address.Hex()).Big().Cmp(zero)
 }
