@@ -1,0 +1,17 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Test
+        run: make test
