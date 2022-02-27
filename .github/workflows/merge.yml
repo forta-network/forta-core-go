@@ -1,0 +1,17 @@
+name: Merge
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  go:
+    name: Validate Go code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Validate and test Go code
+        id: go
+        uses: ./.github/actions/go
