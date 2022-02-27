@@ -13,7 +13,7 @@ type client struct {
 	ic ipfs.Client
 }
 
-func (c *client) GetManifest(ctx context.Context, reference string) (*SignedAgentManifest, error) {
+func (c *client) GetAgentManifest(ctx context.Context, reference string) (*SignedAgentManifest, error) {
 	var m SignedAgentManifest
 	if err := c.ic.UnmarshalJson(ctx, reference, &m); err != nil {
 		return nil, err
