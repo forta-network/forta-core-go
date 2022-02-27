@@ -112,12 +112,18 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		return nil, err
 	}
 
+	sv, err := contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &client{
 		eth: eth,
 
 		sr: sr,
 		ar: ar,
 		dp: dp,
+		sv: sv,
 	}, err
 }
 
