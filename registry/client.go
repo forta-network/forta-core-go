@@ -16,22 +16,22 @@ import (
 
 //Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
-	// PegLatestBlock will set the opts so that every call uses same block
+	//PegLatestBlock will set the opts so that every call uses same block
 	PegLatestBlock() error
 
 	//ResetOpts unsets the options for the store
 	ResetOpts()
 
-	// GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
+	//GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
 	GetAssignmentHash(scannerID string) (*AssignmentHash, error)
 
-	// ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
+	//ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
 	ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error
 
-	// IsEnabledScanner returns true if the scanner exists and is enabled
+	//IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
 
-	// GetAgent returns the registry information for the agent
+	//GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
 }
 
@@ -136,7 +136,7 @@ func (c *client) ResetOpts() {
 	c.opts = nil
 }
 
-// latestOpts returns the callopts for the latest block so that calls can use a same block
+//latestOpts returns the callopts for the latest block so that calls can use a same block
 func (c *client) latestOpts() (*bind.CallOpts, error) {
 	blk, err := c.eth.BlockByNumber(c.ctx, nil)
 	if err != nil {
@@ -151,7 +151,7 @@ func (c *client) latestOpts() (*bind.CallOpts, error) {
 	}, nil
 }
 
-// PegLatestBlock will set the opts so that every call uses same block
+//PegLatestBlock will set the opts so that every call uses same block
 func (c *client) PegLatestBlock() error {
 	opts, err := c.latestOpts()
 	if err != nil {
