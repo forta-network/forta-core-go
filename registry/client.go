@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/forta-protocol/forta-core-go/contracts"
+	"github.com/forta-protocol/forta-core-go/ens"
 	"github.com/forta-protocol/forta-core-go/ethereum"
 	"github.com/forta-protocol/forta-core-go/utils"
 	"math/big"
@@ -34,9 +36,9 @@ type client struct {
 	// call PegLatestBlock to peg the context to the latest block
 	opts *bind.CallOpts
 
-	ar *contracts.AgentRegistry
-	sr *contracts.ScannerRegistry
-	dp *contracts.Dispatch
+	ar *contracts.AgentRegistryCaller
+	sr *contracts.ScannerRegistryCaller
+	dp *contracts.DispatchCaller
 }
 
 type ClientConfig struct {
@@ -61,13 +63,58 @@ func NewDefaultClient(ctx context.Context) (*client, error) {
 }
 
 func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
-	ec, err := ethereum.NewStreamEthClient(ctx, cfg.Name, cfg.JsonRpcUrl)
+	eth, err := ethereum.NewStreamEthClient(ctx, cfg.Name, cfg.JsonRpcUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, cfg.ENSAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	agentReg, err := ensStore.Resolve(ens.AgentRegistryContract)
+	if err != nil {
+		return nil, err
+	}
+
+	scannerReg, err := ensStore.Resolve(ens.ScannerRegistryContract)
+	if err != nil {
+		return nil, err
+	}
+
+	dispatch, err := ensStore.Resolve(ens.DispatchContract)
+	if err != nil {
+		return nil, err
+	}
+
+	rpc, err := ethereum.NewRpcClient(cfg.JsonRpcUrl)
+	if err != nil {
+		return nil, err
+	}
+	ec := ethclient.NewClient(rpc)
+
+	ar, err := contracts.NewAgentRegistryCaller(agentReg, ec)
+	if err != nil {
+		return nil, err
+	}
+
+	sr, err := contracts.NewScannerRegistryCaller(scannerReg, ec)
+	if err != nil {
+		return nil, err
+	}
+
+	dp, err := contracts.NewDispatchCaller(dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
 
 	return &client{
-		eth: ec,
+		eth: eth,
+
+		sr: sr,
+		ar: ar,
+		dp: dp,
 	}, err
 }
 
