@@ -2,14 +2,16 @@ package registry
 
 import (
 	"context"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	
 	"github.com/forta-protocol/forta-core-go/contracts"
 	"github.com/forta-protocol/forta-core-go/ens"
 	"github.com/forta-protocol/forta-core-go/ethereum"
 	"github.com/forta-protocol/forta-core-go/utils"
-	"math/big"
 )
 
 type Client interface {
