@@ -10,6 +10,7 @@ import (
 
 	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-protocol/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_node_version"
 	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-protocol/forta-core-go/ens"
 	"github.com/forta-protocol/forta-core-go/ethereum"
@@ -33,6 +34,9 @@ type Client interface {
 	//IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
 
+	//GetScannerNodeVersion returns the current ipfs reference for the latest scanner node release
+	GetScannerNodeVersion() (string, error)
+
 	//GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
 }
@@ -50,6 +54,7 @@ type client struct {
 	ar *contract_agent_registry.AgentRegistryCaller
 	sr *contract_scanner_registry.ScannerRegistryCaller
 	dp *contract_dispatch.DispatchCaller
+	sv *contract_scanner_node_version.ScannerNodeVersionCaller
 }
 
 type ClientConfig struct {
@@ -148,6 +153,14 @@ func (c *client) PegLatestBlock() error {
 	}
 	c.opts = opts
 	return nil
+}
+
+func (c *client) GetScannerNodeVersion() (string, error) {
+	sv, err := c.sv.ScannerNodeVersion(c.opts)
+	if err != nil {
+		return "", err
+	}
+	return sv, nil
 }
 
 func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {

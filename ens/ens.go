@@ -11,15 +11,17 @@ import (
 )
 
 const (
-	DispatchContract        = "dispatch.forta.eth"
-	AgentRegistryContract   = "agents.registries.forta.eth"
-	ScannerRegistryContract = "scanners.registries.forta.eth"
+	DispatchContract           = "dispatch.forta.eth"
+	AgentRegistryContract      = "agents.registries.forta.eth"
+	ScannerRegistryContract    = "scanners.registries.forta.eth"
+	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
 )
 
 type RegistryContracts struct {
-	Dispatch        common.Address
-	AgentRegistry   common.Address
-	ScannerRegistry common.Address
+	Dispatch           common.Address
+	AgentRegistry      common.Address
+	ScannerRegistry    common.Address
+	ScannerNodeVersion common.Address
 }
 
 // ENS resolves inputs.
@@ -93,10 +95,16 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*RegistryContracts, error)
 		return nil, err
 	}
 
+	scannerNodeVersion, err := ensstore.Resolve(ScannerNodeVersionContract)
+	if err != nil {
+		return nil, err
+	}
+
 	return &RegistryContracts{
-		AgentRegistry:   agentReg,
-		ScannerRegistry: scannerReg,
-		Dispatch:        dispatch,
+		AgentRegistry:      agentReg,
+		ScannerRegistry:    scannerReg,
+		Dispatch:           dispatch,
+		ScannerNodeVersion: scannerNodeVersion,
 	}, nil
 
 }
