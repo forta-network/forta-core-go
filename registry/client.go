@@ -118,6 +118,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}
 
 	return &client{
+		ctx: ctx,
 		eth: eth,
 
 		sr: sr,
