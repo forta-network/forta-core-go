@@ -161,38 +161,25 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, err
 	}
 
-	agentReg, err := ensStore.Resolve(ens.AgentRegistryContract)
+	regContracts, err := ensStore.ResolveRegistryContracts()
+
+	sf, err := contracts.NewScannerRegistryFilterer(regContracts.ScannerRegistry, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	scannerReg, err := ensStore.Resolve(ens.ScannerRegistryContract)
+	af, err := contracts.NewAgentRegistryFilterer(regContracts.AgentRegistry, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	dispatch, err := ensStore.Resolve(ens.DispatchContract)
-	if err != nil {
-		return nil, err
-	}
-
-	sf, err := contracts.NewScannerRegistryFilterer(scannerReg, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	af, err := contracts.NewAgentRegistryFilterer(agentReg, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	df, err := contracts.NewDispatchFilterer(dispatch, nil)
+	df, err := contracts.NewDispatchFilterer(regContracts.Dispatch, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	logFeed, err := feeds.NewLogFeed(ctx, client, feeds.LogFeedConfig{
-		Addresses:  []string{agentReg.Hex(), scannerReg.Hex(), dispatch.Hex()},
+		Addresses:  []string{regContracts.AgentRegistry.Hex(), regContracts.ScannerRegistry.Hex(), regContracts.Dispatch.Hex()},
 		StartBlock: cfg.StartBlock,
 		Offset:     cfg.BlockOffset,
 	})
@@ -205,9 +192,9 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		ctx:              ctx,
 		cfg:              cfg,
 		logs:             logFeed,
-		scannerAddr:      scannerReg.Hex(),
-		agentAddr:        agentReg.Hex(),
-		dispatchAddr:     dispatch.Hex(),
+		scannerAddr:      regContracts.ScannerRegistry.Hex(),
+		agentAddr:        regContracts.AgentRegistry.Hex(),
+		dispatchAddr:     regContracts.Dispatch.Hex(),
 		scannerFilterer:  sf,
 		agentsFilterer:   af,
 		dispatchFilterer: df,

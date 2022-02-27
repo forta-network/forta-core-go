@@ -3,7 +3,6 @@ package ens
 import (
 	"bytes"
 	"errors"
-
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -17,9 +16,16 @@ const (
 	ScannerRegistryContract = "scanners.registries.forta.eth"
 )
 
+type RegistryContracts struct {
+	Dispatch        common.Address
+	AgentRegistry   common.Address
+	ScannerRegistry common.Address
+}
+
 // ENS resolves inputs.
 type ENS interface {
 	Resolve(input string) (common.Address, error)
+	ResolveRegistryContracts() (*RegistryContracts, error)
 }
 
 // ENSStore wraps the ENS client which interacts with namespace contract(s).
@@ -29,12 +35,12 @@ type ENSStore struct {
 }
 
 // NewENSStore creates a new store.
-func NewENSStore(backend bind.ContractBackend) ENS {
+func NewENSStore(backend bind.ContractBackend) *ENSStore {
 	return &ENSStore{backend: backend}
 }
 
 // DialENSStore dials an Ethereum API and creates a new store.
-func DialENSStore(rpcUrl string) (ENS, error) {
+func DialENSStore(rpcUrl string) (*ENSStore, error) {
 	client, err := rpc.Dial(rpcUrl)
 	if err != nil {
 		return nil, err
@@ -43,7 +49,7 @@ func DialENSStore(rpcUrl string) (ENS, error) {
 }
 
 // DialENSStoreAt dials an Ethereum API and creates a new store that works with a resolver at given address.
-func DialENSStoreAt(rpcUrl, resolverAddr string) (ENS, error) {
+func DialENSStoreAt(rpcUrl, resolverAddr string) (*ENSStore, error) {
 	client, err := rpc.Dial(rpcUrl)
 	if err != nil {
 		return nil, err
@@ -69,4 +75,28 @@ func (ensstore *ENSStore) Resolve(input string) (common.Address, error) {
 		return ens.UnknownAddress, errors.New("no address")
 	}
 	return address, nil
+}
+
+func (ensstore *ENSStore) ResolveRegistryContracts() (*RegistryContracts, error) {
+	agentReg, err := ensstore.Resolve(AgentRegistryContract)
+	if err != nil {
+		return nil, err
+	}
+
+	scannerReg, err := ensstore.Resolve(ScannerRegistryContract)
+	if err != nil {
+		return nil, err
+	}
+
+	dispatch, err := ensstore.Resolve(DispatchContract)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RegistryContracts{
+		AgentRegistry:   agentReg,
+		ScannerRegistry: scannerReg,
+		Dispatch:        dispatch,
+	}, nil
+
 }

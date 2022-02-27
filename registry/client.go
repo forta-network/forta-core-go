@@ -82,20 +82,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		return nil, err
 	}
 
-	agentReg, err := ensStore.Resolve(ens.AgentRegistryContract)
-	if err != nil {
-		return nil, err
-	}
-
-	scannerReg, err := ensStore.Resolve(ens.ScannerRegistryContract)
-	if err != nil {
-		return nil, err
-	}
-
-	dispatch, err := ensStore.Resolve(ens.DispatchContract)
-	if err != nil {
-		return nil, err
-	}
+	regContracts, err := ensStore.ResolveRegistryContracts()
 
 	rpc, err := ethereum.NewRpcClient(cfg.JsonRpcUrl)
 	if err != nil {
@@ -103,17 +90,17 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}
 	ec := ethclient.NewClient(rpc)
 
-	ar, err := contracts.NewAgentRegistryCaller(agentReg, ec)
+	ar, err := contracts.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	sr, err := contracts.NewScannerRegistryCaller(scannerReg, ec)
+	sr, err := contracts.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	dp, err := contracts.NewDispatchCaller(dispatch, ec)
+	dp, err := contracts.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
