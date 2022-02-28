@@ -9,6 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Constants
+const (
+	DefaultServerPort = "8090"
+)
+
 // HealthChecker checks service health and generates reports.
 type HealthChecker func() Reports
 
@@ -43,14 +48,26 @@ func CheckerFrom(summarizer Summarizer, reporters ...Reporter) HealthChecker {
 	}
 }
 
+// ServerErrorHandler lets the caller do custom stuff when ListenAndServe fails.
+type ServerErrorHandler func(err error)
+
 // StartServer starts the health check server to receive and handle incoming health check requests.
-func StartServer(ctx context.Context, healthChecker HealthChecker) {
+func StartServer(ctx context.Context, port string, serverErrHandler ServerErrorHandler, healthChecker HealthChecker) {
+	if len(port) == 0 {
+		port = DefaultServerPort
+	}
 	Handle(healthChecker)
 	server := &http.Server{
-		Addr: "8090",
+		Addr: port,
 	}
 	go func() {
-		server.ListenAndServe()
+		if err := server.ListenAndServe(); err != nil {
+			if serverErrHandler != nil {
+				serverErrHandler(err)
+			} else {
+				log.WithError(err).Error("health server failed")
+			}
+		}
 	}()
 	go func() {
 		<-ctx.Done()
@@ -78,18 +95,20 @@ func Handle(healthChecker HealthChecker) {
 
 // Service is a service implementation of a health server, to make things easier.
 type Service struct {
-	ctx           context.Context
-	healthChecker HealthChecker
+	ctx              context.Context
+	port             string
+	serverErrHandler ServerErrorHandler
+	healthChecker    HealthChecker
 }
 
 // NewService creates a new service.
-func NewService(ctx context.Context, healthChecker HealthChecker) *Service {
-	return &Service{ctx: ctx, healthChecker: healthChecker}
+func NewService(ctx context.Context, port string, serverErrHandler ServerErrorHandler, healthChecker HealthChecker) *Service {
+	return &Service{ctx: ctx, port: port, serverErrHandler: serverErrHandler, healthChecker: healthChecker}
 }
 
 // Start starts a service.
 func (service *Service) Start() error {
-	StartServer(service.ctx, service.healthChecker)
+	StartServer(service.ctx, service.port, service.serverErrHandler, service.healthChecker)
 	return nil
 }
 
