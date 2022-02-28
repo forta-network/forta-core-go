@@ -193,7 +193,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 	}
 
 	sID := scannerIDtoBigInt(scannerID)
-	length, err := c.dp.AgentsFor(opts, sID)
+	length, err := c.dp.NumAgentsFor(opts, sID)
 	if err != nil {
 		return err
 	}

@@ -11,10 +11,15 @@ import (
 	"github.com/forta-protocol/forta-core-go/testutils"
 
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
 )
+
+const testEventSignature = "SomeEvent(bytes32,address,uint256,uint256,uint256,uint256,uint256,string)"
+
+var testEventTopic = crypto.Keccak256Hash([]byte(testEventSignature)).Hex()
 
 func TestLogFeed_ForEachLog(t *testing.T) {
 	ctx := context.Background()
@@ -35,7 +40,7 @@ func TestLogFeed_ForEachLog(t *testing.T) {
 
 	lf, err := NewLogFeed(ctx, client, LogFeedConfig{
 		Addresses: []string{addr},
-		Topics:    [][]string{{AlertBatchTopic}},
+		Topics:    [][]string{{testEventTopic}},
 	})
 	assert.NoError(t, err)
 

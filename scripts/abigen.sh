@@ -1,14 +1,18 @@
 #!/bin/sh
 
-CONTRACT_NAME_SNAKE_CASE="$1"
+CONTRACT_REPO_NAME="$1"
+CONTRACT_REPO_ABI_PARENT_DIR="$2"
+CONTRACT_NAME_SNAKE_CASE="$3"
 CONTRACT_NAME_TITLE_CASE=$(echo "$CONTRACT_NAME_SNAKE_CASE" | sed -r 's/(^|_)(\w)/\U\2/g')
-FLAGS="$2"
+FLAGS="$4"
 
-# filter out error types because they are reported to cause a runtime problem
-jq -c '[ .[] | select( .type != "error") ]' \
-	< "./contracts/contract_$CONTRACT_NAME_SNAKE_CASE/$CONTRACT_NAME_SNAKE_CASE.json" \
-	| abigen --out "./contracts/contract_$CONTRACT_NAME_SNAKE_CASE/$CONTRACT_NAME_SNAKE_CASE.go" \
-		--pkg "contract_$CONTRACT_NAME_SNAKE_CASE" \
-		--type "$CONTRACT_NAME_TITLE_CASE" \
-		$FLAGS \
-		--abi -
+# copy in the ABI from local contracts repo
+CONTRACT_REPO_ABI_PATH="$CONTRACT_REPO_NAME/.abis-no-errors/contracts/$CONTRACT_REPO_ABI_PARENT_DIR/$CONTRACT_NAME_TITLE_CASE.sol/$CONTRACT_NAME_TITLE_CASE.json"
+CURRENT_REPO_ABI_PATH="contracts/contract_$CONTRACT_NAME_SNAKE_CASE/$CONTRACT_NAME_TITLE_CASE.json"
+jq -M . <  "$CONTRACT_REPO_ABI_PATH" > "$CURRENT_REPO_ABI_PATH"
+
+abigen --out "./contracts/contract_$CONTRACT_NAME_SNAKE_CASE/$CONTRACT_NAME_SNAKE_CASE.go" \
+	--pkg "contract_$CONTRACT_NAME_SNAKE_CASE" \
+	--type "$CONTRACT_NAME_TITLE_CASE" \
+	$FLAGS \
+	--abi "$CURRENT_REPO_ABI_PATH"
