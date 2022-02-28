@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -53,12 +54,13 @@ type ServerErrorHandler func(err error)
 
 // StartServer starts the health check server to receive and handle incoming health check requests.
 func StartServer(ctx context.Context, port string, serverErrHandler ServerErrorHandler, healthChecker HealthChecker) {
+	port = strings.ReplaceAll(port, ":", "")
 	if len(port) == 0 {
 		port = DefaultServerPort
 	}
 	Handle(healthChecker)
 	server := &http.Server{
-		Addr: port,
+		Addr: fmt.Sprintf(":%s", port),
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
