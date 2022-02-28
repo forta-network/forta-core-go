@@ -62,7 +62,11 @@ func StartServer(ctx context.Context, port string, serverErrHandler ServerErrorH
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
-			serverErrHandler(err)
+			if serverErrHandler != nil {
+				serverErrHandler(err)
+			} else {
+				log.WithError(err).Error("health server failed")
+			}
 		}
 	}()
 	go func() {
