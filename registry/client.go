@@ -230,10 +230,7 @@ func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 }
 
 func (c *client) GetAgent(agentID string) (*Agent, error) {
-	aID, err := utils.HexToBigInt(agentID)
-	if err != nil {
-		return nil, err
-	}
+	aID := utils.AgentHexToBigInt(agentID)
 	agt, err := c.ar.GetAgent(c.opts, aID)
 	if err != nil {
 		return nil, err
@@ -249,10 +246,16 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		return nil, err
 	}
 
+	owner, err := c.ar.OwnerOf(c.opts, aID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Agent{
 		AgentID:  agentID,
 		ChainIDs: utils.IntArray(agt.ChainIds),
 		Enabled:  enabled,
 		Manifest: agt.Metadata,
+		Owner:    owner.Hex(),
 	}, nil
 }
