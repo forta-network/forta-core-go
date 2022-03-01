@@ -39,6 +39,9 @@ type Client interface {
 
 	//GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
+
+	//GetScanner returns the registry information for the scanner
+	GetScanner(scannerID string) (*Scanner, error)
 }
 
 var zero = big.NewInt(0)
@@ -227,6 +230,35 @@ func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 		return false, nil
 	}
 	return c.sr.IsEnabled(c.opts, sID)
+}
+
+func (c *client) GetScanner(scannerID string) (*Scanner, error) {
+	sID := scannerIDtoBigInt(scannerID)
+	owner, err := c.sr.OwnerOf(c.opts, sID)
+	if err != nil || isZeroAddress(owner) {
+		// owner returns an error when not existing
+		return nil, nil
+	}
+
+	sc, err := c.sr.GetScanner(c.opts, sID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	enabled, err := c.sr.IsEnabled(c.opts, sID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &Scanner{
+		ScannerID: scannerID,
+		ChainID:   sc.ChainId.Int64(),
+		Enabled:   enabled,
+		Manifest:  sc.Metadata,
+	}, nil
+
 }
 
 func (c *client) GetAgent(agentID string) (*Agent, error) {
