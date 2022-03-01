@@ -232,12 +232,12 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
 	scn, err := c.sr.GetScanner(c.opts, sID)
 
-	if !scn.Registered {
-		return nil, nil
-	}
-
 	if err != nil {
 		return nil, err
+	}
+
+	if !scn.Registered {
+		return nil, nil
 	}
 
 	enabled, err := c.sr.IsEnabled(c.opts, sID)
