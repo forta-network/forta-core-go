@@ -5,6 +5,7 @@ type Agent struct {
 	ChainIDs []int64 `json:"chainIds"`
 	Enabled  bool    `json:"enabled"`
 	Manifest string  `json:"manifest"`
+	Owner    string  `json:"owner"`
 }
 
 type Scanner struct {
@@ -12,6 +13,7 @@ type Scanner struct {
 	ChainID   int64  `json:"chainId"`
 	Enabled   bool   `json:"enabled"`
 	Manifest  string `json:"manifest"`
+	Owner     string `json:"owner"`
 }
 
 type AssignmentHash struct {

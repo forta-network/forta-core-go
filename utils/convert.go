@@ -1,15 +1,32 @@
 package utils
 
 import (
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/common"
 	log "github.com/sirupsen/logrus"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 func BigIntToHex(i *big.Int) string {
 	return hexutil.EncodeBig(i)
+}
+
+func ScannerIDBigIntToHex(i *big.Int) string {
+	return BytesToHex(i.Bytes())
+}
+
+func ScannerIDHexToBigInt(scannerID string) *big.Int {
+	return common.HexToHash(scannerID).Big()
+}
+
+func AgentBigIntToHex(i *big.Int) string {
+	return BytesToHex(i.Bytes())
+}
+
+func AgentHexToBigInt(hex string) *big.Int {
+	return common.HexToHash(hex).Big()
 }
 
 func HexToBigInt(hex string) (*big.Int, error) {

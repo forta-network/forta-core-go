@@ -30,7 +30,7 @@ var (
 
 // DispatchMetaData contains all meta data concerning the Dispatch contract.
 var DispatchMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forwarder\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newAddressManager\",\"type\":\"address\"}],\"name\":\"AccessManagerUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"previousAdmin\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"AdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"beacon\",\"type\":\"address\"}],\"name\":\"BeaconUpgraded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"enable\",\"type\":\"bool\"}],\"name\":\"Link\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"router\",\"type\":\"address\"}],\"name\":\"RouterUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"agentAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"}],\"name\":\"agentHash\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"manifest\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"agentRefAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"enabled\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"agentVersion\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"metadata\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"chainIds\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"agentRegistry\",\"outputs\":[{\"internalType\":\"contractAgentRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"__manager\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__router\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__agents\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__scanners\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forwarder\",\"type\":\"address\"}],\"name\":\"isTrustedForwarder\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"link\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"data\",\"type\":\"bytes[]\"}],\"name\":\"multicall\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"results\",\"type\":\"bytes[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"numAgentsFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"}],\"name\":\"numScannersFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"scannerAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"scannerHash\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"manifest\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"scannerRefAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"enabled\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"chainId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"metadata\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"scannerRegistry\",\"outputs\":[{\"internalType\":\"contractScannerRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newManager\",\"type\":\"address\"}],\"name\":\"setAccessManager\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newAgentRegistry\",\"type\":\"address\"}],\"name\":\"setAgentRegistry\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"ensRegistry\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"ensName\",\"type\":\"string\"}],\"name\":\"setName\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newRouter\",\"type\":\"address\"}],\"name\":\"setRouter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newScannerRegistry\",\"type\":\"address\"}],\"name\":\"setScannerRegistry\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"unlink\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"}],\"name\":\"upgradeTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forwarder\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newAddressManager\",\"type\":\"address\"}],\"name\":\"AccessManagerUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"previousAdmin\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAdmin\",\"type\":\"address\"}],\"name\":\"AdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"beacon\",\"type\":\"address\"}],\"name\":\"BeaconUpgraded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"enable\",\"type\":\"bool\"}],\"name\":\"Link\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"router\",\"type\":\"address\"}],\"name\":\"RouterUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"agentAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"}],\"name\":\"agentHash\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"manifest\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"agentRefAt\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"registered\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"agentVersion\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"metadata\",\"type\":\"string\"},{\"internalType\":\"uint256[]\",\"name\":\"chainIds\",\"type\":\"uint256[]\"},{\"internalType\":\"bool\",\"name\":\"enabled\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"agentRegistry\",\"outputs\":[{\"internalType\":\"contractAgentRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"__manager\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__router\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__agents\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"__scanners\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forwarder\",\"type\":\"address\"}],\"name\":\"isTrustedForwarder\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"link\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"data\",\"type\":\"bytes[]\"}],\"name\":\"multicall\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"results\",\"type\":\"bytes[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"numAgentsFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"}],\"name\":\"numScannersFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"scannerAt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"scannerHash\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"manifest\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pos\",\"type\":\"uint256\"}],\"name\":\"scannerRefAt\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"registered\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"chainId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"metadata\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"enabled\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"scannerRegistry\",\"outputs\":[{\"internalType\":\"contractScannerRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newManager\",\"type\":\"address\"}],\"name\":\"setAccessManager\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newAgentRegistry\",\"type\":\"address\"}],\"name\":\"setAgentRegistry\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"ensRegistry\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"ensName\",\"type\":\"string\"}],\"name\":\"setName\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newRouter\",\"type\":\"address\"}],\"name\":\"setRouter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newScannerRegistry\",\"type\":\"address\"}],\"name\":\"setScannerRegistry\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"agentId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"scannerId\",\"type\":\"uint256\"}],\"name\":\"unlink\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"}],\"name\":\"upgradeTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // DispatchABI is the input ABI used to generate the binding from.
@@ -257,33 +257,39 @@ func (_Dispatch *DispatchCallerSession) AgentHash(agentId *big.Int) (struct {
 
 // AgentRefAt is a free data retrieval call binding the contract method 0x32dee2f6.
 //
-// Solidity: function agentRefAt(uint256 scannerId, uint256 pos) view returns(uint256 agentId, bool enabled, uint256 agentVersion, string metadata, uint256[] chainIds)
+// Solidity: function agentRefAt(uint256 scannerId, uint256 pos) view returns(bool registered, address owner, uint256 agentId, uint256 agentVersion, string metadata, uint256[] chainIds, bool enabled)
 func (_Dispatch *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int, pos *big.Int) (struct {
+	Registered   bool
+	Owner        common.Address
 	AgentId      *big.Int
-	Enabled      bool
 	AgentVersion *big.Int
 	Metadata     string
 	ChainIds     []*big.Int
+	Enabled      bool
 }, error) {
 	var out []interface{}
 	err := _Dispatch.contract.Call(opts, &out, "agentRefAt", scannerId, pos)
 
 	outstruct := new(struct {
+		Registered   bool
+		Owner        common.Address
 		AgentId      *big.Int
-		Enabled      bool
 		AgentVersion *big.Int
 		Metadata     string
 		ChainIds     []*big.Int
+		Enabled      bool
 	})
 	if err != nil {
 		return *outstruct, err
 	}
 
-	outstruct.AgentId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Enabled = *abi.ConvertType(out[1], new(bool)).(*bool)
-	outstruct.AgentVersion = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.Metadata = *abi.ConvertType(out[3], new(string)).(*string)
-	outstruct.ChainIds = *abi.ConvertType(out[4], new([]*big.Int)).(*[]*big.Int)
+	outstruct.Registered = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.Owner = *abi.ConvertType(out[1], new(common.Address)).(*common.Address)
+	outstruct.AgentId = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.AgentVersion = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.Metadata = *abi.ConvertType(out[4], new(string)).(*string)
+	outstruct.ChainIds = *abi.ConvertType(out[5], new([]*big.Int)).(*[]*big.Int)
+	outstruct.Enabled = *abi.ConvertType(out[6], new(bool)).(*bool)
 
 	return *outstruct, err
 
@@ -291,26 +297,30 @@ func (_Dispatch *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.
 
 // AgentRefAt is a free data retrieval call binding the contract method 0x32dee2f6.
 //
-// Solidity: function agentRefAt(uint256 scannerId, uint256 pos) view returns(uint256 agentId, bool enabled, uint256 agentVersion, string metadata, uint256[] chainIds)
+// Solidity: function agentRefAt(uint256 scannerId, uint256 pos) view returns(bool registered, address owner, uint256 agentId, uint256 agentVersion, string metadata, uint256[] chainIds, bool enabled)
 func (_Dispatch *DispatchSession) AgentRefAt(scannerId *big.Int, pos *big.Int) (struct {
+	Registered   bool
+	Owner        common.Address
 	AgentId      *big.Int
-	Enabled      bool
 	AgentVersion *big.Int
 	Metadata     string
 	ChainIds     []*big.Int
+	Enabled      bool
 }, error) {
 	return _Dispatch.Contract.AgentRefAt(&_Dispatch.CallOpts, scannerId, pos)
 }
 
 // AgentRefAt is a free data retrieval call binding the contract method 0x32dee2f6.
 //
-// Solidity: function agentRefAt(uint256 scannerId, uint256 pos) view returns(uint256 agentId, bool enabled, uint256 agentVersion, string metadata, uint256[] chainIds)
+// Solidity: function agentRefAt(uint256 scannerId, uint256 pos) view returns(bool registered, address owner, uint256 agentId, uint256 agentVersion, string metadata, uint256[] chainIds, bool enabled)
 func (_Dispatch *DispatchCallerSession) AgentRefAt(scannerId *big.Int, pos *big.Int) (struct {
+	Registered   bool
+	Owner        common.Address
 	AgentId      *big.Int
-	Enabled      bool
 	AgentVersion *big.Int
 	Metadata     string
 	ChainIds     []*big.Int
+	Enabled      bool
 }, error) {
 	return _Dispatch.Contract.AgentRefAt(&_Dispatch.CallOpts, scannerId, pos)
 }
@@ -517,30 +527,36 @@ func (_Dispatch *DispatchCallerSession) ScannerHash(scannerId *big.Int) (struct 
 
 // ScannerRefAt is a free data retrieval call binding the contract method 0x8b2e98d6.
 //
-// Solidity: function scannerRefAt(uint256 agentId, uint256 pos) view returns(uint256 scannerId, bool enabled, uint256 chainId, string metadata)
+// Solidity: function scannerRefAt(uint256 agentId, uint256 pos) view returns(bool registered, uint256 scannerId, address owner, uint256 chainId, string metadata, bool enabled)
 func (_Dispatch *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int, pos *big.Int) (struct {
-	ScannerId *big.Int
-	Enabled   bool
-	ChainId   *big.Int
-	Metadata  string
+	Registered bool
+	ScannerId  *big.Int
+	Owner      common.Address
+	ChainId    *big.Int
+	Metadata   string
+	Enabled    bool
 }, error) {
 	var out []interface{}
 	err := _Dispatch.contract.Call(opts, &out, "scannerRefAt", agentId, pos)
 
 	outstruct := new(struct {
-		ScannerId *big.Int
-		Enabled   bool
-		ChainId   *big.Int
-		Metadata  string
+		Registered bool
+		ScannerId  *big.Int
+		Owner      common.Address
+		ChainId    *big.Int
+		Metadata   string
+		Enabled    bool
 	})
 	if err != nil {
 		return *outstruct, err
 	}
 
-	outstruct.ScannerId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Enabled = *abi.ConvertType(out[1], new(bool)).(*bool)
-	outstruct.ChainId = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
-	outstruct.Metadata = *abi.ConvertType(out[3], new(string)).(*string)
+	outstruct.Registered = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.ScannerId = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.Owner = *abi.ConvertType(out[2], new(common.Address)).(*common.Address)
+	outstruct.ChainId = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.Metadata = *abi.ConvertType(out[4], new(string)).(*string)
+	outstruct.Enabled = *abi.ConvertType(out[5], new(bool)).(*bool)
 
 	return *outstruct, err
 
@@ -548,24 +564,28 @@ func (_Dispatch *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.
 
 // ScannerRefAt is a free data retrieval call binding the contract method 0x8b2e98d6.
 //
-// Solidity: function scannerRefAt(uint256 agentId, uint256 pos) view returns(uint256 scannerId, bool enabled, uint256 chainId, string metadata)
+// Solidity: function scannerRefAt(uint256 agentId, uint256 pos) view returns(bool registered, uint256 scannerId, address owner, uint256 chainId, string metadata, bool enabled)
 func (_Dispatch *DispatchSession) ScannerRefAt(agentId *big.Int, pos *big.Int) (struct {
-	ScannerId *big.Int
-	Enabled   bool
-	ChainId   *big.Int
-	Metadata  string
+	Registered bool
+	ScannerId  *big.Int
+	Owner      common.Address
+	ChainId    *big.Int
+	Metadata   string
+	Enabled    bool
 }, error) {
 	return _Dispatch.Contract.ScannerRefAt(&_Dispatch.CallOpts, agentId, pos)
 }
 
 // ScannerRefAt is a free data retrieval call binding the contract method 0x8b2e98d6.
 //
-// Solidity: function scannerRefAt(uint256 agentId, uint256 pos) view returns(uint256 scannerId, bool enabled, uint256 chainId, string metadata)
+// Solidity: function scannerRefAt(uint256 agentId, uint256 pos) view returns(bool registered, uint256 scannerId, address owner, uint256 chainId, string metadata, bool enabled)
 func (_Dispatch *DispatchCallerSession) ScannerRefAt(agentId *big.Int, pos *big.Int) (struct {
-	ScannerId *big.Int
-	Enabled   bool
-	ChainId   *big.Int
-	Metadata  string
+	Registered bool
+	ScannerId  *big.Int
+	Owner      common.Address
+	ChainId    *big.Int
+	Metadata   string
+	Enabled    bool
 }, error) {
 	return _Dispatch.Contract.ScannerRefAt(&_Dispatch.CallOpts, agentId, pos)
 }

@@ -39,6 +39,9 @@ type Client interface {
 
 	//GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
+
+	//GetScanner returns a scanner
+	GetScanner(scannerID string) (*Scanner, error)
 }
 
 var zero = big.NewInt(0)
@@ -128,10 +131,6 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}, err
 }
 
-func scannerIDtoBigInt(scannerID string) *big.Int {
-	return common.HexToHash(scannerID).Big()
-}
-
 //ResetOpts unsets the options for the store
 func (c *client) ResetOpts() {
 	c.opts = nil
@@ -171,7 +170,7 @@ func (c *client) GetScannerNodeVersion() (string, error) {
 }
 
 func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
-	sh, err := c.dp.ScannerHash(c.opts, scannerIDtoBigInt(scannerID))
+	sh, err := c.dp.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +191,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 		opts = currentOpts
 	}
 
-	sID := scannerIDtoBigInt(scannerID)
+	sID := utils.ScannerIDHexToBigInt(scannerID)
 	length, err := c.dp.NumAgentsFor(opts, sID)
 	if err != nil {
 		return err
@@ -204,7 +203,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 			return err
 		}
 		if err := handler(&Agent{
-			AgentID:  utils.BigIntToHex(agt.AgentId),
+			AgentID:  utils.AgentBigIntToHex(agt.AgentId),
 			ChainIDs: utils.IntArray(agt.ChainIds),
 			Enabled:  agt.Enabled,
 			Manifest: agt.Metadata,
@@ -220,7 +219,7 @@ func isZeroAddress(address common.Address) bool {
 }
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
-	sID := scannerIDtoBigInt(scannerID)
+	sID := utils.ScannerIDHexToBigInt(scannerID)
 	owner, err := c.sr.OwnerOf(c.opts, sID)
 	if err != nil || isZeroAddress(owner) {
 		// owner returns an error when not existing
@@ -229,18 +228,41 @@ func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	return c.sr.IsEnabled(c.opts, sID)
 }
 
-func (c *client) GetAgent(agentID string) (*Agent, error) {
-	aID, err := utils.HexToBigInt(agentID)
+func (c *client) GetScanner(scannerID string) (*Scanner, error) {
+	sID := utils.ScannerIDHexToBigInt(scannerID)
+	scn, err := c.sr.GetScanner(c.opts, sID)
+
 	if err != nil {
 		return nil, err
 	}
+
+	if !scn.Registered {
+		return nil, nil
+	}
+
+	enabled, err := c.sr.IsEnabled(c.opts, sID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Scanner{
+		ScannerID: utils.ScannerIDBigIntToHex(sID),
+		ChainID:   scn.ChainId.Int64(),
+		Enabled:   enabled,
+		Manifest:  scn.Metadata,
+		Owner:     scn.Owner.Hex(),
+	}, nil
+}
+
+func (c *client) GetAgent(agentID string) (*Agent, error) {
+	aID := utils.AgentHexToBigInt(agentID)
 	agt, err := c.ar.GetAgent(c.opts, aID)
 	if err != nil {
 		return nil, err
 	}
 
 	// if agt does not exist, return nil
-	if len(agt.ChainIds) == 0 && agt.Metadata == "" && agt.Version.Int64() == 0 {
+	if !agt.Created {
 		return nil, nil
 	}
 
@@ -254,5 +276,6 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		ChainIDs: utils.IntArray(agt.ChainIds),
 		Enabled:  enabled,
 		Manifest: agt.Metadata,
+		Owner:    agt.Owner.Hex(),
 	}, nil
 }

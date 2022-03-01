@@ -17,3 +17,10 @@ func TestBytesToHex(t *testing.T) {
 	value := "ABCDEFG12382837581235uASDFASDFASDFzxcvzxcvzxcv"
 	assert.Equal(t, "0x37353831323335754153444641534446415344467a7863767a7863767a786376", BytesToHex([]byte(value)))
 }
+
+func TestAgentBigIntToHex(t *testing.T) {
+	agentID := "0x023dfceebe145aac511e103d9665163f87fa432bbc73d55d64d1b15ddd9184c9"
+	res := AgentHexToBigInt(agentID)
+	str := AgentBigIntToHex(res)
+	assert.Equal(t, agentID, str)
+}
