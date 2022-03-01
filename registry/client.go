@@ -204,7 +204,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 			return err
 		}
 		if err := handler(&Agent{
-			AgentID:  utils.BigIntToHex(agt.AgentId),
+			AgentID:  utils.BytesToHex(agt.AgentId.Bytes()),
 			ChainIDs: utils.IntArray(agt.ChainIds),
 			Enabled:  agt.Enabled,
 			Manifest: agt.Metadata,
