@@ -2,6 +2,7 @@ package utils
 
 import (
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	log "github.com/sirupsen/logrus"
@@ -14,7 +15,7 @@ func BigIntToHex(i *big.Int) string {
 }
 
 func ScannerIDBigIntToHex(i *big.Int) string {
-	return BytesToHex(i.Bytes())
+	return strings.ToLower(common.BigToAddress(i).Hex())
 }
 
 func ScannerIDHexToBigInt(scannerID string) *big.Int {
