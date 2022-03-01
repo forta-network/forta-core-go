@@ -24,3 +24,10 @@ func TestAgentBigIntToHex(t *testing.T) {
 	str := AgentBigIntToHex(res)
 	assert.Equal(t, agentID, str)
 }
+
+func TestScannerBigIntToHex(t *testing.T) {
+	scannerID := "0x3f88c2b3e267e6b8e9de017cdb47a59ac9ecb284"
+	res := ScannerIDHexToBigInt(scannerID)
+	str := ScannerIDBigIntToHex(res)
+	assert.Equal(t, scannerID, str)
+}
