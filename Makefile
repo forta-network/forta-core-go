@@ -15,9 +15,12 @@ mocks:
 test:
 	go test -v -count=1 ./...
 
-abigen:
-	./scripts/abigen.sh alerts
-	./scripts/abigen.sh agent_registry
-	./scripts/abigen.sh dispatch
-	./scripts/abigen.sh scanner_node_version
-	./scripts/abigen.sh scanner_registry "--alias _register=underscoreRegister"
+abigen: pull-contracts
+	./scripts/abigen.sh forta-token components/agents agent_registry
+	./scripts/abigen.sh forta-token components/dispatch dispatch
+	./scripts/abigen.sh forta-token components/scanners scanner_node_version
+	./scripts/abigen.sh forta-token components/scanners scanner_registry "--alias _register=underscoreRegister"
+
+.PHONY: pull-contracts
+pull-contracts:
+	./scripts/pull-contracts.sh forta-token master
