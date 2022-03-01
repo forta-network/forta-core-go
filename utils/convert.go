@@ -17,6 +17,10 @@ func AgentBigIntToHex(i *big.Int) string {
 	return BytesToHex(i.Bytes())
 }
 
+func AgentHexToBigInt(hex string) *big.Int {
+	return common.HexToHash(hex).Big()
+}
+
 func HexToBigInt(hex string) (*big.Int, error) {
 	return hexutil.DecodeBig(hex)
 }
