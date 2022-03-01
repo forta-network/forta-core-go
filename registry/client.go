@@ -238,10 +238,17 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// if agt does not exist, return nil
+	if len(agt.ChainIds) == 0 && agt.Metadata == "" && agt.Version.Int64() == 0 {
+		return nil, nil
+	}
+
 	enabled, err := c.ar.IsEnabled(c.opts, aID)
 	if err != nil {
 		return nil, err
 	}
+
 	return &Agent{
 		AgentID:  agentID,
 		ChainIDs: utils.IntArray(agt.ChainIds),
