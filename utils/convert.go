@@ -13,6 +13,14 @@ func BigIntToHex(i *big.Int) string {
 	return hexutil.EncodeBig(i)
 }
 
+func ScannerIDBigIntToHex(i *big.Int) string {
+	return BytesToHex(i.Bytes())
+}
+
+func ScannerIDHexToBigInt(scannerID string) *big.Int {
+	return common.HexToHash(scannerID).Big()
+}
+
 func AgentBigIntToHex(i *big.Int) string {
 	return BytesToHex(i.Bytes())
 }

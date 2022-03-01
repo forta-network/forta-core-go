@@ -170,14 +170,19 @@
     "name": "agentRefAt",
     "outputs": [
       {
+        "internalType": "bool",
+        "name": "registered",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "agentId",
         "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "enabled",
-        "type": "bool"
       },
       {
         "internalType": "uint256",
@@ -193,6 +198,11 @@
         "internalType": "uint256[]",
         "name": "chainIds",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "enabled",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -397,14 +407,19 @@
     "name": "scannerRefAt",
     "outputs": [
       {
+        "internalType": "bool",
+        "name": "registered",
+        "type": "bool"
+      },
+      {
         "internalType": "uint256",
         "name": "scannerId",
         "type": "uint256"
       },
       {
-        "internalType": "bool",
-        "name": "enabled",
-        "type": "bool"
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
       },
       {
         "internalType": "uint256",
@@ -415,6 +430,11 @@
         "internalType": "string",
         "name": "metadata",
         "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "enabled",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
