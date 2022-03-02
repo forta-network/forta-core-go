@@ -189,3 +189,18 @@ func (mr *MockLogFeedMockRecorder) ForEachLog(handler, finishBlockHandler interf
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachLog", reflect.TypeOf((*MockLogFeed)(nil).ForEachLog), handler, finishBlockHandler)
 }
+
+// GetLogsForLastBlocks mocks base method.
+func (m *MockLogFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLogsForLastBlocks", blocksAgo)
+	ret0, _ := ret[0].([]types.Log)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLogsForLastBlocks indicates an expected call of GetLogsForLastBlocks.
+func (mr *MockLogFeedMockRecorder) GetLogsForLastBlocks(blocksAgo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogsForLastBlocks", reflect.TypeOf((*MockLogFeed)(nil).GetLogsForLastBlocks), blocksAgo)
+}
