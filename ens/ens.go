@@ -23,7 +23,7 @@ type RegistryContracts struct {
 	AgentRegistry      common.Address
 	ScannerRegistry    common.Address
 	ScannerNodeVersion common.Address
-	Staking            common.Address
+	FortaStaking       common.Address
 }
 
 // ENS resolves inputs.
@@ -102,7 +102,7 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*RegistryContracts, error)
 		return nil, err
 	}
 
-	staking, err := ensstore.Resolve(StakingContract)
+	fortaStaking, err := ensstore.Resolve(StakingContract)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*RegistryContracts, error)
 		ScannerRegistry:    scannerReg,
 		Dispatch:           dispatch,
 		ScannerNodeVersion: scannerNodeVersion,
-		Staking:            staking,
+		FortaStaking:       fortaStaking,
 	}, nil
 
 }

@@ -20,3 +20,6 @@ type AssignmentHash struct {
 	AgentLength int64  `json:"agentLength"`
 	Hash        string `json:"hash"`
 }
+
+const SubjectTypeScanner = 0
+const SubjectTypeAgent = 1

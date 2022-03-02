@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-protocol/forta-core-go/utils"
@@ -51,7 +52,8 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 	}
 	return &ScannerMessage{
 		Message: Message{
-			Action: evtName,
+			Timestamp: time.Now().UTC(),
+			Action:    evtName,
 		},
 		ScannerID: scannerID,
 	}
@@ -63,7 +65,8 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 		ScannerMessage: ScannerMessage{
 			ScannerID: scannerID,
 			Message: Message{
-				Action: SaveScanner,
+				Timestamp: time.Now().UTC(),
+				Action:    SaveScanner,
 			},
 		},
 		ChainID: evt.ChainId.Int64(),

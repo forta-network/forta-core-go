@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/goccy/go-json"
 
@@ -57,7 +58,8 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled) *Ag
 	}
 	return &AgentMessage{
 		Message: Message{
-			Action: evtName,
+			Action:    evtName,
+			Timestamp: time.Now().UTC(),
 		},
 		AgentID: agentID,
 		TxHash:  evt.Raw.TxHash.Hex(),
@@ -70,7 +72,8 @@ func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated)
 		AgentMessage: AgentMessage{
 			AgentID: agentID,
 			Message: Message{
-				Action: SaveAgent,
+				Action:    SaveAgent,
+				Timestamp: time.Now().UTC(),
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},
