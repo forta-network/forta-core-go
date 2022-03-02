@@ -88,8 +88,8 @@ func main() {
 	lines = append(lines, fmt.Sprintf("package %s", dirName))
 	lines = append(lines, "")
 	for _, def := range defs {
-		lines = append(lines, fmt.Sprintf("var %sSignature = \"%s\"", def.Name, def.Signature))
-		lines = append(lines, fmt.Sprintf("var %sTopic = \"%s\"", def.Name, def.Topic))
+		lines = append(lines, fmt.Sprintf("const %sSignature = \"%s\"", def.Name, def.Signature))
+		lines = append(lines, fmt.Sprintf("const %sTopic = \"%s\"", def.Name, def.Topic))
 	}
 
 	_, err = f.WriteString(strings.Join(lines, "\n"))
