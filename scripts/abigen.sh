@@ -16,3 +16,5 @@ abigen --out "./contracts/contract_$CONTRACT_NAME_SNAKE_CASE/$CONTRACT_NAME_SNAK
 	--type "$CONTRACT_NAME_TITLE_CASE" \
 	$FLAGS \
 	--abi "$CURRENT_REPO_ABI_PATH"
+
+go run ./scripts/topics-generator/main.go ./$CURRENT_REPO_ABI_PATH
