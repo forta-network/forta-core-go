@@ -53,7 +53,7 @@ type ListenerConfig struct {
 
 type Listener interface {
 	Listen() error
-	ProcessLastBlocks(blocksAgo int64)
+	ProcessLastBlocks(blocksAgo int64) error
 }
 
 func (l *listener) isDispatcher(address common.Address) bool {
