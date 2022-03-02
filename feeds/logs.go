@@ -28,7 +28,7 @@ type logFeed struct {
 	offset     int
 }
 
-func (l *logFeed) GetLogs(startBlock *big.Int, endBlock *big.Int) ([]types.Log, error) {
+func (l *logFeed) GetLogs() ([]types.Log, error) {
 	addrs := make([]common.Address, 0, len(l.addresses))
 	for _, addr := range l.addresses {
 		addrs = append(addrs, common.HexToAddress(addr))
@@ -45,8 +45,8 @@ func (l *logFeed) GetLogs(startBlock *big.Int, endBlock *big.Int) ([]types.Log, 
 	}
 
 	q := ethereum.FilterQuery{
-		FromBlock: startBlock,
-		ToBlock:   endBlock,
+		FromBlock: l.startBlock,
+		ToBlock:   l.endBlock,
 		Addresses: addrs,
 		Topics:    topics,
 	}

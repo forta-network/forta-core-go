@@ -3,8 +3,6 @@ package feeds
 import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-protocol/forta-core-go/clients/health"
-	"math/big"
-
 	"github.com/forta-protocol/forta-core-go/domain"
 )
 
@@ -25,5 +23,5 @@ type TransactionFeed interface {
 // LogFeed is a feed of logs
 type LogFeed interface {
 	ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error
-	GetLogs(startBlock *big.Int, endBlock *big.Int) ([]types.Log, error)
+	GetLogs() ([]types.Log, error)
 }
