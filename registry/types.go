@@ -1,5 +1,8 @@
 package registry
 
+const SubjectTypeScanner = 0
+const SubjectTypeAgent = 1
+
 type Agent struct {
 	AgentID  string  `json:"agentId"`
 	ChainIDs []int64 `json:"chainIds"`
@@ -20,6 +23,3 @@ type AssignmentHash struct {
 	AgentLength int64  `json:"agentLength"`
 	Hash        string `json:"hash"`
 }
-
-const SubjectTypeScanner = 0
-const SubjectTypeAgent = 1
