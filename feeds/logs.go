@@ -28,7 +28,20 @@ type logFeed struct {
 	offset     int
 }
 
-func (l *logFeed) GetLogs() ([]types.Log, error) {
+func (l *logFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
+
+	blk, err := l.client.BlockByNumber(l.ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	endBlock, err := utils.HexToBigInt(blk.Number)
+	if err != nil {
+		return nil, err
+	}
+
+	startBlock := big.NewInt(endBlock.Int64() - blocksAgo)
+
 	addrs := make([]common.Address, 0, len(l.addresses))
 	for _, addr := range l.addresses {
 		addrs = append(addrs, common.HexToAddress(addr))
@@ -45,8 +58,8 @@ func (l *logFeed) GetLogs() ([]types.Log, error) {
 	}
 
 	q := ethereum.FilterQuery{
-		FromBlock: l.startBlock,
-		ToBlock:   l.endBlock,
+		FromBlock: startBlock,
+		ToBlock:   endBlock,
 		Addresses: addrs,
 		Topics:    topics,
 	}

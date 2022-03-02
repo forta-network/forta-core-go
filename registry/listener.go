@@ -53,7 +53,7 @@ type ListenerConfig struct {
 
 type Listener interface {
 	Listen() error
-	ProcessLogs() error
+	ProcessLastBlocks(blocksAgo int64)
 }
 
 func (l *listener) isDispatcher(address common.Address) bool {
@@ -151,8 +151,8 @@ func (l *listener) handleAfterBlock(blk *domain.Block) error {
 }
 
 // ProcessLogs fetches the logs in a single pass and calls handlers for them
-func (l *listener) ProcessLogs() error {
-	logs, err := l.logs.GetLogs()
+func (l *listener) ProcessLastBlocks(blocksAgo int64) error {
+	logs, err := l.logs.GetLogsForLastBlocks(blocksAgo)
 	if err != nil {
 		return err
 	}

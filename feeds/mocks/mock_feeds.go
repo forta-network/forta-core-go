@@ -5,7 +5,6 @@
 package mock_feeds
 
 import (
-	big "math/big"
 	reflect "reflect"
 
 	types "github.com/ethereum/go-ethereum/core/types"
@@ -191,17 +190,17 @@ func (mr *MockLogFeedMockRecorder) ForEachLog(handler, finishBlockHandler interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachLog", reflect.TypeOf((*MockLogFeed)(nil).ForEachLog), handler, finishBlockHandler)
 }
 
-// GetLogs mocks base method.
-func (m *MockLogFeed) GetLogs(startBlock, endBlock *big.Int) ([]types.Log, error) {
+// GetLogsForLastBlocks mocks base method.
+func (m *MockLogFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLogs", startBlock, endBlock)
+	ret := m.ctrl.Call(m, "GetLogsForLastBlocks", blocksAgo)
 	ret0, _ := ret[0].([]types.Log)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetLogs indicates an expected call of GetLogs.
-func (mr *MockLogFeedMockRecorder) GetLogs(startBlock, endBlock interface{}) *gomock.Call {
+// GetLogsForLastBlocks indicates an expected call of GetLogsForLastBlocks.
+func (mr *MockLogFeedMockRecorder) GetLogsForLastBlocks(blocksAgo interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogs", reflect.TypeOf((*MockLogFeed)(nil).GetLogs), startBlock, endBlock)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogsForLastBlocks", reflect.TypeOf((*MockLogFeed)(nil).GetLogsForLastBlocks), blocksAgo)
 }
