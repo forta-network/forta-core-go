@@ -4,10 +4,12 @@ import (
 	"errors"
 	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type Message struct {
-	Action string `json:"action"`
+	Action    string    `json:"action"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 func ParseMessage(msg string) (*Message, error) {

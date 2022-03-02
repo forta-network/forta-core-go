@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/goccy/go-json"
 
@@ -39,7 +40,8 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink) *DispatchMessage {
 	}
 	return &DispatchMessage{
 		Message: Message{
-			Action: evtName,
+			Action:    evtName,
+			Timestamp: time.Now().UTC(),
 		},
 		ScannerID: scannerID,
 		AgentID:   agentID,
