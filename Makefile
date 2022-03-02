@@ -16,6 +16,7 @@ test:
 	go test -v -count=1 ./...
 
 abigen: pull-contracts
+	./scripts/abigen.sh forta-token components/staking forta_staking
 	./scripts/abigen.sh forta-token components/agents agent_registry
 	./scripts/abigen.sh forta-token components/dispatch dispatch
 	./scripts/abigen.sh forta-token components/scanners scanner_node_version
