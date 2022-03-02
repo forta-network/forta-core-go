@@ -69,7 +69,7 @@ func (l *listener) isAgentRegistry(address common.Address) bool {
 }
 
 func (l *listener) handleScannerRegistryEvent(le types.Log, logger *log.Entry) error {
-	if isEvent(le, evtScannerUpdatedTopic) {
+	if isEvent(le, contract_scanner_registry.ScannerUpdatedTopic) {
 		su, err := l.scannerFilterer.ParseScannerUpdated(le)
 		if err != nil {
 			return err
@@ -77,7 +77,7 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, logger *log.Entry) e
 		if l.cfg.Handlers.SaveScannerHandler != nil {
 			return l.cfg.Handlers.SaveScannerHandler(logger, registry.NewScannerSaveMessage(su))
 		}
-	} else if isEvent(le, evtScannerEnabledTopic) {
+	} else if isEvent(le, contract_scanner_registry.ScannerEnabledTopic) {
 		se, err := l.scannerFilterer.ParseScannerEnabled(le)
 		if err != nil {
 			return err
@@ -90,7 +90,7 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, logger *log.Entry) e
 }
 
 func (l *listener) handleAgentRegistryEvent(le types.Log, logger *log.Entry) error {
-	if isEvent(le, evtAgentUpdatedTopic) {
+	if isEvent(le, contract_agent_registry.AgentUpdatedTopic) {
 		au, err := l.agentsFilterer.ParseAgentUpdated(le)
 		if err != nil {
 			return err
@@ -98,7 +98,7 @@ func (l *listener) handleAgentRegistryEvent(le types.Log, logger *log.Entry) err
 		if l.cfg.Handlers.SaveAgentHandler != nil {
 			return l.cfg.Handlers.SaveAgentHandler(logger, registry.NewAgentSaveMessage(au))
 		}
-	} else if isEvent(le, evtAgentEnabledTopic) {
+	} else if isEvent(le, contract_agent_registry.AgentEnabledTopic) {
 		ae, err := l.agentsFilterer.ParseAgentEnabled(le)
 		if err != nil {
 			return err
@@ -111,7 +111,7 @@ func (l *listener) handleAgentRegistryEvent(le types.Log, logger *log.Entry) err
 }
 
 func (l *listener) handleDispatcherEvent(le types.Log, logger *log.Entry) error {
-	if isEvent(le, evtLinkTopic) {
+	if isEvent(le, contract_dispatch.LinkTopic) {
 		link, err := l.dispatchFilterer.ParseLink(le)
 		if err != nil {
 			return err

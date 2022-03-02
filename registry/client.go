@@ -5,7 +5,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
@@ -43,8 +42,6 @@ type Client interface {
 	//GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 }
-
-var zero = big.NewInt(0)
 
 type client struct {
 	ctx context.Context
@@ -214,17 +211,8 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 	return nil
 }
 
-func isZeroAddress(address common.Address) bool {
-	return 0 == common.HexToHash(address.Hex()).Big().Cmp(zero)
-}
-
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	owner, err := c.sr.OwnerOf(c.opts, sID)
-	if err != nil || isZeroAddress(owner) {
-		// owner returns an error when not existing
-		return false, nil
-	}
 	return c.sr.IsEnabled(c.opts, sID)
 }
 
