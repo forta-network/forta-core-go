@@ -5,6 +5,7 @@
 package mock_feeds
 
 import (
+	big "math/big"
 	reflect "reflect"
 
 	types "github.com/ethereum/go-ethereum/core/types"
@@ -188,4 +189,19 @@ func (m *MockLogFeed) ForEachLog(handler func(*domain.Block, types.Log) error, f
 func (mr *MockLogFeedMockRecorder) ForEachLog(handler, finishBlockHandler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachLog", reflect.TypeOf((*MockLogFeed)(nil).ForEachLog), handler, finishBlockHandler)
+}
+
+// GetLogs mocks base method.
+func (m *MockLogFeed) GetLogs(startBlock, endBlock *big.Int) ([]types.Log, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLogs", startBlock, endBlock)
+	ret0, _ := ret[0].([]types.Log)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLogs indicates an expected call of GetLogs.
+func (mr *MockLogFeedMockRecorder) GetLogs(startBlock, endBlock interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogs", reflect.TypeOf((*MockLogFeed)(nil).GetLogs), startBlock, endBlock)
 }

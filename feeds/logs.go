@@ -28,6 +28,32 @@ type logFeed struct {
 	offset     int
 }
 
+func (l *logFeed) GetLogs(startBlock *big.Int, endBlock *big.Int) ([]types.Log, error) {
+	addrs := make([]common.Address, 0, len(l.addresses))
+	for _, addr := range l.addresses {
+		addrs = append(addrs, common.HexToAddress(addr))
+	}
+
+	var topics [][]common.Hash
+	for _, topicSet := range l.topics {
+		var topicPosition []common.Hash
+		for _, topic := range topicSet {
+			topicHash := common.HexToHash(topic)
+			topicPosition = append(topicPosition, topicHash)
+		}
+		topics = append(topics, topicPosition)
+	}
+
+	q := ethereum.FilterQuery{
+		FromBlock: startBlock,
+		ToBlock:   endBlock,
+		Addresses: addrs,
+		Topics:    topics,
+	}
+
+	return l.client.GetLogs(l.ctx, q)
+}
+
 func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error {
 	eg, ctx := errgroup.WithContext(l.ctx)
 
