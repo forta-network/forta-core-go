@@ -34,8 +34,7 @@ func (a *abiItem) Signature() string {
 }
 
 func fatal(msg string) {
-	log.Error(msg)
-	os.Exit(1)
+	log.Fatal(msg)
 }
 
 type TopicDefinition struct {
