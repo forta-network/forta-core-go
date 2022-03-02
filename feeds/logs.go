@@ -2,6 +2,7 @@ package feeds
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/forta-protocol/forta-core-go/domain"
@@ -74,9 +75,11 @@ func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log)
 				}
 			}
 
+			blockToRetrieve := big.NewInt(currentBlock.Int64() - int64(l.offset))
+
 			// if offset is set, get previous block instead
 			if l.offset > 0 {
-				pastBlock, err := l.client.BlockByNumber(l.ctx, big.NewInt(currentBlock.Int64()-int64(l.offset)))
+				pastBlock, err := l.client.BlockByNumber(l.ctx, blockToRetrieve)
 				if err != nil {
 					log.WithError(err).Error("error while getting past block")
 					return err
@@ -85,8 +88,8 @@ func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log)
 			}
 
 			q := ethereum.FilterQuery{
-				FromBlock: currentBlock,
-				ToBlock:   currentBlock,
+				FromBlock: blockToRetrieve,
+				ToBlock:   blockToRetrieve,
 				Addresses: addrs,
 				Topics:    topics,
 			}
@@ -94,6 +97,7 @@ func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log)
 			if err != nil {
 				return err
 			}
+
 			for _, lg := range logs {
 				if err := handler(blk, lg); err != nil {
 					log.Error("handler returned error, exiting log subscription:", err)
@@ -123,6 +127,9 @@ type LogFeedConfig struct {
 }
 
 func NewLogFeed(ctx context.Context, client eth.Client, cfg LogFeedConfig) (*logFeed, error) {
+	if cfg.Offset < 0 {
+		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
+	}
 	return &logFeed{
 		ctx:        ctx,
 		client:     client,
