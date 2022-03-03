@@ -2,6 +2,7 @@ package registry
 
 import (
 	"context"
+	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -20,6 +21,7 @@ import (
 type Client interface {
 	//PegLatestBlock will set the opts so that every call uses same block
 	PegLatestBlock() error
+	PegBlock(blockNum *big.Int)
 
 	//ResetOpts unsets the options for the store
 	ResetOpts()
@@ -55,6 +57,7 @@ type client struct {
 	sr *contract_scanner_registry.ScannerRegistryCaller
 	dp *contract_dispatch.DispatchCaller
 	sv *contract_scanner_node_version.ScannerNodeVersionCaller
+	fs *contract_forta_staking.FortaStakingCaller
 }
 
 type ClientConfig struct {
@@ -72,6 +75,16 @@ var defaultConfig = ClientConfig{
 	JsonRpcUrl: "https://polygon-rpc.com",
 	ENSAddress: "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7",
 	Name:       "registry-client",
+}
+
+var devConfig = ClientConfig{
+	JsonRpcUrl: "https://rpc-mumbai.matic.today",
+	ENSAddress: "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9",
+	Name:       "registry-client",
+}
+
+func NewDevClient(ctx context.Context) (*client, error) {
+	return NewClient(ctx, devConfig)
 }
 
 func NewDefaultClient(ctx context.Context) (*client, error) {
@@ -117,6 +130,11 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		return nil, err
 	}
 
+	fs, err := contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &client{
 		ctx: ctx,
 		eth: eth,
@@ -125,6 +143,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		ar: ar,
 		dp: dp,
 		sv: sv,
+		fs: fs,
 	}, err
 }
 
@@ -146,6 +165,12 @@ func (c *client) latestOpts() (*bind.CallOpts, error) {
 	return &bind.CallOpts{
 		BlockNumber: num,
 	}, nil
+}
+
+func (c *client) PegBlock(blockNum *big.Int) {
+	c.opts = &bind.CallOpts{
+		BlockNumber: blockNum,
+	}
 }
 
 //PegLatestBlock will set the opts so that every call uses same block
@@ -214,6 +239,11 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
 	return c.sr.IsEnabled(c.opts, sID)
+}
+
+func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {
+	sID := utils.ScannerIDHexToBigInt(scannerID)
+	return c.fs.ActiveStakeFor(c.opts, 0, sID)
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {

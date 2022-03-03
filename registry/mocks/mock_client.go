@@ -5,6 +5,7 @@
 package mock_registry
 
 import (
+	big "math/big"
 	reflect "reflect"
 
 	registry "github.com/forta-protocol/forta-core-go/registry"
@@ -121,6 +122,18 @@ func (m *MockClient) IsEnabledScanner(scannerID string) (bool, error) {
 func (mr *MockClientMockRecorder) IsEnabledScanner(scannerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEnabledScanner", reflect.TypeOf((*MockClient)(nil).IsEnabledScanner), scannerID)
+}
+
+// PegBlock mocks base method.
+func (m *MockClient) PegBlock(blockNum *big.Int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "PegBlock", blockNum)
+}
+
+// PegBlock indicates an expected call of PegBlock.
+func (mr *MockClientMockRecorder) PegBlock(blockNum interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PegBlock", reflect.TypeOf((*MockClient)(nil).PegBlock), blockNum)
 }
 
 // PegLatestBlock mocks base method.
