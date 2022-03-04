@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/forta-protocol/forta-core-go/domain/registry"
 	"github.com/wealdtech/go-ens/v3"
 )
 
@@ -18,18 +19,10 @@ const (
 	StakingContract            = "staking.forta.eth"
 )
 
-type RegistryContracts struct {
-	Dispatch           common.Address
-	AgentRegistry      common.Address
-	ScannerRegistry    common.Address
-	ScannerNodeVersion common.Address
-	FortaStaking       common.Address
-}
-
 // ENS resolves inputs.
 type ENS interface {
 	Resolve(input string) (common.Address, error)
-	ResolveRegistryContracts() (*RegistryContracts, error)
+	ResolveRegistryContracts() (*registry.RegistryContracts, error)
 }
 
 // ENSStore wraps the ENS client which interacts with namespace contract(s).
@@ -81,7 +74,7 @@ func (ensstore *ENSStore) Resolve(input string) (common.Address, error) {
 	return address, nil
 }
 
-func (ensstore *ENSStore) ResolveRegistryContracts() (*RegistryContracts, error) {
+func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContracts, error) {
 	agentReg, err := ensstore.Resolve(AgentRegistryContract)
 	if err != nil {
 		return nil, err
@@ -107,7 +100,7 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*RegistryContracts, error)
 		return nil, err
 	}
 
-	return &RegistryContracts{
+	return &registry.RegistryContracts{
 		AgentRegistry:      agentReg,
 		ScannerRegistry:    scannerReg,
 		Dispatch:           dispatch,

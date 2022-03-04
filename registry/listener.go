@@ -14,7 +14,6 @@ import (
 	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-protocol/forta-core-go/domain"
 	"github.com/forta-protocol/forta-core-go/domain/registry"
-	"github.com/forta-protocol/forta-core-go/ens"
 	"github.com/forta-protocol/forta-core-go/ethereum"
 	"github.com/forta-protocol/forta-core-go/feeds"
 )
@@ -23,6 +22,7 @@ type listener struct {
 	ctx  context.Context
 	cfg  ListenerConfig
 	logs feeds.LogFeed
+	c    Client
 
 	scannerAddr      string
 	agentAddr        string
@@ -75,7 +75,12 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, logger *log.Entry) e
 			return err
 		}
 		if l.cfg.Handlers.SaveScannerHandler != nil {
-			return l.cfg.Handlers.SaveScannerHandler(logger, registry.NewScannerSaveMessage(su))
+			scannerID := utils.ScannerIDBigIntToHex(su.ScannerId)
+			enabled, err := l.c.IsEnabledScanner(scannerID)
+			if err != nil {
+				return err
+			}
+			return l.cfg.Handlers.SaveScannerHandler(logger, registry.NewScannerSaveMessage(su, enabled))
 		}
 	} else if isEvent(le, contract_scanner_registry.ScannerEnabledTopic) {
 		se, err := l.scannerFilterer.ParseScannerEnabled(le)
@@ -240,12 +245,17 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 	if err != nil {
 		return nil, err
 	}
-	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcURL, cfg.ENSAddress)
+
+	c, err := NewClient(ctx, ClientConfig{
+		JsonRpcUrl: cfg.JsonRpcURL,
+		ENSAddress: cfg.ENSAddress,
+		Name:       "registry-listener",
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	regContracts, err := ensStore.ResolveRegistryContracts()
+	regContracts := c.contracts
 
 	sf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, nil)
 	if err != nil {
@@ -279,6 +289,7 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 
 	return &listener{
 		ctx:                  ctx,
+		c:                    c,
 		cfg:                  cfg,
 		logs:                 logFeed,
 		scannerAddr:          regContracts.ScannerRegistry.Hex(),

@@ -3,6 +3,7 @@ package registry
 import (
 	"context"
 	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-protocol/forta-core-go/domain/registry"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -43,6 +44,9 @@ type Client interface {
 
 	//GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
+
+	//RegistryContracts returns the ens-resolved registry contracts
+	RegistryContracts() *registry.RegistryContracts
 }
 
 type client struct {
@@ -53,11 +57,12 @@ type client struct {
 	// call PegLatestBlock to peg the context to the latest block
 	opts *bind.CallOpts
 
-	ar *contract_agent_registry.AgentRegistryCaller
-	sr *contract_scanner_registry.ScannerRegistryCaller
-	dp *contract_dispatch.DispatchCaller
-	sv *contract_scanner_node_version.ScannerNodeVersionCaller
-	fs *contract_forta_staking.FortaStakingCaller
+	contracts *registry.RegistryContracts
+	ar        *contract_agent_registry.AgentRegistryCaller
+	sr        *contract_scanner_registry.ScannerRegistryCaller
+	dp        *contract_dispatch.DispatchCaller
+	sv        *contract_scanner_node_version.ScannerNodeVersionCaller
+	fs        *contract_forta_staking.FortaStakingCaller
 }
 
 type ClientConfig struct {
@@ -137,14 +142,20 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 
 	return &client{
 		ctx: ctx,
+		cfg: cfg,
 		eth: eth,
 
-		sr: sr,
-		ar: ar,
-		dp: dp,
-		sv: sv,
-		fs: fs,
+		contracts: regContracts,
+		sr:        sr,
+		ar:        ar,
+		dp:        dp,
+		sv:        sv,
+		fs:        fs,
 	}, err
+}
+
+func (c *client) RegistryContracts() *registry.RegistryContracts {
+	return c.contracts
 }
 
 //ResetOpts unsets the options for the store
