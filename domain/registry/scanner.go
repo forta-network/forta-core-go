@@ -21,6 +21,7 @@ type ScannerMessage struct {
 type ScannerSaveMessage struct {
 	ScannerMessage
 	ChainID int64 `json:"chainId"`
+	Enabled bool  `json:"enabled"`
 }
 
 func ParseScannerSave(msg string) (*ScannerSaveMessage, error) {
@@ -59,7 +60,7 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 	}
 }
 
-func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScannerUpdated) *ScannerSaveMessage {
+func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScannerUpdated, enabled bool) *ScannerSaveMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{
@@ -69,6 +70,7 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 				Action:    SaveScanner,
 			},
 		},
+		Enabled: enabled,
 		ChainID: evt.ChainId.Int64(),
 	}
 }
