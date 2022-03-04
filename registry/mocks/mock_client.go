@@ -8,7 +8,8 @@ import (
 	big "math/big"
 	reflect "reflect"
 
-	registry "github.com/forta-protocol/forta-core-go/registry"
+	registry "github.com/forta-protocol/forta-core-go/domain/registry"
+	registry0 "github.com/forta-protocol/forta-core-go/registry"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -36,7 +37,7 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // ForEachAssignedAgent mocks base method.
-func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry.Agent) error) error {
+func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry0.Agent) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachAssignedAgent", scannerID, handler)
 	ret0, _ := ret[0].(error)
@@ -50,10 +51,10 @@ func (mr *MockClientMockRecorder) ForEachAssignedAgent(scannerID, handler interf
 }
 
 // GetAgent mocks base method.
-func (m *MockClient) GetAgent(agentID string) (*registry.Agent, error) {
+func (m *MockClient) GetAgent(agentID string) (*registry0.Agent, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAgent", agentID)
-	ret0, _ := ret[0].(*registry.Agent)
+	ret0, _ := ret[0].(*registry0.Agent)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +66,10 @@ func (mr *MockClientMockRecorder) GetAgent(agentID interface{}) *gomock.Call {
 }
 
 // GetAssignmentHash mocks base method.
-func (m *MockClient) GetAssignmentHash(scannerID string) (*registry.AssignmentHash, error) {
+func (m *MockClient) GetAssignmentHash(scannerID string) (*registry0.AssignmentHash, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAssignmentHash", scannerID)
-	ret0, _ := ret[0].(*registry.AssignmentHash)
+	ret0, _ := ret[0].(*registry0.AssignmentHash)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +81,10 @@ func (mr *MockClientMockRecorder) GetAssignmentHash(scannerID interface{}) *gomo
 }
 
 // GetScanner mocks base method.
-func (m *MockClient) GetScanner(scannerID string) (*registry.Scanner, error) {
+func (m *MockClient) GetScanner(scannerID string) (*registry0.Scanner, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetScanner", scannerID)
-	ret0, _ := ret[0].(*registry.Scanner)
+	ret0, _ := ret[0].(*registry0.Scanner)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -148,6 +149,20 @@ func (m *MockClient) PegLatestBlock() error {
 func (mr *MockClientMockRecorder) PegLatestBlock() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PegLatestBlock", reflect.TypeOf((*MockClient)(nil).PegLatestBlock))
+}
+
+// RegistryContracts mocks base method.
+func (m *MockClient) RegistryContracts() *registry.RegistryContracts {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegistryContracts")
+	ret0, _ := ret[0].(*registry.RegistryContracts)
+	return ret0
+}
+
+// RegistryContracts indicates an expected call of RegistryContracts.
+func (mr *MockClientMockRecorder) RegistryContracts() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegistryContracts", reflect.TypeOf((*MockClient)(nil).RegistryContracts))
 }
 
 // ResetOpts mocks base method.
