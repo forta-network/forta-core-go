@@ -15,9 +15,26 @@ runs:
       key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
       restore-keys: |
         ${{ runner.os }}-go-
+  - name: Vet
+    shell: bash
+    run: |
+      go vet $(go list -f '{{ .Dir }}' ./...)
+  - name: Lint
+    uses: golangci/golangci-lint-action@v2
   - name: Build
     shell: bash
     run: go build -v ./...
-  - name: Test
+  - name: Test and generate coverage
     shell: bash
-    run: make test
+    run: |
+      set pipefail
+
+      touch ./coverage.tmp
+      echo 'mode: atomic' > coverage.txt
+      go list ./... \
+        | xargs -n1 -I{} sh -c \
+          "go test -race -covermode=atomic -coverprofile=coverage.tmp -coverpkg \
+            $(go list ./... | tr "\n" ",") \
+            {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255" > /dev/null 2>&1 \
+        && rm coverage.tmp \
+        && go tool cover -func=coverage.txt > coverage.out
