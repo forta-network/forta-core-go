@@ -121,12 +121,15 @@ func TestBlockFeed_ForEachBlock(t *testing.T) {
 	block3 := blockWithParent(block2.Hash, 3)
 
 	//TODO: actually test that the trace part matters (this returns nil for now)
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(1), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(2), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(3), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
 
@@ -156,12 +159,15 @@ func TestBlockFeed_ForEachBlockWithOldBlock(t *testing.T) {
 	block3 := blockWithParent(block2.Hash, 3)
 
 	//TODO: actually test that the trace part matters (this returns nil for now)
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(1), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(2), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(3), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
 
@@ -189,6 +195,7 @@ func TestBlockFeed_ForEachBlock_Cancelled(t *testing.T) {
 	hash1 := "0x4fc0862e76691f5312964883954d5c2db35e2b8f7a4f191775a4f50c69804a8d"
 	block1 := blockWithParent(hash1, 1)
 
+	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(1), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
