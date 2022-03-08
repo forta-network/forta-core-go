@@ -23,7 +23,8 @@ runs:
     uses: golangci/golangci-lint-action@v2
     with:
       skip-go-installation: true
-      skip-cache: true
+      skip-pkg-cache: true
+      skip-build-cache: true
   - name: Build
     shell: bash
     run: go build -v ./...
