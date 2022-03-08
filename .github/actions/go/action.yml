@@ -7,27 +7,22 @@ runs:
     uses: actions/setup-go@v2
     with:
       go-version: 1.16
-  # - uses: actions/cache@v2
-  #   with:
-  #     path: |
-  #       ~/go/pkg/mod
-  #       ~/.cache/go-build
-  #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-  #     restore-keys: |
-  #       ${{ runner.os }}-go-
+  - uses: actions/cache@v2
+    with:
+      path: |
+        ~/go/pkg/mod
+        ~/.cache/go-build
+      key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      restore-keys: |
+        ${{ runner.os }}-go-
   - name: Vet
     shell: bash
     run: |
       go vet $(go list -f '{{ .Dir }}' ./...)
-  - name: Configure linters
-    shell: bash
-    run: |
-      echo 'checks = [
-      "all", "-ST1000", "-ST1003", "-ST1016", # defaults
-      "-SA1019"
-      ]' > staticcheck.conf
   - name: Lint
     uses: golangci/golangci-lint-action@v2
+    with:
+      skip-cache: true
   - name: Build
     shell: bash
     run: go build -v ./...
