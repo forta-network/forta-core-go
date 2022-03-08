@@ -34,14 +34,6 @@ func singleReport(name string, status Status, details string) Reports {
 	}
 }
 
-// shortens to 64 bytes
-func shortenResponse(b []byte) []byte {
-	if len(b) > 61 {
-		return append(b[:61], '.', '.', '.')
-	}
-	return b
-}
-
 type errorResponse struct {
 	Error string `json:"error"`
 }

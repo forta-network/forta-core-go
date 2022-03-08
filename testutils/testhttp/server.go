@@ -61,12 +61,14 @@ func (s *server) ServerURL() string {
 
 func (s *server) Start(ctx context.Context) error {
 	go func() {
-		apiutils.ListenAndServe(ctx, &http.Server{
+		if err := apiutils.ListenAndServe(ctx, &http.Server{
 			Handler:      s.createRoutes(),
 			Addr:         s.ServerHost(),
 			WriteTimeout: 15 * time.Second,
 			ReadTimeout:  15 * time.Second,
-		}, "started alerts api")
+		}, "started alerts api"); err != nil {
+			log.WithError(err).Warn("alerts api stopped")
+		}
 	}()
 	return s.WaitForStart(ctx)
 }

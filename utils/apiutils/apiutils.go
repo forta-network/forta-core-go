@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/sync/errgroup"
 )
 
 type SuccessResponse struct {
@@ -79,18 +78,10 @@ func ReadBody(dst interface{}, w http.ResponseWriter, r *http.Request) bool {
 
 // ListenAndServe lets the server be closed whenever the context is closed.
 func ListenAndServe(ctx context.Context, server *http.Server, startMsg string) error {
-	grp, ctx := errgroup.WithContext(ctx)
-	grp.Go(func() error {
-		for {
-			select {
-			case <-ctx.Done():
-				_ = server.Close()
-				break
-			}
-		}
-	})
-	go func() { _ = grp.Wait() }()
-
+	go func() {
+		<-ctx.Done()
+		server.Close()
+	}()
 	log.Info(startMsg)
 	return server.ListenAndServe()
 }

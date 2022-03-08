@@ -3,9 +3,10 @@ package ethereum
 import (
 	"context"
 	"errors"
-	"github.com/goccy/go-json"
 	"testing"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,6 @@ import (
 )
 
 const testBlockHash = "0x4fc0862e76691f5312964883954d5c2db35e2b8f7a4f191775a4f50c69804a8d"
-const testTxHash = "0x9b9cc76d6b3b51976b1396a5b417b3bf3f4b39b8fe080e4a5aef39d02be882df"
 
 var testErr = errors.New("test err")
 

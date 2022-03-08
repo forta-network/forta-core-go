@@ -2,9 +2,10 @@ package registry
 
 import (
 	"context"
+	"math/big"
+
 	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-protocol/forta-core-go/domain/registry"
-	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -108,6 +109,9 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}
 
 	regContracts, err := ensStore.ResolveRegistryContracts()
+	if err != nil {
+		return nil, err
+	}
 
 	rpc, err := ethereum.NewRpcClient(cfg.JsonRpcUrl)
 	if err != nil {
