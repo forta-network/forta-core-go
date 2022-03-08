@@ -199,7 +199,7 @@ func (bf *blockFeed) forEachBlock() error {
 			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
 		}
 
-		blockToRetrieve.Add(blockToRetrieve, increment)
+		blockNum.Add(blockNum, increment)
 	}
 }
 
