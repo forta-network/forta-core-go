@@ -143,18 +143,34 @@ func (bf *blockFeed) forEachBlock() error {
 		if bf.ctx.Err() != nil {
 			return bf.ctx.Err()
 		}
-		blockToRetrieve := big.NewInt(blockNum.Int64() - int64(bf.offset))
-
-		if bf.end != nil && blockToRetrieve.Uint64() > bf.end.Uint64() {
-			return ErrEndBlockReached
-		}
 		if bf.rateLimit != nil {
 			<-bf.rateLimit.C
 		}
 
+		latestBlockNum, err := bf.client.BlockNumber(bf.ctx)
+		if err != nil {
+			log.WithError(err).Error("failed to get the latest block num")
+			continue
+		}
+		blockToRetrieve := big.NewInt(blockNum.Int64() - int64(bf.offset))
+		maxBlockToRetrieve := big.NewInt(latestBlockNum.Int64() - int64(bf.offset))
+
+		if blockToRetrieve.Cmp(maxBlockToRetrieve) > 0 { // should always be smaller or equal
+			log.WithFields(log.Fields{
+				"latestBlockNum":     latestBlockNum.String(),
+				"blockToRetrieve":    blockToRetrieve.String(),
+				"maxBlockToRetrieve": maxBlockToRetrieve.String(),
+			}).Info("waiting for new block - skipping")
+			time.Sleep(time.Second * 2) // sleep a while
+			continue
+		}
+
+		if bf.end != nil && blockToRetrieve.Uint64() > bf.end.Uint64() {
+			return ErrEndBlockReached
+		}
+
 		bf.lastBlock.Set(blockToRetrieve.String())
 
-		var err error
 		var traces []domain.Trace
 		if bf.tracing {
 			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockToRetrieve)
