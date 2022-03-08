@@ -36,7 +36,9 @@ func ReleaseInfoFromString(s string) *ReleaseInfo {
 		return nil
 	}
 	var releaseInfo ReleaseInfo
-	json.Unmarshal([]byte(s), &releaseInfo)
+	if err := json.Unmarshal([]byte(s), &releaseInfo); err != nil {
+		return &releaseInfo
+	}
 	if len(releaseInfo.Manifest.Release.Commit) > 0 {
 		LogReleaseInfo(&releaseInfo)
 	}

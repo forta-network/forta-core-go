@@ -25,7 +25,7 @@ var ErrMissingSignature = errors.New("missing signature")
 var ErrInvalidSignature = errors.New("invalid signature")
 
 func ReadPassphrase() (string, error) {
-	f, err := os.OpenFile("/passphrase", os.O_RDONLY, 400)
+	f, err := os.OpenFile("/passphrase", os.O_RDONLY, 0400)
 	if err != nil {
 		return "", err
 	}

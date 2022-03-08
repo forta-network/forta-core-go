@@ -61,7 +61,7 @@ func (s *server) ServerURL() string {
 
 func (s *server) Start(ctx context.Context) error {
 	go func() {
-		apiutils.ListenAndServe(ctx, &http.Server{
+		_ = apiutils.ListenAndServe(ctx, &http.Server{
 			Handler:      s.createRoutes(),
 			Addr:         s.ServerHost(),
 			WriteTimeout: 15 * time.Second,

@@ -12,12 +12,37 @@ runs:
       path: |
         ~/go/pkg/mod
         ~/.cache/go-build
-      key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      key: ${{ runner.os }}-go-validate-${{ hashFiles('**/go.sum') }}
       restore-keys: |
-        ${{ runner.os }}-go-
+        ${{ runner.os }}-go-validate
+  - name: Vet
+    shell: bash
+    run: |
+      go vet $(go list -f '{{ .Dir }}' ./...)
+  - name: Lint
+    uses: golangci/golangci-lint-action@v2
+    with:
+      skip-go-installation: true
+      skip-pkg-cache: true
+      skip-build-cache: true
   - name: Build
     shell: bash
     run: go build -v ./...
   - name: Test
     shell: bash
-    run: make test
+    run: |
+      make test
+  - name: Generate coverage
+    shell: bash
+    run: |
+      set pipefail
+
+      touch ./coverage.tmp
+      echo 'mode: atomic' > coverage.txt
+      go list ./... \
+        | xargs -n1 -I{} sh -c \
+          "go test -race -covermode=atomic -coverprofile=coverage.tmp -coverpkg \
+            $(go list ./... | tr "\n" ",") \
+            {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255" > /dev/null 2>&1 \
+        && rm coverage.tmp \
+        && go tool cover -func=coverage.txt > coverage.out

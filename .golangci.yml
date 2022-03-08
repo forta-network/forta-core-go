@@ -1,0 +1,13 @@
+linters-settings:
+  gosimple:
+    go: "1.16"
+
+  staticcheck:
+    go: "1.16"
+    checks: [ "all", "-SA1019" ]
+
+  stylecheck:
+    go: "1.16"
+
+  unused:
+    go: "1.16"
