@@ -216,23 +216,23 @@ func TestBlockFeed_ForEachBlock_WithOffset(t *testing.T) {
 	block3 := blockWithParent(block2.Hash, 3)
 	block4 := blockWithParent(block3.Hash, 4)
 
-	// get block 1
+	// check block 2, use block 1
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
-	// get block 2
+	// check block 3, use block 2
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
-	// get block 3 and error: skip
+	// check block 4, receive error, skip
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(4)).Return(nil, errors.New("block error")).Times(1)
 
-	// get block 3 and error again: skip
+	// check block 4, receive error, skip
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(4)).Return(nil, errors.New("block error")).Times(1)
 
-	// get block 3
+	// check block 4, use block 3
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(4)).Return(block4, nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
