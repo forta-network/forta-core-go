@@ -25,6 +25,7 @@ type bfHandler struct {
 type blockFeed struct {
 	start       *big.Int
 	end         *big.Int
+	offset      int
 	ctx         context.Context
 	client      ethereum.Client
 	traceClient ethereum.Client
@@ -42,6 +43,7 @@ type blockFeed struct {
 type BlockFeedConfig struct {
 	Start               *big.Int
 	End                 *big.Int
+	Offset              int
 	ChainID             *big.Int
 	RateLimit           *time.Ticker
 	Tracing             bool
@@ -135,34 +137,42 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 
 func (bf *blockFeed) forEachBlock() error {
 	increment := big.NewInt(1)
-	blockNum := big.NewInt(bf.start.Int64())
+	currentBlockNum := big.NewInt(bf.start.Int64())
 
 	for {
 		if bf.ctx.Err() != nil {
 			return bf.ctx.Err()
 		}
-		if bf.end != nil && blockNum.Uint64() > bf.end.Uint64() {
-			return ErrEndBlockReached
-		}
 		if bf.rateLimit != nil {
 			<-bf.rateLimit.C
 		}
 
-		bf.lastBlock.Set(blockNum.String())
-
-		var err error
-		var traces []domain.Trace
-		if bf.tracing {
-			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNum)
-			if err != nil {
-				log.WithError(err).Error("error tracing block")
-			}
-		}
-
-		block, err := bf.client.BlockByNumber(bf.ctx, blockNum)
+		block, err := bf.client.BlockByNumber(bf.ctx, currentBlockNum)
 		if err != nil {
 			log.WithError(err).Error("error getting block")
 			continue
+		}
+
+		processedBlockNum := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
+		if bf.end != nil && processedBlockNum.Uint64() > bf.end.Uint64() {
+			return ErrEndBlockReached
+		}
+		if processedBlockNum.Cmp(currentBlockNum) != 0 {
+			block, err = bf.client.BlockByNumber(bf.ctx, processedBlockNum)
+			if err != nil {
+				log.WithError(err).Error("error getting block")
+				continue
+			}
+		}
+
+		bf.lastBlock.Set(processedBlockNum.String())
+
+		var traces []domain.Trace
+		if bf.tracing {
+			traces, err = bf.traceClient.TraceBlock(bf.ctx, processedBlockNum)
+			if err != nil {
+				log.WithError(err).Error("error tracing block")
+			}
 		}
 
 		if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
@@ -178,7 +188,7 @@ func (bf *blockFeed) forEachBlock() error {
 			continue
 		}
 		logger := log.WithFields(log.Fields{
-			"blockNum": blockNum.Uint64(),
+			"blockNum": processedBlockNum.Uint64(),
 			"blockHex": block.Number,
 		})
 		// if not too old
@@ -195,7 +205,7 @@ func (bf *blockFeed) forEachBlock() error {
 			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
 		}
 
-		blockNum.Add(blockNum, increment)
+		currentBlockNum.Add(currentBlockNum, increment)
 	}
 }
 
@@ -226,9 +236,13 @@ func (bf *blockFeed) Health() health.Reports {
 }
 
 func NewBlockFeed(ctx context.Context, client ethereum.Client, traceClient ethereum.Client, cfg BlockFeedConfig) (*blockFeed, error) {
+	if cfg.Offset < 0 {
+		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
+	}
 	bf := &blockFeed{
 		start:       cfg.Start,
 		end:         cfg.End,
+		offset:      cfg.Offset,
 		ctx:         ctx,
 		client:      client,
 		traceClient: traceClient,
