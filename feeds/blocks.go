@@ -147,42 +147,32 @@ func (bf *blockFeed) forEachBlock() error {
 			<-bf.rateLimit.C
 		}
 
-		latestBlockNum, err := bf.client.BlockNumber(bf.ctx)
-		if err != nil {
-			log.WithError(err).Error("failed to get the latest block num")
-			continue
-		}
-		blockDistance := new(big.Int).Sub(latestBlockNum, currentBlockNum)
-		offset := big.NewInt(int64(bf.offset))
-
-		// distance is smaller than offset => keep current block num, wait for new latest block
-		if blockDistance.Cmp(offset) < 0 {
-			log.WithFields(log.Fields{
-				"currentBlockNum": currentBlockNum.String(),
-				"latestBlockNum":  latestBlockNum.String(),
-			}).Info("waiting for new block - skipping")
-			time.Sleep(time.Second * 2) // sleep a while
-			continue
-		}
-
-		if bf.end != nil && currentBlockNum.Uint64() > bf.end.Uint64() {
-			return ErrEndBlockReached
-		}
-
-		bf.lastBlock.Set(currentBlockNum.String())
-
-		var traces []domain.Trace
-		if bf.tracing {
-			traces, err = bf.traceClient.TraceBlock(bf.ctx, currentBlockNum)
-			if err != nil {
-				log.WithError(err).Error("error tracing block")
-			}
-		}
-
 		block, err := bf.client.BlockByNumber(bf.ctx, currentBlockNum)
 		if err != nil {
 			log.WithError(err).Error("error getting block")
 			continue
+		}
+
+		processedBlockNum := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
+		if bf.end != nil && processedBlockNum.Uint64() > bf.end.Uint64() {
+			return ErrEndBlockReached
+		}
+		if processedBlockNum.Cmp(currentBlockNum) != 0 {
+			block, err = bf.client.BlockByNumber(bf.ctx, processedBlockNum)
+			if err != nil {
+				log.WithError(err).Error("error getting block")
+				continue
+			}
+		}
+
+		bf.lastBlock.Set(processedBlockNum.String())
+
+		var traces []domain.Trace
+		if bf.tracing {
+			traces, err = bf.traceClient.TraceBlock(bf.ctx, processedBlockNum)
+			if err != nil {
+				log.WithError(err).Error("error tracing block")
+			}
 		}
 
 		if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
@@ -198,7 +188,7 @@ func (bf *blockFeed) forEachBlock() error {
 			continue
 		}
 		logger := log.WithFields(log.Fields{
-			"blockNum": currentBlockNum.Uint64(),
+			"blockNum": processedBlockNum.Uint64(),
 			"blockHex": block.Number,
 		})
 		// if not too old
