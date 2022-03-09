@@ -137,7 +137,7 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 
 func (bf *blockFeed) forEachBlock() error {
 	increment := big.NewInt(1)
-	blockNum := big.NewInt(bf.start.Int64())
+	currentBlockNum := big.NewInt(bf.start.Int64())
 
 	for {
 		if bf.ctx.Err() != nil {
@@ -152,34 +152,34 @@ func (bf *blockFeed) forEachBlock() error {
 			log.WithError(err).Error("failed to get the latest block num")
 			continue
 		}
-		blockToRetrieve := big.NewInt(blockNum.Int64() - int64(bf.offset))
-		maxBlockToRetrieve := big.NewInt(latestBlockNum.Int64() - int64(bf.offset))
+		blockDistance := new(big.Int).Sub(latestBlockNum, currentBlockNum)
+		offset := big.NewInt(int64(bf.offset))
 
-		if blockToRetrieve.Cmp(maxBlockToRetrieve) > 0 { // should always be smaller or equal
+		// distance is smaller than offset => keep current block num, wait for new latest block
+		if blockDistance.Cmp(offset) < 0 {
 			log.WithFields(log.Fields{
-				"latestBlockNum":     latestBlockNum.String(),
-				"blockToRetrieve":    blockToRetrieve.String(),
-				"maxBlockToRetrieve": maxBlockToRetrieve.String(),
+				"currentBlockNum": currentBlockNum.String(),
+				"latestBlockNum":  latestBlockNum.String(),
 			}).Info("waiting for new block - skipping")
 			time.Sleep(time.Second * 2) // sleep a while
 			continue
 		}
 
-		if bf.end != nil && blockToRetrieve.Uint64() > bf.end.Uint64() {
+		if bf.end != nil && currentBlockNum.Uint64() > bf.end.Uint64() {
 			return ErrEndBlockReached
 		}
 
-		bf.lastBlock.Set(blockToRetrieve.String())
+		bf.lastBlock.Set(currentBlockNum.String())
 
 		var traces []domain.Trace
 		if bf.tracing {
-			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockToRetrieve)
+			traces, err = bf.traceClient.TraceBlock(bf.ctx, currentBlockNum)
 			if err != nil {
 				log.WithError(err).Error("error tracing block")
 			}
 		}
 
-		block, err := bf.client.BlockByNumber(bf.ctx, blockToRetrieve)
+		block, err := bf.client.BlockByNumber(bf.ctx, currentBlockNum)
 		if err != nil {
 			log.WithError(err).Error("error getting block")
 			continue
@@ -198,7 +198,7 @@ func (bf *blockFeed) forEachBlock() error {
 			continue
 		}
 		logger := log.WithFields(log.Fields{
-			"blockNum": blockToRetrieve.Uint64(),
+			"blockNum": currentBlockNum.Uint64(),
 			"blockHex": block.Number,
 		})
 		// if not too old
@@ -215,7 +215,7 @@ func (bf *blockFeed) forEachBlock() error {
 			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
 		}
 
-		blockNum.Add(blockNum, increment)
+		currentBlockNum.Add(currentBlockNum, increment)
 	}
 }
 

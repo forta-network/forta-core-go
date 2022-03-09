@@ -215,30 +215,29 @@ func TestBlockFeed_ForEachBlock_Cancelled(t *testing.T) {
 
 func TestBlockFeed_ForEachBlock_WithOffset(t *testing.T) {
 	bf, client, traceClient, ctx, _ := getTestBlockFeed(t)
-	bf.offset = 1            // use a simple offset of 1
-	bf.start = big.NewInt(2) // make it 2 so we don't request block 0
+	bf.offset = 1 // use a simple offset of 1
 
 	block1 := blockWithParent(startHash, 1)
 	block2 := blockWithParent(block1.Hash, 2)
 	block3 := blockWithParent(block2.Hash, 3)
 
-	// current block number is 2, latest block number is 3: get block 1
+	// current block number is 1, latest block number is 3: get block 1
 	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(3), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
-	// current block number is 3, latest block number is 3: get block 2
+	// current block number is 2, latest block number is 3: get block 2
 	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(3), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
-	// current block number is 4, latest block number is 3: skip
+	// current block number is 3, latest block number is 3: skip
 	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(3), nil).Times(1)
 
-	// current block number is 4 again, latest block number is 3: skip
+	// current block number is 3 again, latest block number is 3: skip
 	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(3), nil).Times(1)
 
-	// current block number is 4, latest block number is 4: get block 3
+	// current block number is 3, latest block number is 4: get block 3
 	client.EXPECT().BlockNumber(ctx).Return(big.NewInt(4), nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
