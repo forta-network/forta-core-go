@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	eth "github.com/ethereum/go-ethereum"
-	"github.com/goccy/go-json"
 	"math/big"
 	"time"
 
+	eth "github.com/ethereum/go-ethereum"
+	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-protocol/forta-core-go/clients/health"
@@ -137,6 +137,7 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 	return errCh
 }
 
+// converts from types.Log to domain.LogEntry object
 func (bf *blockFeed) logsForBlock(blockNum *big.Int) ([]domain.LogEntry, error) {
 	logs, err := bf.client.GetLogs(bf.ctx, eth.FilterQuery{
 		FromBlock: blockNum,
@@ -178,7 +179,7 @@ func (bf *blockFeed) forEachBlock() error {
 		}
 
 		blockNumToAnalyze := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
-		logger = log.WithFields(log.Fields{
+		logger = logger.WithFields(log.Fields{
 			"blockToAnalyze": blockNumToAnalyze.Uint64(),
 		})
 
@@ -192,38 +193,33 @@ func (bf *blockFeed) forEachBlock() error {
 				continue
 			}
 		}
-
-		bf.lastBlock.Set(blockNumToAnalyze.String())
-
-		var traces []domain.Trace
-		if bf.tracing {
-			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
-			if err != nil {
-				log.WithError(err).Error("error tracing block")
-			}
-		}
-
-		if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
-			log.WithFields(log.Fields{
-				"ethereumBlockHash": block.Hash,
-				"traceBlockHash":    utils.String(traces[0].BlockHash),
-			}).Warn("mismatching block hash from ethereum and trace apis - ignoring traces")
-			traces = nil
-		}
-
-		if err != nil {
-			log.WithError(err).Errorf("error getting blocknumber: num=%s", block.Number)
-			continue
-		}
-		logger = log.WithFields(log.Fields{
+		logger = logger.WithFields(log.Fields{
+			"blockHash":         block.Hash,
 			"blockToAnalyzeHex": block.Number,
 		})
-		// if not too old
 		tooOld, age := blockIsTooOld(block, bf.maxBlockAge)
 		if !tooOld {
+			bf.lastBlock.Set(blockNumToAnalyze.String())
+
+			var traces []domain.Trace
+			if bf.tracing {
+				traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
+				if err != nil {
+					logger.WithError(err).Error("error tracing block")
+				}
+			}
+
+			if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
+				logger.WithFields(log.Fields{
+					"traceBlockHash": utils.String(traces[0].BlockHash),
+				}).Warn("trace block hash != ethereum block hash, ignoring traces")
+				traces = nil
+			}
+
+			// if not too old
 			logs, err := bf.logsForBlock(blockNumToAnalyze)
 			if err != nil {
-				logger.WithError(err).Errorf("error getting blocknumber: num=%s", block.Number)
+				logger.WithError(err).Errorf("error getting logs for block")
 				continue
 			}
 
@@ -237,7 +233,6 @@ func (bf *blockFeed) forEachBlock() error {
 		} else {
 			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
 		}
-
 		currentBlockNum.Add(currentBlockNum, increment)
 	}
 }

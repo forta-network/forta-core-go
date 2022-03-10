@@ -165,7 +165,6 @@ func TestBlockFeed_ForEachBlockWithOldBlock(t *testing.T) {
 
 	//too old to process, skipping this one
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
-	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)

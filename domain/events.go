@@ -173,9 +173,14 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 	if err := json.Unmarshal(logJson, &logs); err != nil {
 		return nil, err
 	}
+
+	var txLogs []*protocol.TransactionEvent_Log
 	for _, l := range logs {
-		l.Address = strings.ToLower(l.Address)
-		safeAddStrValueToMap(addresses, l.Address)
+		if l.TransactionHash == t.Transaction.Hash {
+			txLogs = append(txLogs, l)
+			l.Address = strings.ToLower(l.Address)
+			safeAddStrValueToMap(addresses, l.Address)
+		}
 	}
 
 	// for backwards compatibility
@@ -184,7 +189,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		Status:            "",
 		CumulativeGasUsed: "",
 		LogsBloom:         "",
-		Logs:              logs,
+		Logs:              txLogs,
 		TransactionHash:   t.Transaction.Hash,
 		ContractAddress:   "",
 		GasUsed:           "",
@@ -204,7 +209,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		Network:     nw,
 		Traces:      traces,
 		Addresses:   addresses,
-		Logs:        logs,
+		Logs:        txLogs,
 		Receipt:     &receipt,
 		Block: &protocol.TransactionEvent_EthBlock{
 			BlockHash:      t.BlockEvt.Block.Hash,
