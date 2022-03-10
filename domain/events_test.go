@@ -14,6 +14,7 @@ func intPtr(val int) *int {
 func TestTransactionEvent_ToMessage(t *testing.T) {
 	blockHash := "0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069"
 	txHash := "0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2"
+	txHash2 := "0x11ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2"
 
 	// these are checksum addresses, to confirm that logic lower-cases these
 	from := "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"
@@ -51,6 +52,12 @@ func TestTransactionEvent_ToMessage(t *testing.T) {
 					BlockHash:       &blockHash,
 					BlockNumber:     strPtr("0x2"),
 					TransactionHash: &txHash,
+				},
+				{
+					Address:         strPtr(to),
+					BlockHash:       &blockHash,
+					BlockNumber:     strPtr("0x2"),
+					TransactionHash: &txHash2, // should ignore, because doesn't match tx
 				},
 			},
 			Traces: []Trace{
