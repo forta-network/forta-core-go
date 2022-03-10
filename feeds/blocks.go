@@ -197,42 +197,46 @@ func (bf *blockFeed) forEachBlock() error {
 			"blockHash":         block.Hash,
 			"blockToAnalyzeHex": block.Number,
 		})
+
 		tooOld, age := blockIsTooOld(block, bf.maxBlockAge)
-		if !tooOld {
-			bf.lastBlock.Set(blockNumToAnalyze.String())
-
-			var traces []domain.Trace
-			if bf.tracing {
-				traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
-				if err != nil {
-					logger.WithError(err).Error("error tracing block")
-				}
-			}
-
-			if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
-				logger.WithFields(log.Fields{
-					"traceBlockHash": utils.String(traces[0].BlockHash),
-				}).Warn("trace block hash != ethereum block hash, ignoring traces")
-				traces = nil
-			}
-
-			// if not too old
-			logs, err := bf.logsForBlock(blockNumToAnalyze)
-			if err != nil {
-				logger.WithError(err).Errorf("error getting logs for block")
-				continue
-			}
-
-			evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces, Logs: logs}
-			for _, handler := range bf.handlers {
-				if err := handler.Handler(evt); err != nil {
-					return err
-				}
-			}
-			bf.cache.Add(block.Hash)
-		} else {
+		if tooOld {
 			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
+			currentBlockNum.Add(currentBlockNum, increment)
+			continue
 		}
+
+		bf.lastBlock.Set(blockNumToAnalyze.String())
+
+		var traces []domain.Trace
+		if bf.tracing {
+			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
+			if err != nil {
+				logger.WithError(err).Error("error tracing block")
+			}
+		}
+
+		if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
+			logger.WithFields(log.Fields{
+				"traceBlockHash": utils.String(traces[0].BlockHash),
+			}).Warn("trace block hash != ethereum block hash, ignoring traces")
+			traces = nil
+		}
+
+		// if not too old
+		logs, err := bf.logsForBlock(blockNumToAnalyze)
+		if err != nil {
+			logger.WithError(err).Errorf("error getting logs for block")
+			continue
+		}
+
+		evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces, Logs: logs}
+		for _, handler := range bf.handlers {
+			if err := handler.Handler(evt); err != nil {
+				return err
+			}
+		}
+		bf.cache.Add(block.Hash)
+
 		currentBlockNum.Add(currentBlockNum, increment)
 	}
 }
