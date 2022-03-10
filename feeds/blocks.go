@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	eth "github.com/ethereum/go-ethereum"
+	"github.com/goccy/go-json"
 	"math/big"
 	"time"
 
@@ -135,6 +137,25 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 	return errCh
 }
 
+func (bf *blockFeed) logsForBlock(blockNum *big.Int) ([]domain.LogEntry, error) {
+	logs, err := bf.client.GetLogs(bf.ctx, eth.FilterQuery{
+		FromBlock: blockNum,
+		ToBlock:   blockNum,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var logEntries []domain.LogEntry
+	b, err := json.Marshal(logs)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(b, &logEntries); err != nil {
+		return nil, err
+	}
+	return logEntries, nil
+}
+
 func (bf *blockFeed) forEachBlock() error {
 	increment := big.NewInt(1)
 	currentBlockNum := big.NewInt(bf.start.Int64())
@@ -146,30 +167,37 @@ func (bf *blockFeed) forEachBlock() error {
 		if bf.rateLimit != nil {
 			<-bf.rateLimit.C
 		}
+		logger := log.WithFields(log.Fields{
+			"currentBlock": currentBlockNum.Uint64(),
+		})
 
 		block, err := bf.client.BlockByNumber(bf.ctx, currentBlockNum)
 		if err != nil {
-			log.WithError(err).Error("error getting block")
+			logger.WithError(err).Error("error getting block")
 			continue
 		}
 
-		processedBlockNum := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
-		if bf.end != nil && processedBlockNum.Uint64() > bf.end.Uint64() {
+		blockNumToAnalyze := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
+		logger = log.WithFields(log.Fields{
+			"blockToAnalyze": blockNumToAnalyze.Uint64(),
+		})
+
+		if bf.end != nil && blockNumToAnalyze.Uint64() > bf.end.Uint64() {
 			return ErrEndBlockReached
 		}
-		if processedBlockNum.Cmp(currentBlockNum) != 0 {
-			block, err = bf.client.BlockByNumber(bf.ctx, processedBlockNum)
+		if blockNumToAnalyze.Cmp(currentBlockNum) != 0 {
+			block, err = bf.client.BlockByNumber(bf.ctx, blockNumToAnalyze)
 			if err != nil {
-				log.WithError(err).Error("error getting block")
+				logger.WithError(err).Error("error getting block")
 				continue
 			}
 		}
 
-		bf.lastBlock.Set(processedBlockNum.String())
+		bf.lastBlock.Set(blockNumToAnalyze.String())
 
 		var traces []domain.Trace
 		if bf.tracing {
-			traces, err = bf.traceClient.TraceBlock(bf.ctx, processedBlockNum)
+			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
 			if err != nil {
 				log.WithError(err).Error("error tracing block")
 			}
@@ -187,14 +215,19 @@ func (bf *blockFeed) forEachBlock() error {
 			log.WithError(err).Errorf("error getting blocknumber: num=%s", block.Number)
 			continue
 		}
-		logger := log.WithFields(log.Fields{
-			"blockNum": processedBlockNum.Uint64(),
-			"blockHex": block.Number,
+		logger = log.WithFields(log.Fields{
+			"blockToAnalyzeHex": block.Number,
 		})
 		// if not too old
 		tooOld, age := blockIsTooOld(block, bf.maxBlockAge)
 		if !tooOld {
-			evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces}
+			logs, err := bf.logsForBlock(blockNumToAnalyze)
+			if err != nil {
+				logger.WithError(err).Errorf("error getting blocknumber: num=%s", block.Number)
+				continue
+			}
+
+			evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces, Logs: logs}
 			for _, handler := range bf.handlers {
 				if err := handler.Handler(evt); err != nil {
 					return err

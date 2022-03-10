@@ -23,6 +23,7 @@ type BlockEvent struct {
 	EventType EventType
 	ChainID   *big.Int
 	Block     *Block
+	Logs      []LogEntry
 	Traces    []Trace
 }
 
@@ -164,27 +165,32 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		tx.From = strings.ToLower(tx.From)
 	}
 
-	// convert receipt domain model to proto
-	var receipt protocol.TransactionEvent_EthReceipt
-	if t.Receipt != nil {
-		receiptJson, err := json.Marshal(t.Receipt)
-		if err != nil {
-			return nil, err
-		}
-		err = um.Unmarshal(bytes.NewReader(receiptJson), &receipt)
+	var logs []*protocol.TransactionEvent_Log
+	logJson, err := json.Marshal(t.BlockEvt.Logs)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(logJson, &logs); err != nil {
+		return nil, err
+	}
+	for _, l := range logs {
+		l.Address = strings.ToLower(l.Address)
+		safeAddStrValueToMap(addresses, l.Address)
+	}
 
-		if err != nil {
-			log.Errorf("cannot unmarshal receiptJson: %s", err.Error())
-			log.Errorf("JSON: %s", string(receiptJson))
-			return nil, err
-		}
-
-		receipt.ContractAddress = strings.ToLower(receipt.ContractAddress)
-		safeAddStrValueToMap(addresses, receipt.ContractAddress)
-		for _, l := range receipt.Logs {
-			l.Address = strings.ToLower(l.Address)
-			safeAddStrValueToMap(addresses, l.Address)
-		}
+	// for backwards compatibility
+	receipt := protocol.TransactionEvent_EthReceipt{
+		Root:              "",
+		Status:            "",
+		CumulativeGasUsed: "",
+		LogsBloom:         "",
+		Logs:              logs,
+		TransactionHash:   t.Transaction.Hash,
+		ContractAddress:   "",
+		GasUsed:           "",
+		BlockHash:         t.BlockEvt.Block.Hash,
+		BlockNumber:       t.BlockEvt.Block.Number,
+		TransactionIndex:  t.Transaction.TransactionIndex,
 	}
 
 	nw := &protocol.TransactionEvent_Network{}
@@ -198,6 +204,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		Network:     nw,
 		Traces:      traces,
 		Addresses:   addresses,
+		Logs:        logs,
 		Receipt:     &receipt,
 		Block: &protocol.TransactionEvent_EthBlock{
 			BlockHash:      t.BlockEvt.Block.Hash,
