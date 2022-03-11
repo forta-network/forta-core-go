@@ -4,18 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	
 	"github.com/forta-protocol/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
 )
 
 type scannerSummary struct {
-	Scanner *registry.Scanner `json:"scanner"`
-	Agents  []*registry.Agent `json:"agents"`
+	Scanner  *registry.Scanner `json:"scanner"`
+	AgentIDs []string          `json:"agentIds"`
 }
 
 type agentSummary struct {
-	Agent    *registry.Agent     `json:"agent"`
-	Scanners []*registry.Scanner `json:"scanners"`
+	Agent      *registry.Agent `json:"agent"`
+	ScannerIDs []string        `json:"scannerIds"`
 }
 
 type export struct {
@@ -26,7 +27,7 @@ type export struct {
 func main() {
 	ex := &export{}
 	c, err := registry.NewClient(context.Background(), registry.ClientConfig{
-		JsonRpcUrl: "", //TODO: fill in your json rpc provider
+		JsonRpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/9kCNKDfEefzmgHm9KoSZ8SjeYcQdExbC", //TODO: fill in your json rpc provider
 		ENSAddress: "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7",
 		Name:       "export",
 	})
@@ -41,11 +42,12 @@ func main() {
 
 	err = c.ForEachScanner(func(s *registry.Scanner) error {
 		scn := &scannerSummary{
-			Scanner: s,
+			Scanner:  s,
+			AgentIDs: []string{},
 		}
 		ex.Scanners = append(ex.Scanners, scn)
 		return c.ForEachAssignedAgent(s.ScannerID, func(a *registry.Agent) error {
-			scn.Agents = append(scn.Agents, a)
+			scn.AgentIDs = append(scn.AgentIDs, a.AgentID)
 			return nil
 		})
 	})
@@ -56,11 +58,12 @@ func main() {
 
 	err = c.ForEachAgent(func(a *registry.Agent) error {
 		agt := &agentSummary{
-			Agent: a,
+			Agent:      a,
+			ScannerIDs: []string{},
 		}
 		ex.Agents = append(ex.Agents, agt)
 		return c.ForEachAssignedScanner(a.AgentID, func(s *registry.Scanner) error {
-			agt.Scanners = append(agt.Scanners, s)
+			agt.ScannerIDs = append(agt.ScannerIDs, s.ScannerID)
 			return nil
 		})
 	})
@@ -74,5 +77,6 @@ func main() {
 		log.WithError(err).Fatal("failed to marshal export json")
 		return
 	}
+
 	fmt.Println(string(b))
 }
