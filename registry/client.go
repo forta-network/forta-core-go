@@ -2,7 +2,6 @@ package registry
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
 	"math/big"
 
 	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
@@ -268,9 +267,6 @@ func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
 			if err != nil {
 				return err
 			}
-
-			log.Info(it.Event.From.Hex())
-
 			if err := handler(&Scanner{
 				ScannerID: utils.ScannerIDBigIntToHex(it.Event.TokenId),
 				ChainID:   scn.ChainId.Int64(),
