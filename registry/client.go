@@ -19,6 +19,9 @@ import (
 	"github.com/forta-protocol/forta-core-go/utils"
 )
 
+const scannerRegistryDeployBlock = 20187154
+const zeroAddress = "0x0000000000000000000000000000000000000000"
+
 //Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
 	//PegLatestBlock will set the opts so that every call uses same block
@@ -30,9 +33,6 @@ type Client interface {
 
 	//GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
 	GetAssignmentHash(scannerID string) (*AssignmentHash, error)
-
-	//ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
-	ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error
 
 	//IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
@@ -48,6 +48,21 @@ type Client interface {
 
 	//RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
+
+	//ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
+	ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error
+
+	//ForEachChainAgent loops over all agents for a chainID
+	ForEachChainAgent(chainID int64, handler func(a *Agent) error) error
+
+	//ForEachAgent loops over all agents
+	ForEachAgent(handler func(a *Agent) error) error
+
+	//ForEachScanner gets all scanners
+	ForEachScanner(handler func(s *Scanner) error) error
+
+	//ForEachAssignedScanner loops over scanners by agent
+	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
 }
 
 type client struct {
@@ -64,6 +79,7 @@ type client struct {
 	dp        *contract_dispatch.DispatchCaller
 	sv        *contract_scanner_node_version.ScannerNodeVersionCaller
 	fs        *contract_forta_staking.FortaStakingCaller
+	srf       *contract_scanner_registry.ScannerRegistryFilterer
 }
 
 type ClientConfig struct {
@@ -144,6 +160,11 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		return nil, err
 	}
 
+	srf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &client{
 		ctx: ctx,
 		cfg: cfg,
@@ -155,6 +176,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		dp:        dp,
 		sv:        sv,
 		fs:        fs,
+		srf:       srf,
 	}, err
 }
 
@@ -217,15 +239,156 @@ func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
 	}, nil
 }
 
-func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error {
-	// if opts not set, peg for this loop
-	opts := c.opts
-	if opts == nil {
-		currentOpts, err := c.latestOpts()
+func (c *client) getOps() (*bind.CallOpts, error) {
+	if c.opts != nil {
+		return c.opts, nil
+	}
+	return c.latestOpts()
+}
+
+func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	it, err := c.srf.FilterTransfer(&bind.FilterOpts{
+		Start:   scannerRegistryDeployBlock,
+		Context: c.ctx,
+	},
+		nil, nil, nil)
+
+	if err != nil {
+		return err
+	}
+
+	for it.Next() {
+		if it.Event != nil && it.Event.From.Hex() == zeroAddress {
+			scn, err := c.sr.GetScannerState(opts, it.Event.TokenId)
+			if err != nil {
+				return err
+			}
+			if err := handler(&Scanner{
+				ScannerID: utils.ScannerIDBigIntToHex(it.Event.TokenId),
+				ChainID:   scn.ChainId.Int64(),
+				Enabled:   scn.Enabled,
+				Manifest:  scn.Metadata,
+				Owner:     scn.Owner.Hex(),
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) error {
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	cID := big.NewInt(chainID)
+	length, err := c.ar.GetAgentCountByChain(opts, cID)
+	if err != nil {
+		return err
+	}
+
+	for i := int64(0); i < length.Int64(); i++ {
+		idx := big.NewInt(i)
+		agtID, err := c.ar.GetAgentByChainAndIndex(opts, cID, idx)
 		if err != nil {
 			return err
 		}
-		opts = currentOpts
+		agt, err := c.ar.GetAgentState(opts, agtID)
+		if err != nil {
+			return err
+		}
+		if err := handler(&Agent{
+			AgentID:  utils.AgentBigIntToHex(agtID),
+			ChainIDs: utils.IntArray(agt.ChainIds),
+			Enabled:  agt.Enabled,
+			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
+		}); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *client) ForEachAgent(handler func(a *Agent) error) error {
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	length, err := c.ar.GetAgentCount(opts)
+	if err != nil {
+		return err
+	}
+
+	for i := int64(0); i < length.Int64(); i++ {
+		idx := big.NewInt(i)
+		agtID, err := c.ar.GetAgentByIndex(opts, idx)
+		if err != nil {
+			return err
+		}
+		agt, err := c.ar.GetAgentState(opts, agtID)
+		if err != nil {
+			return err
+		}
+		if err := handler(&Agent{
+			AgentID:  utils.AgentBigIntToHex(agtID),
+			ChainIDs: utils.IntArray(agt.ChainIds),
+			Enabled:  agt.Enabled,
+			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error {
+	// if opts not set, peg for this loop
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	aID := utils.AgentHexToBigInt(agentID)
+	length, err := c.dp.NumScannersFor(opts, aID)
+	if err != nil {
+		return err
+	}
+	for i := int64(0); i < length.Int64(); i++ {
+		idx := big.NewInt(i)
+		scn, err := c.dp.ScannerRefAt(opts, aID, idx)
+		if err != nil {
+			return err
+		}
+		if err := handler(&Scanner{
+			ScannerID: utils.ScannerIDBigIntToHex(scn.ScannerId),
+			ChainID:   scn.ChainId.Int64(),
+			Enabled:   scn.Enabled,
+			Manifest:  scn.Metadata,
+			Owner:     scn.Owner.Hex(),
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error {
+	// if opts not set, peg for this loop
+	opts, err := c.getOps()
+	if err != nil {
+		return err
 	}
 
 	sID := utils.ScannerIDHexToBigInt(scannerID)
@@ -244,6 +407,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 			ChainIDs: utils.IntArray(agt.ChainIds),
 			Enabled:  agt.Enabled,
 			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
 		}); err != nil {
 			return err
 		}
