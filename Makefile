@@ -12,6 +12,9 @@ mocks:
 	mockgen -source ipfs/client.go -destination ipfs/mocks/mock_client.go
 	mockgen -source release/client.go -destination release/mocks/mock_client.go
 
+lint:
+	golangci-lint run ./...
+
 test:
 	go test -v -count=1 ./...
 
