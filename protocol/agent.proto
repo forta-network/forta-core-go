@@ -227,4 +227,6 @@ message TransactionEvent {
   map<string, bool> addresses = 6;
   EthBlock block = 7;
   repeated Log logs = 8;
+  bool isContractDeployment = 9;
+  string contractAddress = 10;
 }

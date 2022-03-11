@@ -2,6 +2,8 @@ package domain
 
 import (
 	"bytes"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/goccy/go-json"
 	"math/big"
 	"strings"
@@ -183,16 +185,24 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		}
 	}
 
+	contractAddress := ""
+	isDeploy := t.Transaction.To == nil
+	if isDeploy {
+		createdAddr := crypto.CreateAddress(common.HexToAddress(t.Transaction.From), uint64(utils.HexToInt64(t.Transaction.Nonce)))
+		contractAddress = strings.ToLower(createdAddr.Hex())
+		safeAddStrValueToMap(addresses, contractAddress)
+	}
+
 	// for backwards compatibility
 	receipt := protocol.TransactionEvent_EthReceipt{
 		Root:              "",
-		Status:            "",
+		Status:            "0x1",
 		CumulativeGasUsed: "",
 		LogsBloom:         "",
 		Logs:              txLogs,
 		TransactionHash:   t.Transaction.Hash,
-		ContractAddress:   "",
-		GasUsed:           "",
+		ContractAddress:   contractAddress,
+		GasUsed:           t.Transaction.Gas,
 		BlockHash:         t.BlockEvt.Block.Hash,
 		BlockNumber:       t.BlockEvt.Block.Number,
 		TransactionIndex:  t.Transaction.TransactionIndex,
@@ -204,13 +214,15 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 	}
 
 	return &protocol.TransactionEvent{
-		Type:        evtType,
-		Transaction: &tx,
-		Network:     nw,
-		Traces:      traces,
-		Addresses:   addresses,
-		Logs:        txLogs,
-		Receipt:     &receipt,
+		Type:                 evtType,
+		Transaction:          &tx,
+		Network:              nw,
+		Traces:               traces,
+		Addresses:            addresses,
+		Logs:                 txLogs,
+		Receipt:              &receipt,
+		IsContractDeployment: isDeploy,
+		ContractAddress:      contractAddress,
 		Block: &protocol.TransactionEvent_EthBlock{
 			BlockHash:      t.BlockEvt.Block.Hash,
 			BlockNumber:    t.BlockEvt.Block.Number,
