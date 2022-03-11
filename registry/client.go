@@ -302,6 +302,9 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 			return err
 		}
 		agt, err := c.ar.GetAgentState(opts, agtID)
+		if err != nil {
+			return err
+		}
 		if err := handler(&Agent{
 			AgentID:  utils.AgentBigIntToHex(agtID),
 			ChainIDs: utils.IntArray(agt.ChainIds),
@@ -334,6 +337,9 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 			return err
 		}
 		agt, err := c.ar.GetAgentState(opts, agtID)
+		if err != nil {
+			return err
+		}
 		if err := handler(&Agent{
 			AgentID:  utils.AgentBigIntToHex(agtID),
 			ChainIDs: utils.IntArray(agt.ChainIds),
