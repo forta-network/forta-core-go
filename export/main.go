@@ -27,7 +27,7 @@ type export struct {
 func main() {
 	ex := &export{}
 	c, err := registry.NewClient(context.Background(), registry.ClientConfig{
-		JsonRpcUrl: "https://polygon-mainnet.g.alchemy.com/v2/9kCNKDfEefzmgHm9KoSZ8SjeYcQdExbC", //TODO: fill in your json rpc provider
+		JsonRpcUrl: "", //TODO: fill in your json rpc provider
 		ENSAddress: "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7",
 		Name:       "export",
 	})
