@@ -20,6 +20,7 @@ import (
 )
 
 const scannerRegistryDeployBlock = 20187154
+const zeroAddress = "0x0000000000000000000000000000000000000000"
 
 //Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
@@ -262,7 +263,7 @@ func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
 	}
 
 	for it.Next() {
-		if it.Event != nil && it.Event.From.Hex() == "0x0000000000000000000000000000000000000000" {
+		if it.Event != nil && it.Event.From.Hex() == zeroAddress {
 			scn, err := c.sr.GetScannerState(opts, it.Event.TokenId)
 			if err != nil {
 				return err
@@ -306,6 +307,7 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 			ChainIDs: utils.IntArray(agt.ChainIds),
 			Enabled:  agt.Enabled,
 			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
 		}); err != nil {
 			return err
 		}
@@ -337,6 +339,7 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 			ChainIDs: utils.IntArray(agt.ChainIds),
 			Enabled:  agt.Enabled,
 			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
 		}); err != nil {
 			return err
 		}
@@ -398,6 +401,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 			ChainIDs: utils.IntArray(agt.ChainIds),
 			Enabled:  agt.Enabled,
 			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
 		}); err != nil {
 			return err
 		}

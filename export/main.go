@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/forta-protocol/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,8 +19,8 @@ type agentSummary struct {
 }
 
 type export struct {
-	Agents   []*agentSummary
-	Scanners []*scannerSummary
+	Agents   []*agentSummary   `json:"agents"`
+	Scanners []*scannerSummary `json:"scanners"`
 }
 
 func main() {
