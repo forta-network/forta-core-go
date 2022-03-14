@@ -27,4 +27,4 @@ abigen: pull-contracts
 
 .PHONY: pull-contracts
 pull-contracts:
-	./scripts/pull-contracts.sh forta-token deploy_mumbai
+	./scripts/pull-contracts.sh forta-token bridging
