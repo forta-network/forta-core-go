@@ -43,6 +43,9 @@ type Client interface {
 	//GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
 
+	//IsAssigned returns true if the scanner is assigned to the agent
+	IsAssigned(scannerID string, agentID string) (bool, error)
+
 	//GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
@@ -244,6 +247,12 @@ func (c *client) getOps() (*bind.CallOpts, error) {
 		return c.opts, nil
 	}
 	return c.latestOpts()
+}
+
+func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
+	agtID := utils.AgentHexToBigInt(agentID)
+	scnID := utils.ScannerIDHexToBigInt(scannerID)
+	return c.dp.AreTheyLinked(c.opts, agtID, scnID)
 }
 
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
