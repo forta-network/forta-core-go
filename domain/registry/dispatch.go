@@ -47,3 +47,20 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink) *DispatchMessage {
 		AgentID:   agentID,
 	}
 }
+
+func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinked) *DispatchMessage {
+	scannerID := utils.HexAddr(evt.ScannerId)
+	agentID := utils.Hex(evt.AgentId)
+	evtName := Unlink
+	if evt.Enable {
+		evtName = Link
+	}
+	return &DispatchMessage{
+		Message: Message{
+			Action:    evtName,
+			Timestamp: time.Now().UTC(),
+		},
+		ScannerID: scannerID,
+		AgentID:   agentID,
+	}
+}
