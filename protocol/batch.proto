@@ -30,11 +30,11 @@ message Receipt {
 }
 
 message SignedPayload {
+  // defaults to batch because previous batch schema didn't have the type property
   enum PayloadType {
-    UNKNOWN = 0;
-    BATCH = 1;
-    BATCH_SUMMARY = 2;
-    BATCH_RECEIPT = 3;
+    BATCH = 0;
+    BATCH_SUMMARY = 1;
+    BATCH_RECEIPT = 2;
   }
   PayloadType type = 1;
   Signature signature = 2;
