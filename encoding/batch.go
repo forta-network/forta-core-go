@@ -32,7 +32,7 @@ func gunzipBytes(b []byte) ([]byte, error) {
 	return ioutil.ReadAll(r)
 }
 
-func EncodeProto(msg proto.Message) (string, error) {
+func EncodeGzippedProto(msg proto.Message) (string, error) {
 	b, err := proto.Marshal(msg)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal msg: %v", err)
@@ -44,7 +44,7 @@ func EncodeProto(msg proto.Message) (string, error) {
 	return base64.StdEncoding.EncodeToString(zipped), nil
 }
 
-func DecodeProto(encoded string, target proto.Message) error {
+func DecodeGzippedProto(encoded string, target proto.Message) error {
 	zipped, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		return fmt.Errorf("failed to base64decode: %v", err)

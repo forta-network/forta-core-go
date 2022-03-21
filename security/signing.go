@@ -146,7 +146,7 @@ func VerifySignature(message []byte, signerAddress string, sigHex string) error 
 }
 
 func signPayload(key *keystore.Key, payloadType protocol.SignedPayload_PayloadType, msg proto.Message) (*protocol.SignedPayload, error) {
-	encoded, err := encoding.EncodeProto(msg)
+	encoded, err := encoding.EncodeGzippedProto(msg)
 	if err != nil {
 		return nil, err
 	}

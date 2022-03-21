@@ -139,11 +139,11 @@ var testBatch = &protocol.AlertBatch{
 }
 
 func TestEncodeAndDecodeBatch(t *testing.T) {
-	res, err := encoding.EncodeProto(testBatch)
+	res, err := encoding.EncodeGzippedProto(testBatch)
 	assert.NoError(t, err)
 
 	var decoded protocol.AlertBatch
-	err = encoding.DecodeProto(res, &decoded)
+	err = encoding.DecodeGzippedProto(res, &decoded)
 	assert.NoError(t, err)
 
 	assert.True(t, proto.Equal(&decoded, testBatch))
