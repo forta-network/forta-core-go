@@ -172,8 +172,8 @@ func SignBatchSummary(key *keystore.Key, payload *protocol.BatchSummary) (*proto
 	return signPayload(key, protocol.SignedPayload_BATCH_SUMMARY, payload)
 }
 
-// SignReceipt will sign a batch receipt
-func SignReceipt(key *keystore.Key, payload *protocol.BatchSummary) (*protocol.SignedPayload, error) {
+// SignBatchReceipt will sign a batch receipt
+func SignBatchReceipt(key *keystore.Key, payload *protocol.BatchReceipt) (*protocol.SignedPayload, error) {
 	return signPayload(key, protocol.SignedPayload_BATCH_RECEIPT, payload)
 }
 
