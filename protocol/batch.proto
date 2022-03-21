@@ -8,12 +8,6 @@ import public "metrics.proto";
 
 option go_package = "./;protocol";
 
-message SignedAlertBatch {
-  reserved 1;
-  Signature signature = 2;
-  string encoded = 3;
-}
-
 message BatchSummary {
   string batch = 1;
   uint64 chainId = 2;
