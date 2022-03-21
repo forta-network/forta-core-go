@@ -36,6 +36,20 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
+// ForEachAgent mocks base method.
+func (m *MockClient) ForEachAgent(handler func(*registry0.Agent) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachAgent", handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachAgent indicates an expected call of ForEachAgent.
+func (mr *MockClientMockRecorder) ForEachAgent(handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAgent", reflect.TypeOf((*MockClient)(nil).ForEachAgent), handler)
+}
+
 // ForEachAssignedAgent mocks base method.
 func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry0.Agent) error) error {
 	m.ctrl.T.Helper()
@@ -48,6 +62,48 @@ func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*regist
 func (mr *MockClientMockRecorder) ForEachAssignedAgent(scannerID, handler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAssignedAgent", reflect.TypeOf((*MockClient)(nil).ForEachAssignedAgent), scannerID, handler)
+}
+
+// ForEachAssignedScanner mocks base method.
+func (m *MockClient) ForEachAssignedScanner(agentID string, handler func(*registry0.Scanner) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachAssignedScanner", agentID, handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachAssignedScanner indicates an expected call of ForEachAssignedScanner.
+func (mr *MockClientMockRecorder) ForEachAssignedScanner(agentID, handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAssignedScanner", reflect.TypeOf((*MockClient)(nil).ForEachAssignedScanner), agentID, handler)
+}
+
+// ForEachChainAgent mocks base method.
+func (m *MockClient) ForEachChainAgent(chainID int64, handler func(*registry0.Agent) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachChainAgent", chainID, handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachChainAgent indicates an expected call of ForEachChainAgent.
+func (mr *MockClientMockRecorder) ForEachChainAgent(chainID, handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachChainAgent", reflect.TypeOf((*MockClient)(nil).ForEachChainAgent), chainID, handler)
+}
+
+// ForEachScanner mocks base method.
+func (m *MockClient) ForEachScanner(handler func(*registry0.Scanner) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachScanner", handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachScanner indicates an expected call of ForEachScanner.
+func (mr *MockClientMockRecorder) ForEachScanner(handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachScanner", reflect.TypeOf((*MockClient)(nil).ForEachScanner), handler)
 }
 
 // GetAgent mocks base method.
@@ -108,6 +164,21 @@ func (m *MockClient) GetScannerNodeVersion() (string, error) {
 func (mr *MockClientMockRecorder) GetScannerNodeVersion() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerNodeVersion", reflect.TypeOf((*MockClient)(nil).GetScannerNodeVersion))
+}
+
+// IsAssigned mocks base method.
+func (m *MockClient) IsAssigned(scannerID, agentID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsAssigned", scannerID, agentID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsAssigned indicates an expected call of IsAssigned.
+func (mr *MockClientMockRecorder) IsAssigned(scannerID, agentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsAssigned", reflect.TypeOf((*MockClient)(nil).IsAssigned), scannerID, agentID)
 }
 
 // IsEnabledScanner mocks base method.

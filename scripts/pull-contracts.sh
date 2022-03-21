@@ -16,4 +16,4 @@ fi
 
 # generate compatible ABIs
 yarn install
-npx hardhat run scripts/abisWithoutCustomErrors.js
+npx hardhat run scripts/abis-without-custom-errors.js

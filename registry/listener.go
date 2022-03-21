@@ -179,7 +179,7 @@ func (l *listener) handleFortaStakingEvent(le types.Log, logger *log.Entry) erro
 	return nil
 }
 
-func (l *listener) handleDispatcherEvent(le types.Log, logger *log.Entry) error {
+func (l *listener) handleDispatchEvent(le types.Log, logger *log.Entry) error {
 	if isEvent(le, contract_dispatch.LinkTopic) {
 		link, err := l.dispatchFilterer.ParseLink(le)
 		if err != nil {
@@ -187,6 +187,15 @@ func (l *listener) handleDispatcherEvent(le types.Log, logger *log.Entry) error 
 		}
 		if l.cfg.Handlers.DispatchHandler != nil {
 			return l.cfg.Handlers.DispatchHandler(logger, registry.NewDispatchMessage(link))
+		}
+	}
+	if isEvent(le, contract_dispatch.AlreadyLinkedTopic) {
+		link, err := l.dispatchFilterer.ParseAlreadyLinked(le)
+		if err != nil {
+			return err
+		}
+		if l.cfg.Handlers.DispatchHandler != nil {
+			return l.cfg.Handlers.DispatchHandler(logger, registry.NewAlreadyLinkedDispatchMessage(link))
 		}
 	}
 	return nil
@@ -204,7 +213,7 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 		return l.handleAgentRegistryEvent(le, logger)
 	}
 	if equalsAddress(le.Address, l.dispatchAddr) {
-		return l.handleDispatcherEvent(le, logger)
+		return l.handleDispatchEvent(le, logger)
 	}
 	if equalsAddress(le.Address, l.fortaStakingAddr) {
 		return l.handleFortaStakingEvent(le, logger)
