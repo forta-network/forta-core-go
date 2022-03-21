@@ -8,6 +8,7 @@ import public "metrics.proto";
 
 option go_package = "./;protocol";
 
+//a scanner encodes this into a SignedPayload of type BATCH_SUMMARY
 message BatchSummary {
   string batch = 1;
   uint64 chainId = 2;
@@ -19,6 +20,7 @@ message BatchSummary {
   uint64 latestBlockInput = 8;
 }
 
+//an analyzer endpoint encodes this into a SignedPayload of type BATCH_RECEIPT
 message BatchReceipt {
   SignedPayload batchSummary = 1;
 }
@@ -35,6 +37,7 @@ message SignedPayload {
   string encoded = 3;
 }
 
+//a scanner encodes this into a SignedPayload of type BATCH
 message AlertBatch {
   uint64 chainId = 1;
   uint64 blockStart = 2;
