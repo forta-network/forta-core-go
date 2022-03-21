@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/forta-protocol/forta-core-go/protocol"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -33,31 +32,26 @@ func gunzipBytes(b []byte) ([]byte, error) {
 	return ioutil.ReadAll(r)
 }
 
-func DecodeBatch(encoded string) (*protocol.AlertBatch, error) {
-	zipped, err := base64.StdEncoding.DecodeString(encoded)
+func EncodeProto(msg proto.Message) (string, error) {
+	b, err := proto.Marshal(msg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to base64decode batch: %v", err)
-	}
-	b, err := gunzipBytes(zipped)
-	if err != nil {
-		return nil, err
-	}
-	var batch protocol.AlertBatch
-	if err := proto.Unmarshal(b, &batch); err != nil {
-		return nil, err
-	}
-	return &batch, nil
-}
-
-func EncodeBatch(batch *protocol.AlertBatch) (string, error) {
-	b, err := proto.Marshal(batch)
-	if err != nil {
-		return "", fmt.Errorf("failed to marshal batch: %v", err)
+		return "", fmt.Errorf("failed to marshal msg: %v", err)
 	}
 	zipped, err := gzipBytes(b)
 	if err != nil {
-		return "", fmt.Errorf("failed to gzip batch: %v", err)
+		return "", fmt.Errorf("failed to gzip msg: %v", err)
 	}
-
 	return base64.StdEncoding.EncodeToString(zipped), nil
+}
+
+func DecodeProto(encoded string, target proto.Message) error {
+	zipped, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return fmt.Errorf("failed to base64decode: %v", err)
+	}
+	b, err := gunzipBytes(zipped)
+	if err != nil {
+		return err
+	}
+	return proto.Unmarshal(b, target)
 }

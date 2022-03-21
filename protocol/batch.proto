@@ -14,6 +14,33 @@ message SignedAlertBatch {
   string encoded = 3;
 }
 
+message BatchSummary {
+  string batch = 1;
+  uint64 chainId = 2;
+  uint64 blockStart = 3;
+  uint64 blockEnd = 4;
+  uint32 alertCount = 5;
+  ScannerVersion scannerVersion = 6;
+  string parent = 7;
+  uint64 latestBlockInput = 8;
+}
+
+message Receipt {
+  SignedPayload batchSummary = 1;
+}
+
+message SignedPayload {
+  enum PayloadType {
+    UNKNOWN = 0;
+    BATCH = 1;
+    BATCH_SUMMARY = 2;
+    BATCH_RECEIPT = 3;
+  }
+  PayloadType type = 1;
+  Signature signature = 2;
+  string encoded = 3;
+}
+
 message AlertBatch {
   uint64 chainId = 1;
   uint64 blockStart = 2;
