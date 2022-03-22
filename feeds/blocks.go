@@ -198,8 +198,7 @@ func (bf *blockFeed) forEachBlock() error {
 			"blockToAnalyzeHex": block.Number,
 		})
 
-		tooOld, age := blockIsTooOld(block, bf.maxBlockAge)
-		if tooOld {
+		if tooOld, age := blockIsTooOld(block, bf.maxBlockAge); tooOld {
 			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
 			currentBlockNum.Add(currentBlockNum, increment)
 			continue
@@ -222,7 +221,6 @@ func (bf *blockFeed) forEachBlock() error {
 			traces = nil
 		}
 
-		// if not too old
 		logs, err := bf.logsForBlock(blockNumToAnalyze)
 		if err != nil {
 			logger.WithError(err).Errorf("error getting logs for block")
