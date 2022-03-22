@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	"io"
 	"io/ioutil"
 	"os"
@@ -144,9 +145,8 @@ func VerifySignature(message []byte, signerAddress string, sigHex string) error 
 	return nil
 }
 
-// SignBatch will sign an alert batch and return a SignedAlertBatch
-func SignBatch(key *keystore.Key, batch *protocol.AlertBatch) (*protocol.SignedAlertBatch, error) {
-	encoded, err := encoding.EncodeBatch(batch)
+func signPayload(key *keystore.Key, payloadType protocol.SignedPayload_PayloadType, msg proto.Message) (*protocol.SignedPayload, error) {
+	encoded, err := encoding.EncodeGzippedProto(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -154,19 +154,35 @@ func SignBatch(key *keystore.Key, batch *protocol.AlertBatch) (*protocol.SignedA
 	if err != nil {
 		return nil, err
 	}
-
-	return &protocol.SignedAlertBatch{
+	return &protocol.SignedPayload{
+		Type:      payloadType,
 		Encoded:   encoded,
 		Signature: signature,
 	}, nil
+
 }
 
-// VerifyBatchSignature will return an error if the signature fails to validate
-func VerifyBatchSignature(signedBatch *protocol.SignedAlertBatch) error {
-	if signedBatch.Signature == nil {
+// SignBatch will sign an alert batch and return a SignedAlertBatch
+func SignBatch(key *keystore.Key, payload *protocol.AlertBatch) (*protocol.SignedPayload, error) {
+	return signPayload(key, protocol.SignedPayload_BATCH, payload)
+}
+
+// SignBatchSummary will sign an alert batch summary
+func SignBatchSummary(key *keystore.Key, payload *protocol.BatchSummary) (*protocol.SignedPayload, error) {
+	return signPayload(key, protocol.SignedPayload_BATCH_SUMMARY, payload)
+}
+
+// SignBatchReceipt will sign a batch receipt
+func SignBatchReceipt(key *keystore.Key, payload *protocol.BatchReceipt) (*protocol.SignedPayload, error) {
+	return signPayload(key, protocol.SignedPayload_BATCH_RECEIPT, payload)
+}
+
+// VerifySignedPayload will return an error if the signature fails to validate
+func VerifySignedPayload(payload *protocol.SignedPayload) error {
+	if payload.Signature == nil {
 		return ErrMissingSignature
 	}
-	return VerifySignature([]byte(signedBatch.Encoded), signedBatch.Signature.Signer, signedBatch.Signature.Signature)
+	return VerifySignature([]byte(payload.Encoded), payload.Signature.Signer, payload.Signature.Signature)
 }
 
 // NewTransactOpts creates new opts with the private key.

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/forta-protocol/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 type scannerSummary struct {
@@ -26,7 +27,7 @@ type export struct {
 func main() {
 	ex := &export{}
 	c, err := registry.NewClient(context.Background(), registry.ClientConfig{
-		JsonRpcUrl: "", //TODO: fill in your json rpc provider
+		JsonRpcUrl: os.Getenv("POLYGON_JSON_RPC"), //TODO: fill in your json rpc provider
 		ENSAddress: "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7",
 		Name:       "export",
 	})
