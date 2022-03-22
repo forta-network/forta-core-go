@@ -116,18 +116,13 @@ func NewDefaultClient(ctx context.Context) (*client, error) {
 	return NewClient(ctx, defaultConfig)
 }
 
-func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
-	eth, err := ethereum.NewStreamEthClient(ctx, cfg.Name, cfg.JsonRpcUrl)
-	if err != nil {
-		return nil, err
-	}
-
-	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, cfg.ENSAddress)
-	if err != nil {
-		return nil, err
-	}
-
+func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.ENS) (*client, error) {
 	regContracts, err := ensStore.ResolveRegistryContracts()
+	if err != nil {
+		return nil, err
+	}
+
+	eth, err := ethereum.NewStreamEthClient(ctx, cfg.Name, cfg.JsonRpcUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +176,14 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		fs:        fs,
 		srf:       srf,
 	}, err
+}
+
+func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
+	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, cfg.ENSAddress)
+	if err != nil {
+		return nil, err
+	}
+	return NewClientWithENSStore(ctx, cfg, ensStore)
 }
 
 func (c *client) RegistryContracts() *registry.RegistryContracts {
