@@ -2,6 +2,8 @@ package domain
 
 import (
 	"bytes"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/goccy/go-json"
 	"math/big"
 	"strings"
@@ -23,6 +25,7 @@ type BlockEvent struct {
 	EventType EventType
 	ChainID   *big.Int
 	Block     *Block
+	Logs      []LogEntry
 	Traces    []Trace
 }
 
@@ -164,27 +167,45 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		tx.From = strings.ToLower(tx.From)
 	}
 
-	// convert receipt domain model to proto
-	var receipt protocol.TransactionEvent_EthReceipt
-	if t.Receipt != nil {
-		receiptJson, err := json.Marshal(t.Receipt)
-		if err != nil {
-			return nil, err
-		}
-		err = um.Unmarshal(bytes.NewReader(receiptJson), &receipt)
+	var logs []*protocol.TransactionEvent_Log
+	logJson, err := json.Marshal(t.BlockEvt.Logs)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(logJson, &logs); err != nil {
+		return nil, err
+	}
 
-		if err != nil {
-			log.Errorf("cannot unmarshal receiptJson: %s", err.Error())
-			log.Errorf("JSON: %s", string(receiptJson))
-			return nil, err
-		}
-
-		receipt.ContractAddress = strings.ToLower(receipt.ContractAddress)
-		safeAddStrValueToMap(addresses, receipt.ContractAddress)
-		for _, l := range receipt.Logs {
+	var txLogs []*protocol.TransactionEvent_Log
+	for _, l := range logs {
+		if l.TransactionHash == t.Transaction.Hash {
+			txLogs = append(txLogs, l)
 			l.Address = strings.ToLower(l.Address)
 			safeAddStrValueToMap(addresses, l.Address)
 		}
+	}
+
+	contractAddress := ""
+	isDeploy := t.Transaction.To == nil
+	if isDeploy {
+		createdAddr := crypto.CreateAddress(common.HexToAddress(t.Transaction.From), uint64(utils.HexToInt64(t.Transaction.Nonce)))
+		contractAddress = strings.ToLower(createdAddr.Hex())
+		safeAddStrValueToMap(addresses, contractAddress)
+	}
+
+	// for backwards compatibility
+	receipt := protocol.TransactionEvent_EthReceipt{
+		Root:              "",
+		Status:            "0x1",
+		CumulativeGasUsed: "",
+		LogsBloom:         "",
+		Logs:              txLogs,
+		TransactionHash:   t.Transaction.Hash,
+		ContractAddress:   contractAddress,
+		GasUsed:           t.Transaction.Gas,
+		BlockHash:         t.BlockEvt.Block.Hash,
+		BlockNumber:       t.BlockEvt.Block.Number,
+		TransactionIndex:  t.Transaction.TransactionIndex,
 	}
 
 	nw := &protocol.TransactionEvent_Network{}
@@ -193,12 +214,15 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 	}
 
 	return &protocol.TransactionEvent{
-		Type:        evtType,
-		Transaction: &tx,
-		Network:     nw,
-		Traces:      traces,
-		Addresses:   addresses,
-		Receipt:     &receipt,
+		Type:                 evtType,
+		Transaction:          &tx,
+		Network:              nw,
+		Traces:               traces,
+		Addresses:            addresses,
+		Logs:                 txLogs,
+		Receipt:              &receipt,
+		IsContractDeployment: isDeploy,
+		ContractAddress:      contractAddress,
 		Block: &protocol.TransactionEvent_EthBlock{
 			BlockHash:      t.BlockEvt.Block.Hash,
 			BlockNumber:    t.BlockEvt.Block.Number,

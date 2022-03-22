@@ -7,6 +7,8 @@ import (
 	"math/big"
 	"time"
 
+	eth "github.com/ethereum/go-ethereum"
+	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-protocol/forta-core-go/clients/health"
@@ -135,6 +137,26 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 	return errCh
 }
 
+// converts from types.Log to domain.LogEntry object
+func (bf *blockFeed) logsForBlock(blockNum *big.Int) ([]domain.LogEntry, error) {
+	logs, err := bf.client.GetLogs(bf.ctx, eth.FilterQuery{
+		FromBlock: blockNum,
+		ToBlock:   blockNum,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var logEntries []domain.LogEntry
+	b, err := json.Marshal(logs)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(b, &logEntries); err != nil {
+		return nil, err
+	}
+	return logEntries, nil
+}
+
 func (bf *blockFeed) forEachBlock() error {
 	increment := big.NewInt(1)
 	currentBlockNum := big.NewInt(bf.start.Int64())
@@ -146,64 +168,72 @@ func (bf *blockFeed) forEachBlock() error {
 		if bf.rateLimit != nil {
 			<-bf.rateLimit.C
 		}
+		logger := log.WithFields(log.Fields{
+			"currentBlock": currentBlockNum.Uint64(),
+		})
 
 		block, err := bf.client.BlockByNumber(bf.ctx, currentBlockNum)
 		if err != nil {
-			log.WithError(err).Error("error getting block")
+			logger.WithError(err).Error("error getting block")
 			continue
 		}
 
-		processedBlockNum := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
-		if bf.end != nil && processedBlockNum.Uint64() > bf.end.Uint64() {
+		blockNumToAnalyze := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
+		logger = logger.WithFields(log.Fields{
+			"blockToAnalyze": blockNumToAnalyze.Uint64(),
+		})
+
+		if bf.end != nil && blockNumToAnalyze.Uint64() > bf.end.Uint64() {
 			return ErrEndBlockReached
 		}
-		if processedBlockNum.Cmp(currentBlockNum) != 0 {
-			block, err = bf.client.BlockByNumber(bf.ctx, processedBlockNum)
+		if blockNumToAnalyze.Cmp(currentBlockNum) != 0 {
+			block, err = bf.client.BlockByNumber(bf.ctx, blockNumToAnalyze)
 			if err != nil {
-				log.WithError(err).Error("error getting block")
+				logger.WithError(err).Error("error getting block")
 				continue
 			}
 		}
+		logger = logger.WithFields(log.Fields{
+			"blockHash":         block.Hash,
+			"blockToAnalyzeHex": block.Number,
+		})
 
-		bf.lastBlock.Set(processedBlockNum.String())
+		if tooOld, age := blockIsTooOld(block, bf.maxBlockAge); tooOld {
+			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
+			currentBlockNum.Add(currentBlockNum, increment)
+			continue
+		}
+
+		bf.lastBlock.Set(blockNumToAnalyze.String())
 
 		var traces []domain.Trace
 		if bf.tracing {
-			traces, err = bf.traceClient.TraceBlock(bf.ctx, processedBlockNum)
+			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
 			if err != nil {
-				log.WithError(err).Error("error tracing block")
+				logger.WithError(err).Error("error tracing block")
 			}
 		}
 
 		if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
-			log.WithFields(log.Fields{
-				"ethereumBlockHash": block.Hash,
-				"traceBlockHash":    utils.String(traces[0].BlockHash),
-			}).Warn("mismatching block hash from ethereum and trace apis - ignoring traces")
+			logger.WithFields(log.Fields{
+				"traceBlockHash": utils.String(traces[0].BlockHash),
+			}).Warn("trace block hash != ethereum block hash, ignoring traces")
 			traces = nil
 		}
 
+		logs, err := bf.logsForBlock(blockNumToAnalyze)
 		if err != nil {
-			log.WithError(err).Errorf("error getting blocknumber: num=%s", block.Number)
+			logger.WithError(err).Errorf("error getting logs for block")
 			continue
 		}
-		logger := log.WithFields(log.Fields{
-			"blockNum": processedBlockNum.Uint64(),
-			"blockHex": block.Number,
-		})
-		// if not too old
-		tooOld, age := blockIsTooOld(block, bf.maxBlockAge)
-		if !tooOld {
-			evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces}
-			for _, handler := range bf.handlers {
-				if err := handler.Handler(evt); err != nil {
-					return err
-				}
+
+		evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces, Logs: logs}
+		for _, handler := range bf.handlers {
+			if err := handler.Handler(evt); err != nil {
+				return err
 			}
-			bf.cache.Add(block.Hash)
-		} else {
-			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
 		}
+		bf.cache.Add(block.Hash)
 
 		currentBlockNum.Add(currentBlockNum, increment)
 	}

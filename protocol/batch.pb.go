@@ -70,6 +70,7 @@ func (SignedPayload_PayloadType) EnumDescriptor() ([]byte, []int) {
 	return file_batch_proto_rawDescGZIP(), []int{2, 0}
 }
 
+//a scanner encodes this into a SignedPayload of type BATCH_SUMMARY
 type BatchSummary struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -173,6 +174,7 @@ func (x *BatchSummary) GetLatestBlockInput() uint64 {
 	return 0
 }
 
+//an analyzer endpoint encodes this into a SignedPayload of type BATCH_RECEIPT
 type BatchReceipt struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -283,6 +285,7 @@ func (x *SignedPayload) GetEncoded() string {
 	return ""
 }
 
+//a scanner encodes this into a SignedPayload of type BATCH
 type AlertBatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

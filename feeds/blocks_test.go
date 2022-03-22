@@ -122,12 +122,15 @@ func TestBlockFeed_ForEachBlock(t *testing.T) {
 
 	//TODO: actually test that the trace part matters (this returns nil for now)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
 
 	count := 0
@@ -157,12 +160,14 @@ func TestBlockFeed_ForEachBlockWithOldBlock(t *testing.T) {
 
 	//TODO: actually test that the trace part matters (this returns nil for now)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
+	//too old to process, skipping this one
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
-	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
 
 	count := 0
@@ -190,6 +195,7 @@ func TestBlockFeed_ForEachBlock_Cancelled(t *testing.T) {
 	block1 := blockWithParent(hash1, 1)
 
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
 	count := 0
@@ -219,11 +225,13 @@ func TestBlockFeed_ForEachBlock_WithOffset(t *testing.T) {
 	// check block 2, use block 1
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
 	// check block 3, use block 2
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
 
 	// check block 4, receive error, skip
@@ -235,6 +243,7 @@ func TestBlockFeed_ForEachBlock_WithOffset(t *testing.T) {
 	// check block 4, use block 3
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(4)).Return(block4, nil).Times(1)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
 
 	count := 0
