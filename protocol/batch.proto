@@ -18,11 +18,13 @@ message BatchSummary {
   ScannerVersion scannerVersion = 6;
   string previousReceipt = 7;
   uint64 latestBlockInput = 8;
+  string timestamp = 9;
 }
 
 //an analyzer endpoint encodes this into a SignedPayload of type BATCH_RECEIPT
 message BatchReceipt {
   SignedPayload batchSummary = 1;
+  string timestamp = 2;
 }
 
 message SignedPayload {
