@@ -19,11 +19,14 @@ test:
 	go test -v -count=1 ./...
 
 abigen: pull-contracts
-	./scripts/abigen.sh forta-token components/staking forta_staking
-	./scripts/abigen.sh forta-token components/agents agent_registry
-	./scripts/abigen.sh forta-token components/dispatch dispatch
-	./scripts/abigen.sh forta-token components/scanners scanner_node_version
-	./scripts/abigen.sh forta-token components/scanners scanner_registry "--alias _register=underscoreRegister"
+	rm -rf contracts
+	./scripts/abigen.sh forta-token components/staking/FortaStaking.sol FortaStaking forta_staking
+	./scripts/abigen.sh forta-token components/agents/AgentRegistry.sol AgentRegistry agent_registry
+	./scripts/abigen.sh forta-token components/dispatch/Dispatch.sol Dispatch dispatch
+	./scripts/abigen.sh forta-token components/scanners/ScannerNodeVersion.sol ScannerNodeVersion scanner_node_version
+	./scripts/abigen.sh forta-token components/scanners/ScannerRegistry.sol ScannerRegistry scanner_registry "--alias _register=underscoreRegister"
+	./scripts/abigen.sh forta-token components/access/AccessManager.sol AccessManager access_manager
+	./scripts/abigen.sh forta-token components/router/Router.sol Router router
 
 .PHONY: pull-contracts
 pull-contracts:
