@@ -19,6 +19,7 @@ type AlertBatchRequest struct {
 
 // AlertBatchResponse is the response from the alerts API
 type AlertBatchResponse struct {
+	ReceiptID     string                  `json:"receiptId"`
 	SignedReceipt *protocol.SignedPayload `json:"signedReceipt"`
 }
 
