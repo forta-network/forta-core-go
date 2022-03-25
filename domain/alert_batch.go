@@ -13,5 +13,5 @@ type AlertBatch struct {
 	MaxSeverity        int64                   `json:"maxSeverity"`
 	Ref                string                  `json:"ref"`
 	SignedBatch        *protocol.SignedPayload `json:"signedBatch"`
-	SignedBatchSummary *protocol.SignedPayload `json:"batchSummary"`
+	SignedBatchSummary *protocol.SignedPayload `json:"signedBatchSummary"`
 }
