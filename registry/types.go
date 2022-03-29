@@ -1,5 +1,7 @@
 package registry
 
+import "math/big"
+
 const SubjectTypeScanner = 0
 const SubjectTypeAgent = 1
 
@@ -22,4 +24,10 @@ type Scanner struct {
 type AssignmentHash struct {
 	AgentLength int64  `json:"agentLength"`
 	Hash        string `json:"hash"`
+}
+
+type StakingThreshold struct {
+	Min       *big.Int `json:"min"`
+	Max       *big.Int `json:"max"`
+	Activated bool     `json:"activated"`
 }
