@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"sync"
 	"time"
 
 	eth "github.com/ethereum/go-ethereum"
@@ -31,7 +32,6 @@ type blockFeed struct {
 	ctx         context.Context
 	client      ethereum.Client
 	traceClient ethereum.Client
-	handlers    []*bfHandler
 	cache       utils.Cache
 	chainID     *big.Int
 	tracing     bool
@@ -40,6 +40,9 @@ type blockFeed struct {
 	maxBlockAge *time.Duration
 
 	lastBlock health.MessageTracker
+
+	handlers   []bfHandler
+	handlersMu sync.RWMutex
 }
 
 type BlockFeedConfig struct {
@@ -129,8 +132,11 @@ func (bf *blockFeed) loop() {
 }
 
 func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-chan error {
+	bf.handlersMu.Lock()
+	defer bf.handlersMu.Unlock()
+
 	errCh := make(chan error)
-	bf.handlers = append(bf.handlers, &bfHandler{
+	bf.handlers = append(bf.handlers, bfHandler{
 		Handler: handler,
 		ErrCh:   errCh,
 	})
@@ -228,7 +234,10 @@ func (bf *blockFeed) forEachBlock() error {
 		}
 
 		evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces, Logs: logs}
-		for _, handler := range bf.handlers {
+		bf.handlersMu.RLock()
+		handlers := bf.handlers
+		bf.handlersMu.RUnlock()
+		for _, handler := range handlers {
 			if err := handler.Handler(evt); err != nil {
 				return err
 			}
