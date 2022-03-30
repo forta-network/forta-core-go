@@ -5,7 +5,6 @@
 package mock_registry
 
 import (
-	ecdsa "crypto/ecdsa"
 	big "math/big"
 	reflect "reflect"
 
@@ -224,18 +223,18 @@ func (mr *MockClientMockRecorder) PegLatestBlock() *gomock.Call {
 }
 
 // RegisterScanner mocks base method.
-func (m *MockClient) RegisterScanner(privateKey *ecdsa.PrivateKey, ownerAddress string, chainID int64, metadata string) (string, error) {
+func (m *MockClient) RegisterScanner(ownerAddress string, chainID int64, metadata string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterScanner", privateKey, ownerAddress, chainID, metadata)
+	ret := m.ctrl.Call(m, "RegisterScanner", ownerAddress, chainID, metadata)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RegisterScanner indicates an expected call of RegisterScanner.
-func (mr *MockClientMockRecorder) RegisterScanner(privateKey, ownerAddress, chainID, metadata interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) RegisterScanner(ownerAddress, chainID, metadata interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScanner", reflect.TypeOf((*MockClient)(nil).RegisterScanner), privateKey, ownerAddress, chainID, metadata)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScanner", reflect.TypeOf((*MockClient)(nil).RegisterScanner), ownerAddress, chainID, metadata)
 }
 
 // RegistryContracts mocks base method.

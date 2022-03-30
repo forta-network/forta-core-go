@@ -52,8 +52,8 @@ type Client interface {
 	//GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
-	//RegisterScanner registers a scanner.
-	RegisterScanner(privateKey *ecdsa.PrivateKey, ownerAddress string, chainID int64, metadata string) (txHash string, err error)
+	//RegisterScanner registers a scanner using private key.
+	RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
 	//RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
@@ -81,7 +81,8 @@ type client struct {
 	ec  *ethclient.Client
 
 	// call PegLatestBlock to peg the context to the latest block
-	opts *bind.CallOpts
+	opts       *bind.CallOpts
+	privateKey *ecdsa.PrivateKey
 
 	contracts *registry.RegistryContracts
 	ar        *contract_agent_registry.AgentRegistryCaller
@@ -101,6 +102,9 @@ type ClientConfig struct {
 
 	//Name is used for logging
 	Name string `json:"name"`
+
+	//PrivateKey is used for sending transactions
+	PrivateKey *ecdsa.PrivateKey
 }
 
 var defaultConfig = ClientConfig{
@@ -176,6 +180,8 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		eth: eth,
 		ec:  ec,
 
+		privateKey: cfg.PrivateKey,
+
 		contracts: regContracts,
 		sr:        sr,
 		ar:        ar,
@@ -196,6 +202,10 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 
 func (c *client) RegistryContracts() *registry.RegistryContracts {
 	return c.contracts
+}
+
+func (c *client) SetPrivateKey(privateKey *ecdsa.PrivateKey) {
+	c.privateKey = privateKey
 }
 
 //ResetOpts unsets the options for the store
@@ -497,12 +507,12 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	}, nil
 }
 
-func (c *client) RegisterScanner(privateKey *ecdsa.PrivateKey, ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
+func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
 	registry, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts := bind.NewKeyedTransactor(privateKey)
+	opts := bind.NewKeyedTransactor(c.privateKey)
 	tx, err := registry.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
 	if err != nil {
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
