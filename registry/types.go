@@ -1,6 +1,8 @@
 package registry
 
-import "math/big"
+import (
+	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
+)
 
 const SubjectTypeScanner = 0
 const SubjectTypeAgent = 1
@@ -26,8 +28,4 @@ type AssignmentHash struct {
 	Hash        string `json:"hash"`
 }
 
-type StakingThreshold struct {
-	Min       *big.Int `json:"min"`
-	Max       *big.Int `json:"max"`
-	Activated bool     `json:"activated"`
-}
+type StakingThreshold contract_scanner_registry.IStakeSubjectStakeThreshold
