@@ -2,12 +2,15 @@ package registry
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"fmt"
 	"math/big"
 
 	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-protocol/forta-core-go/domain/registry"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
@@ -49,6 +52,9 @@ type Client interface {
 	//GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
+	//RegisterScanner registers a scanner.
+	RegisterScanner(privateKey *ecdsa.PrivateKey, ownerAddress string, chainID int64, metadata string) (txHash string, err error)
+
 	//RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
 
@@ -72,6 +78,7 @@ type client struct {
 	ctx context.Context
 	cfg ClientConfig
 	eth ethereum.Client
+	ec  *ethclient.Client
 
 	// call PegLatestBlock to peg the context to the latest block
 	opts *bind.CallOpts
@@ -167,6 +174,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		ctx: ctx,
 		cfg: cfg,
 		eth: eth,
+		ec:  ec,
 
 		contracts: regContracts,
 		sr:        sr,
@@ -487,4 +495,17 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		Manifest: agt.Metadata,
 		Owner:    agt.Owner.Hex(),
 	}, nil
+}
+
+func (c *client) RegisterScanner(privateKey *ecdsa.PrivateKey, ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
+	registry, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+	if err != nil {
+		return "", fmt.Errorf("failed to create contract transactor: %v", err)
+	}
+	opts := bind.NewKeyedTransactor(privateKey)
+	tx, err := registry.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
+	if err != nil {
+		return "", fmt.Errorf("failed to send the transaction: %v", err)
+	}
+	return tx.Hash().Hex(), nil
 }
