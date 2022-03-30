@@ -3,6 +3,7 @@ package registry
 import (
 	"context"
 	"crypto/ecdsa"
+	"errors"
 	"fmt"
 	"math/big"
 
@@ -508,6 +509,9 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 }
 
 func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
+	if c.privateKey == nil {
+		return "", errors.New("no private key provided to the client")
+	}
 	registry, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
