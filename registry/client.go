@@ -235,11 +235,7 @@ func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error
 	if err != nil {
 		return nil, err
 	}
-	return (*StakingThreshold)(res)
-		Min:       res.Min,
-		Max:       res.Max,
-		Activated: res.Activated,
-	}, nil
+	return (*StakingThreshold)(&res), nil
 }
 
 func (c *client) GetScannerNodeVersion() (string, error) {
