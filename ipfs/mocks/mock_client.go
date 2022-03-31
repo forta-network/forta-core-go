@@ -34,19 +34,34 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
-// CalculateFileHash mocks base method.
-func (m *MockClient) CalculateFileHash(ctx context.Context, payload []byte) (string, error) {
+// AddFile mocks base method.
+func (m *MockClient) AddFile(payload []byte) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CalculateFileHash", ctx, payload)
+	ret := m.ctrl.Call(m, "AddFile", payload)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddFile indicates an expected call of AddFile.
+func (mr *MockClientMockRecorder) AddFile(payload interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFile", reflect.TypeOf((*MockClient)(nil).AddFile), payload)
+}
+
+// CalculateFileHash mocks base method.
+func (m *MockClient) CalculateFileHash(payload []byte) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CalculateFileHash", payload)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CalculateFileHash indicates an expected call of CalculateFileHash.
-func (mr *MockClientMockRecorder) CalculateFileHash(ctx, payload interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) CalculateFileHash(payload interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateFileHash", reflect.TypeOf((*MockClient)(nil).CalculateFileHash), ctx, payload)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateFileHash", reflect.TypeOf((*MockClient)(nil).CalculateFileHash), payload)
 }
 
 // GetBytes mocks base method.
