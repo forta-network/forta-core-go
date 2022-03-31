@@ -15,6 +15,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/ipfs/go-cid v0.1.0
+	github.com/ipfs/go-ipfs-api v0.3.0
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect

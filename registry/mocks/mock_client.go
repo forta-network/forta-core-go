@@ -166,6 +166,21 @@ func (mr *MockClientMockRecorder) GetScannerNodeVersion() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerNodeVersion", reflect.TypeOf((*MockClient)(nil).GetScannerNodeVersion))
 }
 
+// GetStakingThreshold mocks base method.
+func (m *MockClient) GetStakingThreshold(scannerID string) (*registry0.StakingThreshold, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStakingThreshold", scannerID)
+	ret0, _ := ret[0].(*registry0.StakingThreshold)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStakingThreshold indicates an expected call of GetStakingThreshold.
+func (mr *MockClientMockRecorder) GetStakingThreshold(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStakingThreshold", reflect.TypeOf((*MockClient)(nil).GetStakingThreshold), scannerID)
+}
+
 // IsAssigned mocks base method.
 func (m *MockClient) IsAssigned(scannerID, agentID string) (bool, error) {
 	m.ctrl.T.Helper()

@@ -1,8 +1,13 @@
 package ipfs
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/forta-protocol/forta-core-go/protocol"
+	"github.com/golang/protobuf/jsonpb"
+	"os"
 	"testing"
 	"time"
 
@@ -39,6 +44,39 @@ func TestClient_UnmarshalJson(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, "test", result.Name)
+}
+
+func TestClient_CalculateHash_FromFile(t *testing.T) {
+	c, err := NewClient("https://ipfs.forta.network")
+	assert.NoError(t, err)
+	hash := "QmS8cYdRytw1ZeaNwocxASz6Zk7vc28etxXYXv8azu7U6N"
+
+	b, err := os.ReadFile(fmt.Sprintf("./testfiles/%s", hash))
+	assert.NoError(t, err)
+
+	res, err := c.CalculateFileHash(b)
+	assert.NoError(t, err)
+	assert.Equal(t, hash, res)
+}
+
+func TestClient_CalculateHash_FromJson(t *testing.T) {
+	c, err := NewClient("https://ipfs.forta.network")
+	assert.NoError(t, err)
+	hash := "QmS8cYdRytw1ZeaNwocxASz6Zk7vc28etxXYXv8azu7U6N"
+
+	b, err := os.ReadFile(fmt.Sprintf("./testfiles/%s", hash))
+	assert.NoError(t, err)
+
+	var sp protocol.SignedPayload
+	u := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	assert.NoError(t, u.Unmarshal(bytes.NewReader(b), &sp))
+
+	jb, err := json.Marshal(&sp)
+	assert.NoError(t, err)
+
+	res, err := c.CalculateFileHash(jb)
+	assert.NoError(t, err)
+	assert.Equal(t, hash, res)
 }
 
 func TestClient_GetBytes(t *testing.T) {

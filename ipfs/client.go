@@ -1,12 +1,15 @@
 package ipfs
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	ipfsapi "github.com/ipfs/go-ipfs-api"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -19,16 +22,28 @@ var ErrRateLimit = errors.New("rate limited")
 var ErrNotFound = errors.New("not found")
 
 type Client interface {
+	CalculateFileHash(payload []byte) (string, error)
 	GetBytes(ctx context.Context, reference string) ([]byte, error)
 	UnmarshalJson(ctx context.Context, reference string, target interface{}) error
 }
 
 type client struct {
+	c           *ipfsapi.Shell
 	ipfsGateway string
 }
 
 func (c *client) buildUrl(reference string) string {
 	return fmt.Sprintf("%s/ipfs/%s", c.ipfsGateway, reference)
+}
+
+func (c *client) CalculateFileHash(payload []byte) (string, error) {
+	str := string(payload)
+	// if written to file and uploaded to ipfs, final character would be a \n
+	// this simulates that action so that hashes are same
+	if !strings.HasSuffix(str, "\n") {
+		str = fmt.Sprintf("%s%s", str, "\n")
+	}
+	return c.c.Add(bytes.NewReader([]byte(str)), ipfsapi.OnlyHash(true))
 }
 
 func (c *client) UnmarshalJson(ctx context.Context, reference string, target interface{}) error {
@@ -77,5 +92,8 @@ func (c *client) GetBytes(ctx context.Context, reference string) ([]byte, error)
 }
 
 func NewClient(ipfsGateway string) (*client, error) {
-	return &client{ipfsGateway: ipfsGateway}, nil
+	return &client{
+		ipfsGateway: ipfsGateway,
+		c:           ipfsapi.NewShell(ipfsGateway),
+	}, nil
 }
