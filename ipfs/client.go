@@ -22,7 +22,7 @@ var ErrRateLimit = errors.New("rate limited")
 var ErrNotFound = errors.New("not found")
 
 type Client interface {
-	AddFile(ctx context.Context, payload []byte) (string, error)
+	AddFile(payload []byte) (string, error)
 	CalculateFileHash(payload []byte) (string, error)
 	GetBytes(ctx context.Context, reference string) ([]byte, error)
 	UnmarshalJson(ctx context.Context, reference string, target interface{}) error
