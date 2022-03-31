@@ -58,9 +58,11 @@ func StartServer(ctx context.Context, port string, serverErrHandler ServerErrorH
 	if len(port) == 0 {
 		port = DefaultServerPort
 	}
-	Handle(healthChecker)
+	mux := http.NewServeMux()
+	Handle(mux, healthChecker)
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%s", port),
+		Addr:    fmt.Sprintf(":%s", port),
+		Handler: mux,
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
@@ -91,8 +93,8 @@ func MakeHandler(healthChecker HealthChecker) http.Handler {
 }
 
 // Handle transforms and registers health checker to http.DefaultServeMux.
-func Handle(healthChecker HealthChecker) {
-	http.Handle("/health", MakeHandler(healthChecker))
+func Handle(mux *http.ServeMux, healthChecker HealthChecker) {
+	mux.Handle("/health", MakeHandler(healthChecker))
 }
 
 // Service is a service implementation of a health server, to make things easier.
