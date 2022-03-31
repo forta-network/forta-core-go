@@ -22,6 +22,7 @@ var ErrRateLimit = errors.New("rate limited")
 var ErrNotFound = errors.New("not found")
 
 type Client interface {
+	AddFile(ctx context.Context, payload []byte) (string, error)
 	CalculateFileHash(payload []byte) (string, error)
 	GetBytes(ctx context.Context, reference string) ([]byte, error)
 	UnmarshalJson(ctx context.Context, reference string, target interface{}) error
@@ -36,14 +37,24 @@ func (c *client) buildUrl(reference string) string {
 	return fmt.Sprintf("%s/ipfs/%s", c.ipfsGateway, reference)
 }
 
-func (c *client) CalculateFileHash(payload []byte) (string, error) {
+func createFileBytes(payload []byte) []byte {
 	str := string(payload)
 	// if written to file and uploaded to ipfs, final character would be a \n
 	// this simulates that action so that hashes are same
 	if !strings.HasSuffix(str, "\n") {
 		str = fmt.Sprintf("%s%s", str, "\n")
 	}
-	return c.c.Add(bytes.NewReader([]byte(str)), ipfsapi.OnlyHash(true))
+	return []byte(str)
+}
+
+func (c *client) AddFile(payload []byte) (string, error) {
+	b := createFileBytes(payload)
+	return c.c.Add(bytes.NewReader(b), ipfsapi.Pin(true))
+}
+
+func (c *client) CalculateFileHash(payload []byte) (string, error) {
+	b := createFileBytes(payload)
+	return c.c.Add(bytes.NewReader(b), ipfsapi.OnlyHash(true))
 }
 
 func (c *client) UnmarshalJson(ctx context.Context, reference string, target interface{}) error {
