@@ -73,6 +73,9 @@ type Client interface {
 
 	//ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
+
+	//GetStakingThreshold returns the min/max/activated flag for a given address
+	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 }
 
 type client struct {
@@ -243,6 +246,15 @@ func (c *client) PegLatestBlock() error {
 	}
 	c.opts = opts
 	return nil
+}
+
+func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error) {
+	sID := utils.ScannerIDHexToBigInt(scannerID)
+	res, err := c.sr.GetStakeThreshold(c.opts, sID)
+	if err != nil {
+		return nil, err
+	}
+	return (*StakingThreshold)(&res), nil
 }
 
 func (c *client) GetScannerNodeVersion() (string, error) {

@@ -62,6 +62,11 @@ func LoadKeyWithPassphrase(keysDirPath, passphrase string) (*keystore.Key, error
 		return nil, err
 	}
 
+	return LoadKeyFromBytes(keyBytes, passphrase)
+}
+
+// LoadKeyFromBytes decrypts and loads the node private key using bytes of key and passphrase
+func LoadKeyFromBytes(keyBytes []byte, passphrase string) (*keystore.Key, error) {
 	return keystore.DecryptKey(keyBytes, passphrase)
 }
 

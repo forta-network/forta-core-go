@@ -1,5 +1,9 @@
 package registry
 
+import (
+	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
+)
+
 const SubjectTypeScanner = 0
 const SubjectTypeAgent = 1
 
@@ -23,3 +27,5 @@ type AssignmentHash struct {
 	AgentLength int64  `json:"agentLength"`
 	Hash        string `json:"hash"`
 }
+
+type StakingThreshold contract_scanner_registry.IStakeSubjectStakeThreshold
