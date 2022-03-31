@@ -34,6 +34,21 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
+// CalculateFileHash mocks base method.
+func (m *MockClient) CalculateFileHash(ctx context.Context, payload []byte) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CalculateFileHash", ctx, payload)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CalculateFileHash indicates an expected call of CalculateFileHash.
+func (mr *MockClientMockRecorder) CalculateFileHash(ctx, payload interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateFileHash", reflect.TypeOf((*MockClient)(nil).CalculateFileHash), ctx, payload)
+}
+
 // GetBytes mocks base method.
 func (m *MockClient) GetBytes(ctx context.Context, reference string) ([]byte, error) {
 	m.ctrl.T.Helper()
