@@ -156,19 +156,23 @@ func TestBlockFeed_ForEachBlockWithOldBlock(t *testing.T) {
 	block2 := blockWithParent(block1.Hash, 2)
 	block2.Timestamp = utils.BigIntToHex(big.NewInt(time.Now().Add(-2 * time.Hour).Unix()))
 
-	block3 := blockWithParent(block2.Hash, 3)
+	latestBlockNum := 4
+	latestBlockNumBig := big.NewInt(int64(latestBlockNum))
+	latestBlock := blockWithParent(block2.Hash, latestBlockNum)
 
-	//TODO: actually test that the trace part matters (this returns nil for now)
+	// TODO: actually test that the trace part matters (this returns nil for now)
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
 	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
 	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
 
-	//too old to process, skipping this one
+	// too old to process, skipping this one and resetting to latest block number
 	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
+	client.EXPECT().BlockNumber(ctx).Return(latestBlockNumBig, nil)
 
-	client.EXPECT().BlockByNumber(ctx, big.NewInt(3)).Return(block3, nil).Times(1)
+	// continuing from latest block
+	client.EXPECT().BlockByNumber(ctx, latestBlockNumBig).Return(latestBlock, nil).Times(1)
 	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
-	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block3.Number)).Return(nil, nil).Times(1)
+	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(latestBlock.Number)).Return(nil, nil).Times(1)
 
 	count := 0
 	var evts []*domain.BlockEvent
@@ -184,8 +188,8 @@ func TestBlockFeed_ForEachBlockWithOldBlock(t *testing.T) {
 	assert.Error(t, testErr, res)
 	assert.Equal(t, 2, len(evts))
 
-	// should skip block 2 and continue to block 3
-	assertEvts(t, evts, blockEvent(block1), blockEvent(block3))
+	// should skip block 2 and continue to latest block
+	assertEvts(t, evts, blockEvent(block1), blockEvent(latestBlock))
 }
 
 func TestBlockFeed_ForEachBlock_Cancelled(t *testing.T) {

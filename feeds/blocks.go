@@ -174,9 +174,22 @@ func (bf *blockFeed) forEachBlock() error {
 		if bf.rateLimit != nil {
 			<-bf.rateLimit.C
 		}
+
+		blockNumToAnalyze := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
 		logger := log.WithFields(log.Fields{
-			"currentBlock": currentBlockNum.Uint64(),
+			"currentBlock":   currentBlockNum.Uint64(),
+			"blockToAnalyze": blockNumToAnalyze.Uint64(),
 		})
+
+		if bf.end != nil && blockNumToAnalyze.Uint64() > bf.end.Uint64() {
+			logger.Info("end block reached - exiting")
+			return ErrEndBlockReached
+		}
+		if bf.cache.Exists(blockNumToAnalyze.String()) {
+			logger.Info("already analyzed block - skipping")
+			currentBlockNum.Add(currentBlockNum, increment)
+			continue
+		}
 
 		block, err := bf.client.BlockByNumber(bf.ctx, currentBlockNum)
 		if err != nil {
@@ -184,14 +197,6 @@ func (bf *blockFeed) forEachBlock() error {
 			continue
 		}
 
-		blockNumToAnalyze := new(big.Int).Sub(currentBlockNum, big.NewInt(int64(bf.offset)))
-		logger = logger.WithFields(log.Fields{
-			"blockToAnalyze": blockNumToAnalyze.Uint64(),
-		})
-
-		if bf.end != nil && blockNumToAnalyze.Uint64() > bf.end.Uint64() {
-			return ErrEndBlockReached
-		}
 		if blockNumToAnalyze.Cmp(currentBlockNum) != 0 {
 			block, err = bf.client.BlockByNumber(bf.ctx, blockNumToAnalyze)
 			if err != nil {
@@ -205,8 +210,13 @@ func (bf *blockFeed) forEachBlock() error {
 		})
 
 		if tooOld, age := blockIsTooOld(block, bf.maxBlockAge); tooOld {
-			logger.WithField("age", age).Warnf("ignoring block, older than %v", bf.maxBlockAge)
-			currentBlockNum.Add(currentBlockNum, increment)
+			logger.WithField("age", age).Warnf("block is older than %v - setting current block num to latest", bf.maxBlockAge)
+			latestBlockNum, err := bf.client.BlockNumber(bf.ctx)
+			if err != nil {
+				logger.WithError(err).Error("failed to get latest block number")
+				continue
+			}
+			currentBlockNum = latestBlockNum
 			continue
 		}
 
@@ -242,7 +252,7 @@ func (bf *blockFeed) forEachBlock() error {
 				return err
 			}
 		}
-		bf.cache.Add(block.Hash)
+		bf.cache.Add(blockNumToAnalyze.String())
 
 		currentBlockNum.Add(currentBlockNum, increment)
 	}
