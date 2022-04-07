@@ -23,8 +23,11 @@ import (
 	"github.com/forta-protocol/forta-core-go/utils"
 )
 
-const scannerRegistryDeployBlock = 20187154
-const zeroAddress = "0x0000000000000000000000000000000000000000"
+const (
+	scannerRegistryChainID     = 137
+	scannerRegistryDeployBlock = 20187154
+	zeroAddress                = "0x0000000000000000000000000000000000000000"
+)
 
 //Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
@@ -528,7 +531,10 @@ func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata st
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts := bind.NewKeyedTransactor(c.privateKey)
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	if err != nil {
+		return "", fmt.Errorf("failed to create transaction opts: %v", err)
+	}
 	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
