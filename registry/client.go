@@ -529,6 +529,10 @@ func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata st
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
 	opts := bind.NewKeyedTransactor(c.privateKey)
+	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
+	}
 	tx, err := registry.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
 	if err != nil {
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
