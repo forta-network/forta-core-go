@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	ipfsapi "github.com/ipfs/go-ipfs-api"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	ipfsapi "github.com/ipfs/go-ipfs-api"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -29,8 +30,8 @@ type Client interface {
 }
 
 type client struct {
-	c           *ipfsapi.Shell
 	ipfsGateway string
+	*ipfsapi.Shell
 }
 
 func (c *client) buildUrl(reference string) string {
@@ -49,12 +50,12 @@ func createFileBytes(payload []byte) []byte {
 
 func (c *client) AddFile(payload []byte) (string, error) {
 	b := createFileBytes(payload)
-	return c.c.Add(bytes.NewReader(b), ipfsapi.Pin(true))
+	return c.Add(bytes.NewReader(b), ipfsapi.Pin(true))
 }
 
 func (c *client) CalculateFileHash(payload []byte) (string, error) {
 	b := createFileBytes(payload)
-	return c.c.Add(bytes.NewReader(b), ipfsapi.OnlyHash(true))
+	return c.Add(bytes.NewReader(b), ipfsapi.OnlyHash(true))
 }
 
 func (c *client) UnmarshalJson(ctx context.Context, reference string, target interface{}) error {
@@ -105,6 +106,6 @@ func (c *client) GetBytes(ctx context.Context, reference string) ([]byte, error)
 func NewClient(ipfsGateway string) (*client, error) {
 	return &client{
 		ipfsGateway: ipfsGateway,
-		c:           ipfsapi.NewShell(ipfsGateway),
+		Shell:       ipfsapi.NewShell(ipfsGateway),
 	}, nil
 }
