@@ -182,6 +182,13 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			txLogs = append(txLogs, l)
 			l.Address = strings.ToLower(l.Address)
 			safeAddStrValueToMap(addresses, l.Address)
+
+			// add addresses from topics
+			for _, topic := range l.Topics {
+				if strings.HasPrefix(topic, "0x000000000000000000000000") {
+					safeAddStrValueToMap(addresses, common.HexToAddress(topic).Hex())
+				}
+			}
 		}
 	}
 

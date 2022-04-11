@@ -20,6 +20,8 @@ func TestTransactionEvent_ToMessage(t *testing.T) {
 	from := "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"
 	to := "0x9C025948e61aeB2EF99503c81d682045f07344c2"
 
+	topic := "0x000000000000000000000000a5ca6f2d2d07fc983f954552962b3c21c2db0a9A"
+
 	evt := &TransactionEvent{
 		BlockEvt: &BlockEvent{
 			EventType: "block",
@@ -52,6 +54,9 @@ func TestTransactionEvent_ToMessage(t *testing.T) {
 					BlockHash:       &blockHash,
 					BlockNumber:     strPtr("0x2"),
 					TransactionHash: &txHash,
+					Topics: []*string{
+						&topic,
+					},
 				},
 				{
 					Address:         strPtr(to),
@@ -90,7 +95,7 @@ func TestTransactionEvent_ToMessage(t *testing.T) {
 	t.Log(str)
 
 	// I manually checked this json, so this test just ensures this behavior continues
-	expected := `{"transaction":{"nonce":"0x5","gasPrice":"0x3","gas":"0x2","to":"0x9c025948e61aeb2ef99503c81d682045f07344c2","hash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","from":"0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"},"receipt":{"status":"0x1","logs":[{"address":"0x9c025948e61aeb2ef99503c81d682045f07344c2","blockNumber":"0x2","transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069"}],"transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","gasUsed":"0x2","blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069","blockNumber":"0x1"},"network":{"chainId":"0x1"},"traces":[{"action":{"to":"0x9c025948e61aeb2ef99503c81d682045f07344c2","from":"0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"},"blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069","blockNumber":"1","transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","transactionPosition":"5","type":"transaction"}],"addresses":{"0x9c025948e61aeb2ef99503c81d682045f07344c2":true,"0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270":true},"block":{"blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069","blockNumber":"0x1","blockTimestamp":"0x12345"},"logs":[{"address":"0x9c025948e61aeb2ef99503c81d682045f07344c2","blockNumber":"0x2","transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069"}]}`
+	expected := `{"transaction":{"nonce":"0x5","gasPrice":"0x3","gas":"0x2","to":"0x9c025948e61aeb2ef99503c81d682045f07344c2","hash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","from":"0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"},"receipt":{"status":"0x1","logs":[{"address":"0x9c025948e61aeb2ef99503c81d682045f07344c2","topics":["0x000000000000000000000000a5ca6f2d2d07fc983f954552962b3c21c2db0a9A"],"blockNumber":"0x2","transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069"}],"transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","gasUsed":"0x2","blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069","blockNumber":"0x1"},"network":{"chainId":"0x1"},"traces":[{"action":{"to":"0x9c025948e61aeb2ef99503c81d682045f07344c2","from":"0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"},"blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069","blockNumber":"1","transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","transactionPosition":"5","type":"transaction"}],"addresses":{"0x9c025948e61aeb2ef99503c81d682045f07344c2":true,"0xa5ca6f2d2d07fc983f954552962b3c21c2db0a9a":true,"0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270":true},"block":{"blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069","blockNumber":"0x1","blockTimestamp":"0x12345"},"logs":[{"address":"0x9c025948e61aeb2ef99503c81d682045f07344c2","topics":["0x000000000000000000000000a5ca6f2d2d07fc983f954552962b3c21c2db0a9A"],"blockNumber":"0x2","transactionHash":"0x99ed5a4e541454219b444250c5c25d0306e73834b185f3aeee3f9627f0cd64c2","blockHash":"0x8d2636ff603ef946d97ad797ed13afa31234a3412dacdfecfeb3247230eb1069"}]}`
 	assert.NoError(t, err, "error returned from json conversion")
 	assert.Equal(t, expected, str)
 }
