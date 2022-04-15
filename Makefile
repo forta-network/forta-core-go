@@ -42,7 +42,7 @@ pull-contracts:
 
 .PHONY: swagger
 swagger:
-	rm -rf clients/webhook
+	@rm -rf clients/webhook
 	@$(SWAGGER) generate client \
 		-f protocol/webhook/swagger.yml \
 		-c clients/webhook \
