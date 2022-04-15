@@ -1,0 +1,151 @@
+swagger: '2.0'
+info:
+  title: Forta Webhook Specification
+  description: |
+    Forta Webhook Specification
+    Alert models are based on definitions in https://github.com/forta-protocol/forta-alerts-api.
+  version: 1.0.0
+basePath: /forta/v1
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /alerts:
+    post:
+      operationId: SendAlerts
+      summary: Send a list of alerts
+      parameters:
+        - in: body
+          name: alertList
+          required: true
+          schema:
+            $ref: '#/definitions/AlertList'
+      responses:
+        200:
+          description: Successfully sent alerts
+        400:
+          $ref: '#/responses/BadRequestResponse'
+        500:
+          description: Internal error
+
+responses:
+  BadRequestResponse:
+    description: Bad request
+    schema:
+      type: object
+      properties:
+        reason:
+          type: string
+
+definitions:
+  AlertList:
+    type: object
+    properties:
+      alerts:
+        type: array
+        items:
+          - $ref: '#/definitions/Alert'
+
+  Alert:
+    type: object
+    properties:
+      hash:
+        type: string
+        description: Deterministic alert hash
+        example: '0xe9cfda18f167de5cdd63c101e38ec0d4cb0a1c2dea80921ecc4405c2b010855f'
+      createdAt:
+        type: string
+        description: Timestamp (RFC3339Nano)
+        example: '2022-03-01T12:24:33.379756298Z'
+      alertId:
+        type: string
+        example: OZ-GNOSIS-EVENTS
+      name:
+        type: string
+        example: Transfer Event
+      description:
+        type: string
+        example: Detected Transfer event
+      findingType:
+        type: string
+        enum:
+          - UNKNOWN_TYPE
+          - EXPLOIT
+          - SUSPICIOUS
+          - DEGRADED
+          - INFORMATION
+      severity:
+        type: string
+        enum:
+          - UNKNOWN
+          - INFO
+          - LOW
+          - MEDIUM
+          - HIGH
+          - CRITICAL
+      metadata:
+        type: object
+        description: An associative array of string values
+        example:
+          contractAddress: '0x98883145049dec03c00cb7708cbc938058802520'
+          operator: '0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3'
+      source:
+        $ref: '#/definitions/AlertSource'
+      addresses:
+        type: array
+        items:
+          - type: string
+        description: Addresses involved in the source of this alert
+        example:
+          - '0x98883145049dec03c00cb7708cbc938058802520'
+          - '0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3'
+
+  AlertSource:
+    type: object
+    properties:
+      transactionHash:
+        type: string
+        example: '0x7040dd33cbfd3e9d880da80cb5f3697a717fc329abd0251f3dcd51599ab67b0a'
+      agent:
+        $ref: '#/definitions/AlertAgent'
+      block:
+        $ref: '#/definitions/AlertBlock'
+
+  AlertAgent:
+    type: object
+    properties:
+      id:
+        type: string
+        example: '0x17381ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049'
+      reference:
+        type: string
+        description: Agent reference (IPFS hash)
+        example: QmU6L9Zo5rweF6QZLhLfwAAFUFRMF3uFdSnMiJzENXr37R
+      image:
+        type: string
+        description: Docker image reference (Disco)
+        example: bafybeibrigevnhic4befnkqbaagzgxqtdyv2fdgcbqwxe7ees3hw6fymme@sha256:9ca1547e130a6264bb1b4ad6b10f17cabf404957f23d457a30046b9afdf29fc8
+
+  AlertBlock:
+    type: object
+    properties:
+      number:
+        type: integer
+        example: 1235678901234
+      hash:
+        type: string
+        example: '0xf9e777b739cf90a197c74c461933422dcf26fadf50e0ef9aa72af76727da87ca'
+      timestamp:
+        type: string
+        description: Timestamp (RFC3339)
+        example: '2022-03-01T12:24:33Z'
+      chainId:
+        type: integer
+        example: 1337
+      
+      
