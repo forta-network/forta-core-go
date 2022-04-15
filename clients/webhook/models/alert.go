@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 
@@ -21,8 +20,9 @@ import (
 // swagger:model Alert
 type Alert struct {
 
-	// addresses
-	Addresses *AlertAddressesTuple0 `json:"addresses,omitempty"`
+	// Addresses involved in the source of this alert
+	// Example: ["0x98883145049dec03c00cb7708cbc938058802520","0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3"]
+	Addresses []string `json:"addresses"`
 
 	// alert Id
 	// Example: OZ-GNOSIS-EVENTS
@@ -64,10 +64,6 @@ type Alert struct {
 func (m *Alert) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAddresses(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateFindingType(formats); err != nil {
 		res = append(res, err)
 	}
@@ -83,25 +79,6 @@ func (m *Alert) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Alert) validateAddresses(formats strfmt.Registry) error {
-	if swag.IsZero(m.Addresses) { // not required
-		return nil
-	}
-
-	if m.Addresses != nil {
-		if err := m.Addresses.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("addresses")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("addresses")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -233,10 +210,6 @@ func (m *Alert) validateSource(formats strfmt.Registry) error {
 func (m *Alert) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateAddresses(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateSource(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -244,22 +217,6 @@ func (m *Alert) ContextValidate(ctx context.Context, formats strfmt.Registry) er
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Alert) contextValidateAddresses(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Addresses != nil {
-		if err := m.Addresses.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("addresses")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("addresses")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -290,100 +247,6 @@ func (m *Alert) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Alert) UnmarshalBinary(b []byte) error {
 	var res Alert
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
-// AlertAddressesTuple0 AlertAddressesTuple0 a representation of an anonymous Tuple type
-//
-// swagger:model AlertAddressesTuple0
-type AlertAddressesTuple0 struct {
-
-	// p0
-	// Required: true
-	P0 *string `json:"-"` // custom serializer
-
-}
-
-// UnmarshalJSON unmarshals this tuple type from a JSON array
-func (m *AlertAddressesTuple0) UnmarshalJSON(raw []byte) error {
-	// stage 1, get the array but just the array
-	var stage1 []json.RawMessage
-	buf := bytes.NewBuffer(raw)
-	dec := json.NewDecoder(buf)
-	dec.UseNumber()
-
-	if err := dec.Decode(&stage1); err != nil {
-		return err
-	}
-
-	// stage 2: hydrates struct members with tuple elements
-	if len(stage1) > 0 {
-		var dataP0 string
-		buf = bytes.NewBuffer(stage1[0])
-		dec := json.NewDecoder(buf)
-		dec.UseNumber()
-		if err := dec.Decode(&dataP0); err != nil {
-			return err
-		}
-		m.P0 = &dataP0
-
-	}
-
-	return nil
-}
-
-// MarshalJSON marshals this tuple type into a JSON array
-func (m AlertAddressesTuple0) MarshalJSON() ([]byte, error) {
-	data := []interface{}{
-		m.P0,
-	}
-
-	return json.Marshal(data)
-}
-
-// Validate validates this alert addresses tuple0
-func (m *AlertAddressesTuple0) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateP0(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *AlertAddressesTuple0) validateP0(formats strfmt.Registry) error {
-
-	if err := validate.Required("P0", "body", m.P0); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validates this alert addresses tuple0 based on context it is used
-func (m *AlertAddressesTuple0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *AlertAddressesTuple0) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *AlertAddressesTuple0) UnmarshalBinary(b []byte) error {
-	var res AlertAddressesTuple0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

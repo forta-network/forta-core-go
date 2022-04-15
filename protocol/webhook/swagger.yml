@@ -49,7 +49,7 @@ definitions:
       alerts:
         type: array
         items:
-          - $ref: '#/definitions/Alert'
+          $ref: '#/definitions/Alert'
 
   Alert:
     type: object
@@ -99,7 +99,7 @@ definitions:
       addresses:
         type: array
         items:
-          - type: string
+          type: string
         description: Addresses involved in the source of this alert
         example:
           - '0x98883145049dec03c00cb7708cbc938058802520'
