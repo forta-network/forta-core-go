@@ -147,5 +147,3 @@ definitions:
       chainId:
         type: integer
         example: 1337
-      
-      
