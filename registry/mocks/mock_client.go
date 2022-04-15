@@ -37,33 +37,33 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // DisableScanner mocks base method.
-func (m *MockClient) DisableScanner(scannerAddress string) (string, error) {
+func (m *MockClient) DisableScanner(ScannerPermission registry0.ScannerPermission, scannerAddress string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DisableScanner", scannerAddress)
+	ret := m.ctrl.Call(m, "DisableScanner", ScannerPermission, scannerAddress)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DisableScanner indicates an expected call of DisableScanner.
-func (mr *MockClientMockRecorder) DisableScanner(scannerAddress interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) DisableScanner(ScannerPermission, scannerAddress interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DisableScanner", reflect.TypeOf((*MockClient)(nil).DisableScanner), scannerAddress)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DisableScanner", reflect.TypeOf((*MockClient)(nil).DisableScanner), ScannerPermission, scannerAddress)
 }
 
 // EnableScanner mocks base method.
-func (m *MockClient) EnableScanner(scannerAddress string) (string, error) {
+func (m *MockClient) EnableScanner(ScannerPermission registry0.ScannerPermission, scannerAddress string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EnableScanner", scannerAddress)
+	ret := m.ctrl.Call(m, "EnableScanner", ScannerPermission, scannerAddress)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // EnableScanner indicates an expected call of EnableScanner.
-func (mr *MockClientMockRecorder) EnableScanner(scannerAddress interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) EnableScanner(ScannerPermission, scannerAddress interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnableScanner", reflect.TypeOf((*MockClient)(nil).EnableScanner), scannerAddress)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnableScanner", reflect.TypeOf((*MockClient)(nil).EnableScanner), ScannerPermission, scannerAddress)
 }
 
 // ForEachAgent mocks base method.
