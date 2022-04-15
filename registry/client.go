@@ -27,11 +27,13 @@ const (
 	scannerRegistryChainID     = 137
 	scannerRegistryDeployBlock = 20187154
 	zeroAddress                = "0x0000000000000000000000000000000000000000"
+	defaultEnsAddress          = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
 )
 
 // ScannerPermission is an alias to use for enums.
 type ScannerPermission uint8
 
+// ScannerPermission values align with an enum in the ScannerRegistry smart contract
 const (
 	ScannerPermissionAdmin ScannerPermission = iota
 	ScannerPermissionSelf
@@ -91,10 +93,10 @@ type Client interface {
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 
 	// EnableScanner enables a scanner.
-	EnableScanner(scannerAddress string) (txHash string, err error)
+	EnableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
 
 	// DisableScanner disables a scanner.
-	DisableScanner(scannerAddress string) (txHash string, err error)
+	DisableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
 }
 
 type client struct {
@@ -128,14 +130,11 @@ type ClientConfig struct {
 
 	// PrivateKey is used for sending transactions
 	PrivateKey *ecdsa.PrivateKey
-
-	// ScannerPermission is used to assert permissions in scanner management transactions.
-	ScannerPermission *ScannerPermission
 }
 
 var defaultConfig = ClientConfig{
 	JsonRpcUrl: "https://polygon-rpc.com",
-	ENSAddress: "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7",
+	ENSAddress: defaultEnsAddress,
 	Name:       "registry-client",
 }
 
@@ -219,7 +218,12 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 }
 
 func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
-	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, cfg.ENSAddress)
+	// avoids need to provide ENS address outside of dev environment use cases
+	ensAddr := cfg.ENSAddress
+	if ensAddr == "" {
+		ensAddr = defaultEnsAddress
+	}
+	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, ensAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -546,7 +550,7 @@ func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata st
 	if c.privateKey == nil {
 		return "", errors.New("no private key provided to the client")
 	}
-	registry, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
@@ -558,21 +562,18 @@ func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata st
 	if err != nil {
 		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
 	}
-	tx, err := registry.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
+	tx, err := reg.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
 	if err != nil {
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
 	}
 	return tx.Hash().Hex(), nil
 }
 
-func (c *client) EnableScanner(scannerAddress string) (txHash string, err error) {
+func (c *client) EnableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
 	if c.privateKey == nil {
 		return "", errors.New("no private key provided to the client")
 	}
-	if c.cfg.ScannerPermission == nil {
-		return "", errors.New("no permission role specified in client config")
-	}
-	registry, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
@@ -584,21 +585,18 @@ func (c *client) EnableScanner(scannerAddress string) (txHash string, err error)
 	if err != nil {
 		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
 	}
-	tx, err := registry.EnableScanner(opts, utils.ScannerIDHexToBigInt(scannerAddress), uint8(*c.cfg.ScannerPermission))
+	tx, err := reg.EnableScanner(opts, utils.ScannerIDHexToBigInt(scannerAddress), uint8(permission))
 	if err != nil {
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
 	}
 	return tx.Hash().Hex(), nil
 }
 
-func (c *client) DisableScanner(scannerAddress string) (txHash string, err error) {
+func (c *client) DisableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
 	if c.privateKey == nil {
 		return "", errors.New("no private key provided to the client")
 	}
-	if c.cfg.ScannerPermission == nil {
-		return "", errors.New("no permission role specified in client config")
-	}
-	registry, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
@@ -610,7 +608,7 @@ func (c *client) DisableScanner(scannerAddress string) (txHash string, err error
 	if err != nil {
 		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
 	}
-	tx, err := registry.DisableScanner(opts, utils.ScannerIDHexToBigInt(scannerAddress), uint8(*c.cfg.ScannerPermission))
+	tx, err := reg.DisableScanner(opts, utils.ScannerIDHexToBigInt(scannerAddress), uint8(permission))
 	if err != nil {
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
 	}
