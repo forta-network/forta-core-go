@@ -39,56 +39,62 @@ const (
 	ScannerPermissionManager
 )
 
-//Client retrieves agent, scanner, and assignment information from the registry contracts
+// Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
 	//PegLatestBlock will set the opts so that every call uses same block
 	PegLatestBlock() error
 	PegBlock(blockNum *big.Int)
 
-	//ResetOpts unsets the options for the store
+	// ResetOpts unsets the options for the store
 	ResetOpts()
 
-	//GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
+	// GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
 	GetAssignmentHash(scannerID string) (*AssignmentHash, error)
 
-	//IsEnabledScanner returns true if the scanner exists and is enabled
+	// IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
 
-	//GetScannerNodeVersion returns the current ipfs reference for the latest scanner node release
+	// GetScannerNodeVersion returns the current ipfs reference for the latest scanner node release
 	GetScannerNodeVersion() (string, error)
 
-	//GetAgent returns the registry information for the agent
+	// GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
 
-	//IsAssigned returns true if the scanner is assigned to the agent
+	// IsAssigned returns true if the scanner is assigned to the agent
 	IsAssigned(scannerID string, agentID string) (bool, error)
 
-	//GetScanner returns a scanner
+	// GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
-	//RegisterScanner registers a scanner using private key.
+	// RegisterScanner registers a scanner using private key.
 	RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
-	//RegistryContracts returns the ens-resolved registry contracts
+	// RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
 
-	//ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
+	// ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
 	ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error
 
-	//ForEachChainAgent loops over all agents for a chainID
+	// ForEachChainAgent loops over all agents for a chainID
 	ForEachChainAgent(chainID int64, handler func(a *Agent) error) error
 
-	//ForEachAgent loops over all agents
+	// ForEachAgent loops over all agents
 	ForEachAgent(handler func(a *Agent) error) error
 
-	//ForEachScanner gets all scanners
+	// ForEachScanner gets all scanners
 	ForEachScanner(handler func(s *Scanner) error) error
 
-	//ForEachAssignedScanner loops over scanners by agent
+	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
 
-	//GetStakingThreshold returns the min/max/activated flag for a given address
+	// GetStakingThreshold returns the min/max/activated flag for a given address
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
+
+	// EnableScanner enables a scanner.
+	EnableScanner(scannerAddress string) (txHash string, err error)
+
+	// DisableScanner disables a scanner.
+	DisableScanner(scannerAddress string) (txHash string, err error)
 }
 
 type client struct {
