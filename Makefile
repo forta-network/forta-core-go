@@ -1,3 +1,11 @@
+export GOBIN = $(shell pwd)/toolbin
+
+SWAGGER = $(GOBIN)/swagger
+
+tools:
+	@rm -rf toolbin
+	@go install github.com/go-swagger/go-swagger/cmd/swagger@v0.29.0
+
 proto:
 	protoc -I=protocol --go_out=protocol/. protocol/metrics.proto
 	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/agent.proto
@@ -31,3 +39,11 @@ abigen: pull-contracts
 .PHONY: pull-contracts
 pull-contracts:
 	./scripts/pull-contracts.sh forta-token bridging
+
+.PHONY: swagger
+swagger:
+	@rm -rf clients/webhook
+	@$(SWAGGER) generate client \
+		-f protocol/webhook/swagger.yml \
+		-c clients/webhook \
+		-m clients/webhook/models
