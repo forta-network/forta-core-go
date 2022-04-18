@@ -10,7 +10,7 @@ if [ -d "$CONTRACT_REPO_NAME" ]; then
 	git checkout "$CONTRACT_REPO_BRANCH"
 	git pull
 else
-	git clone --branch "$CONTRACT_REPO_BRANCH" https://github.com/forta-protocol/"$CONTRACT_REPO_NAME"
+	git clone --branch "$CONTRACT_REPO_BRANCH" https://github.com/forta-network/"$CONTRACT_REPO_NAME"
 	cd "$CONTRACT_REPO_NAME"
 fi
 
