@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/utils"
 	"math/big"
 	"time"
 )

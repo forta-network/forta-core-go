@@ -2,20 +2,20 @@ package registry
 
 import (
 	"context"
-	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/utils"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-protocol/forta-core-go/contracts/contract_dispatch"
-	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
-	"github.com/forta-protocol/forta-core-go/domain"
-	"github.com/forta-protocol/forta-core-go/domain/registry"
-	"github.com/forta-protocol/forta-core-go/ethereum"
-	"github.com/forta-protocol/forta-core-go/feeds"
+	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/feeds"
 )
 
 type listener struct {

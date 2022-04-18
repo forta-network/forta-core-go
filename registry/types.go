@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 )
 
 const SubjectTypeScanner = 0

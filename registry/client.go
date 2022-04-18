@@ -7,20 +7,20 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/forta-protocol/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-protocol/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/domain/registry"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/forta-protocol/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-protocol/forta-core-go/contracts/contract_dispatch"
-	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_node_version"
-	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
-	"github.com/forta-protocol/forta-core-go/ens"
-	"github.com/forta-protocol/forta-core-go/ethereum"
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/ens"
+	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 const (

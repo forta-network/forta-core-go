@@ -1,8 +1,8 @@
 package encoding_test
 
 import (
-	"github.com/forta-protocol/forta-core-go/encoding"
-	"github.com/forta-protocol/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/encoding"
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"testing"

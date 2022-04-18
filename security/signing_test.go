@@ -1,7 +1,7 @@
 package security
 
 import (
-	"github.com/forta-protocol/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/google/uuid"
 	"testing"
 	"time"

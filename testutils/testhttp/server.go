@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/forta-protocol/forta-core-go/utils/apiutils"
+	"github.com/forta-network/forta-core-go/utils/apiutils"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )

@@ -8,8 +8,8 @@ import (
 	reflect "reflect"
 
 	types "github.com/ethereum/go-ethereum/core/types"
-	health "github.com/forta-protocol/forta-core-go/clients/health"
-	domain "github.com/forta-protocol/forta-core-go/domain"
+	health "github.com/forta-network/forta-core-go/clients/health"
+	domain "github.com/forta-network/forta-core-go/domain"
 	gomock "github.com/golang/mock/gomock"
 )
 
