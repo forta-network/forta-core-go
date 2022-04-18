@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/forta-protocol/forta-core-go/encoding"
-	"github.com/forta-protocol/forta-core-go/ipfs"
-	"github.com/forta-protocol/forta-core-go/protocol"
-	"github.com/forta-protocol/forta-core-go/security"
+	"github.com/forta-network/forta-core-go/encoding"
+	"github.com/forta-network/forta-core-go/ipfs"
+	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/security"
 	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
 )
