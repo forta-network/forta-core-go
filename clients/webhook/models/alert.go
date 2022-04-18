@@ -52,6 +52,10 @@ type Alert struct {
 	// Example: Transfer Event
 	Name string `json:"name,omitempty"`
 
+	// protocol
+	// Example: ethereum
+	Protocol string `json:"protocol,omitempty"`
+
 	// severity
 	// Enum: [UNKNOWN INFO LOW MEDIUM HIGH CRITICAL]
 	Severity string `json:"severity,omitempty"`

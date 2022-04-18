@@ -68,6 +68,9 @@ definitions:
       name:
         type: string
         example: Transfer Event
+      protocol:
+        type: string
+        example: ethereum
       description:
         type: string
         example: Detected Transfer event
@@ -136,6 +139,7 @@ definitions:
     properties:
       number:
         type: integer
+        format: uint64
         example: 1235678901234
       hash:
         type: string
@@ -146,4 +150,5 @@ definitions:
         example: '2022-03-01T12:24:33Z'
       chainId:
         type: integer
+        format: uint64
         example: 1337

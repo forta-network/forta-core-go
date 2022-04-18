@@ -19,7 +19,7 @@ type AlertBlock struct {
 
 	// chain Id
 	// Example: 1337
-	ChainID int64 `json:"chainId,omitempty"`
+	ChainID uint64 `json:"chainId,omitempty"`
 
 	// hash
 	// Example: 0xf9e777b739cf90a197c74c461933422dcf26fadf50e0ef9aa72af76727da87ca
@@ -27,7 +27,7 @@ type AlertBlock struct {
 
 	// number
 	// Example: 1235678901234
-	Number int64 `json:"number,omitempty"`
+	Number uint64 `json:"number,omitempty"`
 
 	// Timestamp (RFC3339)
 	// Example: 2022-03-01T12:24:33Z
