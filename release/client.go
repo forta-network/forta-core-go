@@ -2,7 +2,7 @@ package release
 
 import (
 	"context"
-	"github.com/forta-protocol/forta-core-go/ipfs"
+	"github.com/forta-network/forta-core-go/ipfs"
 )
 
 type Client interface {

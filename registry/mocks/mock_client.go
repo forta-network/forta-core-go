@@ -8,8 +8,8 @@ import (
 	big "math/big"
 	reflect "reflect"
 
-	registry "github.com/forta-protocol/forta-core-go/domain/registry"
-	registry0 "github.com/forta-protocol/forta-core-go/registry"
+	registry "github.com/forta-network/forta-core-go/domain/registry"
+	registry0 "github.com/forta-network/forta-core-go/registry"
 	gomock "github.com/golang/mock/gomock"
 )
 

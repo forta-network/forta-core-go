@@ -11,10 +11,10 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/forta-protocol/forta-core-go/clients/health"
-	"github.com/forta-protocol/forta-core-go/domain"
-	mocks "github.com/forta-protocol/forta-core-go/ethereum/mocks"
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/clients/health"
+	"github.com/forta-network/forta-core-go/domain"
+	mocks "github.com/forta-network/forta-core-go/ethereum/mocks"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 var testErr = errors.New("test")

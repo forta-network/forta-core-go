@@ -12,10 +12,10 @@ import (
 	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/forta-protocol/forta-core-go/clients/health"
-	"github.com/forta-protocol/forta-core-go/domain"
-	"github.com/forta-protocol/forta-core-go/ethereum"
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/clients/health"
+	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 var ErrEndBlockReached = errors.New("end block reached")

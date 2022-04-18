@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/forta-protocol/forta-core-go/utils/workers"
+	"github.com/forta-network/forta-core-go/utils/workers"
 	"github.com/stretchr/testify/require"
 )
 

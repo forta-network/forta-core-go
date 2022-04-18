@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	release "github.com/forta-protocol/forta-core-go/release"
+	release "github.com/forta-network/forta-core-go/release"
 	gomock "github.com/golang/mock/gomock"
 )
 

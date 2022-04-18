@@ -17,9 +17,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/forta-protocol/forta-core-go/encoding"
-	"github.com/forta-protocol/forta-core-go/protocol"
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/encoding"
+	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 var ErrMissingSignature = errors.New("missing signature")

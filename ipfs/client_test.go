@@ -5,13 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/forta-protocol/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/golang/protobuf/jsonpb"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/forta-protocol/forta-core-go/testutils/testhttp"
+	"github.com/forta-network/forta-core-go/testutils/testhttp"
 	"github.com/stretchr/testify/assert"
 )
 

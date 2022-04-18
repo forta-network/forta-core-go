@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/forta-protocol/forta-core-go/registry"
+	"github.com/forta-network/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
 	"os"
 )

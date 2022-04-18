@@ -11,8 +11,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/forta-protocol/forta-core-go/domain"
-	mocks "github.com/forta-protocol/forta-core-go/ethereum/mocks"
+	"github.com/forta-network/forta-core-go/domain"
+	mocks "github.com/forta-network/forta-core-go/ethereum/mocks"
 )
 
 const testBlockHash = "0x4fc0862e76691f5312964883954d5c2db35e2b8f7a4f191775a4f50c69804a8d"

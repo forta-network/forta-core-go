@@ -1,4 +1,4 @@
-module github.com/forta-protocol/forta-core-go
+module github.com/forta-network/forta-core-go
 
 go 1.16
 

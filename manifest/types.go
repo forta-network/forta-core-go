@@ -1,6 +1,6 @@
 package manifest
 
-import "github.com/forta-protocol/forta-core-go/utils"
+import "github.com/forta-network/forta-core-go/utils"
 
 //AgentManifest represents the dev-provided properties of an agent
 type AgentManifest struct {

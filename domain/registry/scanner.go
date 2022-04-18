@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/forta-protocol/forta-core-go/contracts/contract_scanner_registry"
-	"github.com/forta-protocol/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/utils"
 	"github.com/goccy/go-json"
 )
 

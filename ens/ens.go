@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/forta-protocol/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/wealdtech/go-ens/v3"
 )
 

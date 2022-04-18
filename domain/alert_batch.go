@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/forta-protocol/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/protocol"
 )
 
 // AlertBatchRequest is the request payload to the alerts API
