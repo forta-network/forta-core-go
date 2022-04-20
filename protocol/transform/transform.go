@@ -1,7 +1,7 @@
 package transform
 
 import (
-	"github.com/forta-network/forta-core-go/clients/webhook/models"
+	"github.com/forta-network/forta-core-go/clients/webhook/client/models"
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
 )

@@ -15,7 +15,7 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/forta-network/forta-core-go/clients/webhook/models"
+	"github.com/forta-network/forta-core-go/clients/webhook/client/models"
 )
 
 // NewSendAlertsParams creates a new SendAlertsParams object,
