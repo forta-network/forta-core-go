@@ -32,7 +32,7 @@ func NewAlertWebhookClient(dest string) (AlertWebhookClient, error) {
 	}
 	client := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{
 		Host:     u.Host,
-		BasePath: "/", // override /forta/v1
+		BasePath: u.Path,
 		Schemes:  []string{u.Scheme},
 	}).Operations
 	return &alertWebhookClient{
