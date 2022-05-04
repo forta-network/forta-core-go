@@ -4,6 +4,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
+	"math/big"
 )
 
 // BlockFeed is a subscribable feed of blocks.
@@ -24,4 +25,5 @@ type TransactionFeed interface {
 type LogFeed interface {
 	ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error
 	GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error)
+	GetLogsForRange(blockStart *big.Int, blockEnd *big.Int) ([]types.Log, error)
 }

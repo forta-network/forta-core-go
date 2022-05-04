@@ -67,6 +67,7 @@ type ListenerConfig struct {
 type Listener interface {
 	Listen() error
 	ProcessLastBlocks(blocksAgo int64) error
+	ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error
 }
 
 func (l *listener) handleScannerRegistryEvent(le types.Log, logger *log.Entry) error {
@@ -232,7 +233,20 @@ func (l *listener) handleAfterBlock(blk *domain.Block) error {
 	return nil
 }
 
-// ProcessLogs fetches the logs in a single pass and calls handlers for them
+func (l *listener) ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error {
+	logs, err := l.logs.GetLogsForRange(startBlock, endBlock)
+	if err != nil {
+		return err
+	}
+	for _, lg := range logs {
+		if err := l.handleLog(nil, lg); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ProcessLastBlocks fetches the logs in a single pass and calls handlers for them
 func (l *listener) ProcessLastBlocks(blocksAgo int64) error {
 	logs, err := l.logs.GetLogsForLastBlocks(blocksAgo)
 	if err != nil {

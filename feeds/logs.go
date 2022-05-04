@@ -28,20 +28,7 @@ type logFeed struct {
 	offset     int
 }
 
-func (l *logFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
-
-	blk, err := l.client.BlockByNumber(l.ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	endBlock, err := utils.HexToBigInt(blk.Number)
-	if err != nil {
-		return nil, err
-	}
-
-	startBlock := big.NewInt(endBlock.Int64() - blocksAgo)
-
+func (l *logFeed) GetLogsForRange(startBlock *big.Int, endBlock *big.Int) ([]types.Log, error) {
 	addrs := make([]common.Address, 0, len(l.addresses))
 	for _, addr := range l.addresses {
 		addrs = append(addrs, common.HexToAddress(addr))
@@ -65,6 +52,23 @@ func (l *logFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
 	}
 
 	return l.client.GetLogs(l.ctx, q)
+}
+
+func (l *logFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
+
+	blk, err := l.client.BlockByNumber(l.ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	endBlock, err := utils.HexToBigInt(blk.Number)
+	if err != nil {
+		return nil, err
+	}
+
+	startBlock := big.NewInt(endBlock.Int64() - blocksAgo)
+
+	return l.GetLogsForRange(startBlock, endBlock)
 }
 
 func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error {
