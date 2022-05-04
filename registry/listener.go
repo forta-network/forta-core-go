@@ -59,6 +59,7 @@ type ListenerConfig struct {
 	JsonRpcURL  string
 	ENSAddress  string
 	StartBlock  *big.Int
+	EndBlock    *big.Int
 	BlockOffset int
 	Handlers    Handlers
 }
@@ -289,6 +290,7 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 	logFeed, err := feeds.NewLogFeed(ctx, client, feeds.LogFeedConfig{
 		Addresses:  []string{regContracts.AgentRegistry.Hex(), regContracts.ScannerRegistry.Hex(), regContracts.Dispatch.Hex(), regContracts.FortaStaking.Hex()},
 		StartBlock: cfg.StartBlock,
+		EndBlock:   cfg.EndBlock,
 		Offset:     cfg.BlockOffset,
 	})
 
