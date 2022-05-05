@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"github.com/forta-network/forta-core-go/domain"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -31,7 +32,7 @@ func ParseDispatchMessage(msg string) (*DispatchMessage, error) {
 	return &m, nil
 }
 
-func NewDispatchMessage(evt *contract_dispatch.DispatchLink) *DispatchMessage {
+func NewDispatchMessage(evt *contract_dispatch.DispatchLink, blk *domain.Block) *DispatchMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	agentID := utils.Hex(evt.AgentId)
 	evtName := Unlink
@@ -42,13 +43,14 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink) *DispatchMessage {
 		Message: Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(blk),
 		},
 		ScannerID: scannerID,
 		AgentID:   agentID,
 	}
 }
 
-func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinked) *DispatchMessage {
+func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinked, blk *domain.Block) *DispatchMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	agentID := utils.Hex(evt.AgentId)
 	evtName := Unlink
@@ -59,6 +61,7 @@ func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinke
 		Message: Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(blk),
 		},
 		ScannerID: scannerID,
 		AgentID:   agentID,

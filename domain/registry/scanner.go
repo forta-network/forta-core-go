@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"github.com/forta-network/forta-core-go/domain"
 	"time"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
@@ -45,7 +46,7 @@ func ParseScannerMessage(msg string) (*ScannerMessage, error) {
 	return &m, nil
 }
 
-func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnabled) *ScannerMessage {
+func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnabled, blk *domain.Block) *ScannerMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	evtName := DisableScanner
 	if evt.Enabled {
@@ -55,12 +56,13 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 		Message: Message{
 			Timestamp: time.Now().UTC(),
 			Action:    evtName,
+			Source:    SourceFromBlock(blk),
 		},
 		ScannerID: scannerID,
 	}
 }
 
-func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScannerUpdated, enabled bool) *ScannerSaveMessage {
+func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScannerUpdated, enabled bool, blk *domain.Block) *ScannerSaveMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{
@@ -68,6 +70,7 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 			Message: Message{
 				Timestamp: time.Now().UTC(),
 				Action:    SaveScanner,
+				Source:    SourceFromBlock(blk),
 			},
 		},
 		Enabled: enabled,
