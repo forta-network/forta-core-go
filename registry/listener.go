@@ -3,8 +3,6 @@ package registry
 import (
 	"context"
 	"errors"
-	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-network/forta-core-go/utils"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/core/types"
@@ -12,11 +10,13 @@ import (
 
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/feeds"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 type listener struct {
@@ -250,11 +250,6 @@ func (l *listener) ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) err
 	}
 	var block *domain.Block
 	for _, lg := range logs {
-		log.WithFields(log.Fields{
-			"address": lg.Address.Hex(),
-			"block":   lg.BlockNumber,
-		}).Info("log")
-
 		if block == nil || block.Number != utils.BigIntToHex(big.NewInt(int64(lg.BlockNumber))) {
 			blk, err := l.eth.BlockByNumber(l.ctx, big.NewInt(int64(lg.BlockNumber)))
 			if err != nil {
