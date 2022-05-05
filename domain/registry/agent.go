@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"github.com/forta-network/forta-core-go/domain"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -50,7 +51,7 @@ func ParseAgentMessage(msg string) (*AgentMessage, error) {
 	return &m, nil
 }
 
-func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled) *AgentMessage {
+func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk *domain.Block) *AgentMessage {
 	agentID := utils.Hex(evt.AgentId)
 	evtName := DisableAgent
 	if evt.Enabled {
@@ -60,13 +61,14 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled) *Ag
 		Message: Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(blk),
 		},
 		AgentID: agentID,
 		TxHash:  evt.Raw.TxHash.Hex(),
 	}
 }
 
-func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated) *AgentSaveMessage {
+func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated, blk *domain.Block) *AgentSaveMessage {
 	agentID := utils.Hex(evt.AgentId)
 	return &AgentSaveMessage{
 		AgentMessage: AgentMessage{
@@ -74,6 +76,7 @@ func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated)
 			Message: Message{
 				Action:    SaveAgent,
 				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(blk),
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},

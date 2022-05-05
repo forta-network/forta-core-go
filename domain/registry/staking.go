@@ -2,6 +2,7 @@ package registry
 
 import (
 	"encoding/json"
+	"github.com/forta-network/forta-core-go/domain"
 	"time"
 )
 
@@ -38,12 +39,13 @@ type ScannerStakeMessage struct {
 	ScannerID string `json:"scannerId"`
 }
 
-func NewScannerStakeMessage(changeType, scannerID string) *ScannerStakeMessage {
+func NewScannerStakeMessage(changeType, scannerID string, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
 				Action:    ScannerStake,
 				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(blk),
 			},
 			ChangeType: changeType,
 		},
@@ -51,12 +53,13 @@ func NewScannerStakeMessage(changeType, scannerID string) *ScannerStakeMessage {
 	}
 }
 
-func NewAgentStakeMessage(changeType, agentID string) *AgentStakeMessage {
+func NewAgentStakeMessage(changeType, agentID string, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
 				Action:    AgentStake,
 				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(blk),
 			},
 			ChangeType: changeType,
 		},
@@ -64,20 +67,22 @@ func NewAgentStakeMessage(changeType, agentID string) *AgentStakeMessage {
 	}
 }
 
-func NewAgentStakeThresholdMessage() *AgentStakeThresholdMessage {
+func NewAgentStakeThresholdMessage(blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		Message: Message{
 			Action:    AgentStakeThreshold,
 			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(blk),
 		},
 	}
 }
 
-func NewScannerStakeThresholdMessage(chainID int64) *ScannerStakeThresholdMessage {
+func NewScannerStakeThresholdMessage(chainID int64, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		Message: Message{
 			Action:    ScannerStakeThreshold,
 			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(blk),
 		},
 		ChainID: chainID,
 	}
