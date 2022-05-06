@@ -83,6 +83,9 @@ type Client interface {
 	// ForEachAgent loops over all agents
 	ForEachAgent(handler func(a *Agent) error) error
 
+	// ForEachAgentID loops over all agents only returning the ID
+	ForEachAgentID(handler func(agentID string) error) error
+
 	// ForEachScanner gets all scanners
 	ForEachScanner(handler func(s *Scanner) error) error
 
@@ -388,7 +391,7 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 	return nil
 }
 
-func (c *client) ForEachAgent(handler func(a *Agent) error) error {
+func (c *client) ForEachAgentID(handler func(agentID string) error) error {
 	opts, err := c.getOps()
 	if err != nil {
 		return err
@@ -405,21 +408,32 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 		if err != nil {
 			return err
 		}
-		agt, err := c.ar.GetAgentState(opts, agtID)
-		if err != nil {
-			return err
-		}
-		if err := handler(&Agent{
-			AgentID:  utils.AgentBigIntToHex(agtID),
-			ChainIDs: utils.IntArray(agt.ChainIds),
-			Enabled:  agt.Enabled,
-			Manifest: agt.Metadata,
-			Owner:    agt.Owner.Hex(),
-		}); err != nil {
+		if err := handler(utils.AgentBigIntToHex(agtID)); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (c *client) ForEachAgent(handler func(a *Agent) error) error {
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	return c.ForEachAgentID(func(agentID string) error {
+		agt, err := c.ar.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
+		if err != nil {
+			return err
+		}
+		return handler(&Agent{
+			AgentID:  agentID,
+			ChainIDs: utils.IntArray(agt.ChainIds),
+			Enabled:  agt.Enabled,
+			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
+		})
+	})
 }
 
 func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error {
