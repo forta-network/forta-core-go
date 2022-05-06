@@ -80,6 +80,20 @@ func (mr *MockClientMockRecorder) ForEachAgent(handler interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAgent", reflect.TypeOf((*MockClient)(nil).ForEachAgent), handler)
 }
 
+// ForEachAgentID mocks base method.
+func (m *MockClient) ForEachAgentID(handler func(string) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachAgentID", handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachAgentID indicates an expected call of ForEachAgentID.
+func (mr *MockClientMockRecorder) ForEachAgentID(handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAgentID", reflect.TypeOf((*MockClient)(nil).ForEachAgentID), handler)
+}
+
 // ForEachAssignedAgent mocks base method.
 func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry0.Agent) error) error {
 	m.ctrl.T.Helper()
