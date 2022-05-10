@@ -135,6 +135,7 @@ message BlockEvent {
   string blockNumber = 3;
   Network network = 4;
   EthBlock block = 5;
+  TrackingTimestamps timestamps = 6;
 }
 
 message TransactionEvent {
@@ -237,4 +238,5 @@ message TransactionEvent {
   repeated Log logs = 8;
   bool isContractDeployment = 9;
   string contractAddress = 10;
+  TrackingTimestamps timestamps = 11;
 }

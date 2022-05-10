@@ -101,6 +101,7 @@ func (t *BlockEvent) ToMessage() (*protocol.BlockEvent, error) {
 			TransactionsRoot: str(t.Block.TransactionsRoot),
 			Transactions:     txs,
 		},
+		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
 }
 
@@ -253,5 +254,6 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			BlockNumber:    t.BlockEvt.Block.Number,
 			BlockTimestamp: t.BlockEvt.Block.Timestamp,
 		},
+		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
 }
