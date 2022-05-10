@@ -21,6 +21,8 @@ const (
 	EventTypeBlock EventType = "block"
 )
 
+const TimeTrackingTimestampFormat = time.RFC3339Nano
+
 type TrackingTimestamps struct {
 	Block       time.Time
 	Feed        time.Time
@@ -30,15 +32,15 @@ type TrackingTimestamps struct {
 
 func (tt *TrackingTimestamps) ToMessage() *protocol.TrackingTimestamps {
 	return &protocol.TrackingTimestamps{
-		Block:       tt.Block.Format(time.RFC3339),
-		Feed:        tt.Feed.Format(time.RFC3339),
-		BotRequest:  tt.BotRequest.Format(time.RFC3339),
-		BotResponse: tt.BotResponse.Format(time.RFC3339),
+		Block:       tt.Block.Format(TimeTrackingTimestampFormat),
+		Feed:        tt.Feed.Format(TimeTrackingTimestampFormat),
+		BotRequest:  tt.BotRequest.Format(TimeTrackingTimestampFormat),
+		BotResponse: tt.BotResponse.Format(TimeTrackingTimestampFormat),
 	}
 }
 
 func TimeFromString(dt string) time.Time {
-	res, err := time.Parse(time.RFC3339, dt)
+	res, err := time.Parse(TimeTrackingTimestampFormat, dt)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"input": dt,
