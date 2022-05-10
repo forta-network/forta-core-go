@@ -104,7 +104,9 @@ func blockEvent(blk *domain.Block) *domain.BlockEvent {
 func assertEvts(t *testing.T, actual []*domain.BlockEvent, expected ...*domain.BlockEvent) {
 	assert.Equal(t, len(actual), len(expected), "expect same length")
 	for i, exp := range expected {
-		assert.Equal(t, exp, actual[i])
+		assert.Equal(t, exp.Block, actual[i].Block)
+		assert.Equal(t, exp.Logs, actual[i].Logs)
+		assert.Equal(t, exp.Traces, actual[i].Traces)
 	}
 }
 

@@ -61,7 +61,7 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 		Message: Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(blk),
+			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		AgentID: agentID,
 		TxHash:  evt.Raw.TxHash.Hex(),
@@ -76,7 +76,7 @@ func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated,
 			Message: Message{
 				Action:    SaveAgent,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(blk),
+				Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},

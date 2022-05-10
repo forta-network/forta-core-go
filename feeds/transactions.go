@@ -57,6 +57,10 @@ func (tf *transactionFeed) streamTransactions() error {
 					tf.txCh <- &domain.TransactionEvent{
 						BlockEvt:    blockEvt,
 						Transaction: &txTemp,
+						Timestamps: &domain.TrackingTimestamps{
+							Block: blockEvt.Timestamps.Block,
+							Feed:  time.Now().UTC(),
+						},
 					}
 				}
 			}

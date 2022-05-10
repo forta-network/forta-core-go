@@ -5,11 +5,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/goccy/go-json"
-	"math/big"
-	"strings"
-
 	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
+	"math/big"
+	"strings"
+	"time"
 
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
@@ -21,12 +21,20 @@ const (
 	EventTypeBlock EventType = "block"
 )
 
+type TrackingTimestamps struct {
+	Block       time.Time
+	Feed        time.Time
+	BotRequest  time.Time
+	BotResponse time.Time
+}
+
 type BlockEvent struct {
-	EventType EventType
-	ChainID   *big.Int
-	Block     *Block
-	Logs      []LogEntry
-	Traces    []Trace
+	EventType  EventType
+	ChainID    *big.Int
+	Block      *Block
+	Logs       []LogEntry
+	Traces     []Trace
+	Timestamps *TrackingTimestamps
 }
 
 func str(val *string) string {
@@ -91,6 +99,7 @@ type TransactionEvent struct {
 	BlockEvt    *BlockEvent
 	Transaction *Transaction
 	Receipt     *TransactionReceipt
+	Timestamps  *TrackingTimestamps
 }
 
 func safeAddStrValueToMap(addresses map[string]bool, addr string) {

@@ -4,6 +4,13 @@ package network.forta;
 
 option go_package = "./;protocol";
 
+message TrackingTimestamps {
+  string block = 1;
+  string feed = 2;
+  string botRequest = 3;
+  string botResponse = 4;
+}
+
 service Agent {
   rpc Initialize (InitializeRequest) returns (InitializeResponse) {}
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
