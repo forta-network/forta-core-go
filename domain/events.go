@@ -37,6 +37,28 @@ func (tt *TrackingTimestamps) ToMessage() *protocol.TrackingTimestamps {
 	}
 }
 
+func TimeFromString(dt string) time.Time {
+	res, err := time.Parse(time.RFC3339, dt)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"input": dt,
+		}).Errorf("invalid time - for safety, ignorning")
+	}
+	return res
+}
+
+func FromMessage(tt *protocol.TrackingTimestamps) *TrackingTimestamps {
+	if tt == nil {
+		return &TrackingTimestamps{}
+	}
+	return &TrackingTimestamps{
+		Block:       TimeFromString(tt.Block),
+		Feed:        TimeFromString(tt.Feed),
+		BotRequest:  TimeFromString(tt.BotRequest),
+		BotResponse: TimeFromString(tt.BotResponse),
+	}
+}
+
 type BlockEvent struct {
 	EventType  EventType
 	ChainID    *big.Int
