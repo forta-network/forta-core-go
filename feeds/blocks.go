@@ -243,7 +243,23 @@ func (bf *blockFeed) forEachBlock() error {
 			continue
 		}
 
-		evt := &domain.BlockEvent{EventType: domain.EventTypeBlock, Block: block, ChainID: bf.chainID, Traces: traces, Logs: logs}
+		blockTs, err := block.GetTimestamp()
+		if err != nil {
+			logger.WithError(err).Error("failed to get block timestamp")
+			continue
+		}
+
+		evt := &domain.BlockEvent{
+			EventType: domain.EventTypeBlock,
+			Block:     block,
+			ChainID:   bf.chainID,
+			Traces:    traces,
+			Logs:      logs,
+			Timestamps: &domain.TrackingTimestamps{
+				Block: *blockTs,
+				Feed:  time.Now().UTC(),
+			},
+		}
 		bf.handlersMu.RLock()
 		handlers := bf.handlers
 		bf.handlersMu.RUnlock()

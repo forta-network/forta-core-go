@@ -3,6 +3,7 @@ package feeds
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -33,20 +34,24 @@ func getTestTransactionFeed(t *testing.T, blockFeed BlockFeed) (*transactionFeed
 func TestTransactionFeed_ForEachTransaction(t *testing.T) {
 	bf := NewMockBlockFeed([]*domain.BlockEvent{
 		{
-			EventType: domain.EventTypeBlock,
-			Block:     testutils.TestBlock(1, 2, 3),
+			EventType:  domain.EventTypeBlock,
+			Block:      testutils.TestBlock(1, 2, 3),
+			Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
 		},
 		{
-			EventType: domain.EventTypeBlock,
-			Block:     testutils.TestBlock(4, 5, 6, 6), // with duplicate
+			EventType:  domain.EventTypeBlock,
+			Block:      testutils.TestBlock(4, 5, 6, 6), // with duplicate
+			Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
 		},
 		{
-			EventType: domain.EventTypeBlock,
-			Block:     testutils.TestBlock(), // empty
+			EventType:  domain.EventTypeBlock,
+			Block:      testutils.TestBlock(), // empty
+			Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
 		},
 		{
-			EventType: domain.EventTypeBlock,
-			Block:     testutils.TestBlock(7, 8, 9),
+			EventType:  domain.EventTypeBlock,
+			Block:      testutils.TestBlock(7, 8, 9),
+			Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
 		},
 	})
 
@@ -65,8 +70,9 @@ func TestTransactionFeed_ForEachTransaction(t *testing.T) {
 func TestTransactionFeed_ToMessage(t *testing.T) {
 	bf := NewMockBlockFeed([]*domain.BlockEvent{
 		{
-			EventType: domain.EventTypeBlock,
-			Block:     testutils.TestBlock(1),
+			EventType:  domain.EventTypeBlock,
+			Block:      testutils.TestBlock(1),
+			Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
 		},
 	})
 

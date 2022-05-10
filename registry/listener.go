@@ -108,7 +108,7 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, blk *domain.Block, l
 			return err
 		}
 		if l.cfg.Handlers.ScannerStakeThresholdHandler != nil {
-			return l.cfg.Handlers.ScannerStakeThresholdHandler(logger, registry.NewScannerStakeThresholdMessage(evt.ChainId.Int64(), blk))
+			return l.cfg.Handlers.ScannerStakeThresholdHandler(logger, registry.NewScannerStakeThresholdMessage(le, evt.ChainId.Int64(), blk))
 		}
 	}
 	return nil
@@ -133,7 +133,7 @@ func (l *listener) handleAgentRegistryEvent(le types.Log, blk *domain.Block, log
 		}
 	} else if isEvent(le, contract_agent_registry.StakeThresholdChangedTopic) {
 		if l.cfg.Handlers.AgentStakeThresholdHandler != nil {
-			return l.cfg.Handlers.AgentStakeThresholdHandler(logger, registry.NewAgentStakeThresholdMessage(blk))
+			return l.cfg.Handlers.AgentStakeThresholdHandler(logger, registry.NewAgentStakeThresholdMessage(le, blk))
 		}
 	}
 	return nil
@@ -177,12 +177,12 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 	if subjectType == SubjectTypeScanner {
 		scannerID := utils.ScannerIDBigIntToHex(subjectID)
 		if l.cfg.Handlers.ScannerStakeHandler != nil {
-			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(changeType, scannerID, blk))
+			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(le, changeType, scannerID, blk))
 		}
 	} else if subjectType == SubjectTypeAgent {
 		agentID := utils.AgentBigIntToHex(subjectID)
 		if l.cfg.Handlers.AgentStakeHandler != nil {
-			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(changeType, agentID, blk))
+			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, agentID, blk))
 		}
 	} else {
 		logger.WithField("subjectID", subjectType).Warn("unhandled subject ID, ignoring")

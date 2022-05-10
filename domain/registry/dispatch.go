@@ -43,7 +43,7 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink, blk *domain.Block) 
 		Message: Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(blk),
+			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		ScannerID: scannerID,
 		AgentID:   agentID,
@@ -61,7 +61,7 @@ func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinke
 		Message: Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(blk),
+			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		ScannerID: scannerID,
 		AgentID:   agentID,

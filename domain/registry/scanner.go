@@ -56,7 +56,7 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 		Message: Message{
 			Timestamp: time.Now().UTC(),
 			Action:    evtName,
-			Source:    SourceFromBlock(blk),
+			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		ScannerID: scannerID,
 	}
@@ -70,7 +70,7 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 			Message: Message{
 				Timestamp: time.Now().UTC(),
 				Action:    SaveScanner,
-				Source:    SourceFromBlock(blk),
+				Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 			},
 		},
 		Enabled: enabled,

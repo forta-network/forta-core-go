@@ -49,6 +49,7 @@ message Alert {
   AgentInfo agent = 6;
   map<string, string> tags = 7;
   ScannerInfo scanner = 8;
+  TrackingTimestamps timestamps = 9;
 }
 
 message SignedAlert {
@@ -66,6 +67,7 @@ message NotifyRequest {
   EvaluateBlockRequest evalBlockRequest = 4;
   EvaluateBlockResponse evalBlockResponse = 5;
   AgentInfo agentInfo = 6;
+  TrackingTimestamps timestamps = 7;
 }
 
 message NotifyResponse {}

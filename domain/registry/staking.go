@@ -2,6 +2,7 @@ package registry
 
 import (
 	"encoding/json"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/domain"
 	"time"
 )
@@ -39,13 +40,13 @@ type ScannerStakeMessage struct {
 	ScannerID string `json:"scannerId"`
 }
 
-func NewScannerStakeMessage(changeType, scannerID string, blk *domain.Block) *ScannerStakeMessage {
+func NewScannerStakeMessage(l types.Log, changeType, scannerID string, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
 				Action:    ScannerStake,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(blk),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			ChangeType: changeType,
 		},
@@ -53,13 +54,13 @@ func NewScannerStakeMessage(changeType, scannerID string, blk *domain.Block) *Sc
 	}
 }
 
-func NewAgentStakeMessage(changeType, agentID string, blk *domain.Block) *AgentStakeMessage {
+func NewAgentStakeMessage(l types.Log, changeType, agentID string, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
 				Action:    AgentStake,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(blk),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			ChangeType: changeType,
 		},
@@ -67,22 +68,22 @@ func NewAgentStakeMessage(changeType, agentID string, blk *domain.Block) *AgentS
 	}
 }
 
-func NewAgentStakeThresholdMessage(blk *domain.Block) *AgentStakeThresholdMessage {
+func NewAgentStakeThresholdMessage(l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		Message: Message{
 			Action:    AgentStakeThreshold,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(blk),
+			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 		},
 	}
 }
 
-func NewScannerStakeThresholdMessage(chainID int64, blk *domain.Block) *ScannerStakeThresholdMessage {
+func NewScannerStakeThresholdMessage(l types.Log, chainID int64, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		Message: Message{
 			Action:    ScannerStakeThreshold,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(blk),
+			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 		},
 		ChainID: chainID,
 	}

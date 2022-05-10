@@ -5,11 +5,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/goccy/go-json"
-	"math/big"
-	"strings"
-
 	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
+	"math/big"
+	"strings"
+	"time"
 
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
@@ -21,12 +21,51 @@ const (
 	EventTypeBlock EventType = "block"
 )
 
+type TrackingTimestamps struct {
+	Block       time.Time
+	Feed        time.Time
+	BotRequest  time.Time
+	BotResponse time.Time
+}
+
+func (tt *TrackingTimestamps) ToMessage() *protocol.TrackingTimestamps {
+	return &protocol.TrackingTimestamps{
+		Block:       tt.Block.Format(time.RFC3339),
+		Feed:        tt.Feed.Format(time.RFC3339),
+		BotRequest:  tt.BotRequest.Format(time.RFC3339),
+		BotResponse: tt.BotResponse.Format(time.RFC3339),
+	}
+}
+
+func TimeFromString(dt string) time.Time {
+	res, err := time.Parse(time.RFC3339, dt)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"input": dt,
+		}).Errorf("invalid time - for safety, ignorning")
+	}
+	return res
+}
+
+func TrackingTimestampsFromMessage(tt *protocol.TrackingTimestamps) *TrackingTimestamps {
+	if tt == nil {
+		return &TrackingTimestamps{}
+	}
+	return &TrackingTimestamps{
+		Block:       TimeFromString(tt.Block),
+		Feed:        TimeFromString(tt.Feed),
+		BotRequest:  TimeFromString(tt.BotRequest),
+		BotResponse: TimeFromString(tt.BotResponse),
+	}
+}
+
 type BlockEvent struct {
-	EventType EventType
-	ChainID   *big.Int
-	Block     *Block
-	Logs      []LogEntry
-	Traces    []Trace
+	EventType  EventType
+	ChainID    *big.Int
+	Block      *Block
+	Logs       []LogEntry
+	Traces     []Trace
+	Timestamps *TrackingTimestamps
 }
 
 func str(val *string) string {
@@ -84,6 +123,7 @@ func (t *BlockEvent) ToMessage() (*protocol.BlockEvent, error) {
 			TransactionsRoot: str(t.Block.TransactionsRoot),
 			Transactions:     txs,
 		},
+		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
 }
 
@@ -91,6 +131,7 @@ type TransactionEvent struct {
 	BlockEvt    *BlockEvent
 	Transaction *Transaction
 	Receipt     *TransactionReceipt
+	Timestamps  *TrackingTimestamps
 }
 
 func safeAddStrValueToMap(addresses map[string]bool, addr string) {
@@ -235,5 +276,6 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			BlockNumber:    t.BlockEvt.Block.Number,
 			BlockTimestamp: t.BlockEvt.Block.Timestamp,
 		},
+		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
 }
