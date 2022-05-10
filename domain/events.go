@@ -28,6 +28,15 @@ type TrackingTimestamps struct {
 	BotResponse time.Time
 }
 
+func (tt *TrackingTimestamps) ToMessage() *protocol.TrackingTimestamps {
+	return &protocol.TrackingTimestamps{
+		Block:       tt.Block.Format(time.RFC3339),
+		Feed:        tt.Feed.Format(time.RFC3339),
+		BotRequest:  tt.BotRequest.Format(time.RFC3339),
+		BotResponse: tt.BotResponse.Format(time.RFC3339),
+	}
+}
+
 type BlockEvent struct {
 	EventType  EventType
 	ChainID    *big.Int
