@@ -244,7 +244,7 @@ func (bf *blockFeed) forEachBlock() error {
 		}
 
 		blockTs, err := block.GetTimestamp()
-		if err != nil || blockTs == nil {
+		if err != nil {
 			logger.WithError(err).Error("failed to get block timestamp")
 			continue
 		}
