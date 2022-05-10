@@ -47,7 +47,7 @@ func TimeFromString(dt string) time.Time {
 	return res
 }
 
-func FromMessage(tt *protocol.TrackingTimestamps) *TrackingTimestamps {
+func TrackingTimestampsFromMessage(tt *protocol.TrackingTimestamps) *TrackingTimestamps {
 	if tt == nil {
 		return &TrackingTimestamps{}
 	}
