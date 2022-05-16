@@ -11,12 +11,12 @@ import (
 	"github.com/forta-network/forta-core-go/utils"
 )
 
-var SaveAgent = "SaveAgent"
-var DisableAgent = "DisableAgent"
-var EnableAgent = "EnableAgent"
+const SaveAgent = "SaveAgent"
+const DisableAgent = "DisableAgent"
+const EnableAgent = "EnableAgent"
 
-var AgentPermissionAdmin = 0
-var AgentPermissionOwner = 1
+const AgentPermissionAdmin = 0
+const AgentPermissionOwner = 1
 
 type AgentMessage struct {
 	Message

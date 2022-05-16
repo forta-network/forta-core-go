@@ -10,14 +10,14 @@ import (
 	"github.com/goccy/go-json"
 )
 
-var SaveScanner = "SaveScanner"
-var EnableScanner = "EnableScanner"
-var DisableScanner = "DisableScanner"
+const SaveScanner = "SaveScanner"
+const EnableScanner = "EnableScanner"
+const DisableScanner = "DisableScanner"
 
-var ScannerPermissionAdmin = 0
-var ScannerPermissionSelf = 1
-var ScannerPermissionOwner = 2
-var ScannerPermissionManager = 3
+const ScannerPermissionAdmin = 0
+const ScannerPermissionSelf = 1
+const ScannerPermissionOwner = 2
+const ScannerPermissionManager = 3
 
 type ScannerMessage struct {
 	Message
