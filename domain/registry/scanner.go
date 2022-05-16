@@ -14,9 +14,15 @@ var SaveScanner = "SaveScanner"
 var EnableScanner = "EnableScanner"
 var DisableScanner = "DisableScanner"
 
+var ScannerPermissionAdmin = 0
+var ScannerPermissionSelf = 1
+var ScannerPermissionOwner = 2
+var ScannerPermissionManager = 3
+
 type ScannerMessage struct {
 	Message
-	ScannerID string `json:"scannerId"`
+	ScannerID  string `json:"scannerId"`
+	Permission int    `json:"permission"`
 }
 
 type ScannerSaveMessage struct {
@@ -58,7 +64,8 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 			Action:    evtName,
 			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
-		ScannerID: scannerID,
+		ScannerID:  scannerID,
+		Permission: int(evt.Permission),
 	}
 }
 

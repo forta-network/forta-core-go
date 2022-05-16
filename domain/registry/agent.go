@@ -15,10 +15,14 @@ var SaveAgent = "SaveAgent"
 var DisableAgent = "DisableAgent"
 var EnableAgent = "EnableAgent"
 
+var AgentPermissionAdmin = 0
+var AgentPermissionOwner = 1
+
 type AgentMessage struct {
 	Message
-	AgentID string `json:"agentId"`
-	TxHash  string `json:"txHash"`
+	AgentID    string `json:"agentId"`
+	TxHash     string `json:"txHash"`
+	Permission int    `json:"permission"`
 }
 
 type AgentSaveMessage struct {
@@ -63,8 +67,9 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 			Timestamp: time.Now().UTC(),
 			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
-		AgentID: agentID,
-		TxHash:  evt.Raw.TxHash.Hex(),
+		AgentID:    agentID,
+		Permission: int(evt.Permission),
+		TxHash:     evt.Raw.TxHash.Hex(),
 	}
 }
 

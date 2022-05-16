@@ -142,7 +142,7 @@ var defaultConfig = ClientConfig{
 }
 
 var devConfig = ClientConfig{
-	JsonRpcUrl: "https://rpc-mumbai.matic.today",
+	JsonRpcUrl: "https://polygon-mumbai.g.alchemy.com/v2/L3olmOBjGxzURvCw08DWS7Y4G-S6glAE",
 	ENSAddress: "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9",
 	Name:       "registry-client",
 }
