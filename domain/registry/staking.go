@@ -2,9 +2,15 @@ package registry
 
 import (
 	"encoding/json"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/forta-network/forta-core-go/domain"
+	"math/big"
 	"time"
+
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 const AgentStake = "AgentStake"
@@ -16,18 +22,29 @@ const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
 const ChangeTypeSlash = "slash"
 
-type AgentStakeThresholdMessage struct {
+type ThresholdMessage struct {
 	Message
+	MinHex    string  `json:"minHex"`
+	MaxHex    string  `json:"maxHex"`
+	Min       float64 `json:"min"`
+	Max       float64 `json:"max"`
+	Activated bool    `json:"activated"`
+}
+
+type AgentStakeThresholdMessage struct {
+	ThresholdMessage
 }
 
 type ScannerStakeThresholdMessage struct {
-	Message
+	ThresholdMessage
 	ChainID int64 `json:"chainId"`
 }
 
 type StakeMessage struct {
 	Message
-	ChangeType string `json:"changeType"`
+	ChangeType string  `json:"changeType"`
+	AmountHex  string  `json:"amountHex"`
+	AmountEth  float64 `json:"amountEth"`
 }
 
 type AgentStakeMessage struct {
@@ -40,7 +57,34 @@ type ScannerStakeMessage struct {
 	ScannerID string `json:"scannerId"`
 }
 
-func NewScannerStakeMessage(l types.Log, changeType, scannerID string, blk *domain.Block) *ScannerStakeMessage {
+// https://github.com/ethereum/go-ethereum/issues/21221
+func weiToEther(wei *big.Int) *big.Float {
+	f := new(big.Float)
+	f.SetPrec(236) //  IEEE 754 octuple-precision binary floating-point format: binary256
+	f.SetMode(big.ToNearestEven)
+	fWei := new(big.Float)
+	fWei.SetPrec(236) //  IEEE 754 octuple-precision binary floating-point format: binary256
+	fWei.SetMode(big.ToNearestEven)
+	return f.Quo(fWei.SetInt(wei), big.NewFloat(params.Ether))
+}
+
+func toEthFloat(v *big.Int) float64 {
+	if v == nil {
+		return 0
+	}
+	fl := weiToEther(v)
+	res, _ := fl.Float64()
+	return res
+}
+
+func hexValue(v *big.Int) string {
+	if v == nil {
+		return ""
+	}
+	return utils.BigIntToHex(v)
+}
+
+func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
@@ -49,12 +93,14 @@ func NewScannerStakeMessage(l types.Log, changeType, scannerID string, blk *doma
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			ChangeType: changeType,
+			AmountHex:  hexValue(value),
+			AmountEth:  toEthFloat(value),
 		},
 		ScannerID: scannerID,
 	}
 }
 
-func NewAgentStakeMessage(l types.Log, changeType, agentID string, blk *domain.Block) *AgentStakeMessage {
+func NewAgentStakeMessage(l types.Log, changeType, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
@@ -63,29 +109,45 @@ func NewAgentStakeMessage(l types.Log, changeType, agentID string, blk *domain.B
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			ChangeType: changeType,
+			AmountHex:  hexValue(value),
+			AmountEth:  toEthFloat(value),
 		},
 		AgentID: agentID,
 	}
 }
 
-func NewAgentStakeThresholdMessage(l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
+func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
-		Message: Message{
-			Action:    AgentStakeThreshold,
-			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+		ThresholdMessage: ThresholdMessage{
+			Message: Message{
+				Action:    AgentStakeThreshold,
+				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			MinHex:    hexValue(evt.Min),
+			MaxHex:    hexValue(evt.Max),
+			Min:       toEthFloat(evt.Min),
+			Max:       toEthFloat(evt.Max),
+			Activated: evt.Activated,
 		},
 	}
 }
 
-func NewScannerStakeThresholdMessage(l types.Log, chainID int64, blk *domain.Block) *ScannerStakeThresholdMessage {
+func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
-		Message: Message{
-			Action:    ScannerStakeThreshold,
-			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+		ThresholdMessage: ThresholdMessage{
+			Message: Message{
+				Action:    ScannerStakeThreshold,
+				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			MinHex:    hexValue(evt.Min),
+			MaxHex:    hexValue(evt.Max),
+			Min:       toEthFloat(evt.Min),
+			Max:       toEthFloat(evt.Max),
+			Activated: evt.Activated,
 		},
-		ChainID: chainID,
+		ChainID: evt.ChainId.Int64(),
 	}
 }
 
