@@ -44,7 +44,7 @@ type StakeMessage struct {
 	Message
 	ChangeType string  `json:"changeType"`
 	AmountHex  string  `json:"amountHex"`
-	AmountEth  float64 `json:"amountEth"`
+	Amount     float64 `json:"amount"`
 }
 
 type AgentStakeMessage struct {
@@ -94,7 +94,7 @@ func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *bi
 			},
 			ChangeType: changeType,
 			AmountHex:  hexValue(value),
-			AmountEth:  toEthFloat(value),
+			Amount:     toEthFloat(value),
 		},
 		ScannerID: scannerID,
 	}
@@ -110,7 +110,7 @@ func NewAgentStakeMessage(l types.Log, changeType, agentID string, value *big.In
 			},
 			ChangeType: changeType,
 			AmountHex:  hexValue(value),
-			AmountEth:  toEthFloat(value),
+			Amount:     toEthFloat(value),
 		},
 		AgentID: agentID,
 	}
