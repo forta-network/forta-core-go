@@ -8,4 +8,5 @@ type RegistryContracts struct {
 	ScannerRegistry    common.Address
 	ScannerNodeVersion common.Address
 	FortaStaking       common.Address
+	Forta              common.Address
 }

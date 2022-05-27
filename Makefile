@@ -35,6 +35,7 @@ abigen: pull-contracts
 	./scripts/abigen.sh forta-token components/scanners/ScannerRegistry.sol ScannerRegistry scanner_registry "--alias _register=underscoreRegister"
 	./scripts/abigen.sh forta-token components/access/AccessManager.sol AccessManager access_manager
 	./scripts/abigen.sh forta-token components/router/Router.sol Router router
+	./scripts/abigen.sh forta-token token/Forta.sol Forta forta
 
 .PHONY: pull-contracts
 pull-contracts:

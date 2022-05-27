@@ -17,6 +17,7 @@ const (
 	ScannerRegistryContract    = "scanners.registries.forta.eth"
 	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
 	StakingContract            = "staking.forta.eth"
+	FortaContract              = "forta.eth"
 )
 
 // ENS resolves inputs.
@@ -100,12 +101,18 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
+	forta, err := ensstore.Resolve(FortaContract)
+	if err != nil {
+		return nil, err
+	}
+
 	return &registry.RegistryContracts{
 		AgentRegistry:      agentReg,
 		ScannerRegistry:    scannerReg,
 		Dispatch:           dispatch,
 		ScannerNodeVersion: scannerNodeVersion,
 		FortaStaking:       fortaStaking,
+		Forta:              forta,
 	}, nil
 
 }
