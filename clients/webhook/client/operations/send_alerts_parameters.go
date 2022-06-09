@@ -61,6 +61,12 @@ func NewSendAlertsParamsWithHTTPClient(client *http.Client) *SendAlertsParams {
 */
 type SendAlertsParams struct {
 
+	/* Authorization.
+
+	   Webhook request authorization
+	*/
+	Authorization *string
+
 	// AlertList.
 	AlertList *models.AlertList
 
@@ -117,6 +123,17 @@ func (o *SendAlertsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithAuthorization adds the authorization to the send alerts params
+func (o *SendAlertsParams) WithAuthorization(authorization *string) *SendAlertsParams {
+	o.SetAuthorization(authorization)
+	return o
+}
+
+// SetAuthorization adds the authorization to the send alerts params
+func (o *SendAlertsParams) SetAuthorization(authorization *string) {
+	o.Authorization = authorization
+}
+
 // WithAlertList adds the alertList to the send alerts params
 func (o *SendAlertsParams) WithAlertList(alertList *models.AlertList) *SendAlertsParams {
 	o.SetAlertList(alertList)
@@ -135,6 +152,14 @@ func (o *SendAlertsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 		return err
 	}
 	var res []error
+
+	if o.Authorization != nil {
+
+		// header param Authorization
+		if err := r.SetHeaderParam("Authorization", *o.Authorization); err != nil {
+			return err
+		}
+	}
 	if o.AlertList != nil {
 		if err := r.SetBodyParam(o.AlertList); err != nil {
 			return err
