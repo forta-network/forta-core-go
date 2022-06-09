@@ -20,6 +20,10 @@ paths:
       operationId: SendAlerts
       summary: Send a list of alerts
       parameters:
+        - in: header
+          name: Authorization
+          description: Webhook request authorization
+          type: string
         - in: body
           name: alertList
           required: true
