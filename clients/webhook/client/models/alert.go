@@ -44,6 +44,10 @@ type Alert struct {
 	// Example: 0xe9cfda18f167de5cdd63c101e38ec0d4cb0a1c2dea80921ecc4405c2b010855f
 	Hash string `json:"hash,omitempty"`
 
+	// An associative array of extra links values
+	// Example: {"blockUrl":"https://etherscan.io/block/18646150","explorerUrl":"https://explorer.forta.network/alert/0xd795c365931762afeccf4a440ecee2f7e89820c59136aa46310a8eec54ba96d8"}
+	Links interface{} `json:"links,omitempty"`
+
 	// An associative array of string values
 	// Example: {"contractAddress":"0x98883145049dec03c00cb7708cbc938058802520","operator":"0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3"}
 	Metadata interface{} `json:"metadata,omitempty"`
