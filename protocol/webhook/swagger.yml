@@ -24,10 +24,6 @@ paths:
           name: Authorization
           description: Webhook request authorization
           type: string
-        - in: header
-          name: X-Request-Signature
-          description: Webhook request validation signature
-          type: string
         - in: body
           name: alertList
           required: true
