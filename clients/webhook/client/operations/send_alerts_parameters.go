@@ -67,6 +67,12 @@ type SendAlertsParams struct {
 	*/
 	Authorization *string
 
+	/* XRequestSignature.
+
+	   Webhook request validation signature
+	*/
+	XRequestSignature *string
+
 	// AlertList.
 	AlertList *models.AlertList
 
@@ -134,6 +140,17 @@ func (o *SendAlertsParams) SetAuthorization(authorization *string) {
 	o.Authorization = authorization
 }
 
+// WithXRequestSignature adds the xRequestSignature to the send alerts params
+func (o *SendAlertsParams) WithXRequestSignature(xRequestSignature *string) *SendAlertsParams {
+	o.SetXRequestSignature(xRequestSignature)
+	return o
+}
+
+// SetXRequestSignature adds the xRequestSignature to the send alerts params
+func (o *SendAlertsParams) SetXRequestSignature(xRequestSignature *string) {
+	o.XRequestSignature = xRequestSignature
+}
+
 // WithAlertList adds the alertList to the send alerts params
 func (o *SendAlertsParams) WithAlertList(alertList *models.AlertList) *SendAlertsParams {
 	o.SetAlertList(alertList)
@@ -157,6 +174,14 @@ func (o *SendAlertsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 
 		// header param Authorization
 		if err := r.SetHeaderParam("Authorization", *o.Authorization); err != nil {
+			return err
+		}
+	}
+
+	if o.XRequestSignature != nil {
+
+		// header param X-Request-Signature
+		if err := r.SetHeaderParam("X-Request-Signature", *o.XRequestSignature); err != nil {
 			return err
 		}
 	}
