@@ -59,6 +59,9 @@ type Client interface {
 	// GetScannerNodeVersion returns the current ipfs reference for the latest scanner node release
 	GetScannerNodeVersion() (string, error)
 
+	// GetScannerNodePrereleaseVersion returns the current ipfs reference for the latest scanner node prerelease
+	GetScannerNodePrereleaseVersion() (string, error)
+
 	// GetAgent returns the registry information for the agent
 	GetAgent(agentID string) (*Agent, error)
 
@@ -117,6 +120,7 @@ type client struct {
 	sr        *contract_scanner_registry.ScannerRegistryCaller
 	dp        *contract_dispatch.DispatchCaller
 	sv        *contract_scanner_node_version.ScannerNodeVersionCaller
+	prv       *contract_scanner_node_version.ScannerNodeVersionCaller
 	fs        *contract_forta_staking.FortaStakingCaller
 	srf       *contract_scanner_registry.ScannerRegistryFilterer
 }
@@ -192,6 +196,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 
+	prv, err := contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodePrereleaseVersion, ec)
+	if err != nil {
+		return nil, err
+	}
+
 	fs, err := contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
 	if err != nil {
 		return nil, err
@@ -215,6 +224,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		ar:        ar,
 		dp:        dp,
 		sv:        sv,
+		prv:       prv,
 		fs:        fs,
 		srf:       srf,
 	}, err
@@ -288,6 +298,14 @@ func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error
 
 func (c *client) GetScannerNodeVersion() (string, error) {
 	sv, err := c.sv.ScannerNodeVersion(c.opts)
+	if err != nil {
+		return "", err
+	}
+	return sv, nil
+}
+
+func (c *client) GetScannerNodePrereleaseVersion() (string, error) {
+	sv, err := c.prv.ScannerNodeVersion(c.opts)
 	if err != nil {
 		return "", err
 	}

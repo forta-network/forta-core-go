@@ -73,8 +73,7 @@ func MakeSummaryFromReleaseInfo(releaseInfo *ReleaseInfo) *ReleaseSummary {
 
 // ReleaseManifest contains the latest info about the latest scanner version.
 type ReleaseManifest struct {
-	Release    Release  `json:"release"`
-	Prerelease *Release `json:"prerelease,omitempty"`
+	Release Release `json:"release"`
 }
 
 // Release contains release data.
