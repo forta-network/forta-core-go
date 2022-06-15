@@ -195,6 +195,21 @@ func (mr *MockClientMockRecorder) GetScanner(scannerID interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScanner", reflect.TypeOf((*MockClient)(nil).GetScanner), scannerID)
 }
 
+// GetScannerNodePrereleaseVersion mocks base method.
+func (m *MockClient) GetScannerNodePrereleaseVersion() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetScannerNodePrereleaseVersion")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetScannerNodePrereleaseVersion indicates an expected call of GetScannerNodePrereleaseVersion.
+func (mr *MockClientMockRecorder) GetScannerNodePrereleaseVersion() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerNodePrereleaseVersion", reflect.TypeOf((*MockClient)(nil).GetScannerNodePrereleaseVersion))
+}
+
 // GetScannerNodeVersion mocks base method.
 func (m *MockClient) GetScannerNodeVersion() (string, error) {
 	m.ctrl.T.Helper()
