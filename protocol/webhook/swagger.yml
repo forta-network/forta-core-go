@@ -124,12 +124,12 @@ definitions:
       transactionHash:
         type: string
         example: '0x7040dd33cbfd3e9d880da80cb5f3697a717fc329abd0251f3dcd51599ab67b0a'
-      agent:
-        $ref: '#/definitions/AlertAgent'
+      bot:
+        $ref: '#/definitions/AlertBot'
       block:
         $ref: '#/definitions/AlertBlock'
 
-  AlertAgent:
+  AlertBot:
     type: object
     properties:
       id:
@@ -137,7 +137,7 @@ definitions:
         example: '0x17381ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049'
       reference:
         type: string
-        description: Agent reference (IPFS hash)
+        description: Bot reference (IPFS hash)
         example: QmU6L9Zo5rweF6QZLhLfwAAFUFRMF3uFdSnMiJzENXr37R
       image:
         type: string

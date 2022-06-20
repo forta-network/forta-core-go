@@ -18,11 +18,11 @@ import (
 // swagger:model AlertSource
 type AlertSource struct {
 
-	// agent
-	Agent *AlertAgent `json:"agent,omitempty"`
-
 	// block
 	Block *AlertBlock `json:"block,omitempty"`
+
+	// bot
+	Bot *AlertBot `json:"bot,omitempty"`
 
 	// transaction hash
 	// Example: 0x7040dd33cbfd3e9d880da80cb5f3697a717fc329abd0251f3dcd51599ab67b0a
@@ -33,36 +33,17 @@ type AlertSource struct {
 func (m *AlertSource) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAgent(formats); err != nil {
+	if err := m.validateBlock(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateBlock(formats); err != nil {
+	if err := m.validateBot(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *AlertSource) validateAgent(formats strfmt.Registry) error {
-	if swag.IsZero(m.Agent) { // not required
-		return nil
-	}
-
-	if m.Agent != nil {
-		if err := m.Agent.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("agent")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("agent")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -85,37 +66,40 @@ func (m *AlertSource) validateBlock(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *AlertSource) validateBot(formats strfmt.Registry) error {
+	if swag.IsZero(m.Bot) { // not required
+		return nil
+	}
+
+	if m.Bot != nil {
+		if err := m.Bot.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bot")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("bot")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this alert source based on the context it is used
 func (m *AlertSource) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateAgent(ctx, formats); err != nil {
+	if err := m.contextValidateBlock(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateBlock(ctx, formats); err != nil {
+	if err := m.contextValidateBot(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *AlertSource) contextValidateAgent(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Agent != nil {
-		if err := m.Agent.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("agent")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("agent")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -127,6 +111,22 @@ func (m *AlertSource) contextValidateBlock(ctx context.Context, formats strfmt.R
 				return ve.ValidateName("block")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("block")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AlertSource) contextValidateBot(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Bot != nil {
+		if err := m.Bot.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bot")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("bot")
 			}
 			return err
 		}

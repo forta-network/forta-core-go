@@ -49,7 +49,7 @@ func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block
 		Protocol:    alert.Finding.Protocol,
 		Severity:    alert.Finding.Severity.String(),
 		Source: &models.AlertSource{
-			Agent: &models.AlertAgent{
+			Bot: &models.AlertBot{
 				ID:        alert.Agent.Id,
 				Image:     alert.Agent.Image,
 				Reference: alert.Agent.Manifest,
