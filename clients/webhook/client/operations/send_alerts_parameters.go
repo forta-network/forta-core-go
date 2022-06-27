@@ -68,7 +68,7 @@ type SendAlertsParams struct {
 	Authorization *string
 
 	// AlertList.
-	AlertList *models.AlertList
+	AlertList *models.AlertBatch
 
 	timeout    time.Duration
 	Context    context.Context
@@ -135,13 +135,13 @@ func (o *SendAlertsParams) SetAuthorization(authorization *string) {
 }
 
 // WithAlertList adds the alertList to the send alerts params
-func (o *SendAlertsParams) WithAlertList(alertList *models.AlertList) *SendAlertsParams {
+func (o *SendAlertsParams) WithAlertList(alertList *models.AlertBatch) *SendAlertsParams {
 	o.SetAlertList(alertList)
 	return o
 }
 
 // SetAlertList adds the alertList to the send alerts params
-func (o *SendAlertsParams) SetAlertList(alertList *models.AlertList) {
+func (o *SendAlertsParams) SetAlertList(alertList *models.AlertBatch) {
 	o.AlertList = alertList
 }
 

@@ -6,6 +6,37 @@ import (
 	"github.com/forta-network/forta-core-go/utils"
 )
 
+// ToWebhookAlertBatch transforms an alert batch to a webhook alert batch.
+func ToWebhookAlertBatch(batch *protocol.AlertBatch) *models.AlertBatch {
+	return &models.AlertBatch{
+		Alerts:  ToWebhookAlertList(batch),
+		Metrics: ToWebhookBotMetricsList(batch),
+	}
+}
+
+// ToWebhookBotMetricsList transforms an alert batch to a bot metrics list.
+func ToWebhookBotMetricsList(batch *protocol.AlertBatch) models.BotMetricsList {
+	var metricsList models.BotMetricsList
+	for _, metric := range batch.Metrics {
+		webhookMetric := &models.BotMetric{
+			BotID:     metric.AgentId,
+			Timestamp: metric.Timestamp,
+		}
+		for _, metricSummary := range metric.Metrics {
+			webhookMetric.Metrics = append(webhookMetric.Metrics, &models.BotMetricSummary{
+				Name:    metricSummary.Name,
+				Count:   float64(metricSummary.Count),
+				Max:     metricSummary.Max,
+				Average: metricSummary.Average,
+				Sum:     metricSummary.Sum,
+				P95:     metricSummary.P95,
+			})
+		}
+		metricsList = append(metricsList, webhookMetric)
+	}
+	return metricsList
+}
+
 // ToWebhookAlertList transforms an alert batch to a webhook alert list.
 func ToWebhookAlertList(batch *protocol.AlertBatch) *models.AlertList {
 	var alertList models.AlertList
