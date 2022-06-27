@@ -25,7 +25,7 @@ paths:
           description: Webhook request authorization
           type: string
         - in: body
-          name: alertList
+          name: payload
           required: true
           schema:
             $ref: '#/definitions/AlertBatch'
