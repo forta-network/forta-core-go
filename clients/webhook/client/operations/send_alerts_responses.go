@@ -41,6 +41,12 @@ func (o *SendAlertsReader) ReadResponse(response runtime.ClientResponse, consume
 			return nil, err
 		}
 		return nil, result
+	case 502:
+		result := NewSendAlertsBadGateway()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
@@ -116,6 +122,27 @@ func (o *SendAlertsInternalServerError) Error() string {
 }
 
 func (o *SendAlertsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewSendAlertsBadGateway creates a SendAlertsBadGateway with default headers values
+func NewSendAlertsBadGateway() *SendAlertsBadGateway {
+	return &SendAlertsBadGateway{}
+}
+
+/* SendAlertsBadGateway describes a response with status code 502, with default header values.
+
+Bad gateway
+*/
+type SendAlertsBadGateway struct {
+}
+
+func (o *SendAlertsBadGateway) Error() string {
+	return fmt.Sprintf("[POST /alerts][%d] sendAlertsBadGateway ", 502)
+}
+
+func (o *SendAlertsBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

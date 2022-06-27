@@ -28,7 +28,7 @@ paths:
           name: alertList
           required: true
           schema:
-            $ref: '#/definitions/AlertList'
+            $ref: '#/definitions/AlertBatch'
       responses:
         200:
           description: Successfully sent alerts
@@ -36,6 +36,8 @@ paths:
           $ref: '#/responses/BadRequestResponse'
         500:
           description: Internal error
+        502:
+          description: Bad gateway
 
 responses:
   BadRequestResponse:
@@ -47,6 +49,14 @@ responses:
           type: string
 
 definitions:
+  AlertBatch:
+    type: object
+    properties:
+      alerts:
+        $ref: '#/definitions/AlertList'
+      metrics:
+        $ref: '#/definitions/BotMetricsList'
+
   AlertList:
     type: object
     properties:
@@ -162,3 +172,51 @@ definitions:
         type: integer
         format: uint64
         example: 1337
+
+  BotMetricsList:
+    type: array
+    items:
+      $ref: '#/definitions/BotMetric'
+
+  BotMetric:
+    type: object
+    properties:
+      botId:
+        type: string
+        example: '0x17381ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049'
+      timestamp:
+        type: string
+        description: Timestamp (RFC3339Nano)
+        example: '2022-03-01T12:24:33.379756298Z'
+      metrics:
+        type: array
+        items:
+          $ref: '#/definitions/BotMetricSummary'
+
+  BotMetricSummary:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Metric name
+        example: block.request
+      count:
+        type: number
+        description: Total count of data points
+        example: 1337
+      max:
+        type: number
+        description: Max value from the data points
+        example: 537
+      average:
+        type: number
+        description: Average value of the data points
+        example: 47
+      sum:
+        type: number
+        description: Sum value of all data points
+        example: 2157
+      p95:
+        type: number
+        description: 95th percentile value of all data points
+        example: 87
