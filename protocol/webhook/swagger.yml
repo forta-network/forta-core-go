@@ -58,12 +58,9 @@ definitions:
         $ref: '#/definitions/BotMetricsList'
 
   AlertList:
-    type: object
-    properties:
-      alerts:
-        type: array
-        items:
-          $ref: '#/definitions/Alert'
+    type: array
+    items:
+      $ref: '#/definitions/Alert'
 
   Alert:
     type: object

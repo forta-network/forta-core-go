@@ -17,42 +17,23 @@ import (
 // AlertList alert list
 //
 // swagger:model AlertList
-type AlertList struct {
-
-	// alerts
-	Alerts []*Alert `json:"alerts"`
-}
+type AlertList []*Alert
 
 // Validate validates this alert list
-func (m *AlertList) Validate(formats strfmt.Registry) error {
+func (m AlertList) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAlerts(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *AlertList) validateAlerts(formats strfmt.Registry) error {
-	if swag.IsZero(m.Alerts) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.Alerts); i++ {
-		if swag.IsZero(m.Alerts[i]) { // not required
+	for i := 0; i < len(m); i++ {
+		if swag.IsZero(m[i]) { // not required
 			continue
 		}
 
-		if m.Alerts[i] != nil {
-			if err := m.Alerts[i].Validate(formats); err != nil {
+		if m[i] != nil {
+			if err := m[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("alerts" + "." + strconv.Itoa(i))
+					return ve.ValidateName(strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("alerts" + "." + strconv.Itoa(i))
+					return ce.ValidateName(strconv.Itoa(i))
 				}
 				return err
 			}
@@ -60,33 +41,24 @@ func (m *AlertList) validateAlerts(formats strfmt.Registry) error {
 
 	}
 
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
 // ContextValidate validate this alert list based on the context it is used
-func (m *AlertList) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m AlertList) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateAlerts(ctx, formats); err != nil {
-		res = append(res, err)
-	}
+	for i := 0; i < len(m); i++ {
 
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *AlertList) contextValidateAlerts(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Alerts); i++ {
-
-		if m.Alerts[i] != nil {
-			if err := m.Alerts[i].ContextValidate(ctx, formats); err != nil {
+		if m[i] != nil {
+			if err := m[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("alerts" + "." + strconv.Itoa(i))
+					return ve.ValidateName(strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("alerts" + "." + strconv.Itoa(i))
+					return ce.ValidateName(strconv.Itoa(i))
 				}
 				return err
 			}
@@ -94,23 +66,8 @@ func (m *AlertList) contextValidateAlerts(ctx context.Context, formats strfmt.Re
 
 	}
 
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *AlertList) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
 	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *AlertList) UnmarshalBinary(b []byte) error {
-	var res AlertList
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
 	return nil
 }

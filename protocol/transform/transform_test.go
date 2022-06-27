@@ -101,7 +101,7 @@ func TestBatchToAlertList(t *testing.T) {
 		},
 	}
 
-	alertList := transform.ToWebhookAlertList(batch).Alerts
+	alertList := transform.ToWebhookAlertList(batch)
 	r := require.New(t)
 
 	r.Len(alertList, 2)
