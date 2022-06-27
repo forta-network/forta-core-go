@@ -38,12 +38,12 @@ func ToWebhookBotMetricsList(batch *protocol.AlertBatch) models.BotMetricsList {
 }
 
 // ToWebhookAlertList transforms an alert batch to a webhook alert list.
-func ToWebhookAlertList(batch *protocol.AlertBatch) *models.AlertList {
+func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 	var alertList models.AlertList
 	for _, resultsForBlock := range batch.Results {
 		for _, blockResult := range resultsForBlock.Results {
 			for _, alert := range blockResult.Alerts {
-				alertList.Alerts = append(alertList.Alerts, ToWebhookAlert(
+				alertList = append(alertList, ToWebhookAlert(
 					alert.Alert,
 					batch.ChainId,
 					resultsForBlock.Block,
@@ -54,7 +54,7 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) *models.AlertList {
 		for _, resultsForTransaction := range resultsForBlock.Transactions {
 			for _, transactionResult := range resultsForTransaction.Results {
 				for _, alert := range transactionResult.Alerts {
-					alertList.Alerts = append(alertList.Alerts, ToWebhookAlert(
+					alertList = append(alertList, ToWebhookAlert(
 						alert.Alert,
 						batch.ChainId,
 						resultsForBlock.Block,
@@ -64,7 +64,7 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) *models.AlertList {
 			}
 		}
 	}
-	return &alertList
+	return alertList
 }
 
 // ToWebhookAlert converts given alert and extra data to webhook alert.

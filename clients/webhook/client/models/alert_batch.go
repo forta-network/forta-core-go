@@ -19,7 +19,7 @@ import (
 type AlertBatch struct {
 
 	// alerts
-	Alerts *AlertList `json:"alerts,omitempty"`
+	Alerts AlertList `json:"alerts,omitempty"`
 
 	// metrics
 	Metrics BotMetricsList `json:"metrics,omitempty"`
@@ -48,15 +48,13 @@ func (m *AlertBatch) validateAlerts(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if m.Alerts != nil {
-		if err := m.Alerts.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("alerts")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("alerts")
-			}
-			return err
+	if err := m.Alerts.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("alerts")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("alerts")
 		}
+		return err
 	}
 
 	return nil
@@ -99,15 +97,13 @@ func (m *AlertBatch) ContextValidate(ctx context.Context, formats strfmt.Registr
 
 func (m *AlertBatch) contextValidateAlerts(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.Alerts != nil {
-		if err := m.Alerts.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("alerts")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("alerts")
-			}
-			return err
+	if err := m.Alerts.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("alerts")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("alerts")
 		}
+		return err
 	}
 
 	return nil
