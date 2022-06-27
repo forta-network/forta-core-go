@@ -67,8 +67,8 @@ type SendAlertsParams struct {
 	*/
 	Authorization *string
 
-	// AlertList.
-	AlertList *models.AlertBatch
+	// Payload.
+	Payload *models.AlertBatch
 
 	timeout    time.Duration
 	Context    context.Context
@@ -134,15 +134,15 @@ func (o *SendAlertsParams) SetAuthorization(authorization *string) {
 	o.Authorization = authorization
 }
 
-// WithAlertList adds the alertList to the send alerts params
-func (o *SendAlertsParams) WithAlertList(alertList *models.AlertBatch) *SendAlertsParams {
-	o.SetAlertList(alertList)
+// WithPayload adds the payload to the send alerts params
+func (o *SendAlertsParams) WithPayload(payload *models.AlertBatch) *SendAlertsParams {
+	o.SetPayload(payload)
 	return o
 }
 
-// SetAlertList adds the alertList to the send alerts params
-func (o *SendAlertsParams) SetAlertList(alertList *models.AlertBatch) {
-	o.AlertList = alertList
+// SetPayload adds the payload to the send alerts params
+func (o *SendAlertsParams) SetPayload(payload *models.AlertBatch) {
+	o.Payload = payload
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -160,8 +160,8 @@ func (o *SendAlertsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 			return err
 		}
 	}
-	if o.AlertList != nil {
-		if err := r.SetBodyParam(o.AlertList); err != nil {
+	if o.Payload != nil {
+		if err := r.SetBodyParam(o.Payload); err != nil {
 			return err
 		}
 	}
