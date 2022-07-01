@@ -21,7 +21,7 @@ func main() {
 				log.WithFields(log.Fields{
 					"to":     msg.To,
 					"from":   msg.From,
-					"amount": msg.Amount.String(),
+					"amount": msg.Amount,
 					"type":   msg.StakeType,
 					"burn":   msg.IsBurn(),
 					"mint":   msg.IsMint(),
