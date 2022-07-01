@@ -28,12 +28,12 @@ type AgentStakeThresholdMessage struct {
 
 type TransferSharesMessage struct {
 	Message
-	ShareID   *big.Int `json:"shareId"`
-	StakeType string   `json:"stakeType"`
-	Active    bool     `json:"active"`
-	To        string   `json:"to"`
-	From      string   `json:"from"`
-	Amount    *big.Int `json:"amount"`
+	ShareID   string `json:"shareId"`
+	StakeType string `json:"stakeType"`
+	Active    bool   `json:"active"`
+	To        string `json:"to"`
+	From      string `json:"from"`
+	Amount    string `json:"amount"`
 }
 
 func (t TransferSharesMessage) IsBurn() bool {
@@ -94,10 +94,11 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 		},
 		StakeType: st,
+		ShareID:   evt.Id.String(),
 		Active:    isActive(evt.Id),
 		To:        evt.To.Hex(),
 		From:      evt.From.Hex(),
-		Amount:    evt.Value,
+		Amount:    evt.Value.String(),
 	}, nil
 }
 
@@ -115,10 +116,11 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			StakeType: st,
+			ShareID:   id.String(),
 			Active:    isActive(id),
 			To:        evt.To.Hex(),
 			From:      evt.From.Hex(),
-			Amount:    evt.Values[i],
+			Amount:    evt.Values[i].String(),
 		})
 	}
 	return res, nil
