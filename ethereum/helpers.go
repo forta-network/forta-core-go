@@ -26,7 +26,7 @@ func toBlockNumArg(number *big.Int) string {
 func toFilterArg(q ethereum.FilterQuery) (interface{}, error) {
 	arg := make(map[string]interface{})
 	if len(q.Addresses) > 0 {
-		arg["addresses"] = q.Addresses
+		arg["address"] = q.Addresses
 	}
 	if len(q.Topics) > 0 {
 		arg["topics"] = q.Topics
