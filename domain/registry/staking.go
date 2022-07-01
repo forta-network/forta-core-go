@@ -3,12 +3,13 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
+	"time"
+
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
-	"math/big"
-	"time"
 )
 
 const AgentStake = "AgentStake"
