@@ -3,6 +3,7 @@ package ens
 import (
 	"bytes"
 	"errors"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -12,11 +13,13 @@ import (
 )
 
 const (
-	DispatchContract           = "dispatch.forta.eth"
-	AgentRegistryContract      = "agents.registries.forta.eth"
-	ScannerRegistryContract    = "scanners.registries.forta.eth"
-	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
-	StakingContract            = "staking.forta.eth"
+	DispatchContract                     = "dispatch.forta.eth"
+	AgentRegistryContract                = "agents.registries.forta.eth"
+	ScannerRegistryContract              = "scanners.registries.forta.eth"
+	ScannerNodeVersionContract           = "scanner-node-version.forta.eth"
+	ScannerNodePrereleaseVersionContract = "scanner-node-version.forta.eth" // "scanner-node-prerelease-version.forta.eth"
+	StakingContract                      = "staking.forta.eth"
+	FortaContract                        = "forta.eth"
 )
 
 // ENS resolves inputs.
@@ -95,17 +98,29 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
+	scannerNodePrereleaseVersion, err := ensstore.Resolve(ScannerNodePrereleaseVersionContract)
+	if err != nil {
+		return nil, err
+	}
+
 	fortaStaking, err := ensstore.Resolve(StakingContract)
 	if err != nil {
 		return nil, err
 	}
 
+	forta, err := ensstore.Resolve(FortaContract)
+	if err != nil {
+		return nil, err
+	}
+
 	return &registry.RegistryContracts{
-		AgentRegistry:      agentReg,
-		ScannerRegistry:    scannerReg,
-		Dispatch:           dispatch,
-		ScannerNodeVersion: scannerNodeVersion,
-		FortaStaking:       fortaStaking,
+		AgentRegistry:                agentReg,
+		ScannerRegistry:              scannerReg,
+		Dispatch:                     dispatch,
+		ScannerNodeVersion:           scannerNodeVersion,
+		ScannerNodePrereleaseVersion: scannerNodePrereleaseVersion,
+		FortaStaking:                 fortaStaking,
+		Forta:                        forta,
 	}, nil
 
 }

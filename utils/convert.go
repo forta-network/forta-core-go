@@ -10,6 +10,12 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
+func BigIntFromIntString(str string) *big.Int {
+	res := big.NewInt(0)
+	res.SetString(str, 10)
+	return res
+}
+
 func BigIntToHex(i *big.Int) string {
 	return hexutil.EncodeBig(i)
 }

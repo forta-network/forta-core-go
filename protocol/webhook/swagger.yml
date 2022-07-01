@@ -20,11 +20,15 @@ paths:
       operationId: SendAlerts
       summary: Send a list of alerts
       parameters:
+        - in: header
+          name: Authorization
+          description: Webhook request authorization
+          type: string
         - in: body
-          name: alertList
+          name: payload
           required: true
           schema:
-            $ref: '#/definitions/AlertList'
+            $ref: '#/definitions/AlertBatch'
       responses:
         200:
           description: Successfully sent alerts
@@ -32,6 +36,8 @@ paths:
           $ref: '#/responses/BadRequestResponse'
         500:
           description: Internal error
+        502:
+          description: Bad gateway
 
 responses:
   BadRequestResponse:
@@ -43,13 +49,18 @@ responses:
           type: string
 
 definitions:
-  AlertList:
+  AlertBatch:
     type: object
     properties:
       alerts:
-        type: array
-        items:
-          $ref: '#/definitions/Alert'
+        $ref: '#/definitions/AlertList'
+      metrics:
+        $ref: '#/definitions/BotMetricsList'
+
+  AlertList:
+    type: array
+    items:
+      $ref: '#/definitions/Alert'
 
   Alert:
     type: object
@@ -97,6 +108,12 @@ definitions:
         example:
           contractAddress: '0x98883145049dec03c00cb7708cbc938058802520'
           operator: '0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3'
+      links:
+        type: object
+        description: An associative array of extra links values
+        example:
+          explorerUrl: 'https://explorer.forta.network/alert/0xd795c365931762afeccf4a440ecee2f7e89820c59136aa46310a8eec54ba96d8'
+          blockUrl: 'https://etherscan.io/block/18646150'
       source:
         $ref: '#/definitions/AlertSource'
       addresses:
@@ -114,12 +131,12 @@ definitions:
       transactionHash:
         type: string
         example: '0x7040dd33cbfd3e9d880da80cb5f3697a717fc329abd0251f3dcd51599ab67b0a'
-      agent:
-        $ref: '#/definitions/AlertAgent'
+      bot:
+        $ref: '#/definitions/AlertBot'
       block:
         $ref: '#/definitions/AlertBlock'
 
-  AlertAgent:
+  AlertBot:
     type: object
     properties:
       id:
@@ -127,7 +144,7 @@ definitions:
         example: '0x17381ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049'
       reference:
         type: string
-        description: Agent reference (IPFS hash)
+        description: Bot reference (IPFS hash)
         example: QmU6L9Zo5rweF6QZLhLfwAAFUFRMF3uFdSnMiJzENXr37R
       image:
         type: string
@@ -152,3 +169,51 @@ definitions:
         type: integer
         format: uint64
         example: 1337
+
+  BotMetricsList:
+    type: array
+    items:
+      $ref: '#/definitions/BotMetric'
+
+  BotMetric:
+    type: object
+    properties:
+      botId:
+        type: string
+        example: '0x17381ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049'
+      timestamp:
+        type: string
+        description: Timestamp (RFC3339Nano)
+        example: '2022-03-01T12:24:33.379756298Z'
+      metrics:
+        type: array
+        items:
+          $ref: '#/definitions/BotMetricSummary'
+
+  BotMetricSummary:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Metric name
+        example: block.request
+      count:
+        type: number
+        description: Total count of data points
+        example: 1337
+      max:
+        type: number
+        description: Max value from the data points
+        example: 537
+      average:
+        type: number
+        description: Average value of the data points
+        example: 47
+      sum:
+        type: number
+        description: Sum value of all data points
+        example: 2157
+      p95:
+        type: number
+        description: 95th percentile value of all data points
+        example: 87

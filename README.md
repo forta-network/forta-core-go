@@ -2,3 +2,4 @@
 # forta-core-go
 
 This contains key golang libraries for Forta services.
+

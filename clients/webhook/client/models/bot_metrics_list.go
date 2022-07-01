@@ -14,13 +14,13 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// AlertList alert list
+// BotMetricsList bot metrics list
 //
-// swagger:model AlertList
-type AlertList []*Alert
+// swagger:model BotMetricsList
+type BotMetricsList []*BotMetric
 
-// Validate validates this alert list
-func (m AlertList) Validate(formats strfmt.Registry) error {
+// Validate validates this bot metrics list
+func (m BotMetricsList) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {
@@ -47,8 +47,8 @@ func (m AlertList) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this alert list based on the context it is used
-func (m AlertList) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this bot metrics list based on the context it is used
+func (m BotMetricsList) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {

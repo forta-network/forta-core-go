@@ -61,8 +61,14 @@ func NewSendAlertsParamsWithHTTPClient(client *http.Client) *SendAlertsParams {
 */
 type SendAlertsParams struct {
 
-	// AlertList.
-	AlertList *models.AlertList
+	/* Authorization.
+
+	   Webhook request authorization
+	*/
+	Authorization *string
+
+	// Payload.
+	Payload *models.AlertBatch
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +123,26 @@ func (o *SendAlertsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithAlertList adds the alertList to the send alerts params
-func (o *SendAlertsParams) WithAlertList(alertList *models.AlertList) *SendAlertsParams {
-	o.SetAlertList(alertList)
+// WithAuthorization adds the authorization to the send alerts params
+func (o *SendAlertsParams) WithAuthorization(authorization *string) *SendAlertsParams {
+	o.SetAuthorization(authorization)
 	return o
 }
 
-// SetAlertList adds the alertList to the send alerts params
-func (o *SendAlertsParams) SetAlertList(alertList *models.AlertList) {
-	o.AlertList = alertList
+// SetAuthorization adds the authorization to the send alerts params
+func (o *SendAlertsParams) SetAuthorization(authorization *string) {
+	o.Authorization = authorization
+}
+
+// WithPayload adds the payload to the send alerts params
+func (o *SendAlertsParams) WithPayload(payload *models.AlertBatch) *SendAlertsParams {
+	o.SetPayload(payload)
+	return o
+}
+
+// SetPayload adds the payload to the send alerts params
+func (o *SendAlertsParams) SetPayload(payload *models.AlertBatch) {
+	o.Payload = payload
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -135,8 +152,16 @@ func (o *SendAlertsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 		return err
 	}
 	var res []error
-	if o.AlertList != nil {
-		if err := r.SetBodyParam(o.AlertList); err != nil {
+
+	if o.Authorization != nil {
+
+		// header param Authorization
+		if err := r.SetHeaderParam("Authorization", *o.Authorization); err != nil {
+			return err
+		}
+	}
+	if o.Payload != nil {
+		if err := r.SetBodyParam(o.Payload); err != nil {
 			return err
 		}
 	}

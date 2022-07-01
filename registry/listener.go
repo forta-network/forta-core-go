@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	log "github.com/sirupsen/logrus"
 
@@ -50,8 +51,10 @@ type Handlers struct {
 	DispatchHandler func(logger *log.Entry, msg *registry.DispatchMessage) error
 
 	// staking
-	AgentStakeHandler            func(logger *log.Entry, msg *registry.AgentStakeMessage) error
-	ScannerStakeHandler          func(logger *log.Entry, msg *registry.ScannerStakeMessage) error
+	AgentStakeHandler     func(logger *log.Entry, msg *registry.AgentStakeMessage) error
+	ScannerStakeHandler   func(logger *log.Entry, msg *registry.ScannerStakeMessage) error
+	TransferSharesHandler func(logger *log.Entry, msg *registry.TransferSharesMessage) error
+
 	AgentStakeThresholdHandler   func(logger *log.Entry, msg *registry.AgentStakeThresholdMessage) error
 	ScannerStakeThresholdHandler func(logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error
 }
@@ -72,6 +75,7 @@ type ListenerConfig struct {
 	BlockOffset    int
 	Handlers       Handlers
 	ContractFilter *ContractFilter
+	Topics         []string
 }
 
 type Listener interface {
@@ -175,6 +179,35 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		subjectID = evt.Subject
 		value = evt.Value
 		changeType = registry.ChangeTypeSlash
+	} else if isEvent(le, contract_forta_staking.TransferSingleTopic) {
+		evt, err := l.fortaStakingFilterer.ParseTransferSingle(le)
+		if err != nil {
+			return err
+		}
+		m, err := registry.TransferSharesMessageFromSingle(le, evt, blk)
+		if err != nil {
+			return err
+		}
+		if l.cfg.Handlers.TransferSharesHandler != nil {
+			return l.cfg.Handlers.TransferSharesHandler(logger, m)
+		}
+	} else if isEvent(le, contract_forta_staking.TransferBatchTopic) {
+		evt, err := l.fortaStakingFilterer.ParseTransferBatch(le)
+		if err != nil {
+			return err
+		}
+		ms, err := registry.TransferSharesMessagesFromBatch(le, evt, blk)
+		if err != nil {
+			return err
+		}
+		if l.cfg.Handlers.TransferSharesHandler != nil {
+			for _, m := range ms {
+				if err := l.cfg.Handlers.TransferSharesHandler(logger, m); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
 	} else {
 		logger.Debug("unhandled topic, ignoring")
 		return nil
@@ -250,24 +283,35 @@ func (l *listener) handleAfterBlock(blk *domain.Block) error {
 	return nil
 }
 
+//ProcessBlockRange pages over a range of blocks, 10k blocks per page
 func (l *listener) ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error {
-	logs, err := l.logs.GetLogsForRange(startBlock, endBlock)
-	if err != nil {
-		return err
-	}
-	var block *domain.Block
-	for _, lg := range logs {
-		if block == nil || block.Number != utils.BigIntToHex(big.NewInt(int64(lg.BlockNumber))) {
-			blk, err := l.eth.BlockByNumber(l.ctx, big.NewInt(int64(lg.BlockNumber)))
-			if err != nil {
-				return err
-			}
-			block = blk
-		}
-
-		if err := l.handleLog(block, lg); err != nil {
+	start := startBlock
+	pageSize := big.NewInt(10000)
+	end := math.BigMin(big.NewInt(0).Add(start, pageSize), endBlock)
+	for end.Cmp(endBlock) <= 0 {
+		logs, err := l.logs.GetLogsForRange(start, end)
+		if err != nil {
 			return err
 		}
+		var block *domain.Block
+		for _, lg := range logs {
+			if block == nil || block.Number != utils.BigIntToHex(big.NewInt(int64(lg.BlockNumber))) {
+				blk, err := l.eth.BlockByNumber(l.ctx, big.NewInt(int64(lg.BlockNumber)))
+				if err != nil {
+					return err
+				}
+				block = blk
+			}
+
+			if err := l.handleLog(block, lg); err != nil {
+				return err
+			}
+		}
+		if end.Cmp(endBlock) == 0 {
+			return nil
+		}
+		start = big.NewInt(0).Add(end, big.NewInt(1))
+		end = math.BigMin(big.NewInt(0).Add(start, pageSize), endBlock)
 	}
 	return nil
 }
@@ -291,14 +335,23 @@ func (l *listener) Listen() error {
 }
 
 func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
-	client, err := ethereum.NewStreamEthClient(ctx, cfg.Name, cfg.JsonRpcURL)
+	jsonRpc := cfg.JsonRpcURL
+	if jsonRpc == "" {
+		jsonRpc = defaultConfig.JsonRpcUrl
+	}
+	ensAddr := cfg.ENSAddress
+	if ensAddr == "" {
+		ensAddr = defaultEnsAddress
+	}
+
+	client, err := ethereum.NewStreamEthClient(ctx, cfg.Name, jsonRpc)
 	if err != nil {
 		return nil, err
 	}
 
 	c, err := NewClient(ctx, ClientConfig{
-		JsonRpcUrl: cfg.JsonRpcURL,
-		ENSAddress: cfg.ENSAddress,
+		JsonRpcUrl: jsonRpc,
+		ENSAddress: ensAddr,
 		Name:       "registry-listener",
 	})
 	if err != nil {
@@ -345,8 +398,14 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		addrs = []string{regContracts.AgentRegistry.Hex(), regContracts.ScannerRegistry.Hex(), regContracts.Dispatch.Hex(), regContracts.FortaStaking.Hex()}
 	}
 
+	var topics [][]string
+	if len(cfg.Topics) > 0 {
+		topics = [][]string{cfg.Topics}
+	}
+
 	logFeed, err := feeds.NewLogFeed(ctx, client, feeds.LogFeedConfig{
 		Addresses:  addrs,
+		Topics:     topics,
 		StartBlock: cfg.StartBlock,
 		EndBlock:   cfg.EndBlock,
 		Offset:     cfg.BlockOffset,

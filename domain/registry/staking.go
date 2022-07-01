@@ -2,12 +2,13 @@ package registry
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"time"
 
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
@@ -17,6 +18,7 @@ const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
+const StakeTransfer = "StakeTransfer"
 
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
@@ -24,15 +26,31 @@ const ChangeTypeSlash = "slash"
 
 type ThresholdMessage struct {
 	Message
-	MinHex    string  `json:"minHex"`
-	MaxHex    string  `json:"maxHex"`
-	Min       float64 `json:"min"`
-	Max       float64 `json:"max"`
-	Activated bool    `json:"activated"`
+	Min       string `json:"min"`
+	Max       string `json:"max"`
+	Activated bool   `json:"activated"`
 }
 
 type AgentStakeThresholdMessage struct {
 	ThresholdMessage
+}
+
+type TransferSharesMessage struct {
+	Message
+	ShareID   string `json:"shareId"`
+	StakeType string `json:"stakeType"`
+	Active    bool   `json:"active"`
+	To        string `json:"to"`
+	From      string `json:"from"`
+	Amount    string `json:"amount"`
+}
+
+func (t TransferSharesMessage) IsBurn() bool {
+	return t.To == utils.ZeroAddress
+}
+
+func (t TransferSharesMessage) IsMint() bool {
+	return t.From == utils.ZeroAddress
 }
 
 type ScannerStakeThresholdMessage struct {
@@ -42,9 +60,8 @@ type ScannerStakeThresholdMessage struct {
 
 type StakeMessage struct {
 	Message
-	ChangeType string  `json:"changeType"`
-	AmountHex  string  `json:"amountHex"`
-	Amount     float64 `json:"amount"`
+	ChangeType string `json:"changeType"`
+	Amount     string `json:"amount"`
 }
 
 type AgentStakeMessage struct {
@@ -57,31 +74,73 @@ type ScannerStakeMessage struct {
 	ScannerID string `json:"scannerId"`
 }
 
-// https://github.com/ethereum/go-ethereum/issues/21221
-func weiToEther(wei *big.Int) *big.Float {
-	f := new(big.Float)
-	f.SetPrec(236) //  IEEE 754 octuple-precision binary floating-point format: binary256
-	f.SetMode(big.ToNearestEven)
-	fWei := new(big.Float)
-	fWei.SetPrec(236) //  IEEE 754 octuple-precision binary floating-point format: binary256
-	fWei.SetMode(big.ToNearestEven)
-	return f.Quo(fWei.SetInt(wei), big.NewFloat(params.Ether))
-}
-
-func toEthFloat(v *big.Int) float64 {
-	if v == nil {
-		return 0
-	}
-	fl := weiToEther(v)
-	res, _ := fl.Float64()
-	return res
-}
-
-func hexValue(v *big.Int) string {
+func valueString(v *big.Int) string {
 	if v == nil {
 		return ""
 	}
-	return utils.BigIntToHex(v)
+	return v.String()
+}
+
+func extractStakeType(id *big.Int) (string, error) {
+	b := id.Bytes()
+	lastByte := b[len(b)-1]
+	switch lastByte {
+	case 0:
+		return ScannerStake, nil
+	case 1:
+		return AgentStake, nil
+	default:
+		return "", fmt.Errorf("invalid stake type: %s", id.String())
+	}
+}
+
+func isActive(id *big.Int) bool {
+	one := big.NewInt(1)
+	return 0 == big.NewInt(0).And(id, one.Lsh(one, 8)).Cmp(big.NewInt(256))
+}
+
+func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.FortaStakingTransferSingle, blk *domain.Block) (*TransferSharesMessage, error) {
+	st, err := extractStakeType(evt.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &TransferSharesMessage{
+		Message: Message{
+			Action:    StakeTransfer,
+			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+		},
+		StakeType: st,
+		ShareID:   evt.Id.String(),
+		Active:    isActive(evt.Id),
+		To:        evt.To.Hex(),
+		From:      evt.From.Hex(),
+		Amount:    evt.Value.String(),
+	}, nil
+}
+
+func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.FortaStakingTransferBatch, blk *domain.Block) ([]*TransferSharesMessage, error) {
+	var res []*TransferSharesMessage
+	for i, id := range evt.Ids {
+		st, err := extractStakeType(id)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, &TransferSharesMessage{
+			Message: Message{
+				Action:    StakeTransfer,
+				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			StakeType: st,
+			ShareID:   id.String(),
+			Active:    isActive(id),
+			To:        evt.To.Hex(),
+			From:      evt.From.Hex(),
+			Amount:    evt.Values[i].String(),
+		})
+	}
+	return res, nil
 }
 
 func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
@@ -93,8 +152,7 @@ func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *bi
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			ChangeType: changeType,
-			AmountHex:  hexValue(value),
-			Amount:     toEthFloat(value),
+			Amount:     valueString(value),
 		},
 		ScannerID: scannerID,
 	}
@@ -109,8 +167,7 @@ func NewAgentStakeMessage(l types.Log, changeType, agentID string, value *big.In
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			ChangeType: changeType,
-			AmountHex:  hexValue(value),
-			Amount:     toEthFloat(value),
+			Amount:     valueString(value),
 		},
 		AgentID: agentID,
 	}
@@ -124,10 +181,8 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistrySta
 				Timestamp: time.Now().UTC(),
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
-			MinHex:    hexValue(evt.Min),
-			MaxHex:    hexValue(evt.Max),
-			Min:       toEthFloat(evt.Min),
-			Max:       toEthFloat(evt.Max),
+			Min:       valueString(evt.Min),
+			Max:       valueString(evt.Max),
 			Activated: evt.Activated,
 		},
 	}
@@ -141,10 +196,8 @@ func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegis
 				Timestamp: time.Now().UTC(),
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
-			MinHex:    hexValue(evt.Min),
-			MaxHex:    hexValue(evt.Max),
-			Min:       toEthFloat(evt.Min),
-			Max:       toEthFloat(evt.Max),
+			Min:       valueString(evt.Min),
+			Max:       valueString(evt.Max),
 			Activated: evt.Activated,
 		},
 		ChainID: evt.ChainId.Int64(),

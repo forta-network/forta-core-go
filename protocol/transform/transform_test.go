@@ -101,12 +101,12 @@ func TestBatchToAlertList(t *testing.T) {
 		},
 	}
 
-	alertList := transform.ToWebhookAlertList(batch).Alerts
+	alertList := transform.ToWebhookAlertList(batch)
 	r := require.New(t)
 
 	r.Len(alertList, 2)
 	blockAlert := alertList[0]
-	blockAlertAgent := blockAlert.Source.Agent
+	blockAlertAgent := blockAlert.Source.Bot
 	blockAlertBlock := blockAlert.Source.Block
 	r.Equal(alertID, blockAlert.AlertID)
 	r.Equal(alertTimestamp, blockAlert.CreatedAt)
@@ -126,7 +126,7 @@ func TestBatchToAlertList(t *testing.T) {
 	r.Empty(blockAlert.Source.TransactionHash)
 
 	txAlert := alertList[1]
-	txAlertAgent := txAlert.Source.Agent
+	txAlertAgent := txAlert.Source.Bot
 	txAlertBlock := txAlert.Source.Block
 	r.Equal(alertID, txAlert.AlertID)
 	r.Equal(alertTimestamp, txAlert.CreatedAt)
