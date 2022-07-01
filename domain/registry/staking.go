@@ -2,8 +2,12 @@ package registry
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/utils"
+	"math/big"
 	"time"
 )
 
@@ -11,6 +15,7 @@ const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
+const StakeTransfer = "StakeTransfer"
 
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
@@ -18,6 +23,24 @@ const ChangeTypeSlash = "slash"
 
 type AgentStakeThresholdMessage struct {
 	Message
+}
+
+type TransferSharesMessage struct {
+	Message
+	ShareID   *big.Int `json:"shareId"`
+	StakeType string   `json:"stakeType"`
+	Active    bool     `json:"active"`
+	To        string   `json:"to"`
+	From      string   `json:"from"`
+	Amount    *big.Int `json:"amount"`
+}
+
+func (t TransferSharesMessage) IsBurn() bool {
+	return t.To == utils.ZeroAddress
+}
+
+func (t TransferSharesMessage) IsMint() bool {
+	return t.From == utils.ZeroAddress
 }
 
 type ScannerStakeThresholdMessage struct {
@@ -38,6 +61,66 @@ type AgentStakeMessage struct {
 type ScannerStakeMessage struct {
 	StakeMessage
 	ScannerID string `json:"scannerId"`
+}
+
+func isActive(id *big.Int) bool {
+	one := big.NewInt(1)
+	return 0 == big.NewInt(0).And(id, one.Lsh(one, 8)).Cmp(big.NewInt(256))
+}
+
+func extractStakeType(id *big.Int) (string, error) {
+	b := id.Bytes()
+	lastByte := b[len(b)-1]
+	switch lastByte {
+	case 0:
+		return ScannerStake, nil
+	case 1:
+		return AgentStake, nil
+	default:
+		return "", fmt.Errorf("invalid stake type: %s", id.String())
+	}
+}
+
+func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.FortaStakingTransferSingle, blk *domain.Block) (*TransferSharesMessage, error) {
+	st, err := extractStakeType(evt.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &TransferSharesMessage{
+		Message: Message{
+			Action:    StakeTransfer,
+			Timestamp: time.Now().UTC(),
+			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+		},
+		StakeType: st,
+		Active:    isActive(evt.Id),
+		To:        evt.To.Hex(),
+		From:      evt.From.Hex(),
+		Amount:    evt.Value,
+	}, nil
+}
+
+func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.FortaStakingTransferBatch, blk *domain.Block) ([]*TransferSharesMessage, error) {
+	var res []*TransferSharesMessage
+	for i, id := range evt.Ids {
+		st, err := extractStakeType(id)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, &TransferSharesMessage{
+			Message: Message{
+				Action:    StakeTransfer,
+				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			StakeType: st,
+			Active:    isActive(id),
+			To:        evt.To.Hex(),
+			From:      evt.From.Hex(),
+			Amount:    evt.Values[i],
+		})
+	}
+	return res, nil
 }
 
 func NewScannerStakeMessage(l types.Log, changeType, scannerID string, blk *domain.Block) *ScannerStakeMessage {
