@@ -41,5 +41,7 @@ func main() {
 	start := big.NewInt(30172379)
 	end := big.NewInt(30189948)
 
-	l.ProcessBlockRange(start, end)
+	if err := l.ProcessBlockRange(start, end); err != nil {
+		panic(err)
+	}
 }
