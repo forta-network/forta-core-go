@@ -16,7 +16,7 @@ const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
-const StakeTransfer = "StakeTransfer"
+const TransferShares = "TransferShares"
 
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
@@ -89,7 +89,7 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 	}
 	return &TransferSharesMessage{
 		Message: Message{
-			Action:    StakeTransfer,
+			Action:    TransferShares,
 			Timestamp: time.Now().UTC(),
 			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 		},
@@ -111,7 +111,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 		}
 		res = append(res, &TransferSharesMessage{
 			Message: Message{
-				Action:    StakeTransfer,
+				Action:    TransferShares,
 				Timestamp: time.Now().UTC(),
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
