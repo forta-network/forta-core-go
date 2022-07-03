@@ -210,3 +210,12 @@ func ParseScannerStakeMessage(msg string) (*ScannerStakeMessage, error) {
 	}
 	return &m, nil
 }
+
+func ParseTransferSharesMessage(msg string) (*TransferSharesMessage, error) {
+	var m TransferSharesMessage
+	err := json.Unmarshal([]byte(msg), &m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
