@@ -84,6 +84,25 @@
         "type": "string"
       }
     ],
+    "name": "ScannerNodeBetaVersionUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "newVersion",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "oldVersion",
+        "type": "string"
+      }
+    ],
     "name": "ScannerNodeVersionUpdated",
     "type": "event"
   },
@@ -158,6 +177,19 @@
   },
   {
     "inputs": [],
+    "name": "scannerNodeBetaVersion",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "scannerNodeVersion",
     "outputs": [
       {
@@ -217,7 +249,20 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "version",
+        "name": "_version",
+        "type": "string"
+      }
+    ],
+    "name": "setScannerNodeBetaVersion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_version",
         "type": "string"
       }
     ],
