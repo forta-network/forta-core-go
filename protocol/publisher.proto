@@ -50,6 +50,7 @@ message Alert {
   map<string, string> tags = 7;
   ScannerInfo scanner = 8;
   TrackingTimestamps timestamps = 9;
+  repeated Metric metrics = 10;
 }
 
 message SignedAlert {
