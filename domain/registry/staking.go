@@ -18,7 +18,7 @@ const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
-const StakeTransfer = "StakeTransfer"
+const TransferShares = "TransferShares"
 
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
@@ -106,7 +106,7 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 	}
 	return &TransferSharesMessage{
 		Message: Message{
-			Action:    StakeTransfer,
+			Action:    TransferShares,
 			Timestamp: time.Now().UTC(),
 			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 		},
@@ -128,7 +128,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 		}
 		res = append(res, &TransferSharesMessage{
 			Message: Message{
-				Action:    StakeTransfer,
+				Action:    TransferShares,
 				Timestamp: time.Now().UTC(),
 				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
 			},
@@ -233,6 +233,15 @@ func ParseAgentStakeMessage(msg string) (*AgentStakeMessage, error) {
 
 func ParseScannerStakeMessage(msg string) (*ScannerStakeMessage, error) {
 	var m ScannerStakeMessage
+	err := json.Unmarshal([]byte(msg), &m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+func ParseTransferSharesMessage(msg string) (*TransferSharesMessage, error) {
+	var m TransferSharesMessage
 	err := json.Unmarshal([]byte(msg), &m)
 	if err != nil {
 		return nil, err
