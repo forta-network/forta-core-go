@@ -209,7 +209,7 @@ func TestListener_Listen(t *testing.T) {
 		},
 	}
 
-	grp, ctx := errgroup.WithContext(ctx)
+	grp, _ := errgroup.WithContext(ctx)
 
 	for _, lt := range tests {
 		tst := lt
