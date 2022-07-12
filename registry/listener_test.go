@@ -212,9 +212,10 @@ func TestListener_Listen(t *testing.T) {
 	grp, ctx := errgroup.WithContext(ctx)
 
 	for _, lt := range tests {
+		tst := lt
 		grp.Go(func() error {
-			err := lt.listener.ProcessBlockRange(big.NewInt(lt.block), big.NewInt(lt.block))
-			assert.Equal(t, found, err, lt.name)
+			err := tst.listener.ProcessBlockRange(big.NewInt(tst.block), big.NewInt(tst.block))
+			assert.Equal(t, found, err, tst.name)
 			return nil
 		})
 	}
