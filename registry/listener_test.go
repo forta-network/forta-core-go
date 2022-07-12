@@ -16,6 +16,8 @@ import (
 	"testing"
 )
 
+// This actually calls out to polygon to get some known blocks and parse the actions
+// by default it gets the data at https://polygon-rpc.com, otherwise override with ENV var POLYGON_JSON_RPC
 func testListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
 	jrpc := os.Getenv("POLYGON_JSON_RPC")
 	if jrpc == "" {
@@ -36,10 +38,9 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 }
 
 type listenerTest struct {
-	name       string
-	listener   Listener
-	block      int64
-	shouldFind bool
+	name     string
+	listener Listener
+	block    int64
 }
 
 func TestListener_Listen(t *testing.T) {
@@ -58,8 +59,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      26030393,
-			shouldFind: true,
+			block: 26030393,
 		},
 		{
 			name: "agent-disable",
@@ -73,8 +73,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      26029118,
-			shouldFind: true,
+			block: 26029118,
 		},
 		{
 			name: "scanner-enable",
@@ -88,8 +87,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      27984372,
-			shouldFind: true,
+			block: 27984372,
 		},
 		{
 			name: "scanner-disable",
@@ -103,8 +101,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      28005870,
-			shouldFind: true,
+			block: 28005870,
 		},
 		{
 			name: "scanner-save",
@@ -118,8 +115,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      25809030,
-			shouldFind: true,
+			block: 25809030,
 		},
 		{
 			name: "agent-save",
@@ -133,8 +129,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      25730681,
-			shouldFind: true,
+			block: 25730681,
 		},
 		{
 			name: "dispatch-link",
@@ -149,8 +144,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      25730716,
-			shouldFind: true,
+			block: 25730716,
 		},
 		{
 			name: "dispatch-unlink",
@@ -165,8 +159,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      25772370,
-			shouldFind: true,
+			block: 25772370,
 		},
 		{
 			name: "scanner-stake-threshold",
@@ -181,8 +174,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      26465762,
-			shouldFind: true,
+			block: 26465762,
 		},
 		{
 			name: "scanner-stake",
@@ -198,8 +190,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      26498238,
-			shouldFind: true,
+			block: 26498238,
 		},
 		{
 			name: "transfer-shares",
@@ -214,8 +205,7 @@ func TestListener_Listen(t *testing.T) {
 						return found
 					},
 				}),
-			block:      26498238,
-			shouldFind: true,
+			block: 26498238,
 		},
 	}
 
@@ -224,11 +214,7 @@ func TestListener_Listen(t *testing.T) {
 	for _, lt := range tests {
 		grp.Go(func() error {
 			err := lt.listener.ProcessBlockRange(big.NewInt(lt.block), big.NewInt(lt.block))
-			if lt.shouldFind {
-				assert.Equal(t, found, err, lt.name)
-			} else {
-				assert.NoError(t, err, lt.name)
-			}
+			assert.Equal(t, found, err, lt.name)
 			return nil
 		})
 	}
