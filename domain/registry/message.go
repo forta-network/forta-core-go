@@ -10,10 +10,11 @@ import (
 )
 
 type Source struct {
-	TxHash      string    `json:"txHash"`
-	BlockNumber string    `json:"blockNumber"`
-	BlockHash   string    `json:"blockHash"`
-	Timestamp   time.Time `json:"timestamp"`
+	TxHash             string    `json:"txHash"`
+	BlockNumberDecimal int64     `json:"blockNumberDecimal"`
+	BlockNumber        string    `json:"blockNumber"`
+	BlockHash          string    `json:"blockHash"`
+	Timestamp          time.Time `json:"timestamp"`
 }
 
 func SourceFromBlock(txHash string, blk *domain.Block) Source {
@@ -22,12 +23,14 @@ func SourceFromBlock(txHash string, blk *domain.Block) Source {
 			TxHash: txHash,
 		}
 	}
+
 	ts := utils.HexToInt64(blk.Timestamp)
 	return Source{
-		BlockNumber: blk.Number,
-		BlockHash:   blk.Hash,
-		Timestamp:   time.Unix(ts, 0).UTC(),
-		TxHash:      txHash,
+		BlockNumberDecimal: utils.HexToInt64(blk.Number),
+		BlockNumber:        blk.Number,
+		BlockHash:          blk.Hash,
+		Timestamp:          time.Unix(ts, 0).UTC(),
+		TxHash:             txHash,
 	}
 }
 

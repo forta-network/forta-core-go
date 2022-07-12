@@ -334,6 +334,15 @@ func (l *listener) Listen() error {
 	return l.logs.ForEachLog(l.handleLog, l.handleAfterBlock)
 }
 
+func NewDefaultListener(ctx context.Context, handlers Handlers) (*listener, error) {
+	return NewListener(ctx, ListenerConfig{
+		Name:       "listener",
+		JsonRpcURL: defaultConfig.JsonRpcUrl,
+		ENSAddress: defaultEnsAddress,
+		Handlers:   handlers,
+	})
+}
+
 func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 	jsonRpc := cfg.JsonRpcURL
 	if jsonRpc == "" {
