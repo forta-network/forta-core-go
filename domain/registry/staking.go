@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/core/types"
@@ -113,8 +114,8 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 		StakeType: st,
 		ShareID:   evt.Id.String(),
 		Active:    isActive(evt.Id),
-		To:        evt.To.Hex(),
-		From:      evt.From.Hex(),
+		To:        strings.ToLower(evt.To.Hex()),
+		From:      strings.ToLower(evt.From.Hex()),
 		Amount:    evt.Value.String(),
 	}, nil
 }
@@ -135,8 +136,8 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 			StakeType: st,
 			ShareID:   id.String(),
 			Active:    isActive(id),
-			To:        evt.To.Hex(),
-			From:      evt.From.Hex(),
+			To:        strings.ToLower(evt.To.Hex()),
+			From:      strings.ToLower(evt.From.Hex()),
 			Amount:    evt.Values[i].String(),
 		})
 	}
@@ -154,7 +155,7 @@ func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *bi
 			ChangeType: changeType,
 			Amount:     valueString(value),
 		},
-		ScannerID: scannerID,
+		ScannerID: strings.ToLower(scannerID),
 	}
 }
 

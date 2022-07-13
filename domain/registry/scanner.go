@@ -3,6 +3,7 @@ package registry
 import (
 	"fmt"
 	"github.com/forta-network/forta-core-go/domain"
+	"strings"
 	"time"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
@@ -64,7 +65,7 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 			Action:    evtName,
 			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
-		ScannerID:  scannerID,
+		ScannerID:  strings.ToLower(scannerID),
 		Permission: int(evt.Permission),
 	}
 }
@@ -73,7 +74,7 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 	scannerID := utils.HexAddr(evt.ScannerId)
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{
-			ScannerID: scannerID,
+			ScannerID: strings.ToLower(scannerID),
 			Message: Message{
 				Timestamp: time.Now().UTC(),
 				Action:    SaveScanner,

@@ -3,6 +3,7 @@ package registry
 import (
 	"fmt"
 	"github.com/forta-network/forta-core-go/domain"
+	"strings"
 	"time"
 
 	"github.com/goccy/go-json"
@@ -45,7 +46,7 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink, blk *domain.Block) 
 			Timestamp: time.Now().UTC(),
 			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
-		ScannerID: scannerID,
+		ScannerID: strings.ToLower(scannerID),
 		AgentID:   agentID,
 	}
 }
@@ -63,7 +64,7 @@ func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinke
 			Timestamp: time.Now().UTC(),
 			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
-		ScannerID: scannerID,
+		ScannerID: strings.ToLower(scannerID),
 		AgentID:   agentID,
 	}
 }

@@ -83,7 +83,7 @@ func TestListener_Listen(t *testing.T) {
 					ScannerActionHandler: func(logger *log.Entry, msg *registry.ScannerMessage) error {
 						assert.Equal(t, int64(27984372), msg.Source.BlockNumberDecimal)
 						assert.Equal(t, registry.EnableScanner, msg.Action)
-						assert.Equal(t, "0xeC542ecf3d371Bb95c45Af6776E20e7e5fF6CBc0", msg.ScannerID)
+						assert.Equal(t, "0xec542ecf3d371bb95c45af6776e20e7e5ff6cbc0", msg.ScannerID)
 						return found
 					},
 				}),
@@ -97,7 +97,7 @@ func TestListener_Listen(t *testing.T) {
 					ScannerActionHandler: func(logger *log.Entry, msg *registry.ScannerMessage) error {
 						assert.Equal(t, int64(28005870), msg.Source.BlockNumberDecimal)
 						assert.Equal(t, registry.DisableScanner, msg.Action)
-						assert.Equal(t, "0x7C4CD89c996Bdc1589A50E7b2116b43fDCa7E6d2", msg.ScannerID)
+						assert.Equal(t, "0x7c4cd89c996bdc1589a50e7b2116b43fdca7e6d2", msg.ScannerID)
 						return found
 					},
 				}),
@@ -111,7 +111,7 @@ func TestListener_Listen(t *testing.T) {
 					SaveScannerHandler: func(logger *log.Entry, msg *registry.ScannerSaveMessage) error {
 						assert.Equal(t, int64(25809030), msg.Source.BlockNumberDecimal)
 						assert.Equal(t, registry.SaveScanner, msg.Action)
-						assert.Equal(t, "0xDEC088FEA5fEab7Dc17789a92BffC10393A769DE", msg.ScannerID)
+						assert.Equal(t, "0xdec088fea5feab7dc17789a92bffc10393a769de", msg.ScannerID)
 						return found
 					},
 				}),
@@ -140,7 +140,7 @@ func TestListener_Listen(t *testing.T) {
 						assert.Equal(t, int64(25730716), msg.Source.BlockNumberDecimal)
 						assert.Equal(t, registry.Link, msg.Action)
 						assert.Equal(t, "0xdc75bb779e1cbe73a21b8d3810867411f6d71eb64f79cec7e7d4fbcaa40de990", msg.AgentID)
-						assert.Equal(t, "0xB0697be4e0eE8f18d741B5B1C940C4BcAc9C7eb4", msg.ScannerID)
+						assert.Equal(t, "0xb0697be4e0ee8f18d741b5b1c940c4bcac9c7eb4", msg.ScannerID)
 						return found
 					},
 				}),
@@ -155,7 +155,7 @@ func TestListener_Listen(t *testing.T) {
 						assert.Equal(t, int64(25772370), msg.Source.BlockNumberDecimal)
 						assert.Equal(t, registry.Unlink, msg.Action)
 						assert.Equal(t, "0x841f771742ce7d9904d061db29dcf31ef500979d73e1859b4b81c7c739499f2a", msg.AgentID)
-						assert.Equal(t, "0xaA64B99Aed1B93e705b35f4a5FF2822871888b9d", msg.ScannerID)
+						assert.Equal(t, "0xaa64b99aed1b93e705b35f4a5ff2822871888b9d", msg.ScannerID)
 						return found
 					},
 				}),
@@ -200,7 +200,7 @@ func TestListener_Listen(t *testing.T) {
 					TransferSharesHandler: func(logger *log.Entry, msg *registry.TransferSharesMessage) error {
 						assert.Equal(t, int64(26498238), msg.Source.BlockNumberDecimal)
 						assert.Equal(t, registry.TransferShares, msg.Action)
-						assert.Equal(t, "0x9b0A8A8e6B2c23d572D7145F3dA14438FEd35374", msg.To)
+						assert.Equal(t, "0x9b0a8a8e6b2c23d572d7145f3da14438fed35374", msg.To)
 						assert.Equal(t, "500000000000000000000", msg.Amount)
 						return found
 					},
