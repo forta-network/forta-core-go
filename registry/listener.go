@@ -112,7 +112,7 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, blk *domain.Block, l
 			return err
 		}
 		if l.cfg.Handlers.ScannerStakeThresholdHandler != nil {
-			return l.cfg.Handlers.ScannerStakeThresholdHandler(logger, registry.NewScannerStakeThresholdMessage(le, evt.ChainId.Int64(), blk))
+			return l.cfg.Handlers.ScannerStakeThresholdHandler(logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
 		}
 	}
 	return nil
@@ -136,8 +136,12 @@ func (l *listener) handleAgentRegistryEvent(le types.Log, blk *domain.Block, log
 			return l.cfg.Handlers.AgentActionHandler(logger, registry.NewAgentMessage(ae, blk))
 		}
 	} else if isEvent(le, contract_agent_registry.StakeThresholdChangedTopic) {
+		stc, err := l.agentsFilterer.ParseStakeThresholdChanged(le)
+		if err != nil {
+			return err
+		}
 		if l.cfg.Handlers.AgentStakeThresholdHandler != nil {
-			return l.cfg.Handlers.AgentStakeThresholdHandler(logger, registry.NewAgentStakeThresholdMessage(le, blk))
+			return l.cfg.Handlers.AgentStakeThresholdHandler(logger, registry.NewAgentStakeThresholdMessage(stc, le, blk))
 		}
 	}
 	return nil
@@ -147,6 +151,7 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 	var subjectType uint8
 	var subjectID *big.Int
 	var changeType string
+	var value *big.Int
 
 	if isEvent(le, contract_forta_staking.StakeDepositedTopic) {
 		evt, err := l.fortaStakingFilterer.ParseStakeDeposited(le)
@@ -155,6 +160,7 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		}
 		subjectType = evt.SubjectType
 		subjectID = evt.Subject
+		value = evt.Amount
 		changeType = registry.ChangeTypeDeposit
 	} else if isEvent(le, contract_forta_staking.WithdrawalInitiatedTopic) {
 		evt, err := l.fortaStakingFilterer.ParseWithdrawalInitiated(le)
@@ -171,6 +177,7 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		}
 		subjectType = evt.SubjectType
 		subjectID = evt.Subject
+		value = evt.Value
 		changeType = registry.ChangeTypeSlash
 	} else if isEvent(le, contract_forta_staking.TransferSingleTopic) {
 		evt, err := l.fortaStakingFilterer.ParseTransferSingle(le)
@@ -210,12 +217,12 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 	if subjectType == SubjectTypeScanner {
 		scannerID := utils.ScannerIDBigIntToHex(subjectID)
 		if l.cfg.Handlers.ScannerStakeHandler != nil {
-			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(le, changeType, scannerID, blk))
+			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(le, changeType, scannerID, value, blk))
 		}
 	} else if subjectType == SubjectTypeAgent {
 		agentID := utils.AgentBigIntToHex(subjectID)
 		if l.cfg.Handlers.AgentStakeHandler != nil {
-			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, agentID, blk))
+			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, agentID, value, blk))
 		}
 	} else {
 		logger.WithField("subjectID", subjectType).Warn("unhandled subject ID, ignoring")
@@ -325,6 +332,15 @@ func (l *listener) ProcessLastBlocks(blocksAgo int64) error {
 
 func (l *listener) Listen() error {
 	return l.logs.ForEachLog(l.handleLog, l.handleAfterBlock)
+}
+
+func NewDefaultListener(ctx context.Context, handlers Handlers) (*listener, error) {
+	return NewListener(ctx, ListenerConfig{
+		Name:       "listener",
+		JsonRpcURL: defaultConfig.JsonRpcUrl,
+		ENSAddress: defaultEnsAddress,
+		Handlers:   handlers,
+	})
 }
 
 func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
