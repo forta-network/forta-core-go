@@ -288,74 +288,19 @@ func (x *AgentMetricList) GetMetrics() []*AgentMetric {
 	return nil
 }
 
-type Indicator struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Name  string  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
-}
-
-func (x *Indicator) Reset() {
-	*x = Indicator{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Indicator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Indicator) ProtoMessage() {}
-
-func (x *Indicator) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Indicator.ProtoReflect.Descriptor instead.
-func (*Indicator) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Indicator) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *Indicator) GetValue() float64 {
-	if x != nil {
-		return x.Value
-	}
-	return 0
-}
-
 type SLAChecks struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Timestamp  string       `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Indicators []*Indicator `protobuf:"bytes,2,rep,name=indicators,proto3" json:"indicators,omitempty"`
+	Timestamp string           `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Metrics   []*MetricSummary `protobuf:"bytes,2,rep,name=metrics,proto3" json:"metrics,omitempty"`
 }
 
 func (x *SLAChecks) Reset() {
 	*x = SLAChecks{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[5]
+		mi := &file_metrics_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -368,7 +313,7 @@ func (x *SLAChecks) String() string {
 func (*SLAChecks) ProtoMessage() {}
 
 func (x *SLAChecks) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[5]
+	mi := &file_metrics_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -381,7 +326,7 @@ func (x *SLAChecks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SLAChecks.ProtoReflect.Descriptor instead.
 func (*SLAChecks) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{5}
+	return file_metrics_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SLAChecks) GetTimestamp() string {
@@ -391,9 +336,119 @@ func (x *SLAChecks) GetTimestamp() string {
 	return ""
 }
 
-func (x *SLAChecks) GetIndicators() []*Indicator {
+func (x *SLAChecks) GetMetrics() []*MetricSummary {
 	if x != nil {
-		return x.Indicators
+		return x.Metrics
+	}
+	return nil
+}
+
+type SLACheck struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Timestamp string  `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Name      string  `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Value     float64 `protobuf:"fixed64,3,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *SLACheck) Reset() {
+	*x = SLACheck{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_metrics_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SLACheck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SLACheck) ProtoMessage() {}
+
+func (x *SLACheck) ProtoReflect() protoreflect.Message {
+	mi := &file_metrics_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SLACheck.ProtoReflect.Descriptor instead.
+func (*SLACheck) Descriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *SLACheck) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+func (x *SLACheck) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SLACheck) GetValue() float64 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+type SLACheckList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Checks []*SLACheck `protobuf:"bytes,2,rep,name=checks,proto3" json:"checks,omitempty"`
+}
+
+func (x *SLACheckList) Reset() {
+	*x = SLACheckList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_metrics_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SLACheckList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SLACheckList) ProtoMessage() {}
+
+func (x *SLACheckList) ProtoReflect() protoreflect.Message {
+	mi := &file_metrics_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SLACheckList.ProtoReflect.Descriptor instead.
+func (*SLACheckList) Descriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SLACheckList) GetChecks() []*SLACheck {
+	if x != nil {
+		return x.Checks
 	}
 	return nil
 }
@@ -431,18 +486,24 @@ var file_metrics_proto_rawDesc = []byte{
 	0x0a, 0x07, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
 	0x1a, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x66, 0x6f, 0x72, 0x74, 0x61, 0x2e,
 	0x41, 0x67, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x52, 0x07, 0x4d, 0x65, 0x74,
-	0x72, 0x69, 0x63, 0x73, 0x22, 0x35, 0x0a, 0x09, 0x49, 0x6e, 0x64, 0x69, 0x63, 0x61, 0x74, 0x6f,
-	0x72, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x63, 0x0a, 0x09, 0x53,
-	0x4c, 0x41, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x73, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65,
-	0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x38, 0x0a, 0x0a, 0x69, 0x6e, 0x64, 0x69, 0x63, 0x61,
-	0x74, 0x6f, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6e, 0x65, 0x74,
-	0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x66, 0x6f, 0x72, 0x74, 0x61, 0x2e, 0x49, 0x6e, 0x64, 0x69, 0x63,
-	0x61, 0x74, 0x6f, 0x72, 0x52, 0x0a, 0x69, 0x6e, 0x64, 0x69, 0x63, 0x61, 0x74, 0x6f, 0x72, 0x73,
-	0x42, 0x0d, 0x5a, 0x0b, 0x2e, 0x2f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x69, 0x63, 0x73, 0x22, 0x61, 0x0a, 0x09, 0x53, 0x4c, 0x41, 0x43, 0x68, 0x65, 0x63, 0x6b,
+	0x73, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12,
+	0x36, 0x0a, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x1c, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x66, 0x6f, 0x72, 0x74, 0x61,
+	0x2e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x07,
+	0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0x52, 0x0a, 0x08, 0x53, 0x4c, 0x41, 0x43, 0x68,
+	0x65, 0x63, 0x6b, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
+	0x70, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x01, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x3f, 0x0a, 0x0c, 0x53,
+	0x4c, 0x41, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x2f, 0x0a, 0x06, 0x63,
+	0x68, 0x65, 0x63, 0x6b, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x6e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x66, 0x6f, 0x72, 0x74, 0x61, 0x2e, 0x53, 0x4c, 0x41, 0x43,
+	0x68, 0x65, 0x63, 0x6b, 0x52, 0x06, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x73, 0x42, 0x0d, 0x5a, 0x0b,
+	0x2e, 0x2f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -457,24 +518,26 @@ func file_metrics_proto_rawDescGZIP() []byte {
 	return file_metrics_proto_rawDescData
 }
 
-var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_metrics_proto_goTypes = []interface{}{
 	(*AgentMetrics)(nil),    // 0: network.forta.AgentMetrics
 	(*MetricSummary)(nil),   // 1: network.forta.MetricSummary
 	(*AgentMetric)(nil),     // 2: network.forta.AgentMetric
 	(*AgentMetricList)(nil), // 3: network.forta.AgentMetricList
-	(*Indicator)(nil),       // 4: network.forta.Indicator
-	(*SLAChecks)(nil),       // 5: network.forta.SLAChecks
+	(*SLAChecks)(nil),       // 4: network.forta.SLAChecks
+	(*SLACheck)(nil),        // 5: network.forta.SLACheck
+	(*SLACheckList)(nil),    // 6: network.forta.SLACheckList
 }
 var file_metrics_proto_depIdxs = []int32{
 	1, // 0: network.forta.AgentMetrics.metrics:type_name -> network.forta.MetricSummary
 	2, // 1: network.forta.AgentMetricList.Metrics:type_name -> network.forta.AgentMetric
-	4, // 2: network.forta.SLAChecks.indicators:type_name -> network.forta.Indicator
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 2: network.forta.SLAChecks.metrics:type_name -> network.forta.MetricSummary
+	5, // 3: network.forta.SLACheckList.checks:type_name -> network.forta.SLACheck
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_metrics_proto_init() }
@@ -532,7 +595,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Indicator); i {
+			switch v := v.(*SLAChecks); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -544,7 +607,19 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SLAChecks); i {
+			switch v := v.(*SLACheck); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_metrics_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SLACheckList); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -562,7 +637,7 @@ func file_metrics_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_metrics_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

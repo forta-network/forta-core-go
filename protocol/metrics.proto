@@ -30,12 +30,17 @@ message AgentMetricList {
   repeated AgentMetric Metrics = 1;
 }
 
-message Indicator {
-  string name = 1;
-  double value = 2;
-}
-
 message SLAChecks {
   string timestamp = 1;
-  repeated Indicator indicators = 2;
+  repeated MetricSummary metrics = 2;
+}
+
+message SLACheck {
+  string timestamp = 1;
+  string name = 2;
+  double value = 3;
+}
+
+message SLACheckList {
+  repeated SLACheck checks = 2;
 }
