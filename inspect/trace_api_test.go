@@ -1,3 +1,8 @@
+//go:build ignore
+
+// TODO: Re-enable these tests by removing above build tag.
+// They are disabled for now due to performance issues and flakiness.
+
 package inspect
 
 import (

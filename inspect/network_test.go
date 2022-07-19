@@ -3,6 +3,8 @@ package inspect
 import (
 	"context"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestRunNetworkInspection(t *testing.T) {
@@ -25,19 +27,17 @@ func TestRunNetworkInspection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {
+				r := require.New(t)
+
 				got, err := RunNetworkInspection(tt.args.ctx)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("RunNetworkInspection() error = %v, wantErr %v", err, tt.wantErr)
+				if tt.wantErr {
+					r.Error(err)
 					return
 				}
-				if !tt.wantErr {
-					if got[MetricContainerNetworkDownloadSpeed] <= 0 {
-						t.Errorf("RunNetworkInspection() download speed test failed")
-					}
-					if got[MetricContainerNetworkUploadSpeed] <= 0 {
-						t.Errorf("RunNetworkInspection() upload speed test failed")
-					}
-				}
+
+				r.NoError(err)
+				r.Greater(got[MetricContainerNetworkDownloadSpeed], float64(0), "download speed test failed")
+				r.Greater(got[MetricContainerNetworkUploadSpeed], float64(0), "upload speed test failed")
 			},
 		)
 	}
