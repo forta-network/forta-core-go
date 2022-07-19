@@ -12,6 +12,7 @@ require-tools:
 	@file $(FORMAT) > /dev/null
 
 	@file $(SWAGGER) > /dev/null
+	@echo "All tools found in $(GOBIN)"
 
 .PHONY: tools
 tools:
@@ -23,6 +24,7 @@ tools:
 
 .PHONY: fmt
 fmt: require-tools
+	@go mod tidy
 	@$(FORMAT) -w $$(go list -f {{.Dir}} ./...)
 
 .PHONY: lint
