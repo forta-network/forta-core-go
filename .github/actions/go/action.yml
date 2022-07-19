@@ -25,6 +25,7 @@ runs:
       skip-go-installation: true
       skip-pkg-cache: true
       skip-build-cache: true
+      version: v1.47
   - name: Build
     shell: bash
     run: go build -v ./...

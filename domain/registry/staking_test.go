@@ -1,9 +1,10 @@
 package registry
 
 import (
+	"testing"
+
 	"github.com/forta-network/forta-core-go/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestExtractions(t *testing.T) {

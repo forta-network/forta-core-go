@@ -2,8 +2,9 @@ package registry
 
 import (
 	"fmt"
-	"github.com/forta-network/forta-core-go/domain"
 	"time"
+
+	"github.com/forta-network/forta-core-go/domain"
 
 	"github.com/goccy/go-json"
 

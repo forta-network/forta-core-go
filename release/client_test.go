@@ -2,8 +2,9 @@ package release
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_GetReleaseManifest(t *testing.T) {

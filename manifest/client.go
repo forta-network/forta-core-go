@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"context"
+
 	"github.com/forta-network/forta-core-go/ipfs"
 )
 

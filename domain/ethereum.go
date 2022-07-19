@@ -1,9 +1,10 @@
 package domain
 
 import (
-	"github.com/forta-network/forta-core-go/utils"
 	"math/big"
 	"time"
+
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 //Block is the intersection between parity and go-ethereum block

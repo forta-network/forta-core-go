@@ -1,17 +1,45 @@
 export GOBIN = $(shell pwd)/toolbin
 
+LINT = $(GOBIN)/golangci-lint
+FORMAT = $(GOBIN)/goimports
+
 SWAGGER = $(GOBIN)/swagger
 
+.PHONY: require-tools
+require-tools:
+	@echo 'Checking tools...'
+	@file $(LINT) > /dev/null
+	@file $(FORMAT) > /dev/null
+
+	@file $(SWAGGER) > /dev/null
+
+.PHONY: tools
 tools:
 	@rm -rf toolbin
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.0
+	@go install golang.org/x/tools/cmd/goimports@v0.1.11
+
 	@go install github.com/go-swagger/go-swagger/cmd/swagger@v0.29.0
 
-proto:
+.PHONY: fmt
+fmt: require-tools
+	@$(FORMAT) -w $$(go list -f {{.Dir}} ./...)
+
+.PHONY: lint
+lint: require-tools fmt
+	@$(LINT) run ./...
+
+.PHONY: proto
+proto: protogen fmt
+
+.PHONY: protogen
+protogen: require-tools
 	protoc -I=protocol --go_out=protocol/. protocol/metrics.proto
 	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/agent.proto
 	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/publisher.proto
 	protoc -I=protocol --go_out=protocol/. protocol/batch.proto
 
+.PHONY: mocks
 mocks:
 	mockgen -source ethereum/client.go -destination ethereum/mocks/mock_client.go
 	mockgen -source feeds/interfaces.go -destination feeds/mocks/mock_feeds.go
@@ -20,12 +48,11 @@ mocks:
 	mockgen -source ipfs/client.go -destination ipfs/mocks/mock_client.go
 	mockgen -source release/client.go -destination release/mocks/mock_client.go
 
-lint:
-	golangci-lint run ./...
-
+.PHONY: test
 test:
 	go test -v -count=1 ./...
 
+.PHONY: abigen
 abigen: pull-contracts
 	rm -rf contracts
 	./scripts/abigen.sh forta-contracts components/staking/FortaStaking.sol FortaStaking forta_staking
@@ -42,7 +69,7 @@ pull-contracts:
 	./scripts/pull-contracts.sh forta-contracts master
 
 .PHONY: swagger
-swagger:
+swagger: require-tools
 	@rm -rf clients/webhook/swagger
 	@$(SWAGGER) generate client \
 		-f protocol/webhook/swagger.yml \

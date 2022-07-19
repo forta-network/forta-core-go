@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"math/big"
+	"testing"
+
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
-	"math/big"
-	"testing"
 )
 
 func intPtr(val int) *int {

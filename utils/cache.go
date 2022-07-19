@@ -3,7 +3,7 @@ package utils
 import (
 	"sync"
 
-	"github.com/tylertreat/BoomFilters"
+	boom "github.com/tylertreat/BoomFilters"
 )
 
 type Cache interface {

@@ -1,10 +1,11 @@
 package security
 
 import (
-	"github.com/forta-network/forta-core-go/protocol"
-	"github.com/google/uuid"
 	"testing"
 	"time"
+
+	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/google/uuid"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -2,6 +2,7 @@ package release
 
 import (
 	"context"
+
 	"github.com/forta-network/forta-core-go/ipfs"
 )
 
