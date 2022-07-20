@@ -1,10 +1,11 @@
 package ethereum
 
 import (
+	"testing"
+
 	"github.com/ethereum/go-ethereum"
 	"github.com/forta-network/forta-core-go/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestToFilterArg(t *testing.T) {

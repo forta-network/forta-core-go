@@ -1,12 +1,13 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const evtScannerUpdated = "ScannerUpdated(uint256,uint256,string)"

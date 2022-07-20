@@ -2,14 +2,15 @@ package domain
 
 import (
 	"bytes"
+	"math/big"
+	"strings"
+	"time"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/goccy/go-json"
 	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
-	"math/big"
-	"strings"
-	"time"
 
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"

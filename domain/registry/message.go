@@ -2,11 +2,12 @@ package registry
 
 import (
 	"errors"
+	"time"
+
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
 	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type Source struct {

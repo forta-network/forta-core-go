@@ -2,9 +2,10 @@ package registry
 
 import (
 	"fmt"
-	"github.com/forta-network/forta-core-go/domain"
 	"strings"
 	"time"
+
+	"github.com/forta-network/forta-core-go/domain"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/utils"

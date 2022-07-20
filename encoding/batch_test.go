@@ -1,11 +1,12 @@
 package encoding_test
 
 import (
+	"testing"
+
 	"github.com/forta-network/forta-core-go/encoding"
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var testMap = map[string]string{

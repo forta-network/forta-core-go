@@ -1,10 +1,11 @@
 package feeds
 
 import (
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
-	"math/big"
 )
 
 // BlockFeed is a subscribable feed of blocks.

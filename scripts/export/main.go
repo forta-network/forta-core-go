@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/forta-network/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 type scannerSummary struct {

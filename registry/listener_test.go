@@ -3,6 +3,10 @@ package registry
 import (
 	"context"
 	"errors"
+	"math/big"
+	"os"
+	"testing"
+
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
@@ -11,9 +15,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
-	"math/big"
-	"os"
-	"testing"
 )
 
 // This actually calls out to polygon to get some known blocks and parse the actions
