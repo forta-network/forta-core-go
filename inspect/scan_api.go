@@ -25,6 +25,12 @@ const (
 	MetricScanAPIHistorySupport = "scan-api.history-support"
 )
 
+const (
+	// VeryOldBlockNumber is the number of a block which inspection logic considers
+	// as a very old block.
+	VeryOldBlockNumber = 5
+)
+
 // ScanAPIInspector is an inspector implementation.
 type ScanAPIInspector struct{}
 
@@ -79,7 +85,7 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 		results.Metrics[MetricScanAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, client)
 	}
 
-	err = moduleFunctionalityCheck(ctx, rpcClient, results)
+	err = checkSupportedModules(ctx, rpcClient, results)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("error checking module functionality %w", err))
 	}
@@ -87,9 +93,9 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 	return
 }
 
-// moduleFunctionalityCheck double-checks the functionality of modules that were declared as supported by
+// checkSupportedModules double-checks the functionality of modules that were declared as supported by
 // the node.
-func moduleFunctionalityCheck(
+func checkSupportedModules(
 	ctx context.Context, rpcClient *rpc.Client, results *InspectionResults,
 ) (resultError error) {
 	client := ethclient.NewClient(rpcClient)
@@ -126,50 +132,49 @@ func moduleFunctionalityCheck(
 
 // checkHistorySupport inspects block history supports. results earliest provided block
 func checkHistorySupport(ctx context.Context, latestBlock uint64, client *ethclient.Client) float64 {
-	// check for genesis block
-	_, err := client.BlockByNumber(ctx, big.NewInt(0))
+	// check for a very old block
+	_, err := client.BlockByNumber(ctx, big.NewInt(VeryOldBlockNumber))
 	if err == nil {
-		return 0
+		return VeryOldBlockNumber
 	}
 
 	// check for earliest block if genesis wasn't available
-	memo := make(map[uint64]bool)
-
-	return float64(findOldestSupportedBlock(ctx, memo, client, latestBlock, 0))
+	return float64(findOldestSupportedBlock(ctx, client, 0, latestBlock))
 }
 
 // findOldestSupportedBlock returns the earliest block provided by client
-func findOldestSupportedBlock(
-	ctx context.Context, memo map[uint64]bool, client *ethclient.Client, low, high uint64,
-) uint64 {
+func findOldestSupportedBlock(ctx context.Context, client *ethclient.Client, low, high uint64) uint64 {
+	memo := make(map[uint64]bool)
+
 	// terminating condition, results merged
-	for low != high {
+	for low < high {
 		mid := (low + high) / 2
 
 		// memoization trick.
 		_, ok := memo[mid]
-		if !ok {
-			block := big.NewInt(int64(mid))
-
-			_, err := client.BlockByNumber(ctx, block)
-			isProvided := err == nil
-
-			memo[mid] = isProvided
-			// terminating condition, optimum solution
-			if isProvided && mid == 0 {
-				return 0
-			}
-
-			// left side of mid
-			if isProvided {
-				high = mid - 1
-
-				continue
-			}
-
-			// right side of mid
-			low = mid + 1
+		if ok {
+			continue
 		}
+
+		block := big.NewInt(int64(mid))
+
+		_, err := client.BlockByNumber(ctx, block)
+		isProvided := err == nil
+
+		memo[mid] = isProvided
+		// terminating condition, optimum solution
+		if isProvided && mid == 0 {
+			return 0
+		}
+
+		// left side of mid
+		if isProvided {
+			high = mid - 1
+			continue
+		}
+
+		// right side of mid
+		low = mid + 1
 	}
 
 	return low
