@@ -18,4 +18,6 @@ func TestNetworkInspection(t *testing.T) {
 	r.Equal(ResultSuccess, results.Metrics[MetricNetworkOutboundAccess])
 	r.Greater(results.Metrics[MetricNetworkDownloadSpeed], zero, "download speed")
 	r.Greater(results.Metrics[MetricNetworkUploadSpeed], zero, "upload speed")
+
+	r.Equal(map[string]string{}, results.Metadata)
 }

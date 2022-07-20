@@ -30,6 +30,7 @@ func TestScanAPIInspection(t *testing.T) {
 		MetricScanAPIModuleNet:      ResultSuccess,
 		MetricScanAPIHistorySupport: VeryOldBlockNumber,
 	}, results.Metrics)
+	r.Equal(map[string]string{}, results.Metadata)
 }
 
 func Test_findOldestSupportedBlock(t *testing.T) {

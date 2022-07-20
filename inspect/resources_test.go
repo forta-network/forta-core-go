@@ -21,4 +21,6 @@ func TestSystemResourcesInspection(t *testing.T) {
 	r.Greater(results.Metrics[MetricResourcesStorageAvailable], zero)
 	r.Greater(results.Metrics[MetricResourcesCPUBenchmark], zero)
 	// we do not know how to utilize CPU usage result yet so we don't test it here
+
+	r.Equal(map[string]string{}, results.Metadata)
 }

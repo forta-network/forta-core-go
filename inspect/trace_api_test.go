@@ -1,77 +1,28 @@
-//go:build ignore
-// +build ignore
-
-// TODO: Re-enable these tests by removing above build tag.
-// They are disabled for now due to performance issues and flakiness.
-
 package inspect
 
 import (
 	"context"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-func TestRunTraceAPIInspection(t *testing.T) {
-	type args struct {
-		ctx     context.Context
-		nodeURL string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    map[string]float64
-		wantErr bool
-	}{
-		/*		{
-				name: "can support trace",
-				args: args{
-					ctx:     context.TODO(),
-					nodeURL: "http://erigon-eth-prod.forta.internal:8545",
-				},
-				wantErr: false,
-				want: map[string]float64{
-					MetricContainerTraceSupported:  ResultSuccess,
-					MetricContainerTraceAccessible: ResultSuccess,
-				},
-			},*/
-		{
-			name: "detects eth-mainnet without tracing",
-			args: args{
-				ctx:     context.TODO(),
-				nodeURL: "https://cloudflare-eth.com",
-			},
-			wantErr: true,
-			want: map[string]float64{
-				MetricContainerTraceSupported:  ResultFailure,
-				MetricContainerTraceAccessible: ResultSuccess,
-			},
-		},
-		{
-			name: "no trace needed except eth-mainnet",
-			args: args{
-				ctx:     context.TODO(),
-				nodeURL: "https://rpc.poa.psdk.io:8545",
-			},
-			wantErr: false,
-			want: map[string]float64{
-				MetricContainerTraceSupported:  ResultFailure,
-				MetricContainerTraceAccessible: ResultSuccess,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(
-			tt.name, func(t *testing.T) {
-				got, err := RunTraceAPIInspection(tt.args.ctx, tt.args.nodeURL)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("RunTraceAPIInspection() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("RunTraceAPIInspection() got = %v, want %v", got, tt.want)
-				}
-			},
-		)
-	}
+const (
+	testTraceAPIURL = "https://cloudflare-eth.com"
+)
+
+func TestTraceAPIInspection(t *testing.T) {
+	r := require.New(t)
+
+	inspector := &TraceAPIInspector{}
+	results, err := inspector.Inspect(context.Background(), InspectionConfig{
+		TraceAPIURL: testTraceAPIURL,
+	})
+	r.Error(err)
+
+	r.Equal(map[string]float64{
+		MetricTraceAccessible: ResultSuccess,
+		MetricTraceSupported:  ResultFailure,
+	}, results.Metrics)
+	r.Equal(map[string]string{}, results.Metadata)
 }

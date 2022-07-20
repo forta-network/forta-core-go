@@ -70,7 +70,6 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to create eth client: %w", err))
 	}
 
-	// Try tracing genesis block
 	traceContext, traceCancel := context.WithTimeout(ctx, time.Second*3)
 	defer traceCancel()
 
