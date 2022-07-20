@@ -14,63 +14,60 @@ import (
 )
 
 const (
-	MetricContainerResourceMemoryTotal      = "container.resource.memory.total"
-	MetricContainerResourceMemoryAvailable  = "container.resource.memory.available"
-	MetricContainerResourceStorageAvailable = "container.resource.storage.total"
-	MetricContainerResourceStorageTotal     = "container.resource.storage.available"
-	MetricContainerResourceCPUUsage         = "container.resource.cpu.usage"
-	// MetricContainerResourceCPUBenchmark average nanoseconds needed for cpu stress test. Less is better.
-	MetricContainerResourceCPUBenchmark = "container.resource.cpu.benchmark"
+	MetricResourcesMemoryTotal      = "resources.memory.total"
+	MetricResourcesMemoryAvailable  = "resources.memory.available"
+	MetricResourcesStorageAvailable = "resources.storage.total"
+	MetricResourcesStorageTotal     = "resources.storage.available"
+	MetricResourcesCPUUsage         = "resources.cpu.usage"
+	// MetricResourcesCPUBenchmark average nanoseconds needed for cpu stress test. Less is better.
+	MetricResourcesCPUBenchmark = "resources.cpu.benchmark"
 )
 
-// RunSystemResourceInspection checks bot has enough resources.
-func RunSystemResourceInspection(ctx context.Context) (map[string]float64, error) {
-	resources, err := GetResources(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve system resources: %w", err)
-	}
+// SystemResourcesInspector is an inspector implementation.
+type SystemResourcesInspector struct{}
 
-	return resources, err
+var _ Inspector = &SystemResourcesInspector{}
+
+// Name returns the name of the inspector.
+func (sri *SystemResourcesInspector) Name() string {
+	return "system-resources"
 }
 
-// GetResources returns resource metrics.
-func GetResources(ctx context.Context) (map[string]float64, error) {
-	var (
-		result      = make(map[string]float64)
-		resultError error
-	)
+// Inspect inspects system resources.
+func (sri *SystemResourcesInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
+	results = NewInspectionResults()
 
 	mi, err := mem.VirtualMemoryWithContext(ctx)
 	if err != nil {
-		resultError = multierror.Append(resultError, fmt.Errorf("can't read memory info: %w", err))
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't read memory info: %w", err))
 	} else {
-		result[MetricContainerResourceMemoryTotal] = float64(mi.Total)
-		result[MetricContainerResourceMemoryAvailable] = float64(mi.Available)
+		results.Metrics[MetricResourcesMemoryTotal] = float64(mi.Total)
+		results.Metrics[MetricResourcesMemoryAvailable] = float64(mi.Available)
 	}
 
 	calcInterval := time.Second / 2
 
 	ci, err := cpu.PercentWithContext(ctx, calcInterval, false)
 	if err != nil {
-		resultError = multierror.Append(resultError, fmt.Errorf("can't read cpu info: %w", err))
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't read cpu info: %w", err))
 	} else {
 		// cpu.Percent should return average result in a slice with a single item
 		if len(ci) != 1 {
-			result[MetricContainerResourceCPUUsage] = ci[0]
+			results.Metrics[MetricResourcesCPUUsage] = ci[0]
 		}
 	}
 
 	di, err := disk.UsageWithContext(ctx, "/")
 	if err != nil {
-		resultError = multierror.Append(resultError, fmt.Errorf("can't read disk usage info: %w", err))
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't read disk usage info: %w", err))
 	} else {
-		result[MetricContainerResourceStorageTotal] = float64(di.Total)
-		result[MetricContainerResourceStorageAvailable] = float64(di.Free)
+		results.Metrics[MetricResourcesStorageTotal] = float64(di.Total)
+		results.Metrics[MetricResourcesStorageAvailable] = float64(di.Free)
 	}
 
-	result[MetricContainerResourceCPUBenchmark] = float64(cpuStressTestBenchmark())
+	results.Metrics[MetricResourcesCPUBenchmark] = float64(cpuStressTestBenchmark())
 
-	return result, resultError
+	return
 }
 
 func cpuStressTestBenchmark() int64 {

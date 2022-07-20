@@ -11,107 +11,114 @@ import (
 )
 
 const (
-	// MetricContainerScanAPIAccessible can connect to node
-	MetricContainerScanAPIAccessible = "container.scanapi.accessible"
-	// MetricContainerScanAPIChainID which chain id the json-rpc provides
-	MetricContainerScanAPIChainID = "container.scanapi.chainid"
-	// MetricContainerScanAPIModuleWeb3 node supports web3 module.
-	MetricContainerScanAPIModuleWeb3 = "container.scanapi.module.web3"
-	// MetricContainerScanAPIModuleEth node supports eth module.
-	MetricContainerScanAPIModuleEth = "container.scanapi.module.eth"
-	// MetricContainerScanAPIModuleNet node supports net module.
-	MetricContainerScanAPIModuleNet = "container.scanapi.module.net"
-	// MetricContainerScanAPIHistorySupport the earliest supported block height. The lower is better.
-	MetricContainerScanAPIHistorySupport = "container.scanapi.historysupport"
+	// MetricScanAPIAccessible can connect to node
+	MetricScanAPIAccessible = "scan-api.accessible"
+	// MetricScanAPIChainID which chain id the json-rpc provides
+	MetricScanAPIChainID = "scan-api.chain-id"
+	// MetricScanAPIModuleWeb3 node supports web3 module.
+	MetricScanAPIModuleWeb3 = "scan-api.module.web3"
+	// MetricScanAPIModuleEth node supports eth module.
+	MetricScanAPIModuleEth = "scan-api.module.eth"
+	// MetricScanAPIModuleNet node supports net module.
+	MetricScanAPIModuleNet = "scan-api.module.net"
+	// MetricScanAPIHistorySupport the earliest supported block height. The lower is better.
+	MetricScanAPIHistorySupport = "scan-api.history-support"
 )
 
-// RunScanNodeInspection checks given JSON-RPC node url supports web3, eth and net modules.
+// ScanAPIInspector is an inspector implementation.
+type ScanAPIInspector struct{}
+
+var _ Inspector = &ScanAPIInspector{}
+
+// Name returns the name of the inspector.
+func (sai *ScanAPIInspector) Name() string {
+	return "scan-api"
+}
+
+// Inspect checks given JSON-RPC node url supports web3, eth and net modules.
 //
 // it doesn't actually return any errors for now,
 // because the point is to keep going and check if it supports the rest
 // error return parameter is simply for keeping the function extensible without api changes in the future.
-func RunScanNodeInspection(ctx context.Context, nodeURL string) (map[string]float64, error) {
-	var (
-		result    = make(map[string]float64)
-		resultErr error
-	)
+func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
+	results = NewInspectionResults()
 
-	rpcClient, err := rpc.DialContext(ctx, nodeURL)
+	rpcClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
 
-		result[MetricContainerScanAPIAccessible] = StateError
-		result[MetricContainerScanAPIModuleWeb3] = StateError
-		result[MetricContainerScanAPIModuleEth] = StateError
-		result[MetricContainerScanAPIModuleNet] = StateError
-		result[MetricContainerScanAPIHistorySupport] = StateError
-		result[MetricContainerScanAPIChainID] = StateError
+		results.Metrics[MetricScanAPIAccessible] = ResultFailure
+		results.Metrics[MetricScanAPIModuleWeb3] = ResultFailure
+		results.Metrics[MetricScanAPIModuleEth] = ResultFailure
+		results.Metrics[MetricScanAPIModuleNet] = ResultFailure
+		results.Metrics[MetricScanAPIHistorySupport] = ResultFailure
+		results.Metrics[MetricScanAPIChainID] = ResultFailure
 
-		return result, resultErr
+		return
 	}
 
 	client := ethclient.NewClient(rpcClient)
 
 	// arbitrary call to check node access
 	if id, err := client.ChainID(ctx); err != nil {
-		result[MetricContainerScanAPIAccessible] = StateError
-		result[MetricContainerScanAPIChainID] = StateError
+		results.Metrics[MetricScanAPIAccessible] = ResultFailure
+		results.Metrics[MetricScanAPIChainID] = ResultFailure
 	} else {
-		result[MetricContainerScanAPIAccessible] = StateSuccess
-		result[MetricContainerScanAPIChainID] = float64(id.Uint64())
+		results.Metrics[MetricScanAPIAccessible] = ResultSuccess
+		results.Metrics[MetricScanAPIChainID] = float64(id.Uint64())
 	}
 
 	currentHeight, err := client.BlockNumber(ctx)
 	if err != nil {
-		result[MetricContainerScanAPIAccessible] = StateError
-		result[MetricContainerScanAPIHistorySupport] = StateError
+		results.Metrics[MetricScanAPIAccessible] = ResultFailure
+		results.Metrics[MetricScanAPIHistorySupport] = ResultFailure
 		resultErr = multierror.Append(resultErr, err)
 	} else {
 		// check history support
-		result[MetricContainerScanAPIAccessible] = StateSuccess
-		result[MetricContainerScanAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, client)
+		results.Metrics[MetricScanAPIAccessible] = ResultSuccess
+		results.Metrics[MetricScanAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, client)
 	}
 
-	err = moduleFunctionalityCheck(ctx, rpcClient, result)
+	err = moduleFunctionalityCheck(ctx, rpcClient, results)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("error checking module functionality %w", err))
 	}
 
-	return result, resultErr
+	return
 }
 
 // moduleFunctionalityCheck double-checks the functionality of modules that were declared as supported by
 // the node.
 func moduleFunctionalityCheck(
-	ctx context.Context, rpcClient *rpc.Client, result map[string]float64,
+	ctx context.Context, rpcClient *rpc.Client, results *InspectionResults,
 ) (resultError error) {
 	client := ethclient.NewClient(rpcClient)
 
 	// sends net_version under the hood. should prove the node supports net module
 	_, err := client.NetworkID(ctx)
 	if err != nil {
-		result[MetricContainerScanAPIModuleNet] = StateError
+		results.Metrics[MetricScanAPIModuleNet] = ResultFailure
 		resultError = multierror.Append(resultError, err)
 	} else {
-		result[MetricContainerScanAPIModuleNet] = StateSuccess
+		results.Metrics[MetricScanAPIModuleNet] = ResultSuccess
 	}
 
 	// sends eth_chainId under the hood. should prove the node supports eth module
 	_, err = client.ChainID(ctx)
 	if err != nil {
-		result[MetricContainerScanAPIModuleEth] = StateError
+		results.Metrics[MetricScanAPIModuleEth] = ResultFailure
 		resultError = multierror.Append(resultError, err)
 	} else {
-		result[MetricContainerScanAPIModuleEth] = StateSuccess
+		results.Metrics[MetricScanAPIModuleEth] = ResultSuccess
 	}
 
 	// ask for web3 client version to prove the node supports web3 module
 	err = rpcClient.CallContext(ctx, nil, "web3_clientVersion")
 	if err != nil {
 		resultError = multierror.Append(resultError, err)
-		result[MetricContainerScanAPIModuleWeb3] = StateError
+		results.Metrics[MetricScanAPIModuleWeb3] = ResultFailure
 	} else {
-		result[MetricContainerScanAPIModuleWeb3] = StateSuccess
+		results.Metrics[MetricScanAPIModuleWeb3] = ResultSuccess
 	}
 
 	return resultError

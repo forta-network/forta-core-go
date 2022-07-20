@@ -9,37 +9,50 @@ package inspect
 import (
 	"context"
 	"math"
-	"reflect"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/stretchr/testify/require"
 )
 
-func TestRunScanNodeInspection(t *testing.T) {
+type Env struct {
+}
+
+var (
+	APINoTrace = "https://cloudflare-eth.com"
+)
+
+func init() {
+
+}
+
+//
+func TestRunAllInspections(t *testing.T) {
 	type args struct {
 		ctx     context.Context
 		nodeURL string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    map[string]float64
-		wantErr bool
+		name      string
+		args      args
+		expected  map[string]float64
+		expectErr bool
 	}{
 		{
-			name: "test a valid node",
+			name: "test node w/o trace",
 			args: args{
 				nodeURL: "https://cloudflare-eth.com",
 				ctx:     context.Background(),
 			},
-			want: map[string]float64{
-				MetricContainerScanAPIAccessible:     StateSuccess,
-				MetricContainerScanAPIModuleWeb3:     StateSuccess,
-				MetricContainerScanAPIModuleEth:      StateSuccess,
-				MetricContainerScanAPIModuleNet:      StateSuccess,
-				MetricContainerScanAPIChainID:        1.0,
-				MetricContainerScanAPIHistorySupport: 0.0,
+			expected: map[string]float64{
+				MetricContainerScanAPIAccessible:     ResultSuccess,
+				MetricContainerScanAPIChainID:        1,
+				MetricContainerScanAPIModuleWeb3:     ResultSuccess,
+				MetricContainerScanAPIModuleEth:      ResultSuccess,
+				MetricContainerScanAPIModuleNet:      ResultSuccess,
+				MetricContainerScanAPIHistorySupport: ResultUnknown,
 			},
+			expectErr: true,
 		},
 		{
 			name: "detects on bad node access",
@@ -47,15 +60,15 @@ func TestRunScanNodeInspection(t *testing.T) {
 				nodeURL: "https://polygon-bdbdfgbd.co",
 				ctx:     context.Background(),
 			},
-			want: map[string]float64{
-				MetricContainerScanAPIAccessible:     StateError,
-				MetricContainerScanAPIChainID:        -1.0,
-				MetricContainerScanAPIModuleWeb3:     StateError,
-				MetricContainerScanAPIModuleEth:      StateError,
-				MetricContainerScanAPIModuleNet:      StateError,
-				MetricContainerScanAPIHistorySupport: StateError,
+			expected: map[string]float64{
+				MetricContainerScanAPIAccessible:     ResultFailure,
+				MetricContainerScanAPIChainID:        ResultFailure,
+				MetricContainerScanAPIModuleWeb3:     ResultFailure,
+				MetricContainerScanAPIModuleEth:      ResultFailure,
+				MetricContainerScanAPIModuleNet:      ResultFailure,
+				MetricContainerScanAPIHistorySupport: ResultFailure,
 			},
-			wantErr: true,
+			expectErr: true,
 		},
 		{
 			name: "test polygon",
@@ -63,15 +76,15 @@ func TestRunScanNodeInspection(t *testing.T) {
 				nodeURL: "https://polygon-rpc.com",
 				ctx:     context.Background(),
 			},
-			want: map[string]float64{
-				MetricContainerScanAPIAccessible:     StateSuccess,
-				MetricContainerScanAPIChainID:        137.0,
-				MetricContainerScanAPIModuleWeb3:     StateSuccess,
-				MetricContainerScanAPIModuleEth:      StateSuccess,
-				MetricContainerScanAPIModuleNet:      StateSuccess,
-				MetricContainerScanAPIHistorySupport: 0.0,
+			expected: map[string]float64{
+				MetricContainerScanAPIAccessible:     ResultSuccess,
+				MetricContainerScanAPIChainID:        137,
+				MetricContainerScanAPIModuleWeb3:     ResultSuccess,
+				MetricContainerScanAPIModuleEth:      ResultSuccess,
+				MetricContainerScanAPIModuleNet:      ResultSuccess,
+				MetricContainerScanAPIHistorySupport: ResultUnknown,
 			},
-			wantErr: false,
+			expectErr: false,
 		},
 		{
 			name: "bad url",
@@ -79,28 +92,30 @@ func TestRunScanNodeInspection(t *testing.T) {
 				nodeURL: "badurl",
 				ctx:     context.Background(),
 			},
-			want: map[string]float64{
-				MetricContainerScanAPIAccessible:     StateError,
-				MetricContainerScanAPIChainID:        StateError,
-				MetricContainerScanAPIModuleWeb3:     StateError,
-				MetricContainerScanAPIModuleEth:      StateError,
-				MetricContainerScanAPIModuleNet:      StateError,
-				MetricContainerScanAPIHistorySupport: StateError,
+			expected: map[string]float64{
+				MetricContainerScanAPIAccessible:     ResultFailure,
+				MetricContainerScanAPIChainID:        ResultFailure,
+				MetricContainerScanAPIModuleWeb3:     ResultFailure,
+				MetricContainerScanAPIModuleEth:      ResultFailure,
+				MetricContainerScanAPIModuleNet:      ResultFailure,
+				MetricContainerScanAPIHistorySupport: ResultFailure,
 			},
-			wantErr: true,
+			expectErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {
-				got, err := RunScanNodeInspection(tt.args.ctx, tt.args.nodeURL)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("RunScanNodeInspection() error = %v, wantErr %v", err, tt.wantErr)
-					return
+				r := require.New(t)
+
+				results, err := RunAllInspections(tt.args.ctx, tt.args.nodeURL)
+				if tt.expectErr {
+					r.Error(err)
+				} else {
+					r.NoError(err)
 				}
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("RunScanNodeInspection() got = %v, want %v", got, tt.want)
-				}
+
+				r.Equal(tt.expected, results)
 			},
 		)
 	}

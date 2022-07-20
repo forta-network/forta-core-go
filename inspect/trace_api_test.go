@@ -31,8 +31,8 @@ func TestRunTraceAPIInspection(t *testing.T) {
 				},
 				wantErr: false,
 				want: map[string]float64{
-					MetricContainerTraceSupported:  StateSuccess,
-					MetricContainerTraceAccessible: StateSuccess,
+					MetricContainerTraceSupported:  ResultSuccess,
+					MetricContainerTraceAccessible: ResultSuccess,
 				},
 			},*/
 		{
@@ -43,8 +43,8 @@ func TestRunTraceAPIInspection(t *testing.T) {
 			},
 			wantErr: true,
 			want: map[string]float64{
-				MetricContainerTraceSupported:  StateError,
-				MetricContainerTraceAccessible: StateSuccess,
+				MetricContainerTraceSupported:  ResultFailure,
+				MetricContainerTraceAccessible: ResultSuccess,
 			},
 		},
 		{
@@ -55,8 +55,8 @@ func TestRunTraceAPIInspection(t *testing.T) {
 			},
 			wantErr: false,
 			want: map[string]float64{
-				MetricContainerTraceSupported:  StateError,
-				MetricContainerTraceAccessible: StateSuccess,
+				MetricContainerTraceSupported:  ResultFailure,
+				MetricContainerTraceAccessible: ResultSuccess,
 			},
 		},
 	}

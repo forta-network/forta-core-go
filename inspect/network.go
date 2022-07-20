@@ -7,13 +7,91 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/showwin/speedtest-go/speedtest"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
-	MetricContainerNetworkOutboundAccess = "container.network.outboundaccess"
-	MetricContainerNetworkDownloadSpeed  = "container.network.downloadspeed"
-	MetricContainerNetworkUploadSpeed    = "container.network.uploadspeed"
+	MetricNetworkOutboundAccess = "network.access.outbound"
+	MetricNetworkDownloadSpeed  = "network.speed.download"
+	MetricNetworkUploadSpeed    = "network.speed.upload"
 )
+
+// NetworkInspector is an inspector implementation.
+type NetworkInspector struct{}
+
+var _ Inspector = &NetworkInspector{}
+
+// Name returns the name of the inspector.
+func (ni *NetworkInspector) Name() string {
+	return "network"
+}
+
+// Inspect inspects network access and quality.
+func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
+	results = NewInspectionResults()
+
+	err := sendOutboundRequest(ctx)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, err)
+		results.Metrics[MetricNetworkOutboundAccess] = ResultFailure
+	} else {
+		results.Metrics[MetricNetworkOutboundAccess] = ResultSuccess
+	}
+
+	downloadSpeed, uploadSpeed, err := speedTest()
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("could not test speed: %w", err))
+	}
+
+	results.Metrics[MetricNetworkDownloadSpeed] = downloadSpeed
+	results.Metrics[MetricNetworkUploadSpeed] = uploadSpeed
+
+	return
+}
+
+// speedTest returns download speed, upload speed and error.
+func speedTest() (float64, float64, error) {
+	speedTest := speedtest.New()
+	users, err := speedTest.FetchUserInfo()
+	if err != nil {
+		return 0, 0, err
+	}
+
+	servers, err := speedTest.FetchServers(users)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	if len(servers) == 0 {
+		return 0, 0, fmt.Errorf("no available servers")
+	}
+
+	// just test with a single server
+	server := servers[0]
+
+	err = server.PingTest()
+	if err != nil {
+		return 0, 0, err
+	}
+
+	logger := log.WithField("inspector", "network")
+
+	logger.Info("started download test")
+	err = server.DownloadTest(false)
+	if err != nil {
+		return 0, 0, err
+	}
+	logger.Info("finished download test")
+
+	logger.Info("started upload test")
+	err = server.UploadTest(false)
+	if err != nil {
+		return 0, 0, err
+	}
+	logger.Info("finished upload test")
+
+	return server.DLSpeed, server.ULSpeed, nil
+}
 
 func sendOutboundRequest(ctx context.Context) error {
 	const url = "https://api.forta.network"
@@ -29,65 +107,4 @@ func sendOutboundRequest(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// RunNetworkInspection tests network access and quality of the node.
-func RunNetworkInspection(ctx context.Context) (result map[string]float64, resultError error) {
-	result = make(map[string]float64)
-
-	err := sendOutboundRequest(ctx)
-	if err != nil {
-		resultError = multierror.Append(resultError, err)
-		result[MetricContainerNetworkOutboundAccess] = StateError
-	} else {
-		result[MetricContainerNetworkOutboundAccess] = StateSuccess
-	}
-
-	downloadSpeed, uploadSpeed, err := speedTest()
-	if err != nil {
-		resultError = multierror.Append(resultError, fmt.Errorf("could not test speed: %w", err))
-	}
-
-	result[MetricContainerNetworkDownloadSpeed] = downloadSpeed
-	result[MetricContainerNetworkUploadSpeed] = uploadSpeed
-
-	return result, nil
-}
-
-// speedTest returns download speed, upload speed and error.
-func speedTest() (float64, float64, error) {
-	st := speedtest.New()
-	users, err := st.FetchUserInfo()
-	if err != nil {
-		return 0, 0, err
-	}
-
-	svs, err := st.FetchServers(users)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	if len(svs) == 0 {
-		return 0, 0, fmt.Errorf("no available servers")
-	}
-
-	// just test with a single server
-	sv := svs[0]
-
-	err = sv.PingTest()
-	if err != nil {
-		return 0, 0, err
-	}
-
-	err = sv.DownloadTest(false)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	err = sv.UploadTest(false)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return sv.DLSpeed, sv.ULSpeed, nil
 }
