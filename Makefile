@@ -6,16 +6,17 @@ FORMAT = $(GOBIN)/goimports
 SWAGGER = $(GOBIN)/swagger
 
 .PHONY: require-tools
-require-tools:
-	@echo 'Checking tools...'
+require-tools: tools
+	@echo 'Checking installed tools...'
 	@file $(LINT) > /dev/null
 	@file $(FORMAT) > /dev/null
 
 	@file $(SWAGGER) > /dev/null
-	@echo "All tools found in $(GOBIN)"
+	@echo "All tools found in $(GOBIN)!"
 
 .PHONY: tools
 tools:
+	@echo 'Installing tools...'
 	@rm -rf toolbin
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.0
 	@go install golang.org/x/tools/cmd/goimports@v0.1.11

@@ -82,7 +82,7 @@ func NormalizeJSON(v interface{}) []byte {
 	}
 
 	var decoded interface{}
-	json.Unmarshal(b, &decoded)
+	_ = json.Unmarshal(b, &decoded)
 	b, _ = json.Marshal(decoded)
 	return b
 }
