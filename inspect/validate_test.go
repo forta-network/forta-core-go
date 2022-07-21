@@ -54,6 +54,7 @@ func TestValidateInspectionFail(t *testing.T) {
 		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
 		BlockNumber: recentBlockNumber,
+		CheckTrace:  true,
 	}
 
 	// make only scan api inspection
