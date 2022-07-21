@@ -91,6 +91,13 @@ message ScannerVersion {
 }
 
 message InspectionResults {
-  map<string, string> metadata = 1;
-  map<string, double> indicators = 2;
+  InspectionInputs inputs = 1;
+  map<string, string> metadata = 2;
+  map<string, double> indicators = 3;
+}
+
+message InspectionInputs {
+  string scanApiHost = 1;
+  string traceApiHost = 2;
+  uint64 blockNumber = 3;
 }

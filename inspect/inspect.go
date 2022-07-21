@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -16,6 +17,7 @@ type InspectionConfig struct {
 
 // InspectionResults contains inspection results.
 type InspectionResults struct {
+	Inputs     InspectionConfig
 	Metadata   map[string]string
 	Indicators map[string]float64
 }
@@ -23,20 +25,33 @@ type InspectionResults struct {
 // NewInspectionResults creates new InspectionResults.
 func NewInspectionResults() *InspectionResults {
 	return &InspectionResults{
-		Indicators: make(map[string]float64),
 		Metadata:   make(map[string]string),
+		Indicators: make(map[string]float64),
 	}
 }
 
 // CopyFrom copies other inspection results in.
 func (ir *InspectionResults) CopyFrom(from *InspectionResults) *InspectionResults {
-	for k, v := range from.Indicators {
-		ir.Indicators[k] = v
-	}
 	for k, v := range from.Metadata {
 		ir.Metadata[k] = v
 	}
+	for k, v := range from.Indicators {
+		ir.Indicators[k] = v
+	}
 	return ir
+}
+
+// ToProto returns the protobuf payload for the results.
+func (ir *InspectionResults) ToProto() *protocol.InspectionResults {
+	return &protocol.InspectionResults{
+		Inputs: &protocol.InspectionInputs{
+			ScanApiHost:  getHost(ir.Inputs.ScanAPIURL),
+			TraceApiHost: getHost(ir.Inputs.TraceAPIURL),
+			BlockNumber:  ir.Inputs.BlockNumber,
+		},
+		Metadata:   ir.Metadata,
+		Indicators: ir.Indicators,
+	}
 }
 
 // Inspector inspects node capabilities.
@@ -57,6 +72,7 @@ func Inspect(ctx context.Context, inspectionCfg InspectionConfig) (*InspectionRe
 
 func inspect(ctx context.Context, inspectors []Inspector, inspectionCfg InspectionConfig) (allResults *InspectionResults, resultError error) {
 	allResults = NewInspectionResults()
+	allResults.Inputs = inspectionCfg
 
 	for _, inspector := range inspectors {
 		results, err := inspector.Inspect(ctx, inspectionCfg)

@@ -19,6 +19,7 @@ const (
 // NetworkInspector is an inspector implementation.
 type NetworkInspector struct{}
 
+// compile time check: it should implement the interface
 var _ Inspector = &NetworkInspector{}
 
 // Name returns the name of the inspector.

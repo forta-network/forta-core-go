@@ -5,20 +5,28 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/stretchr/testify/require"
 )
 
 const (
-	testScanAPIURL                  = "https://cloudflare-eth.com"
 	testScanAPIOldestSupportedBlock = uint64(0)
 )
+
+var testScanEnv struct {
+	ScanAPI string `envconfig:"scan_api" default:"https://cloudflare-eth.com"`
+}
+
+func init() {
+	envconfig.MustProcess("test", &testScanEnv)
+}
 
 func TestScanAPIInspection(t *testing.T) {
 	r := require.New(t)
 
 	inspector := &ScanAPIInspector{}
 	results, err := inspector.Inspect(context.Background(), InspectionConfig{
-		ScanAPIURL:  testScanAPIURL,
+		ScanAPIURL:  testScanEnv.ScanAPI,
 		BlockNumber: testScanAPIOldestSupportedBlock,
 	})
 	r.NoError(err)
@@ -40,7 +48,7 @@ func TestScanAPIInspection(t *testing.T) {
 func Test_findOldestSupportedBlock(t *testing.T) {
 	r := require.New(t)
 
-	cli, err := ethclient.Dial(testScanAPIURL)
+	cli, err := ethclient.Dial(testScanEnv.ScanAPI)
 	r.NoError(err)
 
 	ctx := context.Background()

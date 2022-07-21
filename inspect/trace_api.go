@@ -2,12 +2,10 @@ package inspect
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/ethereum"
@@ -31,6 +29,7 @@ const (
 // TraceAPIInspector is an inspector implementation.
 type TraceAPIInspector struct{}
 
+// compile time check: it should implement the interface
 var _ Inspector = &TraceAPIInspector{}
 
 // Name returns the name of the inspector.
@@ -69,32 +68,39 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorTraceAccessible] = ResultSuccess
 	}
 
-	streamClient, err := ethereum.NewStreamEthClient(ctx, "trace", inspectionCfg.TraceAPIURL)
+	traceClient, err := ethereum.NewStreamEthClient(ctx, "trace", inspectionCfg.TraceAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to create eth client: %w", err))
 	}
 
-	traceContext, traceCancel := context.WithTimeout(ctx, time.Second*3)
-	defer traceCancel()
+	traceCtx, cancel := context.WithTimeout(ctx, time.Second*3)
+	defer cancel()
 
 	// checking trace capability
-	traces, err := streamClient.TraceBlock(traceContext, big.NewInt(0).SetUint64(inspectionCfg.BlockNumber))
+	hash, err := getTraceResponseHash(traceCtx, traceClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to trace block %d: %w", inspectionCfg.BlockNumber, err))
 		results.Indicators[IndicatorTraceSupported] = ResultFailure
 	} else {
 		results.Indicators[IndicatorTraceSupported] = ResultSuccess
-		results.Metadata[MetadataTraceAPITraceBlockHash] = utils.HashNormalizedJSON(traces)
+		results.Metadata[MetadataTraceAPITraceBlockHash] = hash
 	}
 
 	// get configured block and include hash of the returned as metadata
-	var blockData json.RawMessage
-	err = rpcClient.CallContext(ctx, &blockData, "eth_getBlockByNumber", hexutil.EncodeUint64(inspectionCfg.BlockNumber), true)
+	hash, err = getBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
-		results.Metadata[MetadataTraceAPIBlockByNumberHash] = utils.HashNormalizedJSON(blockData)
+		results.Metadata[MetadataTraceAPIBlockByNumberHash] = hash
 	}
 
 	return
+}
+
+func getTraceResponseHash(ctx context.Context, traceClient ethereum.Client, blockNumber uint64) (string, error) {
+	traces, err := traceClient.TraceBlock(ctx, big.NewInt(0).SetUint64(blockNumber))
+	if err != nil {
+		return "", err
+	}
+	return utils.HashNormalizedJSON(traces), nil
 }

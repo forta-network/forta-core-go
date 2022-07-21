@@ -26,6 +26,7 @@ const (
 // SystemResourcesInspector is an inspector implementation.
 type SystemResourcesInspector struct{}
 
+// compile time check: it should implement the interface
 var _ Inspector = &SystemResourcesInspector{}
 
 // Name returns the name of the inspector.

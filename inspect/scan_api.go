@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"net/url"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -40,6 +41,7 @@ const (
 // ScanAPIInspector is an inspector implementation.
 type ScanAPIInspector struct{}
 
+// compile time check: it should implement the interface
 var _ Inspector = &ScanAPIInspector{}
 
 // Name returns the name of the inspector.
@@ -97,12 +99,11 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 	}
 
 	// get configured block and include hash of the returned as metadata
-	var blockData json.RawMessage
-	err = rpcClient.CallContext(ctx, &blockData, "eth_getBlockByNumber", hexutil.EncodeUint64(inspectionCfg.BlockNumber), true)
+	hash, err := getBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
-		results.Metadata[MetadataScanAPIBlockByNumberHash] = utils.HashNormalizedJSON(blockData)
+		results.Metadata[MetadataScanAPIBlockByNumberHash] = hash
 	}
 
 	return
@@ -193,4 +194,24 @@ func findOldestSupportedBlock(ctx context.Context, client *ethclient.Client, low
 	}
 
 	return low
+}
+
+func getBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
+	var blockData json.RawMessage
+	err := rpcClient.CallContext(ctx, &blockData, "eth_getBlockByNumber", hexutil.EncodeUint64(blockNumber), true)
+	if err != nil {
+		return "", err
+	}
+	return utils.HashNormalizedJSON(blockData), nil
+}
+
+func getHost(apiURL string) string {
+	if len(apiURL) == 0 {
+		return "null"
+	}
+	u, err := url.Parse(apiURL)
+	if err != nil {
+		return "invalid"
+	}
+	return u.Host
 }
