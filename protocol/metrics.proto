@@ -29,3 +29,18 @@ message AgentMetric {
 message AgentMetricList {
   repeated AgentMetric Metrics = 1;
 }
+
+message SLAChecks {
+  string timestamp = 1;
+  repeated MetricSummary metrics = 2;
+}
+
+message SLACheck {
+  string timestamp = 1;
+  string name = 2;
+  double value = 3;
+}
+
+message SLACheckList {
+  repeated SLACheck checks = 2;
+}
