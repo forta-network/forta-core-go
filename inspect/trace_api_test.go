@@ -26,6 +26,7 @@ func TestTraceAPIInspection(t *testing.T) {
 	results, err := inspector.Inspect(context.Background(), InspectionConfig{
 		TraceAPIURL: testTraceEnv.TraceAPI,
 		BlockNumber: recentBlockNumber,
+		CheckTrace:  true,
 	})
 	r.NoError(err)
 

@@ -10,10 +10,11 @@ import (
 
 // InspectionConfig contains the parameters for all inspections.
 type InspectionConfig struct {
+	BlockNumber uint64 `json:"blockNumber"`
 	ScanAPIURL  string `json:"scanApiUrl"`
 	ProxyAPIURL string `json:"proxyApiUrl"` // JSON-RPC API for bots
 	TraceAPIURL string `json:"traceApiUrl"`
-	BlockNumber uint64 `json:"blockNumber"`
+	CheckTrace  bool   `json:"checkTrace"`
 }
 
 // InspectionResults contains inspection results.

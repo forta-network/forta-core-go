@@ -41,7 +41,7 @@ func (tai *TraceAPIInspector) Name() string {
 func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
 	results = NewInspectionResults()
 
-	if len(inspectionCfg.TraceAPIURL) == 0 {
+	if !inspectionCfg.CheckTrace {
 		results.Indicators[IndicatorTraceAccessible] = ResultFailure
 		results.Indicators[IndicatorTraceSupported] = ResultFailure
 		return
