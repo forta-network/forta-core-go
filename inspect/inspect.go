@@ -47,9 +47,11 @@ func (ir *InspectionResults) CopyFrom(from *InspectionResults) *InspectionResult
 func (ir *InspectionResults) ToProto() *protocol.InspectionResults {
 	return &protocol.InspectionResults{
 		Inputs: &protocol.InspectionInputs{
-			ScanApiHost:  getHost(ir.Inputs.ScanAPIURL),
-			TraceApiHost: getHost(ir.Inputs.TraceAPIURL),
 			BlockNumber:  ir.Inputs.BlockNumber,
+			ScanApiHost:  getHost(ir.Inputs.ScanAPIURL),
+			ProxyApiHost: getHost(ir.Inputs.ProxyAPIURL),
+			TraceApiHost: getHost(ir.Inputs.TraceAPIURL),
+			CheckTrace:   ir.Inputs.CheckTrace,
 		},
 		Metadata:   ir.Metadata,
 		Indicators: ir.Indicators,

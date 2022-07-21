@@ -97,7 +97,9 @@ message InspectionResults {
 }
 
 message InspectionInputs {
-  string scanApiHost = 1;
-  string traceApiHost = 2;
-  uint64 blockNumber = 3;
+  uint64 blockNumber = 1;
+  string scanApiHost = 2;
+  string proxyApiHost = 3;
+  string traceApiHost = 4;
+  bool checkTrace = 5;
 }
