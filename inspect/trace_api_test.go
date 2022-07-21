@@ -38,9 +38,9 @@ func TestTraceAPIInspection(t *testing.T) {
 	r.NoError(err)
 
 	r.Equal(map[string]float64{
-		MetricTraceAccessible: ResultSuccess,
-		MetricTraceSupported:  ResultSuccess,
-	}, results.Metrics)
+		IndicatorTraceAccessible: ResultSuccess,
+		IndicatorTraceSupported:  ResultSuccess,
+	}, results.Indicators)
 
 	r.NotEmpty(results.Metadata[MetadataTraceAPIBlockByNumberHash])
 	r.NotEmpty(results.Metadata[MetadataTraceAPITraceBlockHash])

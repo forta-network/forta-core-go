@@ -16,22 +16,22 @@ type InspectionConfig struct {
 
 // InspectionResults contains inspection results.
 type InspectionResults struct {
-	Metrics  map[string]float64
-	Metadata map[string]string
+	Metadata   map[string]string
+	Indicators map[string]float64
 }
 
 // NewInspectionResults creates new InspectionResults.
 func NewInspectionResults() *InspectionResults {
 	return &InspectionResults{
-		Metrics:  make(map[string]float64),
-		Metadata: make(map[string]string),
+		Indicators: make(map[string]float64),
+		Metadata:   make(map[string]string),
 	}
 }
 
 // CopyFrom copies other inspection results in.
 func (ir *InspectionResults) CopyFrom(from *InspectionResults) *InspectionResults {
-	for k, v := range from.Metrics {
-		ir.Metrics[k] = v
+	for k, v := range from.Indicators {
+		ir.Indicators[k] = v
 	}
 	for k, v := range from.Metadata {
 		ir.Metadata[k] = v

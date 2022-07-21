@@ -14,13 +14,13 @@ import (
 )
 
 const (
-	MetricResourcesMemoryTotal      = "resources.memory.total"
-	MetricResourcesMemoryAvailable  = "resources.memory.available"
-	MetricResourcesStorageAvailable = "resources.storage.total"
-	MetricResourcesStorageTotal     = "resources.storage.available"
-	MetricResourcesCPUUsage         = "resources.cpu.usage"
-	// MetricResourcesCPUBenchmark average nanoseconds needed for cpu stress test. Less is better.
-	MetricResourcesCPUBenchmark = "resources.cpu.benchmark"
+	IndicatorResourcesMemoryTotal      = "resources.memory.total"
+	IndicatorResourcesMemoryAvailable  = "resources.memory.available"
+	IndicatorResourcesStorageAvailable = "resources.storage.total"
+	IndicatorResourcesStorageTotal     = "resources.storage.available"
+	IndicatorResourcesCPUUsage         = "resources.cpu.usage"
+	// IndicatorResourcesCPUBenchmark is the average duration of CPU stress test in nanoseconds. Less is better.
+	IndicatorResourcesCPUBenchmark = "resources.cpu.benchmark"
 )
 
 // SystemResourcesInspector is an inspector implementation.
@@ -41,8 +41,8 @@ func (sri *SystemResourcesInspector) Inspect(ctx context.Context, inspectionCfg 
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't read memory info: %w", err))
 	} else {
-		results.Metrics[MetricResourcesMemoryTotal] = float64(mi.Total)
-		results.Metrics[MetricResourcesMemoryAvailable] = float64(mi.Available)
+		results.Indicators[IndicatorResourcesMemoryTotal] = float64(mi.Total)
+		results.Indicators[IndicatorResourcesMemoryAvailable] = float64(mi.Available)
 	}
 
 	calcInterval := time.Second / 2
@@ -53,7 +53,7 @@ func (sri *SystemResourcesInspector) Inspect(ctx context.Context, inspectionCfg 
 	} else {
 		// cpu.Percent should return average result in a slice with a single item
 		if len(ci) != 1 {
-			results.Metrics[MetricResourcesCPUUsage] = ci[0]
+			results.Indicators[IndicatorResourcesCPUUsage] = ci[0]
 		}
 	}
 
@@ -61,11 +61,11 @@ func (sri *SystemResourcesInspector) Inspect(ctx context.Context, inspectionCfg 
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't read disk usage info: %w", err))
 	} else {
-		results.Metrics[MetricResourcesStorageTotal] = float64(di.Total)
-		results.Metrics[MetricResourcesStorageAvailable] = float64(di.Free)
+		results.Indicators[IndicatorResourcesStorageTotal] = float64(di.Total)
+		results.Indicators[IndicatorResourcesStorageAvailable] = float64(di.Free)
 	}
 
-	results.Metrics[MetricResourcesCPUBenchmark] = float64(cpuStressTestBenchmark())
+	results.Indicators[IndicatorResourcesCPUBenchmark] = float64(cpuStressTestBenchmark())
 
 	return
 }

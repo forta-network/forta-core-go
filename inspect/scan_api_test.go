@@ -24,13 +24,13 @@ func TestScanAPIInspection(t *testing.T) {
 	r.NoError(err)
 
 	r.Equal(map[string]float64{
-		MetricScanAPIAccessible:     ResultSuccess,
-		MetricScanAPIChainID:        float64(1),
-		MetricScanAPIModuleWeb3:     ResultSuccess,
-		MetricScanAPIModuleEth:      ResultSuccess,
-		MetricScanAPIModuleNet:      ResultSuccess,
-		MetricScanAPIHistorySupport: VeryOldBlockNumber,
-	}, results.Metrics)
+		IndicatorScanAPIAccessible:     ResultSuccess,
+		IndicatorScanAPIChainID:        float64(1),
+		IndicatorScanAPIModuleWeb3:     ResultSuccess,
+		IndicatorScanAPIModuleEth:      ResultSuccess,
+		IndicatorScanAPIModuleNet:      ResultSuccess,
+		IndicatorScanAPIHistorySupport: VeryOldBlockNumber,
+	}, results.Indicators)
 
 	r.Equal(map[string]string{
 		MetadataScanAPIBlockByNumberHash: "3abe2f22edf2b463cbc13343a947be9ebbf8c16c2b50b2b90e10a199a2344f65",

@@ -53,7 +53,7 @@ message AlertBatch {
   string parent = 10;
   repeated AgentAlerts privateAlerts = 11;
   uint64 latestBlockInput = 12;
-  repeated SLAChecks slaChecks = 13;
+  InspectionResults inspectionResults = 13;
 }
 
 message BlockResults {
@@ -88,4 +88,9 @@ message ScannerVersion {
   string commit = 1;
   string ipfs = 2;
   string version = 3;
+}
+
+message InspectionResults {
+  map<string, string> metadata = 1;
+  map<string, double> indicators = 2;
 }

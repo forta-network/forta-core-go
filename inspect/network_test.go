@@ -15,9 +15,9 @@ func TestNetworkInspection(t *testing.T) {
 	r.NoError(err)
 
 	zero := float64(0)
-	r.Equal(ResultSuccess, results.Metrics[MetricNetworkOutboundAccess])
-	r.Greater(results.Metrics[MetricNetworkDownloadSpeed], zero, "download speed")
-	r.Greater(results.Metrics[MetricNetworkUploadSpeed], zero, "upload speed")
+	r.Equal(ResultSuccess, results.Indicators[IndicatorNetworkOutboundAccess])
+	r.Greater(results.Indicators[IndicatorNetworkDownloadSpeed], zero, "download speed")
+	r.Greater(results.Indicators[IndicatorNetworkUploadSpeed], zero, "upload speed")
 
 	r.Equal(map[string]string{}, results.Metadata)
 }

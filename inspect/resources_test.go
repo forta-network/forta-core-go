@@ -15,11 +15,11 @@ func TestSystemResourcesInspection(t *testing.T) {
 	r.NoError(err)
 
 	zero := float64(0)
-	r.Greater(results.Metrics[MetricResourcesMemoryTotal], zero)
-	r.Greater(results.Metrics[MetricResourcesMemoryAvailable], zero)
-	r.Greater(results.Metrics[MetricResourcesStorageTotal], zero)
-	r.Greater(results.Metrics[MetricResourcesStorageAvailable], zero)
-	r.Greater(results.Metrics[MetricResourcesCPUBenchmark], zero)
+	r.Greater(results.Indicators[IndicatorResourcesMemoryTotal], zero)
+	r.Greater(results.Indicators[IndicatorResourcesMemoryAvailable], zero)
+	r.Greater(results.Indicators[IndicatorResourcesStorageTotal], zero)
+	r.Greater(results.Indicators[IndicatorResourcesStorageAvailable], zero)
+	r.Greater(results.Indicators[IndicatorResourcesCPUBenchmark], zero)
 	// we do not know how to utilize CPU usage result yet so we don't test it here
 
 	r.Equal(map[string]string{}, results.Metadata)

@@ -14,18 +14,18 @@ import (
 )
 
 const (
-	// MetricScanAPIAccessible can connect to node
-	MetricScanAPIAccessible = "scan-api.accessible"
-	// MetricScanAPIChainID which chain id the json-rpc provides
-	MetricScanAPIChainID = "scan-api.chain-id"
-	// MetricScanAPIModuleWeb3 node supports web3 module.
-	MetricScanAPIModuleWeb3 = "scan-api.module.web3"
-	// MetricScanAPIModuleEth node supports eth module.
-	MetricScanAPIModuleEth = "scan-api.module.eth"
-	// MetricScanAPIModuleNet node supports net module.
-	MetricScanAPIModuleNet = "scan-api.module.net"
-	// MetricScanAPIHistorySupport the earliest supported block height. The lower is better.
-	MetricScanAPIHistorySupport = "scan-api.history-support"
+	// IndicatorScanAPIAccessible can connect to node
+	IndicatorScanAPIAccessible = "scan-api.accessible"
+	// IndicatorScanAPIChainID which chain id the json-rpc provides
+	IndicatorScanAPIChainID = "scan-api.chain-id"
+	// IndicatorScanAPIModuleWeb3 node supports web3 module.
+	IndicatorScanAPIModuleWeb3 = "scan-api.module.web3"
+	// IndicatorScanAPIModuleEth node supports eth module.
+	IndicatorScanAPIModuleEth = "scan-api.module.eth"
+	// IndicatorScanAPIModuleNet node supports net module.
+	IndicatorScanAPIModuleNet = "scan-api.module.net"
+	// IndicatorScanAPIHistorySupport the earliest supported block height. The lower is better.
+	IndicatorScanAPIHistorySupport = "scan-api.history-support"
 
 	// MetadataScanAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataScanAPIBlockByNumberHash = "scan-api.block-by-number.hash"
@@ -59,12 +59,12 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
 
-		results.Metrics[MetricScanAPIAccessible] = ResultFailure
-		results.Metrics[MetricScanAPIModuleWeb3] = ResultFailure
-		results.Metrics[MetricScanAPIModuleEth] = ResultFailure
-		results.Metrics[MetricScanAPIModuleNet] = ResultFailure
-		results.Metrics[MetricScanAPIHistorySupport] = ResultFailure
-		results.Metrics[MetricScanAPIChainID] = ResultFailure
+		results.Indicators[IndicatorScanAPIAccessible] = ResultFailure
+		results.Indicators[IndicatorScanAPIModuleWeb3] = ResultFailure
+		results.Indicators[IndicatorScanAPIModuleEth] = ResultFailure
+		results.Indicators[IndicatorScanAPIModuleNet] = ResultFailure
+		results.Indicators[IndicatorScanAPIHistorySupport] = ResultFailure
+		results.Indicators[IndicatorScanAPIChainID] = ResultFailure
 
 		return
 	}
@@ -73,22 +73,22 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 
 	// arbitrary call to check node access
 	if id, err := client.ChainID(ctx); err != nil {
-		results.Metrics[MetricScanAPIAccessible] = ResultFailure
-		results.Metrics[MetricScanAPIChainID] = ResultFailure
+		results.Indicators[IndicatorScanAPIAccessible] = ResultFailure
+		results.Indicators[IndicatorScanAPIChainID] = ResultFailure
 	} else {
-		results.Metrics[MetricScanAPIAccessible] = ResultSuccess
-		results.Metrics[MetricScanAPIChainID] = float64(id.Uint64())
+		results.Indicators[IndicatorScanAPIAccessible] = ResultSuccess
+		results.Indicators[IndicatorScanAPIChainID] = float64(id.Uint64())
 	}
 
 	currentHeight, err := client.BlockNumber(ctx)
 	if err != nil {
-		results.Metrics[MetricScanAPIAccessible] = ResultFailure
-		results.Metrics[MetricScanAPIHistorySupport] = ResultFailure
+		results.Indicators[IndicatorScanAPIAccessible] = ResultFailure
+		results.Indicators[IndicatorScanAPIHistorySupport] = ResultFailure
 		resultErr = multierror.Append(resultErr, err)
 	} else {
 		// check history support
-		results.Metrics[MetricScanAPIAccessible] = ResultSuccess
-		results.Metrics[MetricScanAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, client)
+		results.Indicators[IndicatorScanAPIAccessible] = ResultSuccess
+		results.Indicators[IndicatorScanAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, client)
 	}
 
 	err = checkSupportedModules(ctx, rpcClient, results)
@@ -118,28 +118,28 @@ func checkSupportedModules(
 	// sends net_version under the hood. should prove the node supports net module
 	_, err := client.NetworkID(ctx)
 	if err != nil {
-		results.Metrics[MetricScanAPIModuleNet] = ResultFailure
+		results.Indicators[IndicatorScanAPIModuleNet] = ResultFailure
 		resultError = multierror.Append(resultError, err)
 	} else {
-		results.Metrics[MetricScanAPIModuleNet] = ResultSuccess
+		results.Indicators[IndicatorScanAPIModuleNet] = ResultSuccess
 	}
 
 	// sends eth_chainId under the hood. should prove the node supports eth module
 	_, err = client.ChainID(ctx)
 	if err != nil {
-		results.Metrics[MetricScanAPIModuleEth] = ResultFailure
+		results.Indicators[IndicatorScanAPIModuleEth] = ResultFailure
 		resultError = multierror.Append(resultError, err)
 	} else {
-		results.Metrics[MetricScanAPIModuleEth] = ResultSuccess
+		results.Indicators[IndicatorScanAPIModuleEth] = ResultSuccess
 	}
 
 	// ask for web3 client version to prove the node supports web3 module
 	err = rpcClient.CallContext(ctx, nil, "web3_clientVersion")
 	if err != nil {
 		resultError = multierror.Append(resultError, err)
-		results.Metrics[MetricScanAPIModuleWeb3] = ResultFailure
+		results.Indicators[IndicatorScanAPIModuleWeb3] = ResultFailure
 	} else {
-		results.Metrics[MetricScanAPIModuleWeb3] = ResultSuccess
+		results.Indicators[IndicatorScanAPIModuleWeb3] = ResultSuccess
 	}
 
 	return resultError

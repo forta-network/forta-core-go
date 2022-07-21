@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	MetricNetworkOutboundAccess = "network.access.outbound"
-	MetricNetworkDownloadSpeed  = "network.speed.download"
-	MetricNetworkUploadSpeed    = "network.speed.upload"
+	IndicatorNetworkOutboundAccess = "network.access.outbound"
+	IndicatorNetworkDownloadSpeed  = "network.speed.download"
+	IndicatorNetworkUploadSpeed    = "network.speed.upload"
 )
 
 // NetworkInspector is an inspector implementation.
@@ -33,9 +33,9 @@ func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 	err := sendOutboundRequest(ctx)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, err)
-		results.Metrics[MetricNetworkOutboundAccess] = ResultFailure
+		results.Indicators[IndicatorNetworkOutboundAccess] = ResultFailure
 	} else {
-		results.Metrics[MetricNetworkOutboundAccess] = ResultSuccess
+		results.Indicators[IndicatorNetworkOutboundAccess] = ResultSuccess
 	}
 
 	downloadSpeed, uploadSpeed, err := speedTest()
@@ -43,8 +43,8 @@ func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 		resultErr = multierror.Append(resultErr, fmt.Errorf("could not test speed: %w", err))
 	}
 
-	results.Metrics[MetricNetworkDownloadSpeed] = downloadSpeed
-	results.Metrics[MetricNetworkUploadSpeed] = uploadSpeed
+	results.Indicators[IndicatorNetworkDownloadSpeed] = downloadSpeed
+	results.Indicators[IndicatorNetworkUploadSpeed] = uploadSpeed
 
 	return
 }

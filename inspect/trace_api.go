@@ -16,11 +16,11 @@ import (
 )
 
 const (
-	// MetricTraceAccessible tells if it can connect to given API.
-	MetricTraceAccessible = "trace-api.accessible"
-	// MetricTraceSupported is required only for scanning some chains.
+	// IndicatorTraceAccessible tells if it can connect to given API.
+	IndicatorTraceAccessible = "trace-api.accessible"
+	// IndicatorTraceSupported is required only for scanning some chains.
 	// It is safe to ignore the value when scanning other chains.
-	MetricTraceSupported = "trace-api.supported"
+	IndicatorTraceSupported = "trace-api.supported"
 
 	// MetadataTraceAPIBlockByNumberHash is the hash of the block data retrieved from the trace API.
 	MetadataTraceAPIBlockByNumberHash = "trace-api.block-by-number.hash"
@@ -43,8 +43,8 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	results = NewInspectionResults()
 
 	if len(inspectionCfg.TraceAPIURL) == 0 {
-		results.Metrics[MetricTraceAccessible] = ResultFailure
-		results.Metrics[MetricTraceSupported] = ResultFailure
+		results.Indicators[IndicatorTraceAccessible] = ResultFailure
+		results.Indicators[IndicatorTraceSupported] = ResultFailure
 		return
 	}
 
@@ -53,8 +53,8 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to dial api: %w", err))
 
-		results.Metrics[MetricTraceAccessible] = ResultFailure
-		results.Metrics[MetricTraceSupported] = ResultFailure
+		results.Indicators[IndicatorTraceAccessible] = ResultFailure
+		results.Indicators[IndicatorTraceSupported] = ResultFailure
 
 		return
 	}
@@ -64,9 +64,9 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	_, err = ethClient.ChainID(ctx)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get chain id: %w", err))
-		results.Metrics[MetricTraceAccessible] = ResultFailure
+		results.Indicators[IndicatorTraceAccessible] = ResultFailure
 	} else {
-		results.Metrics[MetricTraceAccessible] = ResultSuccess
+		results.Indicators[IndicatorTraceAccessible] = ResultSuccess
 	}
 
 	streamClient, err := ethereum.NewStreamEthClient(ctx, "trace", inspectionCfg.TraceAPIURL)
@@ -81,9 +81,9 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	traces, err := streamClient.TraceBlock(traceContext, big.NewInt(0).SetUint64(inspectionCfg.BlockNumber))
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to trace block %d: %w", inspectionCfg.BlockNumber, err))
-		results.Metrics[MetricTraceSupported] = ResultFailure
+		results.Indicators[IndicatorTraceSupported] = ResultFailure
 	} else {
-		results.Metrics[MetricTraceSupported] = ResultSuccess
+		results.Indicators[IndicatorTraceSupported] = ResultSuccess
 		results.Metadata[MetadataTraceAPITraceBlockHash] = utils.HashNormalizedJSON(traces)
 	}
 
