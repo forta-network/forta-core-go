@@ -53,6 +53,7 @@ message AlertBatch {
   string parent = 10;
   repeated AgentAlerts privateAlerts = 11;
   uint64 latestBlockInput = 12;
+  repeated SLAChecks slaChecks = 13;
 }
 
 message BlockResults {
