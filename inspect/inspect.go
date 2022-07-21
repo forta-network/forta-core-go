@@ -11,6 +11,7 @@ import (
 // InspectionConfig contains the parameters for all inspections.
 type InspectionConfig struct {
 	ScanAPIURL  string `json:"scanApiUrl"`
+	ProxyAPIURL string `json:"proxyApiUrl"` // JSON-RPC API for bots
 	TraceAPIURL string `json:"traceApiUrl"`
 	BlockNumber uint64 `json:"blockNumber"`
 }
@@ -66,6 +67,7 @@ func Inspect(ctx context.Context, inspectionCfg InspectionConfig) (*InspectionRe
 		&NetworkInspector{},
 		&SystemResourcesInspector{},
 		&ScanAPIInspector{},
+		&ProxyAPIInspector{},
 		&TraceAPIInspector{},
 	}, inspectionCfg)
 }

@@ -42,6 +42,10 @@ var (
 		ErrorCode:    "1002",
 		ErrorMessage: "reference trace api is failing",
 	}
+	ErrReferenceProxyAPI = &validationError{
+		ErrorCode:    "1003",
+		ErrorMessage: "reference proxy api is failing",
+	}
 
 	// 2xxx: validator messed up (bad sources etc.)
 	// 2x0x: validator could not fetch reference data
@@ -58,9 +62,13 @@ var (
 		ErrorCode:    "2003",
 		ErrorMessage: "reference trace api could not retrieve the trace data for the configured block",
 	}
+	ErrReferenceProxyAPIBlock = &validationError{
+		ErrorCode:    "2004",
+		ErrorMessage: "reference proxy api could not retrieve the configured block",
+	}
 	ErrReferenceBlockMismatch = &validationError{
 		ErrorCode:    "2011",
-		ErrorMessage: "reference scan and trace apis return different blocks",
+		ErrorMessage: "reference scan, trace and proxy apis return different blocks",
 	}
 
 	// 3xxx: node messed up: inspection results are bad
@@ -68,7 +76,7 @@ var (
 	// 3x1x: inspection results do not match with the reference
 	ErrResultBlockMismatch = &validationError{
 		ErrorCode:    "3001",
-		ErrorMessage: "scan and trace inspection detected different blocks",
+		ErrorMessage: "scan, trace and proxy inspection detected different blocks",
 	}
 	ErrResultScanAPIBlockMismatch = &validationError{
 		ErrorCode:    "3011",
@@ -82,6 +90,10 @@ var (
 		ErrorCode:    "3013",
 		ErrorMessage: "trace inspection detected different trace data than reference",
 	}
+	ErrResultProxyAPIBlockMismatch = &validationError{
+		ErrorCode:    "3014",
+		ErrorMessage: "proxy inspection detected a different block than reference",
+	}
 )
 
 // InspectionValidator validates inspection results.
@@ -90,6 +102,7 @@ type InspectionValidator struct {
 	scanRpcClient  *rpc.Client
 	traceRpcClient *rpc.Client
 	traceClient    ethereum.Client
+	proxyRpcClient *rpc.Client
 }
 
 // NewValidator creates a new inspection validator.
@@ -112,6 +125,11 @@ func NewValidator(ctx context.Context, inspectionCfg InspectionConfig) (*Inspect
 	if err != nil {
 		log.WithError(err).Error("failed to dial trace api (NewStreamEthClient)")
 		return nil, ErrReferenceTraceAPI
+	}
+	validator.proxyRpcClient, err = rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
+	if err != nil {
+		log.WithError(err).Error("failed to dial proxy api")
+		return nil, ErrReferenceProxyAPI
 	}
 	validator.inspectionCfg = &inspectionCfg
 	return &validator, nil
@@ -136,13 +154,25 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionR
 		log.WithError(err).Error("failed to get trace api trace block response hash")
 		resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
 	}
+	proxyApiBlockResponseHash, err := getBlockResponseHash(ctx, v.proxyRpcClient, v.inspectionCfg.BlockNumber)
+	if err != nil {
+		log.WithError(err).Error("failed to get proxy api block response hash")
+		resultErr = multierror.Append(resultErr, ErrReferenceProxyAPI)
+	}
 
 	// return with the first batch of errors at this step
 	if resultErr != nil {
 		return
 	}
 
-	if results.Metadata[MetadataScanAPIBlockByNumberHash] != results.Metadata[MetadataTraceAPIBlockByNumberHash] {
+	// check if this validator is messing up
+	if scanApiBlockResponseHash != traceApiBlockResponseHash || scanApiBlockResponseHash != proxyApiBlockResponseHash {
+		resultErr = multierror.Append(resultErr, ErrReferenceBlockMismatch)
+	}
+
+	// check if the inspected node is messing up
+	if results.Metadata[MetadataScanAPIBlockByNumberHash] != results.Metadata[MetadataTraceAPIBlockByNumberHash] ||
+		results.Metadata[MetadataScanAPIBlockByNumberHash] != results.Metadata[MetadataProxyAPIBlockByNumberHash] {
 		resultErr = multierror.Append(resultErr, ErrResultBlockMismatch)
 	}
 	if results.Metadata[MetadataScanAPIBlockByNumberHash] != scanApiBlockResponseHash {
@@ -153,6 +183,9 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionR
 	}
 	if results.Metadata[MetadataTraceAPITraceBlockHash] != traceApiTraceBlockResponseHash {
 		resultErr = multierror.Append(resultErr, ErrResultTraceAPITraceBlockMismatch)
+	}
+	if results.Metadata[MetadataProxyAPIBlockByNumberHash] != proxyApiBlockResponseHash {
+		resultErr = multierror.Append(resultErr, ErrResultProxyAPIBlockMismatch)
 	}
 
 	return

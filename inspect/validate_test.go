@@ -24,6 +24,7 @@ func TestValidateInspectionSuccess(t *testing.T) {
 	recentBlockNumber := testGetRecentBlockNumber(r, testScanEnv.ScanAPI)
 	inspectionCfg := InspectionConfig{
 		ScanAPIURL:  testValidateEnv.ScanAPI,
+		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
 		BlockNumber: recentBlockNumber,
 	}
@@ -49,6 +50,7 @@ func TestValidateInspectionFail(t *testing.T) {
 	recentBlockNumber := testGetRecentBlockNumber(r, testScanEnv.ScanAPI)
 	inspectionCfg1 := InspectionConfig{
 		ScanAPIURL:  testValidateEnv.ScanAPI,
+		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
 		BlockNumber: recentBlockNumber,
 	}
@@ -62,6 +64,7 @@ func TestValidateInspectionFail(t *testing.T) {
 	// now let's tamper with the initial conditions so trace inspection result is different
 	inspectionCfg2 := InspectionConfig{
 		ScanAPIURL:  testValidateEnv.ScanAPI,
+		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
 		BlockNumber: recentBlockNumber - 10,
 	}
