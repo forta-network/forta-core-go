@@ -18,7 +18,8 @@ func TestScanAPIInspection(t *testing.T) {
 
 	inspector := &ScanAPIInspector{}
 	results, err := inspector.Inspect(context.Background(), InspectionConfig{
-		ScanAPIURL: testScanAPIURL,
+		ScanAPIURL:  testScanAPIURL,
+		BlockNumber: testScanAPIOldestSupportedBlock,
 	})
 	r.NoError(err)
 
@@ -30,7 +31,10 @@ func TestScanAPIInspection(t *testing.T) {
 		MetricScanAPIModuleNet:      ResultSuccess,
 		MetricScanAPIHistorySupport: VeryOldBlockNumber,
 	}, results.Metrics)
-	r.Equal(map[string]string{}, results.Metadata)
+
+	r.Equal(map[string]string{
+		MetadataScanAPIBlockByNumberHash: "3abe2f22edf2b463cbc13343a947be9ebbf8c16c2b50b2b90e10a199a2344f65",
+	}, results.Metadata)
 }
 
 func Test_findOldestSupportedBlock(t *testing.T) {

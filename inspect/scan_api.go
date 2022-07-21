@@ -2,11 +2,14 @@ package inspect
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/forta-network/forta-core-go/utils"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -23,6 +26,9 @@ const (
 	MetricScanAPIModuleNet = "scan-api.module.net"
 	// MetricScanAPIHistorySupport the earliest supported block height. The lower is better.
 	MetricScanAPIHistorySupport = "scan-api.history-support"
+
+	// MetadataScanAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
+	MetadataScanAPIBlockByNumberHash = "scan-api.block-by-number.hash"
 )
 
 const (
@@ -88,6 +94,15 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 	err = checkSupportedModules(ctx, rpcClient, results)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("error checking module functionality %w", err))
+	}
+
+	// get configured block and include hash of the returned as metadata
+	var blockData json.RawMessage
+	err = rpcClient.CallContext(ctx, &blockData, "eth_getBlockByNumber", hexutil.EncodeUint64(inspectionCfg.BlockNumber), true)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
+	} else {
+		results.Metadata[MetadataScanAPIBlockByNumberHash] = utils.HashNormalizedJSON(blockData)
 	}
 
 	return

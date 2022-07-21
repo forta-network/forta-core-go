@@ -73,6 +73,8 @@ func NormalizeJSON(v interface{}) []byte {
 	switch val := v.(type) {
 	case []byte:
 		b = val
+	case json.RawMessage:
+		b = val
 	case string:
 		b = []byte(val)
 	default:
