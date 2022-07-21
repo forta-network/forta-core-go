@@ -67,6 +67,7 @@ func ParseBoolEnvVar(name string) (value bool) {
 
 // NormalizeJSON reorders JSON object keys in a deterministic way. The argument must either be
 // raw JSON bytes or be serializable.
+// See https://pkg.go.dev/encoding/json#Marshal for more details about why this orders fields correctly.
 func NormalizeJSON(v interface{}) []byte {
 	var b []byte
 	switch val := v.(type) {
