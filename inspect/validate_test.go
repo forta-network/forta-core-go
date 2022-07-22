@@ -33,6 +33,7 @@ func TestValidateInspectionSuccess(t *testing.T) {
 	// make only scan and trace api inspections using the inspection config
 	results, err := inspect(ctx, []Inspector{
 		&ScanAPIInspector{},
+		&ProxyAPIInspector{},
 		&TraceAPIInspector{},
 	}, inspectionCfg)
 	r.NoError(err)
@@ -58,8 +59,9 @@ func TestValidateInspectionFail(t *testing.T) {
 	}
 
 	// make only scan api inspection
-	scanResults, err := inspect(ctx, []Inspector{
+	results, err := inspect(ctx, []Inspector{
 		&ScanAPIInspector{},
+		&ProxyAPIInspector{},
 	}, inspectionCfg1)
 	r.NoError(err)
 
@@ -77,8 +79,6 @@ func TestValidateInspectionFail(t *testing.T) {
 		&TraceAPIInspector{},
 	}, inspectionCfg2)
 	r.NoError(err)
-
-	results := scanResults
 	results.CopyFrom(traceResults)
 
 	// validate the inspection using the first config
