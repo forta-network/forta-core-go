@@ -1,11 +1,15 @@
 package utils
 
 import (
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"os"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // ShortenString shortens the string if the string is longer than given length.
@@ -59,4 +63,31 @@ func ParseBoolEnvVar(name string) (value bool) {
 	}
 	value, _ = strconv.ParseBool(boolStr)
 	return
+}
+
+// NormalizeJSON reorders JSON object keys in a deterministic way. The argument must either be
+// raw JSON bytes or be serializable.
+// See https://pkg.go.dev/encoding/json#Marshal for more details about why this orders fields correctly.
+func NormalizeJSON(v interface{}) []byte {
+	var b []byte
+	switch val := v.(type) {
+	case []byte:
+		b = val
+	case json.RawMessage:
+		b = val
+	case string:
+		b = []byte(val)
+	default:
+		b, _ = json.Marshal(v)
+	}
+
+	var decoded interface{}
+	_ = json.Unmarshal(b, &decoded)
+	b, _ = json.Marshal(decoded)
+	return b
+}
+
+// HashNormalizedJSON computes the hash after normalizing given input in JSON format.
+func HashNormalizedJSON(v interface{}) string {
+	return hex.EncodeToString(crypto.Keccak256(NormalizeJSON(v)))
 }

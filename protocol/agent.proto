@@ -76,6 +76,7 @@ message Finding {
   string everestId = 8;
   bool private = 9;
   repeated string addresses = 10;
+  map<string, double> indicators = 11;
 }
 
 message EvaluateTxResponse {
