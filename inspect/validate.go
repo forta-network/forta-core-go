@@ -3,10 +3,13 @@ package inspect
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/hashicorp/go-multierror"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -96,6 +99,10 @@ var (
 	}
 )
 
+const (
+	cacheExpiryDuration = time.Minute * 10
+)
+
 // InspectionValidator validates inspection results.
 type InspectionValidator struct {
 	inspectionCfg  *InspectionConfig
@@ -103,6 +110,8 @@ type InspectionValidator struct {
 	traceRpcClient *rpc.Client
 	traceClient    ethereum.Client
 	proxyRpcClient *rpc.Client
+
+	cache *cache.Cache
 }
 
 // NewValidator creates a new inspection validator.
@@ -134,38 +143,56 @@ func NewValidator(ctx context.Context, inspectionCfg InspectionConfig) (*Inspect
 		return nil, ErrReferenceProxyAPI
 	}
 	validator.inspectionCfg = &inspectionCfg
+
+	validator.cache = cache.New(cacheExpiryDuration, cache.DefaultExpiration)
+
 	return &validator, nil
+}
+
+type blockValidationData struct {
+	scan          string
+	proxy         string
+	trace         string
+	traceResponse string
 }
 
 // Validate validates the inspection result. This is intended for using as a first check.
 // If this validation fails, nothing else should matter because it is the first and foremost requirement
 // to run a node with reliable chain data sources.
 func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionResults) (resultErr error) {
-	scanApiBlockResponseHash, err := getBlockResponseHash(ctx, v.scanRpcClient, v.inspectionCfg.BlockNumber)
-	if err != nil {
-		log.WithError(err).Error("failed to get scan api block response hash")
-		resultErr = multierror.Append(resultErr, ErrReferenceScanAPI)
-	}
-	var (
-		traceApiBlockResponseHash      string
-		traceApiTraceBlockResponseHash string
-	)
-	if v.inspectionCfg.CheckTrace {
-		traceApiBlockResponseHash, err = getBlockResponseHash(ctx, v.traceRpcClient, v.inspectionCfg.BlockNumber)
+	var referenceBlock blockValidationData
+	blockNumberStr := strconv.FormatUint(v.inspectionCfg.BlockNumber, 10)
+
+	if item, ok := v.cache.Get(blockNumberStr); ok {
+		referenceBlock = item.(blockValidationData)
+	} else {
+		var err error
+		referenceBlock.scan, err = getBlockResponseHash(ctx, v.scanRpcClient, v.inspectionCfg.BlockNumber)
 		if err != nil {
-			log.WithError(err).Error("failed to get trace api block response hash")
-			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
+			log.WithError(err).Error("failed to get scan api block response hash")
+			resultErr = multierror.Append(resultErr, ErrReferenceScanAPI)
 		}
-		traceApiTraceBlockResponseHash, err = getTraceResponseHash(ctx, v.traceClient, v.inspectionCfg.BlockNumber)
+
+		if v.inspectionCfg.CheckTrace {
+			referenceBlock.trace, err = getBlockResponseHash(ctx, v.traceRpcClient, v.inspectionCfg.BlockNumber)
+			if err != nil {
+				log.WithError(err).Error("failed to get trace api block response hash")
+				resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
+			}
+			referenceBlock.traceResponse, err = getTraceResponseHash(ctx, v.traceClient, v.inspectionCfg.BlockNumber)
+			if err != nil {
+				log.WithError(err).Error("failed to get trace api trace block response hash")
+				resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
+			}
+		}
+
+		referenceBlock.proxy, err = getBlockResponseHash(ctx, v.proxyRpcClient, v.inspectionCfg.BlockNumber)
 		if err != nil {
-			log.WithError(err).Error("failed to get trace api trace block response hash")
-			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
+			log.WithError(err).Error("failed to get proxy api block response hash")
+			resultErr = multierror.Append(resultErr, ErrReferenceProxyAPI)
 		}
-	}
-	proxyApiBlockResponseHash, err := getBlockResponseHash(ctx, v.proxyRpcClient, v.inspectionCfg.BlockNumber)
-	if err != nil {
-		log.WithError(err).Error("failed to get proxy api block response hash")
-		resultErr = multierror.Append(resultErr, ErrReferenceProxyAPI)
+
+		v.cache.Set(blockNumberStr, referenceBlock, cacheExpiryDuration)
 	}
 
 	// return with the first batch of errors at this step
@@ -174,30 +201,32 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionR
 	}
 
 	// check if this validator is messing up
-	if (scanApiBlockResponseHash != traceApiBlockResponseHash && v.inspectionCfg.CheckTrace) ||
-		scanApiBlockResponseHash != proxyApiBlockResponseHash {
+	if (referenceBlock.scan != referenceBlock.trace && v.inspectionCfg.CheckTrace) ||
+		referenceBlock.scan != referenceBlock.proxy {
 		resultErr = multierror.Append(resultErr, ErrReferenceBlockMismatch)
 	}
 
 	// check if the inspected node is messing up
 	traceApiBlockHashIsDifferent := results.Metadata[MetadataScanAPIBlockByNumberHash] != results.Metadata[MetadataTraceAPIBlockByNumberHash] &&
 		v.inspectionCfg.CheckTrace
+
 	proxyApiBlockHashIsDifferent := results.Metadata[MetadataScanAPIBlockByNumberHash] != results.Metadata[MetadataProxyAPIBlockByNumberHash]
+
 	if traceApiBlockHashIsDifferent || proxyApiBlockHashIsDifferent {
 		resultErr = multierror.Append(resultErr, ErrResultBlockMismatch)
 	}
-	if results.Metadata[MetadataScanAPIBlockByNumberHash] != scanApiBlockResponseHash {
+	if results.Metadata[MetadataScanAPIBlockByNumberHash] != referenceBlock.scan {
 		resultErr = multierror.Append(resultErr, ErrResultScanAPIBlockMismatch)
 	}
 	if v.inspectionCfg.CheckTrace {
-		if results.Metadata[MetadataTraceAPIBlockByNumberHash] != traceApiBlockResponseHash {
+		if results.Metadata[MetadataTraceAPIBlockByNumberHash] != referenceBlock.trace {
 			resultErr = multierror.Append(resultErr, ErrResultTraceAPIBlockMismatch)
 		}
-		if results.Metadata[MetadataTraceAPITraceBlockHash] != traceApiTraceBlockResponseHash {
+		if results.Metadata[MetadataTraceAPITraceBlockHash] != referenceBlock.traceResponse {
 			resultErr = multierror.Append(resultErr, ErrResultTraceAPITraceBlockMismatch)
 		}
 	}
-	if results.Metadata[MetadataProxyAPIBlockByNumberHash] != proxyApiBlockResponseHash {
+	if results.Metadata[MetadataProxyAPIBlockByNumberHash] != referenceBlock.proxy {
 		resultErr = multierror.Append(resultErr, ErrResultProxyAPIBlockMismatch)
 	}
 
