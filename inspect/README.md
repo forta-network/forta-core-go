@@ -49,7 +49,7 @@ Returns `1` by default on other chains
 Checks trace APIs accessibility by establishing rpc connection and tracing the genesis block or the trace field in
 provided gRPC message
 
-`1` for accessible, `-1` for not
+`1` for supported, `-1` for not
 
 ### `trace-api.block-by-number.hash`
 
