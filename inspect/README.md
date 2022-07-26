@@ -104,19 +104,19 @@ Returns the earliest block height that proxy supports. Lower is better.
 
 ### `network.access.outbound`
 
-Tries to access https://api.forta.network
+Can access https://api.forta.network
 
 `1` for ok, `-1` for not accessible
 
 ### `network.speed.download`
 
-Runs a download performance benchmark
+Result of a download performance benchmark
 
 Download speed in `mbps`
 
 ### `network.speed.upload`
 
-Runs an upload performance benchmark
+Result of an upload performance benchmark
 
 Upload speed in `mbps`
 
@@ -140,9 +140,9 @@ Current available storage in bytes
 
 ### `resources.cpu.benchmark`
 
-The Time container needs to calculate first 1e5 prime numbers on average
+The time elapsed during the calculation of the first 1e5 prime numbers
 
-Average time needed in nanoseconds
+Average time in nanoseconds
 
 ### `resources.cpu.usage`
 
@@ -150,9 +150,9 @@ Current average CPU usage percentage
 
 ## Inspection Validator
 
-Crosschecks submitted `*.block-by-number.hash` data in inspection results with reference json-rpc providers
+Crosschecks outputted `*.block-by-number.hash` and `trace-api.trace-block.hash` data in inspection results with reference json-rpc providers
 
-## Example Submission
+## Example Output
 
 ```json
 {
