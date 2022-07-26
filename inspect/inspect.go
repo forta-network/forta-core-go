@@ -19,9 +19,9 @@ type InspectionConfig struct {
 
 // InspectionResults contains inspection results.
 type InspectionResults struct {
-	Inputs     InspectionConfig
-	Metadata   map[string]string
-	Indicators map[string]float64
+	Inputs     InspectionConfig   `json:"inputs"`
+	Metadata   map[string]string  `json:"metadata"`
+	Indicators map[string]float64 `json:"indicators"`
 }
 
 // NewInspectionResults creates new InspectionResults.
