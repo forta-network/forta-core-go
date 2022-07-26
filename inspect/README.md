@@ -1,96 +1,104 @@
 # forta-inspector-bot
 
-# Inspection Details
+# Inspection Results
 
 ## Scan API Inspection
 
 ### `scan-api.accessible`
 
-Checks Scan APIs accessibility by establishing rpc connection and asking for current block height
+Scan API is accessible and responsive
 
 `1` for accessible, `-1` for not
 
+### `scan-api.chain-id`
+
+Chain ID of the JSON-RPC API
+
 ### `scan-api.module.eth`
 
-The scan node should either declare `eth` module in `rpc_modules` method or it should return a valid response to
-a `eth_chainId` query
+`eth` module is supported
 
-`1` for supports, `-1` for not
+The scan API should either declare `eth` module in `rpc_modules` method response or it should return a valid response to an `eth_chainId` request
+
+`1` for supported, `-1` for not
 
 ### `scan-api.module.net`
 
-The scan api should either declare `net` module in `rpc_modules` method or it should return a valid response to
-a `net_version` query
+`net` module is supported
 
-`1` for supports, `-1` for not
+The scan API should either declare `net` module in `rpc_modules` method response or it should return a valid response to a `net_version` request
+
+`1` for supported, `-1` for not
 
 ### `scan-api.block-by-number.hash`
 
-The hash of the block data retrieved from the scan API
+Keccak256 hash of the block data retrieved from the scan API
 
 ## Trace API Inspection
 
 ### `trace-api.accessible`
 
-Checks trace APIs accessibility by establishing rpc connection and asking for current its chain id.
+Trace API is accessible and responsive
 
 `1` for accessible, `-1` for not
 
 ### `trace-api.supported`
 
-`trace_block` method is supported or not
-provided gRPC message
+`trace_block` method is supported
 
 `1` for supported, `-1` for not
 
 ### `trace-api.block-by-number.hash`
 
-The hash of the block data retrieved from the Trace API
+Keccak256 hash of the block data retrieved from the Trace API
 
 ### `trace-api.trace-block.hash`
 
-The hash of the block trace data retrieved from the Trace API
+Keccak256 hash of the block trace data retrieved from the Trace API
 
-## Proxy Inspection
+## Proxy API Inspection
 
-### `proxy.accessible`
+### `proxy-api.accessible`
 
-Checks json-rpc proxy accessibility by establishing rpc connection and asking for current its chain id.
+The proxy API served within the node is accessible and responsive
 
 `1` for accessible, `-1` for not
 
-### `proxy.chain-id`
+### `proxy-api.chain-id`
 
-Chain ID of the provided json-rpc
+Chain ID of the JSON-RPC API
 
-### `proxy.module.web3`
+### `proxy-api.module.web3`
 
-The json-rpc proxy should either declare `net` module in `rpc_modules` method or it should return a valid response to
-a `net_version` query
+`web3` module is supported
 
-`1` for supports, `-1` for not
+The proxy API should either declare `net` module in `rpc_modules` method response or it should return a valid response to a `net_version` request
 
-### `proxy.module.eth`
+`1` for supported, `-1` for not
 
-The json-rpc proxy should either declare `eth` module in `rpc_modules` method or it should return a valid response to
-a `eth_chainId` query
+### `proxy-api.module.eth`
 
-`1` for supports, `-1` for not
+`eth` module is supported
 
-### `proxy.module.net`
+The proxy API should either declare `eth` module in `rpc_modules` method or it should return a valid response to an `eth_chainId` request
 
-The json-rpc proxy should either declare `net` module in `rpc_modules` method or it should return a valid response to
-a `net_version` query
+`1` for supported, `-1` for not
 
-`1` for supports, `-1` for not
+### `proxy-api.module.net`
 
-### `proxy.block-by-number.hash`
+`net` module is supported
 
-The hash of the block data retrieved from the json-rpc proxy.
+The proxy API should either declare `net` module in `rpc_modules` method or it should return a valid response to a `net_version` request
 
-### `proxy.history-support`
+`1` for supported, `-1` for not
 
-Returns the earliest block height that proxy supports. Lower is better.
+### `proxy-api.block-by-number.hash`
+
+Keccak256 hash of the block data retrieved from the proxy API.
+
+### `proxy-api.history-support`
+
+The earliest block height that proxy supports. Lower is better.
 
 ## Network Inspection
 
@@ -148,18 +156,18 @@ Crosschecks outputted `*.block-by-number.hash` and `trace-api.trace-block.hash` 
 
 ```json
 {
-  "Inputs": {
-    "blockNumber": 0,
+  "inputs": {
+    "blockNumber": 123735915,
     "scanApiUrl": "https://cloudflare-eth.com",
     "proxyApiUrl": "https://cloudflare-eth.com",
     "traceApiUrl": "https://cloudflare-eth.com",
     "checkTrace": false
   },
-  "Metadata": {
+  "metadata": {
     "proxy.block-by-number.hash": "3abe2f22edf2b463cbc13343a947be9ebbf8c16c2b50b2b90e10a199a2344f65",
     "scan-api.block-by-number.hash": "3abe2f22edf2b463cbc13343a947be9ebbf8c16c2b50b2b90e10a199a2344f65"
   },
-  "Indicators": {
+  "indicators": {
     "network.access.outbound": 1,
     "network.speed.download": 30.381701453262668,
     "network.speed.upload": 38.8611939336301,

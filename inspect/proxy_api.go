@@ -16,20 +16,20 @@ import (
 
 const (
 	// IndicatorProxyAPIAccessible can connect to node
-	IndicatorProxyAPIAccessible = "proxy.accessible"
+	IndicatorProxyAPIAccessible = "proxy-api.accessible"
 	// IndicatorProxyAPIChainID which chain id the json-rpc provides
-	IndicatorProxyAPIChainID = "proxy.chain-id"
+	IndicatorProxyAPIChainID = "proxy-api.chain-id"
 	// IndicatorProxyAPIModuleWeb3 node supports web3 module.
-	IndicatorProxyAPIModuleWeb3 = "proxy.module.web3"
+	IndicatorProxyAPIModuleWeb3 = "proxy-api.module.web3"
 	// IndicatorProxyAPIModuleEth node supports eth module.
-	IndicatorProxyAPIModuleEth = "proxy.module.eth"
+	IndicatorProxyAPIModuleEth = "proxy-api.module.eth"
 	// IndicatorProxyAPIModuleNet node supports net module.
-	IndicatorProxyAPIModuleNet = "proxy.module.net"
+	IndicatorProxyAPIModuleNet = "proxy-api.module.net"
 	// IndicatorProxyAPIHistorySupport the earliest supported block height. The lower is better.
-	IndicatorProxyAPIHistorySupport = "proxy.history-support"
+	IndicatorProxyAPIHistorySupport = "proxy-api.history-support"
 
 	// MetadataProxyAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
-	MetadataProxyAPIBlockByNumberHash = "proxy.block-by-number.hash"
+	MetadataProxyAPIBlockByNumberHash = "proxy-api.block-by-number.hash"
 )
 
 const (
