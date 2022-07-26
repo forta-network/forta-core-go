@@ -46,7 +46,7 @@ Only necessary for Ethereum Mainnet.
 
 Returns `1` by default on other chains
 
-Checks trace APIs accessibility by establishing rpc connection and tracing the genesis block or the trace field in
+`trace_block` method is supported or not
 provided gRPC message
 
 `1` for supported, `-1` for not
