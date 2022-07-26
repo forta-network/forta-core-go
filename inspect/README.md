@@ -1,9 +1,5 @@
 # forta-inspector-bot
 
-Inspects run environment capabilities and limits
-
-Moved from [forta-network/forta-inspector-bot](forta-inspector-bot-repo)
-
 # Inspection Details
 
 ## Scan API Inspection
@@ -41,10 +37,6 @@ Checks trace APIs accessibility by establishing rpc connection and asking for cu
 `1` for accessible, `-1` for not
 
 ### `trace-api.supported`
-
-Only necessary for Ethereum Mainnet.
-
-Returns `1` by default on other chains
 
 `trace_block` method is supported or not
 provided gRPC message
@@ -191,5 +183,3 @@ Crosschecks outputted `*.block-by-number.hash` and `trace-api.trace-block.hash` 
   }
 }
 ```
-
-[forta-inspector-bot-repo]: https://github.com/forta-network/forta-inspector-bot/ 
