@@ -240,4 +240,5 @@ message TransactionEvent {
   bool isContractDeployment = 9;
   string contractAddress = 10;
   TrackingTimestamps timestamps = 11;
+  map<string, bool> txAddresses = 12;
 }

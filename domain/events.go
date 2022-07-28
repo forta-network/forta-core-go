@@ -190,11 +190,15 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		}
 	}
 
+	txAddresses := make(map[string]bool)
+
 	// convert tx domain model to proto
 	var tx protocol.TransactionEvent_EthTransaction
 	if t.Transaction != nil {
 		safeAddStrToMap(addresses, t.Transaction.To)
 		safeAddStrToMap(addresses, &t.Transaction.From)
+		safeAddStrToMap(txAddresses, t.Transaction.To)
+		safeAddStrToMap(txAddresses, &t.Transaction.From)
 
 		txJson, err := json.Marshal(t.Transaction)
 		if err != nil {
@@ -226,11 +230,13 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			txLogs = append(txLogs, l)
 			l.Address = strings.ToLower(l.Address)
 			safeAddStrValueToMap(addresses, l.Address)
+			safeAddStrValueToMap(txAddresses, l.Address)
 
 			// add addresses from topics
 			for _, topic := range l.Topics {
 				if strings.HasPrefix(topic, "0x000000000000000000000000") {
 					safeAddStrValueToMap(addresses, common.HexToAddress(topic).Hex())
+					safeAddStrValueToMap(txAddresses, common.HexToAddress(topic).Hex())
 				}
 			}
 		}
@@ -242,6 +248,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		createdAddr := crypto.CreateAddress(common.HexToAddress(t.Transaction.From), uint64(utils.HexToInt64(t.Transaction.Nonce)))
 		contractAddress = strings.ToLower(createdAddr.Hex())
 		safeAddStrValueToMap(addresses, contractAddress)
+		safeAddStrValueToMap(txAddresses, contractAddress)
 	}
 
 	// for backwards compatibility
@@ -270,6 +277,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		Network:              nw,
 		Traces:               traces,
 		Addresses:            addresses,
+		TxAddresses:          txAddresses,
 		Logs:                 txLogs,
 		Receipt:              &receipt,
 		IsContractDeployment: isDeploy,
