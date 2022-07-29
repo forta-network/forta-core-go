@@ -94,10 +94,10 @@ func TestValidateInspectionFail(t *testing.T) {
 	r.NotContains(err.Error(), "code: 20")
 
 	// scan inspection should be fine
-	r.False(verrs.Has(ErrResultScanAPIBlockMismatch.Code()))
+	r.False(verrs.HasCode(ErrResultScanAPIBlockMismatch.Code()))
 
 	// trace inspection should have problems
-	r.True(verrs.Has(ErrResultBlockMismatch.Code()))
-	r.True(verrs.Has(ErrResultTraceAPIBlockMismatch.Code()))
-	r.True(verrs.Has(ErrResultTraceAPITraceBlockMismatch.Code()))
+	r.True(verrs.HasCode(ErrResultBlockMismatch.Code()))
+	r.True(verrs.HasCode(ErrResultTraceAPIBlockMismatch.Code()))
+	r.True(verrs.HasCode(ErrResultTraceAPITraceBlockMismatch.Code()))
 }

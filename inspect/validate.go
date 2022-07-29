@@ -40,10 +40,20 @@ func (verrs ValidationErrors) Codes() (codes []string) {
 	return
 }
 
-// Has checks if the validation errors has an error with this code.
-func (verrs ValidationErrors) Has(code string) bool {
+// HasCode checks if the validation errors has an error with this code.
+func (verrs ValidationErrors) HasCode(code string) bool {
 	for _, verr := range verrs {
 		if verr.Code() == code {
+			return true
+		}
+	}
+	return false
+}
+
+// HasCodes checks if the validation errors has any of these codes.
+func (verrs ValidationErrors) HasCodes(codes ...string) bool {
+	for _, code := range codes {
+		if verrs.HasCode(code) {
 			return true
 		}
 	}
