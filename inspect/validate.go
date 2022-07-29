@@ -19,8 +19,40 @@ type validationError struct {
 	ErrorMessage string
 }
 
-// compile time check: it should implement the interface
+// ValidationError is the inspection validation error interface.
+type ValidationError interface {
+	Error() string
+	Code() string
+	Message() string
+}
+
+// ValidationErrors is a type alias which lets us implement convenience methods.
+type ValidationErrors []ValidationError
+
+// Codes returns an array of error codes.
+func (verrs ValidationErrors) Codes() (codes []string) {
+	if len(verrs) == 0 {
+		return
+	}
+	for _, verr := range verrs {
+		codes = append(codes, verr.Code())
+	}
+	return
+}
+
+// Has checks if the validation errors has an error with this code.
+func (verrs ValidationErrors) Has(code string) bool {
+	for _, verr := range verrs {
+		if verr.Code() == code {
+			return true
+		}
+	}
+	return false
+}
+
+// compile time check: it should implement the interfaces
 var _ error = &validationError{}
+var _ ValidationError = &validationError{}
 
 func (err *validationError) Error() string {
 	return fmt.Sprintf("%s (code: %s)", err.ErrorMessage, err.ErrorCode)
@@ -37,15 +69,15 @@ func (err *validationError) Message() string {
 // Validation errors
 var (
 	// 1xxx: validator messed up at initialization
-	ErrReferenceScanAPI = &validationError{
+	ErrReferenceScanAPI ValidationError = &validationError{
 		ErrorCode:    "1001",
 		ErrorMessage: "reference scan api is failing",
 	}
-	ErrReferenceTraceAPI = &validationError{
+	ErrReferenceTraceAPI ValidationError = &validationError{
 		ErrorCode:    "1002",
 		ErrorMessage: "reference trace api is failing",
 	}
-	ErrReferenceProxyAPI = &validationError{
+	ErrReferenceProxyAPI ValidationError = &validationError{
 		ErrorCode:    "1003",
 		ErrorMessage: "reference proxy api is failing",
 	}
@@ -53,23 +85,23 @@ var (
 	// 2xxx: validator messed up (bad sources etc.)
 	// 2x0x: validator could not fetch reference data
 	// 2x1x: validator retrieved bad/mismatching data
-	ErrReferenceScanAPIBlock = &validationError{
+	ErrReferenceScanAPIBlock ValidationError = &validationError{
 		ErrorCode:    "2001",
 		ErrorMessage: "reference scan api could not retrieve the configured block",
 	}
-	ErrReferenceTraceAPIBlock = &validationError{
+	ErrReferenceTraceAPIBlock ValidationError = &validationError{
 		ErrorCode:    "2002",
 		ErrorMessage: "reference trace api could not retrieve the configured block",
 	}
-	ErrReferenceTraceAPITraceBlock = &validationError{
+	ErrReferenceTraceAPITraceBlock ValidationError = &validationError{
 		ErrorCode:    "2003",
 		ErrorMessage: "reference trace api could not retrieve the trace data for the configured block",
 	}
-	ErrReferenceProxyAPIBlock = &validationError{
+	ErrReferenceProxyAPIBlock ValidationError = &validationError{
 		ErrorCode:    "2004",
 		ErrorMessage: "reference proxy api could not retrieve the configured block",
 	}
-	ErrReferenceBlockMismatch = &validationError{
+	ErrReferenceBlockMismatch ValidationError = &validationError{
 		ErrorCode:    "2011",
 		ErrorMessage: "reference scan, trace and proxy apis return different blocks",
 	}
@@ -77,23 +109,23 @@ var (
 	// 3xxx: node messed up: inspection results are bad
 	// 3x0x: inspection results have bad/mismatching data
 	// 3x1x: inspection results do not match with the reference
-	ErrResultBlockMismatch = &validationError{
+	ErrResultBlockMismatch ValidationError = &validationError{
 		ErrorCode:    "3001",
 		ErrorMessage: "scan, trace and proxy inspection detected different blocks",
 	}
-	ErrResultScanAPIBlockMismatch = &validationError{
+	ErrResultScanAPIBlockMismatch ValidationError = &validationError{
 		ErrorCode:    "3011",
 		ErrorMessage: "scan inspection detected a different block than reference",
 	}
-	ErrResultTraceAPIBlockMismatch = &validationError{
+	ErrResultTraceAPIBlockMismatch ValidationError = &validationError{
 		ErrorCode:    "3012",
 		ErrorMessage: "trace inspection detected a different block than reference",
 	}
-	ErrResultTraceAPITraceBlockMismatch = &validationError{
+	ErrResultTraceAPITraceBlockMismatch ValidationError = &validationError{
 		ErrorCode:    "3013",
 		ErrorMessage: "trace inspection detected different trace data than reference",
 	}
-	ErrResultProxyAPIBlockMismatch = &validationError{
+	ErrResultProxyAPIBlockMismatch ValidationError = &validationError{
 		ErrorCode:    "3014",
 		ErrorMessage: "proxy inspection detected a different block than reference",
 	}
@@ -159,10 +191,12 @@ type referenceData struct {
 // Validate validates the inspection result. This is intended for using as a first check.
 // If this validation fails, nothing else should matter because it is the first and foremost requirement
 // to run a node with reliable chain data sources.
-func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionResults) (resultErr error) {
+func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionResults) (validationErrs ValidationErrors, resultErr error) {
 	refData, err := v.getReferenceData(ctx, results)
 	if err != nil {
-		return err
+		validationErrs = validationErrorsFrom(err)
+		resultErr = err
+		return
 	}
 
 	// check if this validator is messing up
@@ -195,6 +229,7 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionR
 		resultErr = multierror.Append(resultErr, ErrResultProxyAPIBlockMismatch)
 	}
 
+	validationErrs = validationErrorsFrom(resultErr)
 	return
 }
 
@@ -231,5 +266,19 @@ func (v *InspectionValidator) getReferenceData(ctx context.Context, results *Ins
 	}
 
 	v.cache.Set(blockNumberStr, refData, cacheExpiryDuration)
+	return
+}
+
+func validationErrorsFrom(err error) (validationErrs ValidationErrors) {
+	merr, ok := err.(*multierror.Error)
+	if !ok {
+		return
+	}
+	for _, merrErr := range merr.Errors {
+		verr, ok := merrErr.(ValidationError)
+		if ok {
+			validationErrs = append(validationErrs, verr)
+		}
+	}
 	return
 }

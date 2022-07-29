@@ -35,7 +35,7 @@ const (
 const (
 	// VeryOldBlockNumber is the number of a block which inspection logic considers
 	// as a very old block.
-	VeryOldBlockNumber = 5
+	VeryOldBlockNumber = 1
 )
 
 // ProxyAPIInspector is an inspector implementation.
