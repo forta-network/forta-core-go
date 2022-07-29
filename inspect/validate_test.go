@@ -41,7 +41,7 @@ func TestValidateInspectionSuccess(t *testing.T) {
 	// validate the inspection using the same config
 	validator, err := NewValidator(ctx, inspectionCfg)
 	r.NoError(err)
-	err = validator.Validate(ctx, results)
+	_, err = validator.Validate(ctx, results)
 	r.NoError(err)
 }
 
@@ -84,7 +84,7 @@ func TestValidateInspectionFail(t *testing.T) {
 	// validate the inspection using the first config
 	validator, err := NewValidator(ctx, inspectionCfg1)
 	r.NoError(err)
-	err = validator.Validate(ctx, results)
+	verrs, err := validator.Validate(ctx, results)
 
 	// expect error(s)
 	r.Error(err)
@@ -94,10 +94,10 @@ func TestValidateInspectionFail(t *testing.T) {
 	r.NotContains(err.Error(), "code: 20")
 
 	// scan inspection should be fine
-	r.NotContains(err.Error(), ErrResultScanAPIBlockMismatch.Code())
+	r.False(verrs.HasCode(ErrResultScanAPIBlockMismatch.Code()))
 
 	// trace inspection should have problems
-	r.Contains(err.Error(), ErrResultBlockMismatch.Code())
-	r.Contains(err.Error(), ErrResultTraceAPIBlockMismatch.Code())
-	r.Contains(err.Error(), ErrResultTraceAPITraceBlockMismatch.Code())
+	r.True(verrs.HasCode(ErrResultBlockMismatch.Code()))
+	r.True(verrs.HasCode(ErrResultTraceAPIBlockMismatch.Code()))
+	r.True(verrs.HasCode(ErrResultTraceAPITraceBlockMismatch.Code()))
 }
