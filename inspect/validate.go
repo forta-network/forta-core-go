@@ -244,32 +244,33 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *InspectionR
 }
 
 func (v *InspectionValidator) getReferenceData(ctx context.Context, results *InspectionResults) (refData referenceData, resultErr error) {
-	blockNumberStr := strconv.FormatUint(v.inspectionCfg.BlockNumber, 10)
+	blockNumber := results.Inputs.BlockNumber
+	blockNumberStr := strconv.FormatUint(blockNumber, 10)
 	if item, ok := v.cache.Get(blockNumberStr); ok {
 		return item.(referenceData), nil
 	}
 
 	var err error
-	refData.scanApiBlockHash, err = getBlockResponseHash(ctx, v.scanRpcClient, v.inspectionCfg.BlockNumber)
+	refData.scanApiBlockHash, err = getBlockResponseHash(ctx, v.scanRpcClient, blockNumber)
 	if err != nil {
 		log.WithError(err).Error("failed to get scanApiBlockHash api block response hash")
 		resultErr = multierror.Append(resultErr, ErrReferenceScanAPI)
 	}
 
 	if v.inspectionCfg.CheckTrace {
-		refData.traceApiBlockHash, err = getBlockResponseHash(ctx, v.traceRpcClient, v.inspectionCfg.BlockNumber)
+		refData.traceApiBlockHash, err = getBlockResponseHash(ctx, v.traceRpcClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api block response hash")
 			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
 		}
-		refData.traceApiTraceHash, err = getTraceResponseHash(ctx, v.traceClient, v.inspectionCfg.BlockNumber)
+		refData.traceApiTraceHash, err = getTraceResponseHash(ctx, v.traceClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api trace block response hash")
 			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
 		}
 	}
 
-	refData.proxyApiBlockHash, err = getBlockResponseHash(ctx, v.proxyRpcClient, v.inspectionCfg.BlockNumber)
+	refData.proxyApiBlockHash, err = getBlockResponseHash(ctx, v.proxyRpcClient, blockNumber)
 	if err != nil {
 		log.WithError(err).Error("failed to get proxy api block response hash")
 		resultErr = multierror.Append(resultErr, ErrReferenceProxyAPI)
