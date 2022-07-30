@@ -16,6 +16,11 @@ const (
 	IndicatorNetworkUploadSpeed    = "network.speed.upload"
 )
 
+// Global flags
+var (
+	DownloadTestSavingMode = false
+)
+
 // NetworkInspector is an inspector implementation.
 type NetworkInspector struct{}
 
@@ -78,14 +83,14 @@ func speedTest() (float64, float64, error) {
 	logger := log.WithField("inspector", "network")
 
 	logger.Info("started download test")
-	err = server.DownloadTest(false)
+	err = server.DownloadTest(DownloadTestSavingMode)
 	if err != nil {
 		return 0, 0, err
 	}
 	logger.Info("finished download test")
 
 	logger.Info("started upload test")
-	err = server.UploadTest(false)
+	err = server.UploadTest(DownloadTestSavingMode)
 	if err != nil {
 		return 0, 0, err
 	}

@@ -10,6 +10,7 @@ import (
 func TestNetworkInspection(t *testing.T) {
 	r := require.New(t)
 
+	DownloadTestSavingMode = true
 	inspector := &NetworkInspector{}
 	results, err := inspector.Inspect(context.Background(), InspectionConfig{})
 	r.NoError(err)
