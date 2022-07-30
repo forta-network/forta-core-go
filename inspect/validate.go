@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/hashicorp/go-multierror"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
@@ -150,7 +149,6 @@ type InspectionValidator struct {
 	inspectionCfg  *InspectionConfig
 	scanRpcClient  *rpc.Client
 	traceRpcClient *rpc.Client
-	traceClient    ethereum.Client
 	proxyRpcClient *rpc.Client
 
 	cache *cache.Cache
@@ -171,11 +169,6 @@ func NewValidator(ctx context.Context, inspectionCfg InspectionConfig) (*Inspect
 		validator.traceRpcClient, err = rpc.DialContext(ctx, inspectionCfg.TraceAPIURL)
 		if err != nil {
 			log.WithError(err).Error("failed to dial trace api")
-			return nil, ErrReferenceTraceAPI
-		}
-		validator.traceClient, err = ethereum.NewStreamEthClient(ctx, "trace", inspectionCfg.TraceAPIURL)
-		if err != nil {
-			log.WithError(err).Error("failed to dial trace api (NewStreamEthClient)")
 			return nil, ErrReferenceTraceAPI
 		}
 	}
@@ -263,7 +256,7 @@ func (v *InspectionValidator) getReferenceData(ctx context.Context, results *Ins
 			log.WithError(err).Error("failed to get trace api block response hash")
 			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
 		}
-		refData.traceApiTraceHash, err = getTraceResponseHash(ctx, v.traceClient, blockNumber)
+		refData.traceApiTraceHash, err = getTraceResponseHash(ctx, v.traceRpcClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api trace block response hash")
 			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)

@@ -197,12 +197,16 @@ func findOldestSupportedBlock(ctx context.Context, client *ethclient.Client, low
 }
 
 func getBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
-	var blockData json.RawMessage
-	err := rpcClient.CallContext(ctx, &blockData, "eth_getBlockByNumber", hexutil.EncodeUint64(blockNumber), true)
+	return getRpcResponseHash(ctx, rpcClient, "eth_getBlockByNumber", hexutil.EncodeUint64(blockNumber), true)
+}
+
+func getRpcResponseHash(ctx context.Context, rpcClient *rpc.Client, method string, args ...interface{}) (string, error) {
+	var respData json.RawMessage
+	err := rpcClient.CallContext(ctx, &respData, method, args...)
 	if err != nil {
 		return "", err
 	}
-	return utils.HashNormalizedJSON(blockData), nil
+	return utils.HashNormalizedJSON(&respData), nil
 }
 
 func getHost(apiURL string) string {
