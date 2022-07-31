@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
-	"net/url"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -207,15 +206,4 @@ func getRpcResponseHash(ctx context.Context, rpcClient *rpc.Client, method strin
 		return "", err
 	}
 	return utils.HashNormalizedJSON(&respData), nil
-}
-
-func getHost(apiURL string) string {
-	if len(apiURL) == 0 {
-		return "null"
-	}
-	u, err := url.Parse(apiURL)
-	if err != nil {
-		return "invalid"
-	}
-	return u.Host
 }
