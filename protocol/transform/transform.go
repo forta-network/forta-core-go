@@ -105,7 +105,7 @@ func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block
 	return webhookAlert
 }
 
-// ToProtoInspectionResults transforms inspect package results to protobuf inspection results model.
+// ToProtoInspectionResults transforms inspection results to protobuf inspection results model.
 func ToProtoInspectionResults(results *inspect.InspectionResults) *protocol.InspectionResults {
 	return &protocol.InspectionResults{
 		Inputs: &protocol.InspectionInputs{
