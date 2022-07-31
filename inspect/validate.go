@@ -247,26 +247,26 @@ func (v *InspectionValidator) getReferenceData(ctx context.Context, results *Ins
 	refData.scanApiBlockHash, err = getBlockResponseHash(ctx, v.scanRpcClient, blockNumber)
 	if err != nil {
 		log.WithError(err).Error("failed to get scanApiBlockHash api block response hash")
-		resultErr = multierror.Append(resultErr, ErrReferenceScanAPI)
+		resultErr = multierror.Append(resultErr, ErrReferenceScanAPIBlock)
 	}
 
 	if v.inspectionCfg.CheckTrace {
 		refData.traceApiBlockHash, err = getBlockResponseHash(ctx, v.traceRpcClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api block response hash")
-			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
+			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPIBlock)
 		}
 		refData.traceApiTraceHash, err = getTraceResponseHash(ctx, v.traceRpcClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api trace block response hash")
-			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPI)
+			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPITraceBlock)
 		}
 	}
 
 	refData.proxyApiBlockHash, err = getBlockResponseHash(ctx, v.proxyRpcClient, blockNumber)
 	if err != nil {
 		log.WithError(err).Error("failed to get proxy api block response hash")
-		resultErr = multierror.Append(resultErr, ErrReferenceProxyAPI)
+		resultErr = multierror.Append(resultErr, ErrReferenceProxyAPIBlock)
 	}
 
 	v.cache.Set(blockNumberStr, refData, cacheExpiryDuration)
