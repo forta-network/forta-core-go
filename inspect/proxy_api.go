@@ -2,14 +2,11 @@ package inspect
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/forta-network/forta-core-go/utils"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -193,17 +190,4 @@ func findOldestSupportedBlock(ctx context.Context, client *ethclient.Client, low
 	}
 
 	return low
-}
-
-func getBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
-	return getRpcResponseHash(ctx, rpcClient, "eth_getBlockByNumber", hexutil.EncodeUint64(blockNumber), true)
-}
-
-func getRpcResponseHash(ctx context.Context, rpcClient *rpc.Client, method string, args ...interface{}) (string, error) {
-	var respData json.RawMessage
-	err := rpcClient.CallContext(ctx, &respData, method, args...)
-	if err != nil {
-		return "", err
-	}
-	return utils.HashNormalizedJSON(&respData), nil
 }

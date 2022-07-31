@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hashicorp/go-multierror"
@@ -88,8 +87,4 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	}
 
 	return
-}
-
-func getTraceResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
-	return getRpcResponseHash(ctx, rpcClient, "trace_block", hexutil.EncodeUint64(blockNumber))
 }
