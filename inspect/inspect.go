@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -41,21 +40,6 @@ func (ir *InspectionResults) CopyFrom(from *InspectionResults) *InspectionResult
 		ir.Indicators[k] = v
 	}
 	return ir
-}
-
-// ToProto returns the protobuf payload for the results.
-func (ir *InspectionResults) ToProto() *protocol.InspectionResults {
-	return &protocol.InspectionResults{
-		Inputs: &protocol.InspectionInputs{
-			BlockNumber:  ir.Inputs.BlockNumber,
-			ScanApiHost:  getHost(ir.Inputs.ScanAPIURL),
-			ProxyApiHost: getHost(ir.Inputs.ProxyAPIURL),
-			TraceApiHost: getHost(ir.Inputs.TraceAPIURL),
-			CheckTrace:   ir.Inputs.CheckTrace,
-		},
-		Metadata:   ir.Metadata,
-		Indicators: ir.Indicators,
-	}
 }
 
 // Inspector inspects node capabilities.
