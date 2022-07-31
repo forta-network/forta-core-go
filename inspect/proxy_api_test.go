@@ -41,7 +41,7 @@ func TestProxyAPIInspection(t *testing.T) {
 	}, results.Indicators)
 
 	r.Equal(map[string]string{
-		MetadataProxyAPIBlockByNumberHash: "3abe2f22edf2b463cbc13343a947be9ebbf8c16c2b50b2b90e10a199a2344f65",
+		MetadataProxyAPIBlockByNumberHash: "0c254d273e1dc75302ae55e12c40d579c6e1b7a4a9f267fc65b2402d4ef45fff",
 	}, results.Metadata)
 }
 
