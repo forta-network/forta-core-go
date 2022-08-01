@@ -40,6 +40,8 @@ func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 	if err != nil {
 		resultErr = multierror.Append(resultErr, err)
 		results.Indicators[IndicatorNetworkOutboundAccess] = ResultFailure
+		results.Indicators[IndicatorNetworkDownloadSpeed] = ResultFailure
+		results.Indicators[IndicatorNetworkUploadSpeed] = ResultFailure
 	} else {
 		results.Indicators[IndicatorNetworkOutboundAccess] = ResultSuccess
 	}

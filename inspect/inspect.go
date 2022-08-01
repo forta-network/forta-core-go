@@ -50,13 +50,15 @@ type Inspector interface {
 
 // Inspect inspects node capabilities.
 func Inspect(ctx context.Context, inspectionCfg InspectionConfig) (*InspectionResults, error) {
-	return inspect(ctx, []Inspector{
-		&NetworkInspector{},
-		&SystemResourcesInspector{},
-		&ScanAPIInspector{},
-		&ProxyAPIInspector{},
-		&TraceAPIInspector{},
-	}, inspectionCfg)
+	return inspect(
+		ctx, []Inspector{
+			&NetworkInspector{},
+			&SystemResourcesInspector{},
+			&ScanAPIInspector{},
+			&ProxyAPIInspector{},
+			&TraceAPIInspector{},
+		}, inspectionCfg,
+	)
 }
 
 func inspect(ctx context.Context, inspectors []Inspector, inspectionCfg InspectionConfig) (allResults *InspectionResults, resultError error) {
