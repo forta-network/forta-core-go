@@ -5,40 +5,51 @@ import (
 )
 
 const (
-	DefaultMinDownloadSpeedInMbps = 10
-	DefaultMinUploadSpeedInMbps   = 3
-	DefaultEarliestBlock          = 5
+	DefaultMinDownloadSpeedInMbps = 10  // 10 mbps
+	DefaultMinUploadSpeedInMbps   = 3   // 3 mbps
+	DefaultEarliestBlock          = 5   // block 5 in chain
 	DefaultMinTotalMemory         = 3e9 // 3 gigabytes
 	DefaultMinAvailableMemory     = 5e7 // 50 megabytes
 )
 
+// ScoreCalculator calculates score of an inspection result
 type ScoreCalculator interface {
 	CalculateSLAScore(results InspectionResults, chainID uint64) (float64, error)
 	Name() string
 }
 
+// passFailCalculator returns 0 if any blocker inspections fail, else 1. See CalculateSLAScore for blocker inspections
 type passFailCalculator struct {
 	chainCalculators []chainPassFailCalculator
 }
 
+// chainPassFailCalculator returns 0 if any blocker inspections fail, else 1. See CalculateSLAScore for blocker inspections
 type chainPassFailCalculator struct {
 	config ChainPassFailCalculatorConfig
 }
 
+// ChainPassFailCalculatorConfig contains calculator related config per chain.
 type ChainPassFailCalculatorConfig struct {
+	// ChainID required to get correct calculator
 	ChainID uint64
 
+	// InspectionConfig currently used only for InspectionConfig.CheckTrace field
 	InspectionConfig InspectionConfig
 
+	// MinDownloadSpeedInMbps fallbacks to DefaultMinDownloadSpeedInMbps.
 	MinDownloadSpeedInMbps float64
-	MinUploadSpeedInMbps   float64
+	// MinUploadSpeedInMbps fallbacks to DefaultMinUploadSpeedInMbps.
+	MinUploadSpeedInMbps float64
 
+	// ExpectedEarliestBlock fallbacks to DefaultEarliestBlock.
 	ExpectedEarliestBlock float64
-
-	MinTotalMemory     float64
+	// MinTotalMemory fallbacks to DefaultMinTotalMemory.
+	MinTotalMemory float64
+	// MinAvailableMemory fallbacks to DefaultMinAvailableMemory.
 	MinAvailableMemory float64
 }
 
+// NewPassFailCalculator creates a new pass-fail calculator.
 func NewPassFailCalculator(configs []ChainPassFailCalculatorConfig) *passFailCalculator {
 	var calculators []chainPassFailCalculator
 	for _, config := range configs {
@@ -137,6 +148,7 @@ func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (
 	return 1, nil
 }
 
+// DefaultChainPassFailCalculatorConfig returns a ChainPassFailCalculatorConfig with the chain id and all default limits.
 func DefaultChainPassFailCalculatorConfig(chainID uint64) ChainPassFailCalculatorConfig {
 	return ChainPassFailCalculatorConfig{
 		ChainID:                chainID,
