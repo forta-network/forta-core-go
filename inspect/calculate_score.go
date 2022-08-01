@@ -25,10 +25,10 @@ type ScoreCalculator interface {
 }
 
 type scoreCalculator struct {
-	chainCalculators []*chainScoreCalculator
+	chainCalculators []*chainPassFailCalculator
 }
 
-type chainScoreCalculator struct {
+type chainPassFailCalculator struct {
 	config ScoreCalculatorConfig
 }
 
@@ -55,7 +55,7 @@ type ScoreCalculatorConfig struct {
 
 // NewChainScoreCalculator creates a new pass-fail calculator.
 func NewChainScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
-	var calculators []*chainScoreCalculator
+	var calculators []*chainPassFailCalculator
 	for _, config := range configs {
 		if config.MinDownloadSpeedInMbps == 0 {
 			config.MinDownloadSpeedInMbps = DefaultMinDownloadSpeedInMbps
@@ -74,7 +74,7 @@ func NewChainScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
 			config.ExpectedEarliestBlock = DefaultEarliestBlock
 		}
 
-		calculators = append(calculators, &chainScoreCalculator{config: config})
+		calculators = append(calculators, &chainPassFailCalculator{config: config})
 	}
 
 	return &scoreCalculator{chainCalculators: calculators}
@@ -89,7 +89,7 @@ func (s *scoreCalculator) CalculateScore(results *InspectionResults, chainID uin
 	return calculator.CalculateScore(results)
 }
 
-func (s *scoreCalculator) getChainScoreCalculator(chainID uint64) (*chainScoreCalculator, error) {
+func (s *scoreCalculator) getChainScoreCalculator(chainID uint64) (*chainPassFailCalculator, error) {
 	for _, calculator := range s.chainCalculators {
 		if calculator.config.ChainID == chainID {
 			return calculator, nil
@@ -100,7 +100,7 @@ func (s *scoreCalculator) getChainScoreCalculator(chainID uint64) (*chainScoreCa
 
 // CalculateScore calculates an inspection score by checking provided results.
 // For now, it returns 0 if some of the indicators report a negative result.
-func (c *chainScoreCalculator) CalculateScore(results *InspectionResults) (float64, error) {
+func (c *chainPassFailCalculator) CalculateScore(results *InspectionResults) (float64, error) {
 	// any node must provide a decent network support.
 	// Including:
 	// Outbound Access
