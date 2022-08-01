@@ -69,7 +69,7 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	defer cancel()
 
 	// checking trace capability
-	hash, err := getTraceResponseHash(traceCtx, rpcClient, inspectionCfg.BlockNumber)
+	hash, err := GetTraceResponseHash(traceCtx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to trace block %d: %w", inspectionCfg.BlockNumber, err))
 		results.Indicators[IndicatorTraceSupported] = ResultFailure
@@ -79,7 +79,7 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	}
 
 	// get configured block and include hash of the returned as metadata
-	hash, err = getBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
+	hash, err = GetBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {

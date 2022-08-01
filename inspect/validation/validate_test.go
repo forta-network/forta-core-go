@@ -1,9 +1,11 @@
-package inspect
+package validate
 
 import (
 	"context"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/forta-network/forta-core-go/inspect"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/stretchr/testify/require"
 )
@@ -21,8 +23,8 @@ func TestValidateInspectionSuccess(t *testing.T) {
 	ctx := context.Background()
 	r := require.New(t)
 
-	recentBlockNumber := testGetRecentBlockNumber(r, testScanEnv.ScanAPI)
-	inspectionCfg := InspectionConfig{
+	recentBlockNumber := testGetRecentBlockNumber(r, testValidateEnv.ScanAPI)
+	inspectionCfg := inspect.InspectionConfig{
 		ScanAPIURL:  testValidateEnv.ScanAPI,
 		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
@@ -31,10 +33,10 @@ func TestValidateInspectionSuccess(t *testing.T) {
 	}
 
 	// make only scan and trace api inspections using the inspection config
-	results, err := inspect(ctx, []Inspector{
-		&ScanAPIInspector{},
-		&ProxyAPIInspector{},
-		&TraceAPIInspector{},
+	results, err := inspect.InspectAll(ctx, []inspect.Inspector{
+		&inspect.ScanAPIInspector{},
+		&inspect.ProxyAPIInspector{},
+		&inspect.TraceAPIInspector{},
 	}, inspectionCfg)
 	r.NoError(err)
 
@@ -49,8 +51,8 @@ func TestValidateInspectionFail(t *testing.T) {
 	ctx := context.Background()
 	r := require.New(t)
 
-	recentBlockNumber := testGetRecentBlockNumber(r, testScanEnv.ScanAPI)
-	inspectionCfg1 := InspectionConfig{
+	recentBlockNumber := testGetRecentBlockNumber(r, testValidateEnv.ScanAPI)
+	inspectionCfg1 := inspect.InspectionConfig{
 		ScanAPIURL:  testValidateEnv.ScanAPI,
 		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
@@ -59,14 +61,14 @@ func TestValidateInspectionFail(t *testing.T) {
 	}
 
 	// make only scan api inspection
-	results, err := inspect(ctx, []Inspector{
-		&ScanAPIInspector{},
-		&ProxyAPIInspector{},
+	results, err := inspect.InspectAll(ctx, []inspect.Inspector{
+		&inspect.ScanAPIInspector{},
+		&inspect.ProxyAPIInspector{},
 	}, inspectionCfg1)
 	r.NoError(err)
 
 	// now let's tamper with the initial conditions so trace inspection result is different
-	inspectionCfg2 := InspectionConfig{
+	inspectionCfg2 := inspect.InspectionConfig{
 		ScanAPIURL:  testValidateEnv.ScanAPI,
 		ProxyAPIURL: testValidateEnv.ScanAPI,
 		TraceAPIURL: testValidateEnv.TraceAPI,
@@ -75,8 +77,8 @@ func TestValidateInspectionFail(t *testing.T) {
 	}
 
 	// make only trace api inspection
-	traceResults, err := inspect(ctx, []Inspector{
-		&TraceAPIInspector{},
+	traceResults, err := inspect.InspectAll(ctx, []inspect.Inspector{
+		&inspect.TraceAPIInspector{},
 	}, inspectionCfg2)
 	r.NoError(err)
 	results.CopyFrom(traceResults)
@@ -100,4 +102,12 @@ func TestValidateInspectionFail(t *testing.T) {
 	r.True(verrs.HasCode(ErrResultBlockMismatch.Code()))
 	r.True(verrs.HasCode(ErrResultTraceAPIBlockMismatch.Code()))
 	r.True(verrs.HasCode(ErrResultTraceAPITraceBlockMismatch.Code()))
+}
+
+func testGetRecentBlockNumber(r *require.Assertions, apiURL string) uint64 {
+	client, err := ethclient.Dial(apiURL)
+	r.NoError(err)
+	block, err := client.BlockByNumber(context.Background(), nil)
+	r.NoError(err)
+	return block.NumberU64() - 20
 }

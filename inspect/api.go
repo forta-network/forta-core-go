@@ -10,7 +10,8 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 )
 
-func getBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
+// GetBlockResponseHash computes a hash by using some data from the API response.
+func GetBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
 	var block domain.Block
 	if err := getRpcResponse(ctx, rpcClient, &block, "eth_getBlockByNumber", hexutil.EncodeUint64(blockNumber), true); err != nil {
 		return "", err
@@ -22,7 +23,8 @@ func getBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumbe
 	return hashOf(hashConcat), nil
 }
 
-func getTraceResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
+// GetTraceResponseHash computes a hash by using some data from the API response.
+func GetTraceResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
 	var traces []*domain.Trace
 	if err := getRpcResponse(ctx, rpcClient, &traces, "trace_block", hexutil.EncodeUint64(blockNumber)); err != nil {
 		return "", err
