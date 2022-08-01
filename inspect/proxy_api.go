@@ -95,7 +95,7 @@ func (sai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	}
 
 	// get configured block and include hash of the returned as metadata
-	hash, err := getBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
+	hash, err := GetBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
