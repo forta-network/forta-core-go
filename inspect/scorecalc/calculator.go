@@ -26,6 +26,8 @@ type ChainScoreCalculator interface {
 	CalculateScore(chainID uint64, results *inspect.InspectionResults) (float64, error)
 }
 
+var _ ChainScoreCalculator = &scoreCalculator{}
+
 type scoreCalculator struct {
 	chainCalculators []*chainPassFailCalculator
 }
@@ -39,14 +41,10 @@ type ScoreCalculatorConfig struct {
 	// ChainID required to get correct calculator
 	ChainID uint64
 
-	// InspectionConfig currently used only for InspectionConfig.CheckTrace field
-	InspectionConfig inspect.InspectionConfig
-
 	// MinDownloadSpeedInMbps fallbacks to DefaultMinDownloadSpeedInMbps.
 	MinDownloadSpeedInMbps float64
 	// MinUploadSpeedInMbps fallbacks to DefaultMinUploadSpeedInMbps.
 	MinUploadSpeedInMbps float64
-
 	// ExpectedEarliestBlock fallbacks to DefaultEarliestBlock.
 	ExpectedEarliestBlock float64
 	// MinTotalMemory fallbacks to DefaultMinTotalMemory.
@@ -82,7 +80,7 @@ func NewScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
 	return &scoreCalculator{chainCalculators: calculators}
 }
 
-func (s *scoreCalculator) CalculateScore(results *inspect.InspectionResults, chainID uint64) (float64, error) {
+func (s *scoreCalculator) CalculateScore(chainID uint64, results *inspect.InspectionResults) (float64, error) {
 	calculator, err := s.getChainScoreCalculator(chainID)
 	if err != nil {
 		return 0, err
@@ -119,7 +117,7 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	}
 
 	// if required, trace should be supported
-	if c.config.InspectionConfig.CheckTrace &&
+	if results.Inputs.CheckTrace &&
 		results.Indicators[inspect.IndicatorTraceSupported] == inspect.ResultFailure {
 		return 0, nil
 	}
