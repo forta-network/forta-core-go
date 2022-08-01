@@ -13,7 +13,7 @@ const (
 )
 
 type ScoreCalculator interface {
-	CalculateSLAScore(results InspectionResults) (float64, error)
+	CalculateSLAScore(results InspectionResults, chainID uint64) (float64, error)
 	Name() string
 }
 
@@ -26,7 +26,7 @@ type chainPassFailCalculator struct {
 }
 
 type ChainPassFailCalculatorConfig struct {
-	chainID uint64
+	ChainID uint64
 
 	InspectionConfig InspectionConfig
 
@@ -74,12 +74,13 @@ func (s *passFailCalculator) CalculateSLAScore(results InspectionResults, chainI
 	if err != nil {
 		return 0, err
 	}
+
 	return calculator.CalculateSLAScore(results)
 }
 
 func (s *passFailCalculator) getChainScoreCalculator(chainID uint64) (chainPassFailCalculator, error) {
 	for _, calculator := range s.chainCalculators {
-		if calculator.config.chainID == chainID {
+		if calculator.config.ChainID == chainID {
 			return calculator, nil
 		}
 	}
@@ -114,7 +115,7 @@ func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (
 	}
 
 	// scan api should point to correct chain id
-	if results.Indicators[IndicatorScanAPIChainID] != float64(c.config.chainID) {
+	if results.Indicators[IndicatorScanAPIChainID] != float64(c.config.ChainID) {
 		return 0, nil
 	}
 
@@ -134,4 +135,15 @@ func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (
 	}
 
 	return 1, nil
+}
+
+func DefaultChainPassFailCalculatorConfig(chainID uint64) ChainPassFailCalculatorConfig {
+	return ChainPassFailCalculatorConfig{
+		ChainID:                chainID,
+		MinDownloadSpeedInMbps: DefaultMinDownloadSpeedInMbps,
+		MinUploadSpeedInMbps:   DefaultMinUploadSpeedInMbps,
+		ExpectedEarliestBlock:  DefaultEarliestBlock,
+		MinTotalMemory:         DefaultMinTotalMemory,
+		MinAvailableMemory:     DefaultMinAvailableMemory,
+	}
 }
