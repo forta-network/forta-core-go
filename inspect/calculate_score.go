@@ -53,8 +53,8 @@ type ScoreCalculatorConfig struct {
 	MinAvailableMemory float64
 }
 
-// NewChainScoreCalculator creates a new pass-fail calculator.
-func NewChainScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
+// NewScoreCalculator creates a score calculator.
+func NewScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
 	var calculators []*chainPassFailCalculator
 	for _, config := range configs {
 		if config.MinDownloadSpeedInMbps == 0 {
