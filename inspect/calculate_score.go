@@ -1,35 +1,39 @@
 package inspect
 
 import (
+	"errors"
 	"fmt"
 )
 
+// Constants
 const (
-	DefaultMinDownloadSpeedInMbps = 10  // 10 mbps
-	DefaultMinUploadSpeedInMbps   = 3   // 3 mbps
-	DefaultEarliestBlock          = 5   // block 5 in chain
+	DefaultMinDownloadSpeedInMbps = 10 // 10 mbps
+	DefaultMinUploadSpeedInMbps   = 3  // 3 mbps
+	DefaultEarliestBlock          = VeryOldBlockNumber
 	DefaultMinTotalMemory         = 3e9 // 3 gigabytes
 	DefaultMinAvailableMemory     = 5e7 // 50 megabytes
 )
 
-// ScoreCalculator calculates score of an inspection result
+// Errors
+var (
+	ErrCalculatorNotFound = errors.New("calculator not found")
+)
+
+// ScoreCalculator calculates score of an inspection result.
 type ScoreCalculator interface {
-	CalculateSLAScore(results InspectionResults, chainID uint64) (float64, error)
-	Name() string
+	CalculateScore(results *InspectionResults, chainID uint64) (float64, error)
 }
 
-// passFailCalculator returns 0 if any blocker inspections fail, else 1. See CalculateSLAScore for blocker inspections
-type passFailCalculator struct {
-	chainCalculators []chainPassFailCalculator
+type scoreCalculator struct {
+	chainCalculators []*chainScoreCalculator
 }
 
-// chainPassFailCalculator returns 0 if any blocker inspections fail, else 1. See CalculateSLAScore for blocker inspections
-type chainPassFailCalculator struct {
-	config ChainPassFailCalculatorConfig
+type chainScoreCalculator struct {
+	config ScoreCalculatorConfig
 }
 
-// ChainPassFailCalculatorConfig contains calculator related config per chain.
-type ChainPassFailCalculatorConfig struct {
+// ScoreCalculatorConfig contains calculator related config per chain.
+type ScoreCalculatorConfig struct {
 	// ChainID required to get correct calculator
 	ChainID uint64
 
@@ -49,9 +53,9 @@ type ChainPassFailCalculatorConfig struct {
 	MinAvailableMemory float64
 }
 
-// NewPassFailCalculator creates a new pass-fail calculator.
-func NewPassFailCalculator(configs []ChainPassFailCalculatorConfig) *passFailCalculator {
-	var calculators []chainPassFailCalculator
+// NewChainScoreCalculator creates a new pass-fail calculator.
+func NewChainScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
+	var calculators []*chainScoreCalculator
 	for _, config := range configs {
 		if config.MinDownloadSpeedInMbps == 0 {
 			config.MinDownloadSpeedInMbps = DefaultMinDownloadSpeedInMbps
@@ -65,41 +69,38 @@ func NewPassFailCalculator(configs []ChainPassFailCalculatorConfig) *passFailCal
 		if config.MinTotalMemory == 0 {
 			config.MinTotalMemory = DefaultMinTotalMemory
 		}
-		// this prevents us from using genesis block for expected block, but nbd
+		// this prevents us from using a very old block for expected block, but no big deal
 		if config.ExpectedEarliestBlock <= 0 {
 			config.ExpectedEarliestBlock = DefaultEarliestBlock
 		}
 
-		calculators = append(calculators, chainPassFailCalculator{config: config})
+		calculators = append(calculators, &chainScoreCalculator{config: config})
 	}
 
-	return &passFailCalculator{chainCalculators: calculators}
+	return &scoreCalculator{chainCalculators: calculators}
 }
 
-func (s *passFailCalculator) Name() string {
-	return "pass-fail"
-}
-
-func (s *passFailCalculator) CalculateSLAScore(results InspectionResults, chainID uint64) (float64, error) {
+func (s *scoreCalculator) CalculateScore(results *InspectionResults, chainID uint64) (float64, error) {
 	calculator, err := s.getChainScoreCalculator(chainID)
 	if err != nil {
 		return 0, err
 	}
 
-	return calculator.CalculateSLAScore(results)
+	return calculator.CalculateScore(results)
 }
 
-func (s *passFailCalculator) getChainScoreCalculator(chainID uint64) (chainPassFailCalculator, error) {
+func (s *scoreCalculator) getChainScoreCalculator(chainID uint64) (*chainScoreCalculator, error) {
 	for _, calculator := range s.chainCalculators {
 		if calculator.config.ChainID == chainID {
 			return calculator, nil
 		}
 	}
-	return chainPassFailCalculator{}, fmt.Errorf("no calculator for %d", chainID)
+	return nil, fmt.Errorf("%w (chain %d)", ErrCalculatorNotFound, chainID)
 }
 
-// CalculateSLAScore returns 0 if any blocker inspections fail, else 1.
-func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (float64, error) {
+// CalculateScore calculates an inspection score by checking provided results.
+// For now, it returns 0 if some of the indicators report a negative result.
+func (c *chainScoreCalculator) CalculateScore(results *InspectionResults) (float64, error) {
 	// any node must provide a decent network support.
 	// Including:
 	// Outbound Access
@@ -116,12 +117,16 @@ func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (
 	}
 
 	// if required, trace should be supported
-	if c.config.InspectionConfig.CheckTrace && (results.Indicators[IndicatorTraceAccessible] == ResultFailure || results.Indicators[IndicatorTraceSupported] == ResultFailure) {
+	if c.config.InspectionConfig.CheckTrace &&
+		(results.Indicators[IndicatorTraceAccessible] == ResultFailure ||
+			results.Indicators[IndicatorTraceSupported] == ResultFailure) {
 		return 0, nil
 	}
 
-	// 	scan api should be provided along with required modules
-	if results.Indicators[IndicatorScanAPIAccessible] == ResultFailure || results.Indicators[IndicatorScanAPIModuleEth] == ResultFailure || results.Indicators[IndicatorScanAPIModuleNet] == ResultFailure {
+	// scan api should be provided along with required modules
+	if results.Indicators[IndicatorScanAPIAccessible] == ResultFailure ||
+		results.Indicators[IndicatorScanAPIModuleEth] == ResultFailure ||
+		results.Indicators[IndicatorScanAPIModuleNet] == ResultFailure {
 		return 0, nil
 	}
 
@@ -131,14 +136,14 @@ func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (
 	}
 
 	// proxy api with required modules should be accessible
-	if results.Indicators[IndicatorProxyAPIAccessible] == ResultFailure || results.Indicators[IndicatorProxyAPIModuleEth] == ResultFailure || results.Indicators[IndicatorProxyAPIModuleNet] == ResultFailure || results.Indicators[IndicatorProxyAPIModuleWeb3] == ResultFailure {
-		return 0, nil
-	}
+	// if results.Indicators[IndicatorProxyAPIAccessible] == ResultFailure || results.Indicators[IndicatorProxyAPIModuleEth] == ResultFailure || results.Indicators[IndicatorProxyAPIModuleNet] == ResultFailure || results.Indicators[IndicatorProxyAPIModuleWeb3] == ResultFailure {
+	// 	return 0, nil
+	// }
 
 	// proxy should support enough history of blocks
-	if results.Indicators[IndicatorProxyAPIHistorySupport] >= c.config.ExpectedEarliestBlock {
-		return 0, nil
-	}
+	// if results.Indicators[IndicatorProxyAPIHistorySupport] >= c.config.ExpectedEarliestBlock {
+	// 	return 0, nil
+	// }
 
 	// enough total as well as available memory should be provided to prevent OOM issues
 	if results.Indicators[IndicatorResourcesMemoryTotal] < c.config.MinTotalMemory || results.Indicators[IndicatorResourcesMemoryAvailable] < c.config.MinAvailableMemory {
@@ -148,9 +153,9 @@ func (c *chainPassFailCalculator) CalculateSLAScore(results InspectionResults) (
 	return 1, nil
 }
 
-// DefaultChainPassFailCalculatorConfig returns a ChainPassFailCalculatorConfig with the chain id and all default limits.
-func DefaultChainPassFailCalculatorConfig(chainID uint64) ChainPassFailCalculatorConfig {
-	return ChainPassFailCalculatorConfig{
+// DefaultScoreCalculatorConfig returns a ScoreCalculatorConfig with the chain id and all default limits.
+func DefaultScoreCalculatorConfig(chainID uint64) ScoreCalculatorConfig {
+	return ScoreCalculatorConfig{
 		ChainID:                chainID,
 		MinDownloadSpeedInMbps: DefaultMinDownloadSpeedInMbps,
 		MinUploadSpeedInMbps:   DefaultMinUploadSpeedInMbps,
