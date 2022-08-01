@@ -120,8 +120,7 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 
 	// if required, trace should be supported
 	if c.config.InspectionConfig.CheckTrace &&
-		(results.Indicators[inspect.IndicatorTraceAccessible] == inspect.ResultFailure ||
-			results.Indicators[inspect.IndicatorTraceSupported] == inspect.ResultFailure) {
+		results.Indicators[inspect.IndicatorTraceSupported] == inspect.ResultFailure {
 		return 0, nil
 	}
 
