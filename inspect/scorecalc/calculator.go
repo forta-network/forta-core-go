@@ -69,8 +69,7 @@ func NewScoreCalculator(configs []ScoreCalculatorConfig) *scoreCalculator {
 		if config.MinTotalMemory == 0 {
 			config.MinTotalMemory = DefaultMinTotalMemory
 		}
-		// this prevents us from using a very old block for expected block, but no big deal
-		if config.ExpectedEarliestBlock <= 0 {
+		if config.ExpectedEarliestBlock < DefaultEarliestBlock {
 			config.ExpectedEarliestBlock = DefaultEarliestBlock
 		}
 
