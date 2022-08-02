@@ -53,14 +53,14 @@ var allChainSettings = []ChainSettings{
 		ChainID:             43114,
 		Offset:              defaultBlockOffset,
 		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  1000,
+		InspectionInterval:  350,
 	},
 	{
 		Name:                "Arbitrum",
 		ChainID:             42161,
 		Offset:              defaultBlockOffset,
 		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  1000,
+		InspectionInterval:  1500,
 	},
 	{
 		Name:                "Optimism",
@@ -75,7 +75,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         true,
 		Offset:              defaultBlockOffset,
 		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  1000,
+		InspectionInterval:  750,
 	},
 }
 
