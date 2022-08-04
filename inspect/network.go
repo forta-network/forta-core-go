@@ -49,10 +49,12 @@ func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 	downloadSpeed, uploadSpeed, err := speedTest()
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("could not test speed: %w", err))
+		results.Indicators[IndicatorNetworkDownloadSpeed] = ResultInternalProblem
+		results.Indicators[IndicatorNetworkUploadSpeed] = ResultInternalProblem
+	} else {
+		results.Indicators[IndicatorNetworkDownloadSpeed] = downloadSpeed
+		results.Indicators[IndicatorNetworkUploadSpeed] = uploadSpeed
 	}
-
-	results.Indicators[IndicatorNetworkDownloadSpeed] = downloadSpeed
-	results.Indicators[IndicatorNetworkUploadSpeed] = uploadSpeed
 
 	return
 }
