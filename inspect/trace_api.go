@@ -23,6 +23,12 @@ const (
 	MetadataTraceAPITraceBlockHash = "trace-api.trace-block.hash"
 )
 
+var (
+	traceAPIIndicators = []string{
+		IndicatorTraceAccessible, IndicatorTraceSupported,
+	}
+)
+
 // TraceAPIInspector is an inspector implementation.
 type TraceAPIInspector struct{}
 
@@ -37,6 +43,7 @@ func (tai *TraceAPIInspector) Name() string {
 // Inspect inspects tracing support.
 func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
 	results = NewInspectionResults()
+	results.Indicators = defaultIndicators(traceAPIIndicators)
 
 	if !inspectionCfg.CheckTrace {
 		results.Indicators[IndicatorTraceAccessible] = ResultFailure

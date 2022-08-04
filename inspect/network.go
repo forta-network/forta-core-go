@@ -19,6 +19,9 @@ const (
 // Global flags
 var (
 	DownloadTestSavingMode = false
+	networkIndicators      = []string{
+		IndicatorNetworkOutboundAccess, IndicatorNetworkDownloadSpeed, IndicatorNetworkUploadSpeed,
+	}
 )
 
 // NetworkInspector is an inspector implementation.
@@ -35,6 +38,7 @@ func (ni *NetworkInspector) Name() string {
 // Inspect inspects network access and quality.
 func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
 	results = NewInspectionResults()
+	results.Indicators = defaultIndicators(networkIndicators)
 
 	err := sendOutboundRequest(ctx)
 	if err != nil {

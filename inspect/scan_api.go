@@ -24,6 +24,12 @@ const (
 	MetadataScanAPIBlockByNumberHash = "scan-api.block-by-number.hash"
 )
 
+var (
+	scanAPIIndicators = []string{
+		IndicatorScanAPIAccessible, IndicatorScanAPIChainID, IndicatorScanAPIModuleEth, IndicatorScanAPIModuleNet,
+	}
+)
+
 // ScanAPIInspector is an inspector implementation.
 type ScanAPIInspector struct{}
 
@@ -38,6 +44,7 @@ func (sai *ScanAPIInspector) Name() string {
 // Inspect checks given JSON-RPC node url supports eth and net modules.
 func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
 	results = NewInspectionResults()
+	results.Indicators = defaultIndicators(scanAPIIndicators)
 
 	rpcClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
 	if err != nil {
