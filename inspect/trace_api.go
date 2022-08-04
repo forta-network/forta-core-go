@@ -61,6 +61,7 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get chain id: %w", err))
 		results.Indicators[IndicatorTraceAccessible] = ResultFailure
+		results.Indicators[IndicatorTraceSupported] = ResultFailure
 	} else {
 		results.Indicators[IndicatorTraceAccessible] = ResultSuccess
 	}

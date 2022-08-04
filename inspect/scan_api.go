@@ -49,16 +49,17 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 		results.Indicators[IndicatorScanAPIChainID] = ResultFailure
 
 		return
+	} else {
+		results.Indicators[IndicatorScanAPIAccessible] = ResultSuccess
 	}
 
 	client := ethclient.NewClient(rpcClient)
 
 	// arbitrary call to check node access
 	if id, err := client.ChainID(ctx); err != nil {
-		results.Indicators[IndicatorScanAPIAccessible] = ResultFailure
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorScanAPIChainID] = ResultFailure
 	} else {
-		results.Indicators[IndicatorScanAPIAccessible] = ResultSuccess
 		results.Indicators[IndicatorScanAPIChainID] = float64(id.Uint64())
 	}
 
@@ -97,8 +98,8 @@ func checkSupportedScanApiModules(
 	// sends eth_chainId under the hood. should prove the node supports eth module
 	_, err = client.ChainID(ctx)
 	if err != nil {
-		results.Indicators[IndicatorScanAPIModuleEth] = ResultFailure
 		resultError = multierror.Append(resultError, err)
+		results.Indicators[IndicatorScanAPIModuleEth] = ResultFailure
 	} else {
 		results.Indicators[IndicatorScanAPIModuleEth] = ResultSuccess
 	}

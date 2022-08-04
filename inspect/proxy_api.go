@@ -65,16 +65,17 @@ func (sai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 
 		return
+	} else {
+		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 	}
 
 	client := ethclient.NewClient(rpcClient)
 
 	// arbitrary call to check node access
 	if id, err := client.ChainID(ctx); err != nil {
-		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 	} else {
-		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 		results.Indicators[IndicatorProxyAPIChainID] = float64(id.Uint64())
 	}
 
