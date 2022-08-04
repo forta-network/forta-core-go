@@ -28,6 +28,13 @@ const (
 	MetadataProxyAPIBlockByNumberHash = "proxy-api.block-by-number.hash"
 )
 
+var (
+	proxyAPIIndicators = []string{
+		IndicatorProxyAPIAccessible, IndicatorProxyAPIChainID, IndicatorProxyAPIModuleWeb3, IndicatorProxyAPIModuleEth, IndicatorProxyAPIModuleNet,
+		IndicatorProxyAPIHistorySupport,
+	}
+)
+
 const (
 	// VeryOldBlockNumber is the number of a block which inspection logic considers
 	// as a very old block.
@@ -41,7 +48,7 @@ type ProxyAPIInspector struct{}
 var _ Inspector = &ProxyAPIInspector{}
 
 // Name returns the name of the inspector.
-func (sai *ProxyAPIInspector) Name() string {
+func (pai *ProxyAPIInspector) Name() string {
 	return "proxy-api"
 }
 
@@ -50,8 +57,9 @@ func (sai *ProxyAPIInspector) Name() string {
 // it doesn't actually return any errors for now,
 // because the point is to keep going and check if it supports the rest
 // error return parameter is simply for keeping the function extensible without api changes in the future.
-func (sai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
+func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
 	results = NewInspectionResults()
+	results.Indicators = defaultIndicators(proxyAPIIndicators)
 
 	rpcClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if err != nil {
@@ -65,16 +73,17 @@ func (sai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 
 		return
+	} else {
+		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 	}
 
 	client := ethclient.NewClient(rpcClient)
 
 	// arbitrary call to check node access
 	if id, err := client.ChainID(ctx); err != nil {
-		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 	} else {
-		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 		results.Indicators[IndicatorProxyAPIChainID] = float64(id.Uint64())
 	}
 

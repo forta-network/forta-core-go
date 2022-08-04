@@ -23,6 +23,13 @@ const (
 	IndicatorResourcesCPUBenchmark = "resources.cpu.benchmark"
 )
 
+var (
+	resourceIndicators = []string{
+		IndicatorResourcesMemoryTotal, IndicatorResourcesMemoryAvailable, IndicatorResourcesStorageAvailable,
+		IndicatorResourcesStorageTotal, IndicatorResourcesCPUUsage, IndicatorResourcesCPUBenchmark,
+	}
+)
+
 // SystemResourcesInspector is an inspector implementation.
 type SystemResourcesInspector struct{}
 
@@ -37,6 +44,7 @@ func (sri *SystemResourcesInspector) Name() string {
 // Inspect inspects system resources.
 func (sri *SystemResourcesInspector) Inspect(ctx context.Context, inspectionCfg InspectionConfig) (results *InspectionResults, resultErr error) {
 	results = NewInspectionResults()
+	results.Indicators = defaultIndicators(resourceIndicators)
 
 	mi, err := mem.VirtualMemoryWithContext(ctx)
 	if err != nil {
