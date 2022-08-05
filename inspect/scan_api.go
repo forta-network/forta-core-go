@@ -62,7 +62,6 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 
 	client := ethclient.NewClient(rpcClient)
 
-	// arbitrary call to check node access
 	if id, err := client.ChainID(ctx); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorScanAPIChainID] = ResultFailure
