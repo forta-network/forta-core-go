@@ -10,6 +10,10 @@ type chainPassFailCalculator struct {
 	config ScoreCalculatorConfig
 }
 
+const (
+	minTotalMemoryRequired = 8e9 // 8 gigabytes
+)
+
 // CalculateScore calculates an inspection score by checking provided results. It returns either 0 or 1
 // For now, it returns 0 if some indicators report a negative result.
 func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResults) (float64, error) {
@@ -41,6 +45,11 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 
 	// scan api should point to correct chain id
 	if results.Indicators[inspect.IndicatorScanAPIChainID] != float64(c.config.ChainID) {
+		return 0, nil
+	}
+
+	// at least 50% of the required memory limit is required
+	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < minTotalMemoryRequired {
 		return 0, nil
 	}
 
