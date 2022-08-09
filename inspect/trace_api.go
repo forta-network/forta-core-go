@@ -16,6 +16,8 @@ const (
 	// IndicatorTraceSupported is required only for scanning some chains.
 	// It is safe to ignore the value when scanning other chains.
 	IndicatorTraceSupported = "trace-api.supported"
+	// IndicatorTraceAPIChainID which chain id the json-rpc provides
+	IndicatorTraceAPIChainID = "trace-api.chain-id"
 
 	// MetadataTraceAPIBlockByNumberHash is the hash of the block data retrieved from the trace API.
 	MetadataTraceAPIBlockByNumberHash = "trace-api.block-by-number.hash"
@@ -64,13 +66,15 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 
 	ethClient := ethclient.NewClient(rpcClient)
 
-	_, err = ethClient.ChainID(ctx)
+	id, err := ethClient.ChainID(ctx)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get chain id: %w", err))
 		results.Indicators[IndicatorTraceAccessible] = ResultFailure
 		results.Indicators[IndicatorTraceSupported] = ResultFailure
+		results.Indicators[IndicatorTraceAPIChainID] = ResultFailure
 	} else {
 		results.Indicators[IndicatorTraceAccessible] = ResultSuccess
+		results.Indicators[IndicatorTraceAPIChainID] = float64(id.Uint64())
 	}
 
 	traceCtx, cancel := context.WithTimeout(ctx, time.Second*3)

@@ -33,6 +33,7 @@ func TestTraceAPIInspection(t *testing.T) {
 	r.Equal(map[string]float64{
 		IndicatorTraceAccessible: ResultSuccess,
 		IndicatorTraceSupported:  ResultSuccess,
+		IndicatorTraceAPIChainID: 250,
 	}, results.Indicators)
 
 	r.NotEmpty(results.Metadata[MetadataTraceAPIBlockByNumberHash])
