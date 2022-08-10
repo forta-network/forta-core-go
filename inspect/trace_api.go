@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hashicorp/go-multierror"
 )
@@ -64,9 +63,7 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		return
 	}
 
-	ethClient := ethclient.NewClient(rpcClient)
-
-	id, err := ethClient.ChainID(ctx)
+	id, err := GetChainOrNetworkID(ctx, rpcClient)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get chain id: %w", err))
 		results.Indicators[IndicatorTraceAccessible] = ResultFailure

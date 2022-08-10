@@ -79,7 +79,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 
 	client := ethclient.NewClient(rpcClient)
 
-	if id, err := client.ChainID(ctx); err != nil {
+	if id, err := GetChainOrNetworkID(ctx, rpcClient); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 	} else {
@@ -118,10 +118,8 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 func checkSupportedModules(
 	ctx context.Context, rpcClient *rpc.Client, results *InspectionResults,
 ) (resultError error) {
-	client := ethclient.NewClient(rpcClient)
-
 	// sends net_version under the hood. should prove the node supports net module
-	_, err := client.NetworkID(ctx)
+	_, err := GetNetworkID(ctx, rpcClient)
 	if err != nil {
 		results.Indicators[IndicatorProxyAPIModuleNet] = ResultFailure
 		resultError = multierror.Append(resultError, err)
@@ -130,7 +128,7 @@ func checkSupportedModules(
 	}
 
 	// sends eth_chainId under the hood. should prove the node supports eth module
-	_, err = client.ChainID(ctx)
+	_, err = GetChainID(ctx, rpcClient)
 	if err != nil {
 		results.Indicators[IndicatorProxyAPIModuleEth] = ResultFailure
 		resultError = multierror.Append(resultError, err)

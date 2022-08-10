@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hashicorp/go-multierror"
 )
@@ -60,9 +59,7 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 		results.Indicators[IndicatorScanAPIAccessible] = ResultSuccess
 	}
 
-	client := ethclient.NewClient(rpcClient)
-
-	if id, err := client.ChainID(ctx); err != nil {
+	if id, err := GetChainOrNetworkID(ctx, rpcClient); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorScanAPIChainID] = ResultFailure
 	} else {
@@ -90,10 +87,8 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 func checkSupportedScanApiModules(
 	ctx context.Context, rpcClient *rpc.Client, results *InspectionResults,
 ) (resultError error) {
-	client := ethclient.NewClient(rpcClient)
-
 	// sends net_version under the hood. should prove the node supports net module
-	_, err := client.NetworkID(ctx)
+	_, err := GetNetworkID(ctx, rpcClient)
 	if err != nil {
 		results.Indicators[IndicatorScanAPIModuleNet] = ResultFailure
 		resultError = multierror.Append(resultError, err)
@@ -102,7 +97,7 @@ func checkSupportedScanApiModules(
 	}
 
 	// sends eth_chainId under the hood. should prove the node supports eth module
-	_, err = client.ChainID(ctx)
+	_, err = GetChainID(ctx, rpcClient)
 	if err != nil {
 		resultError = multierror.Append(resultError, err)
 		results.Indicators[IndicatorScanAPIModuleEth] = ResultFailure
