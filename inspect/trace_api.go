@@ -63,7 +63,7 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		return
 	}
 
-	id, err := GetChainID(ctx, rpcClient)
+	id, err := GetChainOrNetworkID(ctx, rpcClient)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get chain id: %w", err))
 		results.Indicators[IndicatorTraceAccessible] = ResultFailure

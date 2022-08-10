@@ -49,16 +49,35 @@ func getRpcResponse(ctx context.Context, rpcClient *rpc.Client, respData interfa
 	return rpcClient.CallContext(ctx, &respData, method, args...)
 }
 
-// GetChainID gets the chain ID from either of eth_chainId or net_version.
+// GetNetworkID gets the network ID from net_version.
+func GetNetworkID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
+	var result string
+	err := rpcClient.CallContext(ctx, &result, "net_version")
+	if err != nil {
+		return nil, fmt.Errorf("net_version failed: %v", err)
+	}
+	return decodeChainID(result)
+}
+
+// GetChainID gets the chain ID from eth_chainId.
 func GetChainID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
 	var result string
-	err1 := rpcClient.CallContext(ctx, &result, "eth_chainId")
-	if err1 == nil {
-		return decodeChainID(result)
+	err := rpcClient.CallContext(ctx, &result, "eth_chainId")
+	if err != nil {
+		return nil, fmt.Errorf("eth_chainId failed: %v", err)
 	}
-	err2 := rpcClient.CallContext(ctx, &result, "net_version")
+	return decodeChainID(result)
+}
+
+// GetChainOrNetworkID gets the chain ID from either of eth_chainId or net_version.
+func GetChainOrNetworkID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
+	num, err1 := GetChainID(ctx, rpcClient)
+	if err1 == nil {
+		return num, nil
+	}
+	num, err2 := GetNetworkID(ctx, rpcClient)
 	if err2 == nil {
-		return decodeChainID(result)
+		return num, nil
 	}
 	return nil, fmt.Errorf("neither eth_chainId nor net_version worked: %v, %v", err1, err2)
 }
