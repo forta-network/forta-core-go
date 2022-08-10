@@ -39,8 +39,7 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 
 	// scan api should be provided along with required modules
 	if results.Indicators[inspect.IndicatorScanAPIAccessible] == inspect.ResultFailure ||
-		results.Indicators[inspect.IndicatorScanAPIModuleEth] == inspect.ResultFailure ||
-		results.Indicators[inspect.IndicatorScanAPIModuleNet] == inspect.ResultFailure {
+		results.Indicators[inspect.IndicatorScanAPIModuleEth] == inspect.ResultFailure {
 		return 0, nil
 	}
 
