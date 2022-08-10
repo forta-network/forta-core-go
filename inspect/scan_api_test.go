@@ -9,7 +9,7 @@ import (
 )
 
 var testScanEnv struct {
-	ScanAPI string `envconfig:"scan_api" default:"https://cloudflare-eth.com"`
+	ScanAPI string `envconfig:"scan_api" default:"https://arb1.arbitrum.io/rpc"`
 }
 
 func init() {
@@ -30,7 +30,7 @@ func TestScanAPIInspection(t *testing.T) {
 
 	r.Equal(map[string]float64{
 		IndicatorScanAPIAccessible: ResultSuccess,
-		IndicatorScanAPIChainID:    float64(1),
+		IndicatorScanAPIChainID:    float64(42161),
 		IndicatorScanAPIModuleEth:  ResultSuccess,
 		IndicatorScanAPIModuleNet:  ResultSuccess,
 	}, results.Indicators)

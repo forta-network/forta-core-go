@@ -79,7 +79,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 
 	client := ethclient.NewClient(rpcClient)
 
-	if id, err := client.ChainID(ctx); err != nil {
+	if id, err := GetChainID(ctx, rpcClient); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 	} else {
