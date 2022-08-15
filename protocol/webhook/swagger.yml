@@ -3,7 +3,7 @@ info:
   title: Forta Webhook Specification
   description: |
     Forta Webhook Specification
-    Alert models are based on definitions in https://github.com/forta-protocol/forta-alerts-api.
+    Alert models are based on definitions in https://github.com/forta-network/forta-alerts-api.
   version: 1.0.0
 basePath: /forta/v1
 schemes:
