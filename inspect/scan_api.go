@@ -19,13 +19,16 @@ const (
 	// IndicatorScanAPIModuleNet node supports net module.
 	IndicatorScanAPIModuleNet = "scan-api.module.net"
 
+	// IndicatorScanAPIUpToDate is upgraded to Ethereum 2.0.
+	IndicatorScanAPIUpToDate = "scan-api.up-to-date"
+
 	// MetadataScanAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataScanAPIBlockByNumberHash = "scan-api.block-by-number.hash"
 )
 
 var (
 	scanAPIIndicators = []string{
-		IndicatorScanAPIAccessible, IndicatorScanAPIChainID, IndicatorScanAPIModuleEth, IndicatorScanAPIModuleNet,
+		IndicatorScanAPIAccessible, IndicatorScanAPIChainID, IndicatorScanAPIModuleEth, IndicatorScanAPIModuleNet, IndicatorScanAPIUpToDate,
 	}
 )
 
@@ -79,6 +82,12 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 		results.Metadata[MetadataScanAPIBlockByNumberHash] = hash
 	}
 
+	if err := CheckNodeUpToDate(ctx, rpcClient); err != nil {
+		results.Indicators[IndicatorScanAPIUpToDate] = ResultFailure
+		resultErr = multierror.Append(resultErr, err)
+	} else {
+		results.Indicators[IndicatorScanAPIUpToDate] = ResultSuccess
+	}
 	return
 }
 

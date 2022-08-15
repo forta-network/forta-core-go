@@ -12,6 +12,12 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 )
 
+const (
+	blockByNumber = "eth_getBlockByNumber"
+	// TODO: change this to safe or finalized after merge.
+	safeHead = "latest"
+)
+
 // GetBlockResponseHash computes a hash by using some data from the API response.
 func GetBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
 	var block domain.Block
@@ -92,4 +98,8 @@ func decodeChainID(numStr string) (*big.Int, error) {
 		return num, nil
 	}
 	return nil, fmt.Errorf("could not decode chain ID '%s' - it is neither hex nor base10", numStr)
+}
+
+func CheckNodeUpToDate(ctx context.Context, rpcClient *rpc.Client) (resultError error) {
+	return rpcClient.CallContext(ctx, nil, blockByNumber, safeHead, true)
 }
