@@ -29,8 +29,9 @@ type ScannerMessage struct {
 
 type ScannerSaveMessage struct {
 	ScannerMessage
-	ChainID int64 `json:"chainId"`
-	Enabled bool  `json:"enabled"`
+	ChainID  int64  `json:"chainId"`
+	Enabled  bool   `json:"enabled"`
+	MetaData string `json:"metaData"`
 }
 
 func ParseScannerSave(msg string) (*ScannerSaveMessage, error) {
@@ -82,7 +83,8 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 				Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 			},
 		},
-		Enabled: enabled,
-		ChainID: evt.ChainId.Int64(),
+		Enabled:  enabled,
+		ChainID:  evt.ChainId.Int64(),
+		MetaData: evt.Metadata,
 	}
 }
