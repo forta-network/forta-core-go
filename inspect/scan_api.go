@@ -84,7 +84,7 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 
 	if err := CheckNodeUpToDate(ctx, rpcClient); err != nil {
 		results.Indicators[IndicatorScanAPIUpToDate] = ResultFailure
-		resultErr = multierror.Append(resultErr, err)
+		resultErr = multierror.Append(resultErr, fmt.Errorf("scan api not up to date: %v", err))
 	} else {
 		results.Indicators[IndicatorScanAPIUpToDate] = ResultSuccess
 	}
