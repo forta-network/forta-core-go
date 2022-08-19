@@ -90,13 +90,13 @@ type Client interface {
 	ForEachAgentID(handler func(agentID string) error) error
 
 	// ForEachAgentSinceBlock loops over all agents since a provided block number
-	ForEachAgentSinceBlock(block uint64, handler func(a *Agent) error) error
+	ForEachAgentSinceBlock(block uint64, handler func(blockNumber uint64, a *Agent) error) error
 
 	// ForEachScanner gets all scanners
 	ForEachScanner(handler func(s *Scanner) error) error
 
 	// ForEachScannerSinceBlock loops over all scanners since a provided block number
-	ForEachScannerSinceBlock(block uint64, handler func(s *Scanner) error) error
+	ForEachScannerSinceBlock(block uint64, handler func(blockNumber uint64, s *Scanner) error) error
 
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
@@ -345,10 +345,12 @@ func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 }
 
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
-	return c.ForEachScannerSinceBlock(scannerRegistryDeployBlock, handler)
+	return c.ForEachScannerSinceBlock(scannerRegistryDeployBlock, func(blockNumber uint64, s *Scanner) error {
+		return handler(s)
+	})
 }
 
-func (c *client) ForEachScannerSinceBlock(block uint64, handler func(s *Scanner) error) error {
+func (c *client) ForEachScannerSinceBlock(block uint64, handler func(blockNumber uint64, s *Scanner) error) error {
 	opts, err := c.getOps()
 	if err != nil {
 		return err
@@ -370,7 +372,7 @@ func (c *client) ForEachScannerSinceBlock(block uint64, handler func(s *Scanner)
 			if err != nil {
 				return err
 			}
-			if err := handler(&Scanner{
+			if err := handler(it.Event.Raw.BlockNumber, &Scanner{
 				ScannerID: utils.ScannerIDBigIntToHex(it.Event.TokenId),
 				ChainID:   scn.ChainId.Int64(),
 				Enabled:   scn.Enabled,
@@ -466,7 +468,7 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 	})
 }
 
-func (c *client) ForEachAgentSinceBlock(block uint64, handler func(a *Agent) error) error {
+func (c *client) ForEachAgentSinceBlock(block uint64, handler func(blockNumber uint64, a *Agent) error) error {
 	opts, err := c.getOps()
 	if err != nil {
 		return err
@@ -488,7 +490,7 @@ func (c *client) ForEachAgentSinceBlock(block uint64, handler func(a *Agent) err
 			if err != nil {
 				return err
 			}
-			if err := handler(&Agent{
+			if err := handler(it.Event.Raw.BlockNumber, &Agent{
 				AgentID:  utils.AgentBigIntToHex(it.Event.TokenId),
 				ChainIDs: utils.IntArray(agt.ChainIds),
 				Enabled:  agt.Enabled,
