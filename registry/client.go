@@ -89,8 +89,14 @@ type Client interface {
 	// ForEachAgentID loops over all agents only returning the ID
 	ForEachAgentID(handler func(agentID string) error) error
 
+	// ForEachAgentSinceBlock loops over all agents since a provided block number
+	ForEachAgentSinceBlock(block uint64, handler func(a *Agent) error) error
+
 	// ForEachScanner gets all scanners
 	ForEachScanner(handler func(s *Scanner) error) error
+
+	// ForEachScannerSinceBlock loops over all scanners since a provided block number
+	ForEachScannerSinceBlock(block uint64, handler func(s *Scanner) error) error
 
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
@@ -122,7 +128,10 @@ type client struct {
 	sv        *contract_scanner_node_version.ScannerNodeVersionCaller
 	fs        *contract_forta_staking.FortaStakingCaller
 	srf       *contract_scanner_registry.ScannerRegistryFilterer
+	arf       *contract_agent_registry.AgentRegistryFilterer
 }
+
+var _ Client = &client{}
 
 type ClientConfig struct {
 	// JsonRpcUrl is the url used for resolving the registry (polygon)
@@ -205,6 +214,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 
+	arf, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &client{
 		ctx: ctx,
 		cfg: cfg,
@@ -220,6 +234,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		sv:        sv,
 		fs:        fs,
 		srf:       srf,
+		arf:       arf,
 	}, err
 }
 
@@ -330,13 +345,17 @@ func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 }
 
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
+	return c.ForEachScannerSinceBlock(scannerRegistryDeployBlock, handler)
+}
+
+func (c *client) ForEachScannerSinceBlock(block uint64, handler func(s *Scanner) error) error {
 	opts, err := c.getOps()
 	if err != nil {
 		return err
 	}
 
 	it, err := c.srf.FilterTransfer(&bind.FilterOpts{
-		Start:   scannerRegistryDeployBlock,
+		Start:   block,
 		Context: c.ctx,
 	},
 		nil, nil, nil)
@@ -445,6 +464,43 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 			Owner:    agt.Owner.Hex(),
 		})
 	})
+}
+
+func (c *client) ForEachAgentSinceBlock(block uint64, handler func(a *Agent) error) error {
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	it, err := c.arf.FilterTransfer(&bind.FilterOpts{
+		Start:   block,
+		Context: c.ctx,
+	},
+		nil, nil, nil)
+
+	if err != nil {
+		return err
+	}
+
+	for it.Next() {
+		if it.Event != nil && it.Event.From.Hex() == zeroAddress {
+			agt, err := c.ar.GetAgentState(opts, it.Event.TokenId)
+			if err != nil {
+				return err
+			}
+			if err := handler(&Agent{
+				AgentID:  utils.AgentBigIntToHex(it.Event.TokenId),
+				ChainIDs: utils.IntArray(agt.ChainIds),
+				Enabled:  agt.Enabled,
+				Manifest: agt.Metadata,
+				Owner:    agt.Owner.Hex(),
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error {
