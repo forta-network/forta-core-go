@@ -14,8 +14,7 @@ import (
 
 const (
 	blockByNumber = "eth_getBlockByNumber"
-	// TODO: change this to safe or finalized after merge.
-	safeHead = "latest"
+	safeHead      = "safe"
 )
 
 // GetBlockResponseHash computes a hash by using some data from the API response.
