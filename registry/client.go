@@ -90,13 +90,13 @@ type Client interface {
 	ForEachAgentID(handler func(agentID string) error) error
 
 	// ForEachAgentSinceBlock loops over all agents since a provided block number
-	ForEachAgentSinceBlock(block uint64, handler func(event *contract_agent_registry.AgentRegistryTransfer, a *Agent) error) error
+	ForEachAgentSinceBlock(block uint64, handler func(event *contract_agent_registry.AgentRegistryAgentUpdated, a *Agent) error) error
 
 	// ForEachScanner gets all scanners
 	ForEachScanner(handler func(s *Scanner) error) error
 
 	// ForEachScannerSinceBlock loops over all scanners since a provided block number
-	ForEachScannerSinceBlock(block uint64, handler func(event *contract_scanner_registry.ScannerRegistryTransfer, s *Scanner) error) error
+	ForEachScannerSinceBlock(block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error) error
 
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
@@ -347,37 +347,36 @@ func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
 	return c.ForEachScannerSinceBlock(
 		scannerRegistryDeployBlock,
-		func(_ *contract_scanner_registry.ScannerRegistryTransfer, s *Scanner) error {
+		func(_ *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error {
 			return handler(s)
 		})
 }
 
 func (c *client) ForEachScannerSinceBlock(
-	block uint64, handler func(event *contract_scanner_registry.ScannerRegistryTransfer, s *Scanner) error,
+	block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error,
 ) error {
 	opts, err := c.getOps()
 	if err != nil {
 		return err
 	}
 
-	it, err := c.srf.FilterTransfer(&bind.FilterOpts{
+	it, err := c.srf.FilterScannerUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
-	},
-		nil, nil, nil)
+	}, nil, nil)
 
 	if err != nil {
 		return err
 	}
 
 	for it.Next() {
-		if it.Event != nil && it.Event.From.Hex() == zeroAddress {
-			scn, err := c.sr.GetScannerState(opts, it.Event.TokenId)
+		if it.Event != nil {
+			scn, err := c.sr.GetScannerState(opts, it.Event.ScannerId)
 			if err != nil {
 				return err
 			}
 			if err := handler(it.Event, &Scanner{
-				ScannerID: utils.ScannerIDBigIntToHex(it.Event.TokenId),
+				ScannerID: utils.ScannerIDBigIntToHex(it.Event.ScannerId),
 				ChainID:   scn.ChainId.Int64(),
 				Enabled:   scn.Enabled,
 				Manifest:  scn.Metadata,
@@ -473,31 +472,30 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 }
 
 func (c *client) ForEachAgentSinceBlock(
-	block uint64, handler func(event *contract_agent_registry.AgentRegistryTransfer, a *Agent) error,
+	block uint64, handler func(event *contract_agent_registry.AgentRegistryAgentUpdated, a *Agent) error,
 ) error {
 	opts, err := c.getOps()
 	if err != nil {
 		return err
 	}
 
-	it, err := c.arf.FilterTransfer(&bind.FilterOpts{
+	it, err := c.arf.FilterAgentUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
-	},
-		nil, nil, nil)
+	}, nil, nil)
 
 	if err != nil {
 		return err
 	}
 
 	for it.Next() {
-		if it.Event != nil && it.Event.From.Hex() == zeroAddress {
-			agt, err := c.ar.GetAgentState(opts, it.Event.TokenId)
+		if it.Event != nil {
+			agt, err := c.ar.GetAgentState(opts, it.Event.AgentId)
 			if err != nil {
 				return err
 			}
 			if err := handler(it.Event, &Agent{
-				AgentID:  utils.AgentBigIntToHex(it.Event.TokenId),
+				AgentID:  utils.AgentBigIntToHex(it.Event.AgentId),
 				ChainIDs: utils.IntArray(agt.ChainIds),
 				Enabled:  agt.Enabled,
 				Manifest: agt.Metadata,
