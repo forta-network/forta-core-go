@@ -48,6 +48,16 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 		return 0, nil
 	}
 
+	// proxy should point to correct chain id
+	if results.Indicators[inspect.IndicatorProxyAPIChainID] != float64(c.config.ChainID) {
+		return 0, nil
+	}
+
+	// trace api should point to correct chain id
+	if results.Indicators[inspect.IndicatorTraceAPIChainID] != float64(c.config.ChainID) {
+		return 0, nil
+	}
+
 	// at least 50% of the required memory limit is required
 	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < MinTotalMemoryRequired {
 		return 0, nil
