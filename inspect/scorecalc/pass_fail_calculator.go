@@ -54,7 +54,7 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	}
 
 	// trace api should point to correct chain id
-	if results.Indicators[inspect.IndicatorTraceAPIChainID] != float64(c.config.ChainID) {
+	if results.Inputs.CheckTrace && results.Indicators[inspect.IndicatorTraceAPIChainID] != float64(c.config.ChainID) {
 		return 0, nil
 	}
 
