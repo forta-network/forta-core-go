@@ -65,7 +65,7 @@ func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 }
 
 // speedTest returns download speed, upload speed and error.
-func speedTest() (float64, float64, error) {
+func _() (float64, float64, error) {
 	speedTest := speedtest.New()
 	users, err := speedTest.FetchUserInfo()
 	if err != nil {
