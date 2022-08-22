@@ -26,7 +26,6 @@ import (
 const (
 	scannerRegistryChainID     = 137
 	scannerRegistryDeployBlock = 20187154
-	zeroAddress                = "0x0000000000000000000000000000000000000000"
 	defaultEnsAddress          = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
 )
 
