@@ -23,7 +23,8 @@ const (
 	IndicatorProxyAPIModuleNet = "proxy-api.module.net"
 	// IndicatorProxyAPIHistorySupport the earliest supported block height. The lower is better.
 	IndicatorProxyAPIHistorySupport = "proxy-api.history-support"
-
+	// IndicatorProxyAPIIsETH2 is upgraded to Ethereum 2.0.
+	IndicatorProxyAPIIsETH2 = "proxy-api.is-eth2"
 	// MetadataProxyAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataProxyAPIBlockByNumberHash = "proxy-api.block-by-number.hash"
 )
@@ -31,7 +32,7 @@ const (
 var (
 	proxyAPIIndicators = []string{
 		IndicatorProxyAPIAccessible, IndicatorProxyAPIChainID, IndicatorProxyAPIModuleWeb3, IndicatorProxyAPIModuleEth, IndicatorProxyAPIModuleNet,
-		IndicatorProxyAPIHistorySupport,
+		IndicatorProxyAPIHistorySupport, IndicatorProxyAPIIsETH2,
 	}
 )
 
@@ -108,6 +109,14 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
 		results.Metadata[MetadataProxyAPIBlockByNumberHash] = hash
+	}
+
+	if err := CheckETH2Support(ctx, rpcClient); err != nil {
+		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
+		// TODO temporarily ignore eth2 error
+		// resultErr = multierror.Append(resultErr, fmt.Errorf("proxy api does not support eth2: %v", err))
+	} else {
+		results.Indicators[IndicatorProxyAPIIsETH2] = ResultSuccess
 	}
 
 	return

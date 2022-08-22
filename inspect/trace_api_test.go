@@ -23,18 +23,23 @@ func TestTraceAPIInspection(t *testing.T) {
 	recentBlockNumber := testGetRecentBlockNumber(r, testTraceEnv.TraceAPI)
 
 	inspector := &TraceAPIInspector{}
-	results, err := inspector.Inspect(context.Background(), InspectionConfig{
-		TraceAPIURL: testTraceEnv.TraceAPI,
-		BlockNumber: recentBlockNumber,
-		CheckTrace:  true,
-	})
+	results, err := inspector.Inspect(
+		context.Background(), InspectionConfig{
+			TraceAPIURL: testTraceEnv.TraceAPI,
+			BlockNumber: recentBlockNumber,
+			CheckTrace:  true,
+		},
+	)
 	r.NoError(err)
 
-	r.Equal(map[string]float64{
-		IndicatorTraceAccessible: ResultSuccess,
-		IndicatorTraceSupported:  ResultSuccess,
-		IndicatorTraceAPIChainID: 250,
-	}, results.Indicators)
+	r.Equal(
+		map[string]float64{
+			IndicatorTraceAccessible: ResultSuccess,
+			IndicatorTraceSupported:  ResultSuccess,
+			IndicatorTraceAPIChainID: 250,
+			IndicatorTraceAPIIsETH2:  ResultFailure,
+		}, results.Indicators,
+	)
 
 	r.NotEmpty(results.Metadata[MetadataTraceAPIBlockByNumberHash])
 	r.NotEmpty(results.Metadata[MetadataTraceAPITraceBlockHash])

@@ -17,7 +17,8 @@ const (
 	IndicatorTraceSupported = "trace-api.supported"
 	// IndicatorTraceAPIChainID which chain id the json-rpc provides
 	IndicatorTraceAPIChainID = "trace-api.chain-id"
-
+	// IndicatorTraceAPIIsETH2 is upgraded to Ethereum 2.0.
+	IndicatorTraceAPIIsETH2 = "trace-api.is-eth2"
 	// MetadataTraceAPIBlockByNumberHash is the hash of the block data retrieved from the trace API.
 	MetadataTraceAPIBlockByNumberHash = "trace-api.block-by-number.hash"
 	// MetadataTraceAPITraceBlockHash is the hash of the block trace data retrieved from the trace API.
@@ -26,7 +27,7 @@ const (
 
 var (
 	traceAPIIndicators = []string{
-		IndicatorTraceAccessible, IndicatorTraceSupported,
+		IndicatorTraceAccessible, IndicatorTraceSupported, IndicatorTraceAPIIsETH2,
 	}
 )
 
@@ -93,6 +94,14 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
 		results.Metadata[MetadataTraceAPIBlockByNumberHash] = hash
+	}
+
+	if err := CheckETH2Support(ctx, rpcClient); err != nil {
+		results.Indicators[IndicatorTraceAPIIsETH2] = ResultFailure
+		// TODO temporarily ignore eth2 error
+		// resultErr = multierror.Append(resultErr, fmt.Errorf("trace api does not support eth2: %v", err))
+	} else {
+		results.Indicators[IndicatorTraceAPIIsETH2] = ResultSuccess
 	}
 
 	return

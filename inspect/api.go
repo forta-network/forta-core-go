@@ -99,6 +99,6 @@ func decodeChainID(numStr string) (*big.Int, error) {
 	return nil, fmt.Errorf("could not decode chain ID '%s' - it is neither hex nor base10", numStr)
 }
 
-func CheckNodeUpToDate(ctx context.Context, rpcClient *rpc.Client) (resultError error) {
+func CheckETH2Support(ctx context.Context, rpcClient *rpc.Client) (resultError error) {
 	return rpcClient.CallContext(ctx, nil, blockByNumber, safeHead, true)
 }

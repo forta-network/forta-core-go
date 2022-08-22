@@ -36,7 +36,7 @@ func TestScanAPIInspection(t *testing.T) {
 			IndicatorScanAPIChainID:    float64(5),
 			IndicatorScanAPIModuleEth:  ResultSuccess,
 			IndicatorScanAPIModuleNet:  ResultSuccess,
-			IndicatorScanAPIUpToDate:   ResultSuccess,
+			IndicatorScanAPIIsETH2:     ResultSuccess,
 		}, results.Indicators,
 	)
 
