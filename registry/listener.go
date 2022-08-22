@@ -3,6 +3,7 @@ package registry
 import (
 	"context"
 	"errors"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/math"
@@ -27,15 +28,17 @@ type listener struct {
 	c    Client
 	eth  ethereum.Client
 
-	scannerAddr      string
-	agentAddr        string
-	dispatchAddr     string
-	fortaStakingAddr string
+	scannerAddr        string
+	scannerVersionAddr string
+	agentAddr          string
+	dispatchAddr       string
+	fortaStakingAddr   string
 
-	fortaStakingFilterer *contract_forta_staking.FortaStakingFilterer
-	scannerFilterer      *contract_scanner_registry.ScannerRegistryFilterer
-	agentsFilterer       *contract_agent_registry.AgentRegistryFilterer
-	dispatchFilterer     *contract_dispatch.DispatchFilterer
+	fortaStakingFilterer   *contract_forta_staking.FortaStakingFilterer
+	scannerFilterer        *contract_scanner_registry.ScannerRegistryFilterer
+	agentsFilterer         *contract_agent_registry.AgentRegistryFilterer
+	dispatchFilterer       *contract_dispatch.DispatchFilterer
+	scannerVersionFilterer *contract_scanner_node_version.ScannerNodeVersionFilterer
 }
 
 type Handlers struct {
@@ -46,6 +49,9 @@ type Handlers struct {
 	AgentActionHandler   func(logger *log.Entry, msg *registry.AgentMessage) error
 	SaveScannerHandler   func(logger *log.Entry, msg *registry.ScannerSaveMessage) error
 	ScannerActionHandler func(logger *log.Entry, msg *registry.ScannerMessage) error
+
+	// scanner node versions
+	ScannerNodeVersionHandler func(logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error
 
 	// assignment
 	DispatchHandler func(logger *log.Entry, msg *registry.DispatchMessage) error
@@ -64,6 +70,7 @@ type ContractFilter struct {
 	ScannerRegistry  bool
 	DispatchRegistry bool
 	FortaStaking     bool
+	ScannerVersion   bool
 }
 
 type ListenerConfig struct {
@@ -113,6 +120,19 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, blk *domain.Block, l
 		}
 		if l.cfg.Handlers.ScannerStakeThresholdHandler != nil {
 			return l.cfg.Handlers.ScannerStakeThresholdHandler(logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
+		}
+	}
+	return nil
+}
+
+func (l *listener) handleScannerVersionEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
+	if isEvent(le, contract_scanner_node_version.ScannerNodeVersionUpdatedTopic) {
+		su, err := l.scannerVersionFilterer.ParseScannerNodeVersionUpdated(le)
+		if err != nil {
+			return err
+		}
+		if l.cfg.Handlers.ScannerNodeVersionHandler != nil {
+			return l.cfg.Handlers.ScannerNodeVersionHandler(logger, registry.NewScannerNodeVersionUpdated(su, blk))
 		}
 	}
 	return nil
@@ -261,6 +281,9 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	if equalsAddress(le.Address, l.scannerAddr) {
 		return l.handleScannerRegistryEvent(le, blk, logger)
 	}
+	if equalsAddress(le.Address, l.scannerVersionAddr) {
+		return l.handleScannerVersionEvent(le, blk, logger)
+	}
 	if equalsAddress(le.Address, l.agentAddr) {
 		return l.handleAgentRegistryEvent(le, blk, logger)
 	}
@@ -283,7 +306,7 @@ func (l *listener) handleAfterBlock(blk *domain.Block) error {
 	return nil
 }
 
-//ProcessBlockRange pages over a range of blocks, 10k blocks per page
+// ProcessBlockRange pages over a range of blocks, 10k blocks per page
 func (l *listener) ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error {
 	start := startBlock
 	pageSize := big.NewInt(10000)
@@ -374,6 +397,11 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, err
 	}
 
+	snv, err := contract_scanner_node_version.NewScannerNodeVersionFilterer(regContracts.ScannerNodeVersion, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	af, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, nil)
 	if err != nil {
 		return nil, err
@@ -403,8 +431,12 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		if cfg.ContractFilter.DispatchRegistry {
 			addrs = append(addrs, regContracts.Dispatch.Hex())
 		}
+		if cfg.ContractFilter.ScannerVersion {
+			addrs = append(addrs, regContracts.ScannerNodeVersion.Hex())
+		}
+
 	} else {
-		addrs = []string{regContracts.AgentRegistry.Hex(), regContracts.ScannerRegistry.Hex(), regContracts.Dispatch.Hex(), regContracts.FortaStaking.Hex()}
+		addrs = []string{regContracts.AgentRegistry.Hex(), regContracts.ScannerRegistry.Hex(), regContracts.Dispatch.Hex(), regContracts.FortaStaking.Hex(), regContracts.ScannerNodeVersion.Hex()}
 	}
 
 	var topics [][]string
@@ -425,18 +457,20 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 	}
 
 	return &listener{
-		ctx:                  ctx,
-		c:                    c,
-		cfg:                  cfg,
-		logs:                 logFeed,
-		eth:                  client,
-		scannerAddr:          regContracts.ScannerRegistry.Hex(),
-		agentAddr:            regContracts.AgentRegistry.Hex(),
-		dispatchAddr:         regContracts.Dispatch.Hex(),
-		fortaStakingAddr:     regContracts.FortaStaking.Hex(),
-		scannerFilterer:      sf,
-		agentsFilterer:       af,
-		dispatchFilterer:     df,
-		fortaStakingFilterer: stkf,
+		ctx:                    ctx,
+		c:                      c,
+		cfg:                    cfg,
+		logs:                   logFeed,
+		eth:                    client,
+		scannerAddr:            regContracts.ScannerRegistry.Hex(),
+		scannerVersionAddr:     regContracts.ScannerNodeVersion.Hex(),
+		agentAddr:              regContracts.AgentRegistry.Hex(),
+		dispatchAddr:           regContracts.Dispatch.Hex(),
+		fortaStakingAddr:       regContracts.FortaStaking.Hex(),
+		scannerFilterer:        sf,
+		scannerVersionFilterer: snv,
+		agentsFilterer:         af,
+		dispatchFilterer:       df,
+		fortaStakingFilterer:   stkf,
 	}, nil
 }

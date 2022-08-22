@@ -3,6 +3,7 @@ package registry
 import (
 	"context"
 	"errors"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 	"math/big"
 	"os"
 	"testing"
@@ -207,6 +208,20 @@ func TestListener_Listen(t *testing.T) {
 					},
 				}),
 			block: 26498238,
+		}, {
+			name: "scanner-version",
+			listener: testListener(ctx, &ContractFilter{ScannerVersion: true},
+				contract_scanner_node_version.ScannerNodeVersionUpdatedTopic,
+				Handlers{
+					ScannerNodeVersionHandler: func(logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error {
+						assert.Equal(t, int64(31739343), msg.Source.BlockNumberDecimal)
+						assert.Equal(t, registry.ScannerNodeVersionUpdated, msg.Action)
+						assert.Equal(t, "QmPU5yx6Puapj7o79zY4n1LkyhnZowLjoDaZv7TRhytYpt", msg.NewVersion)
+						assert.Equal(t, "QmQX4FELAScb8n1cjAr6wK4WF73b2jGv9FSRtUWhysnKu1", msg.OldVersion)
+						return found
+					},
+				}),
+			block: 31739343,
 		},
 	}
 
