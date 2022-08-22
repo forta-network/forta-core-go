@@ -53,10 +53,16 @@ func getRpcResponse(ctx context.Context, rpcClient *rpc.Client, respData interfa
 func GetNetworkID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
 	var result string
 	err := rpcClient.CallContext(ctx, &result, "net_version")
-	if err != nil {
-		return nil, fmt.Errorf("net_version failed: %v", err)
+	if err == nil {
+		return decodeChainID(result)
 	}
-	return decodeChainID(result)
+	var resultHex big.Int
+	err = rpcClient.CallContext(ctx, &resultHex, "net_version")
+	if err == nil {
+		return &resultHex, nil
+	}
+
+	return nil, fmt.Errorf("net_version failed: %v", err)
 }
 
 // GetChainID gets the chain ID from eth_chainId.
