@@ -12,8 +12,8 @@ const ScannerNodeVersionUpdated = "ScannerNodeVersionUpdated"
 
 type ScannerNodeVersionMessage struct {
 	Message
-	NewVersion string `json:"new_version"`
-	OldVersion string `json:"old_version"`
+	NewVersion string `json:"newVersion"`
+	OldVersion string `json:"oldVersion"`
 }
 
 func ParseScannerNodeVersionUpdated(msg string) (*ScannerNodeVersionMessage, error) {
