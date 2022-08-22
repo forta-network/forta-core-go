@@ -51,7 +51,7 @@ type Handlers struct {
 	ScannerActionHandler func(logger *log.Entry, msg *registry.ScannerMessage) error
 
 	// scanner node versions
-	ScannerNodeVersionHandler func(logger *log.Entry, msg *registry.ScannerNodeVersionUpdated) error
+	ScannerNodeVersionHandler func(logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error
 
 	// assignment
 	DispatchHandler func(logger *log.Entry, msg *registry.DispatchMessage) error
