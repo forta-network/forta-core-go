@@ -97,7 +97,7 @@ func (mr *MockClientMockRecorder) ForEachAgentID(handler interface{}) *gomock.Ca
 }
 
 // ForEachAgentSinceBlock mocks base method.
-func (m *MockClient) ForEachAgentSinceBlock(block uint64, handler func(*contract_agent_registry.AgentRegistryTransfer, *registry0.Agent) error) error {
+func (m *MockClient) ForEachAgentSinceBlock(block uint64, handler func(*contract_agent_registry.AgentRegistryAgentUpdated, *registry0.Agent) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachAgentSinceBlock", block, handler)
 	ret0, _ := ret[0].(error)
@@ -167,7 +167,7 @@ func (mr *MockClientMockRecorder) ForEachScanner(handler interface{}) *gomock.Ca
 }
 
 // ForEachScannerSinceBlock mocks base method.
-func (m *MockClient) ForEachScannerSinceBlock(block uint64, handler func(*contract_scanner_registry.ScannerRegistryTransfer, *registry0.Scanner) error) error {
+func (m *MockClient) ForEachScannerSinceBlock(block uint64, handler func(*contract_scanner_registry.ScannerRegistryScannerUpdated, *registry0.Scanner) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachScannerSinceBlock", block, handler)
 	ret0, _ := ret[0].(error)
