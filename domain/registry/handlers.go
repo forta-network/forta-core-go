@@ -23,3 +23,7 @@ type ScannerMessageHandler interface {
 type DispatchMessageHandler interface {
 	HandleDispatchMessage(logger *log.Entry, agt *DispatchMessage) error
 }
+
+type ScannerNodeVersionUpdatedHandler interface {
+	HandleScannerNodeVersionUpdated(logger *log.Entry, agt *ScannerNodeVersionUpdated) error
+}
