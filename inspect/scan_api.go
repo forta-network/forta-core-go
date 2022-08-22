@@ -19,13 +19,16 @@ const (
 	// IndicatorScanAPIModuleNet node supports net module.
 	IndicatorScanAPIModuleNet = "scan-api.module.net"
 
+	// IndicatorScanAPIIsETH2 is upgraded to Ethereum 2.0.
+	IndicatorScanAPIIsETH2 = "scan-api.is-eth2"
+
 	// MetadataScanAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataScanAPIBlockByNumberHash = "scan-api.block-by-number.hash"
 )
 
 var (
 	scanAPIIndicators = []string{
-		IndicatorScanAPIAccessible, IndicatorScanAPIChainID, IndicatorScanAPIModuleEth, IndicatorScanAPIModuleNet,
+		IndicatorScanAPIAccessible, IndicatorScanAPIChainID, IndicatorScanAPIModuleEth, IndicatorScanAPIModuleNet, IndicatorScanAPIIsETH2,
 	}
 )
 
@@ -77,6 +80,14 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
 		results.Metadata[MetadataScanAPIBlockByNumberHash] = hash
+	}
+
+	if err := CheckETH2Support(ctx, rpcClient); err != nil {
+		results.Indicators[IndicatorScanAPIIsETH2] = ResultFailure
+		// TODO temporarily ignore eth2 error
+		// resultErr = multierror.Append(resultErr, fmt.Errorf("scan api does not support eth2: %v", err))
+	} else {
+		results.Indicators[IndicatorScanAPIIsETH2] = ResultSuccess
 	}
 
 	return
