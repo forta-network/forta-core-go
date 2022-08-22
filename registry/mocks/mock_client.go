@@ -8,6 +8,8 @@ import (
 	big "math/big"
 	reflect "reflect"
 
+	contract_agent_registry "github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	contract_scanner_registry "github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	registry "github.com/forta-network/forta-core-go/domain/registry"
 	registry0 "github.com/forta-network/forta-core-go/registry"
 	gomock "github.com/golang/mock/gomock"
@@ -94,6 +96,20 @@ func (mr *MockClientMockRecorder) ForEachAgentID(handler interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAgentID", reflect.TypeOf((*MockClient)(nil).ForEachAgentID), handler)
 }
 
+// ForEachAgentSinceBlock mocks base method.
+func (m *MockClient) ForEachAgentSinceBlock(block uint64, handler func(*contract_agent_registry.AgentRegistryTransfer, *registry0.Agent) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachAgentSinceBlock", block, handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachAgentSinceBlock indicates an expected call of ForEachAgentSinceBlock.
+func (mr *MockClientMockRecorder) ForEachAgentSinceBlock(block, handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAgentSinceBlock", reflect.TypeOf((*MockClient)(nil).ForEachAgentSinceBlock), block, handler)
+}
+
 // ForEachAssignedAgent mocks base method.
 func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry0.Agent) error) error {
 	m.ctrl.T.Helper()
@@ -148,6 +164,20 @@ func (m *MockClient) ForEachScanner(handler func(*registry0.Scanner) error) erro
 func (mr *MockClientMockRecorder) ForEachScanner(handler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachScanner", reflect.TypeOf((*MockClient)(nil).ForEachScanner), handler)
+}
+
+// ForEachScannerSinceBlock mocks base method.
+func (m *MockClient) ForEachScannerSinceBlock(block uint64, handler func(*contract_scanner_registry.ScannerRegistryTransfer, *registry0.Scanner) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachScannerSinceBlock", block, handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachScannerSinceBlock indicates an expected call of ForEachScannerSinceBlock.
+func (mr *MockClientMockRecorder) ForEachScannerSinceBlock(block, handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachScannerSinceBlock", reflect.TypeOf((*MockClient)(nil).ForEachScannerSinceBlock), block, handler)
 }
 
 // GetAgent mocks base method.

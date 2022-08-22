@@ -7,7 +7,7 @@
 
 **Change License:** GNU General Public License 3.0 or later
 
-**Licensed Work:** `forta-core-go` located at https://github.com/forta-protocol/forta-core-go. The Licensed Work is Copyright (c) 2022 Forta Foundation
+**Licensed Work:** `forta-core-go` located at https://github.com/forta-network/forta-core-go. The Licensed Work is Copyright (c) 2022 Forta Foundation
 
 **Licensor:**  Forta Foundation
 
