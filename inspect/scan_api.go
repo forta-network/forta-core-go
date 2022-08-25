@@ -82,12 +82,10 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 		results.Metadata[MetadataScanAPIBlockByNumberHash] = hash
 	}
 
-	if err := CheckETH2Support(ctx, rpcClient); err != nil {
-		results.Indicators[IndicatorScanAPIIsETH2] = ResultFailure
-		// TODO temporarily ignore eth2 error
-		// resultErr = multierror.Append(resultErr, fmt.Errorf("scan api does not support eth2: %v", err))
-	} else {
+	if SupportsETH2(ctx, rpcClient) {
 		results.Indicators[IndicatorScanAPIIsETH2] = ResultSuccess
+	} else {
+		results.Indicators[IndicatorScanAPIIsETH2] = ResultFailure
 	}
 
 	return

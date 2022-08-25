@@ -8,13 +8,14 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/domain"
 )
 
 const (
 	blockByNumber = "eth_getBlockByNumber"
-	safeHead      = "safe"
+	latestBlock   = "latest"
 )
 
 // GetBlockResponseHash computes a hash by using some data from the API response.
@@ -106,6 +107,39 @@ func decodeChainID(numStr string) (*big.Int, error) {
 	return nil, fmt.Errorf("could not decode chain ID '%s' - it is neither hex nor base10", numStr)
 }
 
-func CheckETH2Support(ctx context.Context, rpcClient *rpc.Client) (resultError error) {
-	return rpcClient.CallContext(ctx, nil, blockByNumber, safeHead, true)
+func SupportsETH2(ctx context.Context, rpcClient *rpc.Client) bool {
+	chainID, err := GetChainOrNetworkID(ctx, rpcClient)
+	if err != nil {
+		return false
+	}
+	if !(chainID.Uint64() == 1 || chainID.Uint64() == 5) { // eth mainnet and goerli
+		return false
+	}
+
+	var block domain.Block
+	if err := getRpcResponse(ctx, rpcClient, &block, blockByNumber, latestBlock, true); err != nil {
+		return false
+	}
+	if block.Difficulty == nil {
+		return false
+	}
+	if block.Nonce == nil {
+		return false
+	}
+	difficulty, err := hexutil.DecodeBig(*block.Difficulty)
+	if err != nil {
+		return false
+	}
+	var nonce types.BlockNonce
+	if err := (&nonce).UnmarshalText([]byte(*block.Nonce)); err != nil {
+		return false
+	}
+	if err != nil {
+		return false
+	}
+
+	if difficulty.Sign() == 0 && nonce.Uint64() == 0 {
+		return true
+	}
+	return false
 }
