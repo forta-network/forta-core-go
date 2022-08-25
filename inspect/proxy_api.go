@@ -111,12 +111,10 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Metadata[MetadataProxyAPIBlockByNumberHash] = hash
 	}
 
-	if err := CheckETH2Support(ctx, rpcClient); err != nil {
-		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
-		// TODO temporarily ignore eth2 error
-		// resultErr = multierror.Append(resultErr, fmt.Errorf("proxy api does not support eth2: %v", err))
-	} else {
+	if SupportsETH2(ctx, rpcClient) {
 		results.Indicators[IndicatorProxyAPIIsETH2] = ResultSuccess
+	} else {
+		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
 	}
 
 	return

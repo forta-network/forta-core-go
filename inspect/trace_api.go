@@ -96,12 +96,10 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Metadata[MetadataTraceAPIBlockByNumberHash] = hash
 	}
 
-	if err := CheckETH2Support(ctx, rpcClient); err != nil {
-		results.Indicators[IndicatorTraceAPIIsETH2] = ResultFailure
-		// TODO temporarily ignore eth2 error
-		// resultErr = multierror.Append(resultErr, fmt.Errorf("trace api does not support eth2: %v", err))
-	} else {
+	if SupportsETH2(ctx, rpcClient) {
 		results.Indicators[IndicatorTraceAPIIsETH2] = ResultSuccess
+	} else {
+		results.Indicators[IndicatorTraceAPIIsETH2] = ResultFailure
 	}
 
 	return
