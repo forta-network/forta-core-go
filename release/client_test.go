@@ -11,8 +11,8 @@ func TestClient_GetReleaseManifest(t *testing.T) {
 	c, err := NewClient("https://ipfs.forta.network")
 	assert.NoError(t, err)
 
-	rm, err := c.GetReleaseManifest(context.Background(), "QmfFajdVEMZWNTkaK4Z49xGhK3VWDhx8tKwfKCmu7VApDx")
+	rm, err := c.GetReleaseManifest(context.Background(), "QmPU5yx6Puapj7o79zY4n1LkyhnZowLjoDaZv7TRhytYpt")
 	assert.NoError(t, err)
 
-	assert.Equal(t, "9470f9e7a71279dee141757f54c07d8e74b0dcb3", rm.Release.Commit)
+	assert.Equal(t, "7ef0aca978a3d7ed9d10170442e80a4e12a9a7b5", rm.Release.Commit)
 }
