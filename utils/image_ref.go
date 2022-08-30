@@ -70,3 +70,9 @@ func isCidv1(fileCid string) bool {
 	}
 	return parsed.Version() == 1
 }
+
+// IsValidCid tells is the provided IPFS CID is valid.
+func IsValidCid(cidStr string) bool {
+	_, err := cid.Parse(cidStr)
+	return err == nil
+}
