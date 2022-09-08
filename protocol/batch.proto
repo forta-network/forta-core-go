@@ -102,4 +102,5 @@ message InspectionInputs {
   string proxyApiHost = 3;
   string traceApiHost = 4;
   bool checkTrace = 5;
+  bool isETH2 = 6;
 }
