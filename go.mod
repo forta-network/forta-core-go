@@ -36,3 +36,6 @@ require (
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.28.0
 )
+
+// See https://github.com/prysmaticlabs/grpc-gateway/issues/2
+replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/prysmaticlabs/grpc-gateway/v2 v2.3.1-0.20220721162526-0d1c40b5f064
