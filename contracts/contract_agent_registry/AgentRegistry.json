@@ -197,6 +197,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "router",
@@ -408,7 +421,7 @@
     "outputs": [
       {
         "internalType": "bool",
-        "name": "created",
+        "name": "registered",
         "type": "bool"
       },
       {
@@ -522,7 +535,7 @@
     "outputs": [
       {
         "internalType": "bool",
-        "name": "created",
+        "name": "registered",
         "type": "bool"
       },
       {
@@ -549,6 +562,11 @@
         "internalType": "bool",
         "name": "enabled",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "disabledFlags",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -582,6 +600,25 @@
       }
     ],
     "name": "getCommitTimestamp",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "agentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDisableFlags",
     "outputs": [
       {
         "internalType": "uint256",
@@ -701,7 +738,7 @@
         "type": "uint256"
       }
     ],
-    "name": "isCreated",
+    "name": "isEnabled",
     "outputs": [
       {
         "internalType": "bool",
@@ -720,7 +757,7 @@
         "type": "uint256"
       }
     ],
-    "name": "isEnabled",
+    "name": "isRegistered",
     "outputs": [
       {
         "internalType": "bool",
@@ -834,6 +871,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -875,7 +925,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "_data",
+        "name": "data",
         "type": "bytes"
       }
     ],

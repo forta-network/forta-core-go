@@ -614,7 +614,7 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	}
 
 	// if agt does not exist, return nil
-	if !agt.Created {
+	if !agt.Registered {
 		return nil, nil
 	}
 
