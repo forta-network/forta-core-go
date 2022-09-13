@@ -10,8 +10,11 @@ import (
 func GzipEncode(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	w := gzip.NewWriter(&buf)
-	_, _ = w.Write(b)
-	w.Close()
+	defer w.Close()
+	_, err := w.Write(b)
+	if err != nil {
+		return nil, err
+	}
 	return buf.Bytes(), nil
 }
 
