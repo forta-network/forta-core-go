@@ -6,15 +6,20 @@ import (
 	"io"
 )
 
+
 // GzipEncode compresses bytes.
 func GzipEncode(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
+
 	w := gzip.NewWriter(&buf)
-	defer w.Close()
 	_, err := w.Write(b)
+	if closeErr := w.Close(); closeErr != nil {
+		return nil, closeErr
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	return buf.Bytes(), nil
 }
 
