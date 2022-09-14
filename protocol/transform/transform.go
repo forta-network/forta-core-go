@@ -120,7 +120,6 @@ func ToProtoInspectionResults(results *inspect.InspectionResults) *protocol.Insp
 			ProxyApiHost: getHost(results.Inputs.ProxyAPIURL),
 			TraceApiHost: getHost(results.Inputs.TraceAPIURL),
 			CheckTrace:   results.Inputs.CheckTrace,
-			IsETH2:       results.Inputs.IsETH2,
 		},
 		Metadata:   results.Metadata,
 		Indicators: results.Indicators,
