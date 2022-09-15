@@ -127,7 +127,7 @@ func (bf *blockFeed) loop() {
 		handler.ErrCh <- err
 	}
 	if err != ErrEndBlockReached {
-		log.WithError(err).Panic("failed while processing blocks - exiting loop")
+		log.WithError(err).Warn("failed while processing blocks - exiting loop")
 	}
 }
 
@@ -141,6 +141,13 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 		ErrCh:   errCh,
 	})
 	return errCh
+}
+
+// Errors creates a no-op subscription, just to listen to the errors.
+func (bf *blockFeed) Errors() <-chan error {
+	return bf.Subscribe(func(_ *domain.BlockEvent) error {
+		return nil
+	})
 }
 
 // converts from types.Log to domain.LogEntry object
