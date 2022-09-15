@@ -14,6 +14,7 @@ type InspectionConfig struct {
 	ProxyAPIURL string `json:"proxyApiUrl"` // JSON-RPC API for bots
 	TraceAPIURL string `json:"traceApiUrl"`
 	CheckTrace  bool   `json:"checkTrace"`
+	IsETH2      bool   `json:"isETH2"`
 }
 
 // InspectionResults contains inspection results.

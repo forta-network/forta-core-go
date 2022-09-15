@@ -107,12 +107,17 @@ func decodeChainID(numStr string) (*big.Int, error) {
 	return nil, fmt.Errorf("could not decode chain ID '%s' - it is neither hex nor base10", numStr)
 }
 
+// IsETH2Chain currently supports goerli and mainnet.
+func IsETH2Chain(chainId uint64) bool {
+	return chainId == 1 || chainId == 5
+}
 func SupportsETH2(ctx context.Context, rpcClient *rpc.Client) bool {
 	chainID, err := GetChainOrNetworkID(ctx, rpcClient)
 	if err != nil {
 		return false
 	}
-	if !(chainID.Uint64() == 1 || chainID.Uint64() == 5) { // eth mainnet and goerli
+
+	if !IsETH2Chain(chainID.Uint64()) {
 		return false
 	}
 
