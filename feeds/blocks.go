@@ -123,11 +123,11 @@ func (bf *blockFeed) loop() {
 	if err == nil {
 		return
 	}
-	if err != ErrEndBlockReached {
-		log.WithError(err).Warn("failed while processing blocks")
-	}
 	for _, handler := range bf.handlers {
 		handler.ErrCh <- err
+	}
+	if err != ErrEndBlockReached {
+		log.WithError(err).Panic("failed while processing blocks - exiting loop")
 	}
 }
 
@@ -135,7 +135,7 @@ func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-cha
 	bf.handlersMu.Lock()
 	defer bf.handlersMu.Unlock()
 
-	errCh := make(chan error)
+	errCh := make(chan error, 1)
 	bf.handlers = append(bf.handlers, bfHandler{
 		Handler: handler,
 		ErrCh:   errCh,
@@ -227,6 +227,7 @@ func (bf *blockFeed) forEachBlock() error {
 			traces, err = bf.traceClient.TraceBlock(bf.ctx, blockNumToAnalyze)
 			if err != nil {
 				logger.WithError(err).Error("error tracing block")
+				return err
 			}
 		}
 
