@@ -9,7 +9,6 @@ import (
 	"time"
 
 	eth "github.com/ethereum/go-ethereum"
-	"github.com/forta-network/forta-core-go/inspect"
 	"github.com/goccy/go-json"
 	"github.com/prysmaticlabs/prysm/v3/consensus-types/interfaces"
 	log "github.com/sirupsen/logrus"
@@ -44,8 +43,9 @@ type blockFeed struct {
 
 	lastBlock health.MessageTracker
 
-	handlers   []bfHandler
-	handlersMu sync.RWMutex
+	handlers      []bfHandler
+	handlersMu    sync.RWMutex
+	beaconSupport bool
 }
 
 type BlockFeedConfig struct {
@@ -55,6 +55,7 @@ type BlockFeedConfig struct {
 	ChainID             *big.Int
 	RateLimit           *time.Ticker
 	Tracing             bool
+	BeaconSupport       bool
 	SkipBlocksOlderThan *time.Duration
 }
 
@@ -234,7 +235,7 @@ func (bf *blockFeed) forEachBlock() error {
 		}
 
 		var beaconData interfaces.SignedBeaconBlock
-		if inspect.IsETH2Chain(bf.chainID.Uint64()) {
+		if bf.beaconSupport {
 			beaconData, err = bf.beaconClient.GetBlock(bf.ctx, blockNumToAnalyze.String())
 			if err != nil {
 				logger.WithError(err).Error("error getting beacon data")
@@ -317,18 +318,19 @@ func NewBlockFeed(ctx context.Context, client ethereum.Client, traceClient ether
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
 	bf := &blockFeed{
-		start:        cfg.Start,
-		end:          cfg.End,
-		offset:       cfg.Offset,
-		ctx:          ctx,
-		client:       client,
-		traceClient:  traceClient,
-		beaconClient: beaconClient,
-		cache:        utils.NewCache(10000),
-		chainID:      cfg.ChainID,
-		tracing:      cfg.Tracing,
-		rateLimit:    cfg.RateLimit,
-		maxBlockAge:  cfg.SkipBlocksOlderThan,
+		start:         cfg.Start,
+		end:           cfg.End,
+		offset:        cfg.Offset,
+		ctx:           ctx,
+		client:        client,
+		traceClient:   traceClient,
+		beaconClient:  beaconClient,
+		cache:         utils.NewCache(10000),
+		chainID:       cfg.ChainID,
+		tracing:       cfg.Tracing,
+		beaconSupport: cfg.BeaconSupport,
+		rateLimit:     cfg.RateLimit,
+		maxBlockAge:   cfg.SkipBlocksOlderThan,
 	}
 	return bf, nil
 }
