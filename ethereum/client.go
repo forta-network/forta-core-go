@@ -194,7 +194,7 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 		return nil
 	}, RetryOptions{
 		MinBackoff:     pointDur(15 * time.Second),
-		MaxElapsedTime: pointDur(12 * time.Hour),
+		MaxElapsedTime: pointDur(1 * time.Minute),
 		MaxBackoff:     pointDur(15 * time.Second),
 	}, &e.lastTraceBlockReq, &e.lastTraceBlockErr)
 	return result, err
