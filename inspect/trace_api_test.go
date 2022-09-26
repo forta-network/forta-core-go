@@ -34,10 +34,11 @@ func TestTraceAPIInspection(t *testing.T) {
 
 	r.Equal(
 		map[string]float64{
-			IndicatorTraceAccessible: ResultSuccess,
-			IndicatorTraceSupported:  ResultSuccess,
-			IndicatorTraceAPIChainID: 250,
-			IndicatorTraceAPIIsETH2:  ResultFailure,
+			IndicatorTraceAccessible:  ResultSuccess,
+			IndicatorTraceSupported:   ResultSuccess,
+			IndicatorTraceAPIChainID:  250,
+			IndicatorTraceAPIIsETH2:   ResultFailure,
+			IndicatorTraceAPIUpToDate: ResultSuccess,
 		}, results.Indicators,
 	)
 

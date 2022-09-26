@@ -19,6 +19,8 @@ const (
 	// IndicatorScanAPIModuleNet node supports net module.
 	IndicatorScanAPIModuleNet = "scan-api.module.net"
 
+	// IndicatorScanAPIUpToDate can get the configured block hash. Shows that there is no offset between the inspection and scan api.
+	IndicatorScanAPIUpToDate = "scan-api.up-to-date"
 	// IndicatorScanAPIIsETH2 is upgraded to Ethereum 2.0.
 	IndicatorScanAPIIsETH2 = "scan-api.is-eth2"
 
@@ -78,8 +80,10 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 	hash, err := GetBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
+		results.Indicators[IndicatorScanAPIUpToDate] = ResultFailure
 	} else {
 		results.Metadata[MetadataScanAPIBlockByNumberHash] = hash
+		results.Indicators[IndicatorScanAPIUpToDate] = ResultSuccess
 	}
 
 	if SupportsETH2(ctx, rpcClient) {
