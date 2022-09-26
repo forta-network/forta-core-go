@@ -25,6 +25,8 @@ const (
 	IndicatorProxyAPIHistorySupport = "proxy-api.history-support"
 	// IndicatorProxyAPIIsETH2 is upgraded to Ethereum 2.0.
 	IndicatorProxyAPIIsETH2 = "proxy-api.is-eth2"
+	// IndicatorProxyAPIUpToDate can get the configured block hash. Shows that there is no offset between the inspection and proxy api.
+	IndicatorProxyAPIUpToDate = "proxy-api.up-to-date"
 	// MetadataProxyAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataProxyAPIBlockByNumberHash = "proxy-api.block-by-number.hash"
 )
@@ -107,8 +109,10 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	hash, err := GetBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
+		results.Indicators[IndicatorProxyAPIUpToDate] = ResultFailure
 	} else {
 		results.Metadata[MetadataProxyAPIBlockByNumberHash] = hash
+		results.Indicators[IndicatorProxyAPIUpToDate] = ResultSuccess
 	}
 
 	if SupportsETH2(ctx, rpcClient) {

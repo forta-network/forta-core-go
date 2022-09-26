@@ -42,6 +42,7 @@ func TestProxyAPIInspection(t *testing.T) {
 			IndicatorProxyAPIModuleNet:      ResultSuccess,
 			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
 			IndicatorProxyAPIIsETH2:         ResultSuccess,
+			IndicatorProxyAPIUpToDate:       ResultSuccess,
 		}, results.Indicators,
 	)
 
