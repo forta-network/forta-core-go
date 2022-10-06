@@ -36,7 +36,7 @@ type ClientService interface {
 }
 
 /*
-  SendAlerts sends a list of alerts
+SendAlerts sends a list of alerts
 */
 func (a *Client) SendAlerts(params *SendAlertsParams, opts ...ClientOption) (*SendAlertsOK, error) {
 	// TODO: Validate the params before sending

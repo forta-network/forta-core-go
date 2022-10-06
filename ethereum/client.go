@@ -50,7 +50,7 @@ const chainId = "eth_chainId"
 
 var ErrNotFound = fmt.Errorf("not found")
 
-//any non-retriable failure errors can be listed here
+// any non-retriable failure errors can be listed here
 var permanentErrors = []string{
 	"method not found",
 	"hash is not currently canonical",

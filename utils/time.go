@@ -13,7 +13,7 @@ func ParseTime(s string) time.Time {
 	return t
 }
 
-//UnixToTime converts a epoch timestamp to a time object
+// UnixToTime converts a epoch timestamp to a time object
 func UnixToTime(ms uint64) time.Time {
 	return time.Unix(0, int64(ms)*int64(time.Millisecond))
 }

@@ -6,7 +6,6 @@ import (
 	"io"
 )
 
-
 // GzipEncode compresses bytes.
 func GzipEncode(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
