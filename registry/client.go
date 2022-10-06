@@ -258,12 +258,12 @@ func (c *client) SetPrivateKey(privateKey *ecdsa.PrivateKey) {
 	c.privateKey = privateKey
 }
 
-//ResetOpts unsets the options for the store
+// ResetOpts unsets the options for the store
 func (c *client) ResetOpts() {
 	c.opts = nil
 }
 
-//latestOpts returns the callopts for the latest block so that calls can use a same block
+// latestOpts returns the callopts for the latest block so that calls can use a same block
 func (c *client) latestOpts() (*bind.CallOpts, error) {
 	blk, err := c.eth.BlockByNumber(c.ctx, nil)
 	if err != nil {
@@ -284,7 +284,7 @@ func (c *client) PegBlock(blockNum *big.Int) {
 	}
 }
 
-//PegLatestBlock will set the opts so that every call uses same block
+// PegLatestBlock will set the opts so that every call uses same block
 func (c *client) PegLatestBlock() error {
 	opts, err := c.latestOpts()
 	if err != nil {

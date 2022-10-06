@@ -37,7 +37,7 @@ proto: protogen fmt
 
 .PHONY: protogen
 protogen: require-tools
-	protoc -I=protocol --go_out=protocol/. protocol/metrics.proto
+	protoc -I=protocol --go_out=protocol/. protocol/bot_metrics.proto
 	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/agent.proto
 	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/publisher.proto
 	protoc -I=protocol --go_out=protocol/. protocol/batch.proto

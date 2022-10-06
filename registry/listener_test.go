@@ -3,10 +3,11 @@ package registry
 import (
 	"context"
 	"errors"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 	"math/big"
 	"os"
 	"testing"
+
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"

@@ -4,7 +4,7 @@ package network.forta;
 
 import public "publisher.proto";
 import public "agent.proto";
-import public "metrics.proto";
+import public "bot_metrics.proto";
 
 option go_package = "./;protocol";
 
