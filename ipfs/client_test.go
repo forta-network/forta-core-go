@@ -125,3 +125,23 @@ func TestClient_GetBytes(t *testing.T) {
 	assert.NoError(t, json.Unmarshal(b, &result))
 	assert.Equal(t, "test", result.Name)
 }
+
+func TestCalculateFileHash(t *testing.T) {
+	c, err := NewClient("")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// remember that CalculateFileHash adds a newline at the end of the payload
+	payload := "test // data && \\"
+	const expectedCID = "QmUyscxixDckkTnAxxzYQFC9yce3Weruss2ZPZ41jmB3ht"
+
+	path, err := c.CalculateFileHash([]byte(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if expectedCID != path {
+		t.Fatal("created cid does not match the expected")
+	}
+}
