@@ -36,6 +36,11 @@ message InitializeResponse {
   ResponseStatus status = 1;
   repeated Error errors = 2;
   repeated string addresses = 3;
+  AlertConfig alertConfig = 4;
+}
+
+message AlertConfig {
+  repeated string subscriptions = 1;
 }
 
 message EvaluateTxRequest {
