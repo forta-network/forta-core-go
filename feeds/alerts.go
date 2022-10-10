@@ -7,6 +7,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
@@ -26,9 +27,11 @@ type alertFeed struct {
 	rateLimit *time.Ticker
 
 	lastAlert health.MessageTracker
+	workers   int
 
 	handlers   []afHandler
 	handlersMu sync.RWMutex
+	alertCh    chan *domain.AlertEvent
 }
 
 type AlertFeedConfig struct {
@@ -104,6 +107,35 @@ func (af *alertFeed) forEachBlock() error {
 			}
 		}
 	}
+}
+
+func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
+	grp, _ := errgroup.WithContext(af.ctx)
+
+	// iterate over blocks
+	grp.Go(
+		func() error {
+			errCh := af.Subscribe(
+				func(evt *domain.AlertEvent) error {
+					af.alertCh <- evt
+					var blockHandlerErr error
+					if alertHandler != nil {
+						blockHandlerErr = alertHandler(evt)
+					}
+					return blockHandlerErr
+				},
+			)
+			err := <-errCh
+			close(af.alertCh)
+			if err == ErrEndBlockReached {
+				return nil
+			}
+			return err
+		},
+	)
+
+	// block until above all finish (when context is cancelled or error returns)
+	return grp.Wait()
 }
 
 // Name returns the name of this implementation.
