@@ -70,6 +70,7 @@ func ForTransactionAlert(inputs *Inputs) string {
 
 // ForAlertHandlerAlert calculates the hash for the alert handler alert.
 func ForAlertHandlerAlert(inputs *Inputs) string {
+	// TODO: add implementation
 	panic("unimplemented")
 	idStr := strings.Join(
 		[]string{
