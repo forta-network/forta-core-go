@@ -12,10 +12,11 @@ import (
 // Version represents alert hash version.
 const Version = "1"
 
-// Inputs hold all of the possible inputs for alert hash calculation.
+// Inputs hold all the possible inputs for alert hash calculation.
 type Inputs struct {
 	Block       *protocol.BlockEvent
 	Transaction *protocol.TransactionEvent
+	Alert       *protocol.AlertEvent
 	Finding     *protocol.Finding
 	BotInfo
 }
@@ -61,6 +62,30 @@ func ForTransactionAlert(inputs *Inputs) string {
 		inputs.BotImage,
 		inputs.BotID,
 		strings.Join(txAddrs, ""),
-		strings.Join(inputs.Finding.Addresses, "")}, "")
+		strings.Join(inputs.Finding.Addresses, ""),
+	}, "",
+	)
+	return crypto.Keccak256Hash([]byte(idStr)).Hex()
+}
+
+// ForAlertHandlerAlert calculates the hash for the alert handler alert.
+func ForAlertHandlerAlert(inputs *Inputs) string {
+	panic("unimplemented")
+	idStr := strings.Join(
+		[]string{
+			Version, "|",
+			inputs.Transaction.Network.ChainId,
+			inputs.Transaction.Transaction.Hash,
+			inputs.Finding.Name,
+			inputs.Finding.Description,
+			inputs.Finding.Protocol,
+			inputs.Finding.Type.String(),
+			inputs.Finding.AlertId,
+			inputs.Finding.Severity.String(),
+			inputs.BotImage,
+			inputs.BotID,
+			strings.Join(inputs.Finding.Addresses, ""),
+		}, "",
+	)
 	return crypto.Keccak256Hash([]byte(idStr)).Hex()
 }
