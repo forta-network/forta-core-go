@@ -15,6 +15,7 @@ service Agent {
   rpc Initialize (InitializeRequest) returns (InitializeResponse) {}
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
+  rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
 }
 
 message Error {
@@ -51,6 +52,11 @@ message EvaluateTxRequest {
 message EvaluateBlockRequest {
   string requestId = 1;
   BlockEvent event = 2;
+}
+
+message EvaluateAlertRequest {
+  string requestId = 1;
+  AlertEvent event = 2;
 }
 
 message Finding {
@@ -95,6 +101,16 @@ message EvaluateTxResponse {
 }
 
 message EvaluateBlockResponse {
+  ResponseStatus status = 1;
+  repeated Error errors = 2;
+  repeated Finding findings = 3;
+  map<string, string> metadata = 4;
+  string timestamp = 5;
+  uint32 latencyMs = 6;
+  bool private = 7;
+}
+
+message EvaluateAlertResponse {
   ResponseStatus status = 1;
   repeated Error errors = 2;
   repeated Finding findings = 3;
@@ -246,4 +262,8 @@ message TransactionEvent {
   string contractAddress = 10;
   TrackingTimestamps timestamps = 11;
   map<string, bool> txAddresses = 12;
+}
+
+message AlertEvent {
+
 }
