@@ -22,6 +22,11 @@ type TransactionFeed interface {
 	ForEachTransaction(blockHandler func(evt *domain.BlockEvent) error, txHandler func(evt *domain.TransactionEvent) error) error
 }
 
+// AlertFeed is a subscribable feed of alerts.
+type AlertFeed interface {
+	ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error
+}
+
 // LogFeed is a feed of logs
 type LogFeed interface {
 	ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error

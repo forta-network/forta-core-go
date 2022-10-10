@@ -1,0 +1,132 @@
+package feeds
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/forta-network/forta-core-go/clients/health"
+	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/utils"
+)
+
+type afHandler struct {
+	Handler func(evt *domain.AlertEvent) error
+	ErrCh   chan<- error
+}
+
+type alertFeed struct {
+	offset    int
+	ctx       context.Context
+	cache     utils.Cache
+	started   bool
+	rateLimit *time.Ticker
+
+	lastAlert health.MessageTracker
+
+	handlers   []afHandler
+	handlersMu sync.RWMutex
+}
+
+type AlertFeedConfig struct {
+	Offset    int
+	RateLimit *time.Ticker
+}
+
+func (af *alertFeed) initialize() error {
+	return nil
+}
+
+func (af *alertFeed) IsStarted() bool {
+	return af.started
+}
+
+func (af *alertFeed) Start() {
+	if !af.started {
+		go af.loop()
+	}
+}
+
+func (af *alertFeed) loop() {
+	if err := af.initialize(); err != nil {
+		log.WithError(err).Panic("failed to initialize")
+	}
+
+	af.started = true
+	defer func() {
+		af.started = false
+	}()
+	err := af.forEachBlock()
+	if err == nil {
+		return
+	}
+	if err != ErrEndBlockReached {
+		log.WithError(err).Warn("failed while processing blocks")
+	}
+	for _, handler := range af.handlers {
+		handler.ErrCh <- err
+	}
+}
+
+func (af *alertFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-chan error {
+	af.handlersMu.Lock()
+	defer af.handlersMu.Unlock()
+
+	errCh := make(chan error)
+	af.handlers = append(
+		af.handlers, afHandler{
+			Handler: handler,
+			ErrCh:   errCh,
+		},
+	)
+	return errCh
+}
+
+func (af *alertFeed) forEachBlock() error {
+	for {
+		if af.ctx.Err() != nil {
+			return af.ctx.Err()
+		}
+		if af.rateLimit != nil {
+			<-af.rateLimit.C
+		}
+
+		evt := &domain.AlertEvent{}
+		af.handlersMu.RLock()
+		handlers := af.handlers
+		af.handlersMu.RUnlock()
+		for _, handler := range handlers {
+			if err := handler.Handler(evt); err != nil {
+				return err
+			}
+		}
+	}
+}
+
+// Name returns the name of this implementation.
+func (af *alertFeed) Name() string {
+	return "alert-feed"
+}
+
+// Health implements the health.Reporter interface.
+func (af *alertFeed) Health() health.Reports {
+	return health.Reports{
+		af.lastAlert.GetReport("last-alert"),
+	}
+}
+
+func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) {
+	if cfg.Offset < 0 {
+		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
+	}
+	bf := &alertFeed{
+		offset:    cfg.Offset,
+		ctx:       ctx,
+		cache:     utils.NewCache(10000),
+		rateLimit: cfg.RateLimit,
+	}
+	return bf, nil
+}
