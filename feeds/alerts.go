@@ -211,12 +211,13 @@ func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) 
 	alerts := make(chan *domain.AlertEvent, 10)
 
 	bf := &alertFeed{
-		offset:    cfg.Offset,
-		ctx:       ctx,
-		client:    ac,
-		cache:     utils.NewCache(10000),
-		rateLimit: cfg.RateLimit,
-		alertCh:   alerts,
+		offset:           cfg.Offset,
+		ctx:              ctx,
+		client:           ac,
+		cache:            utils.NewCache(10000),
+		rateLimit:        cfg.RateLimit,
+		alertCh:          alerts,
+		botSubscriptions: map[string][]string{},
 	}
 	return bf, nil
 }
