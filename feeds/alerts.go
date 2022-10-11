@@ -59,6 +59,11 @@ func (af *alertFeed) SubscribedBots() (bots []string) {
 func (af *alertFeed) AddSubscription(subscription, subscriber string) {
 	af.botsMu.Lock()
 	defer af.botsMu.Unlock()
+	for _, s := range af.botSubscriptions[subscription] {
+		if s == subscriber {
+			return
+		}
+	}
 	af.botSubscriptions[subscription] = append(af.botSubscriptions[subscription], subscriber)
 }
 func (af *alertFeed) RemoveSubscription(subscription, subscriber string) {
