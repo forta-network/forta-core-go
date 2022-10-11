@@ -135,7 +135,10 @@ func (af *alertFeed) forEachBlock() error {
 		if af.rateLimit != nil {
 			<-af.rateLimit.C
 		}
-
+		// skip query if there are no alert subscriptions
+		if len(af.SubscribedBots()) == 0 {
+			continue
+		}
 		af.botsMu.RLock()
 		alerts, err := af.client.GetAlerts(
 			af.ctx,
