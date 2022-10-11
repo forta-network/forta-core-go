@@ -25,6 +25,8 @@ type TransactionFeed interface {
 // AlertFeed is a subscribable feed of alerts.
 type AlertFeed interface {
 	Start()
+	AddSubscription(subscription, subscriber string)
+	RemoveSubscription(subscription, subscriber string)
 	ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error
 	health.Reporter
 }

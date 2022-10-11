@@ -36,22 +36,34 @@ type alertFeed struct {
 	alertCh    chan *domain.AlertEvent
 	client     *graphql.Client
 
-	botSubscriptions []string
+	botSubscriptions map[string][]string
 	botsMu           sync.RWMutex
 	// createdSince the earliest alert in milliseconds
 	createdSince uint
 }
 
-func (af *alertFeed) Bots() []string {
+func (af *alertFeed) Subscriptions() map[string][]string {
 	af.botsMu.RLock()
 	defer af.botsMu.RUnlock()
 	return af.botSubscriptions
 }
-
-func (af *alertFeed) SetBots(bots []string) {
+func (af *alertFeed) AddSubscription(subscription, subscriber string) {
 	af.botsMu.Lock()
 	defer af.botsMu.Unlock()
-	af.botSubscriptions = bots
+	af.botSubscriptions[subscription] = append(af.botSubscriptions[subscription], subscriber)
+}
+func (af *alertFeed) RemoveSubscription(subscription, subscriber string) {
+	af.botsMu.Lock()
+	defer af.botsMu.Unlock()
+
+	for i, s := range af.botSubscriptions[subscription] {
+		if s == subscriber {
+			af.botSubscriptions[subscription] = append(af.botSubscriptions[subscription][:i], af.botSubscriptions[subscription][i+1:]...)
+		}
+	}
+	if len(af.botSubscriptions[subscription]) == 0 {
+		delete(af.botSubscriptions, subscription)
+	}
 }
 
 type AlertFeedConfig struct {
