@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package network.forta;
+
+import public "response.proto";
+
+option go_package = "./;protocol";
+
+enum ContentKind {
+  CONTENT_UNKNOWN = 0;
+  CONTENT_BATCH_RECEIPT = 1;
+}
+
+message PutRequest {
+  ContentKind kind = 1;
+  bytes bytes = 2;
+}
+
+message PutResponse {
+  Response response = 1;
+  string contentId = 2;
+}
+
+message GetRequest {
+  string contentId = 1;
+}
+
+message GetResponse {
+  Response response = 1;
+  bytes bytes = 2;
+}
+
+enum SortDirection {
+  DESC = 0;
+  ASC = 1;
+}
+
+message ListRequest {
+  ContentKind kind = 1;
+  SortDirection sort = 2;
+  int64 offset = 3;
+  int64 limit = 4;
+}
+
+message ListResponse {
+  Response response = 1;
+  repeated string contentIds = 2;
+}
+
+service Storage {
+  rpc Put (PutRequest) returns (PutResponse);
+  rpc Get (GetRequest) returns (GetResponse);
+  rpc List (ListRequest) returns (ListResponse);
+}

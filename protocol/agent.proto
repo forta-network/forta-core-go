@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package network.forta;
 
+import public "response.proto";
+
 option go_package = "./;protocol";
 
 message TrackingTimestamps {
@@ -15,16 +17,6 @@ service Agent {
   rpc Initialize (InitializeRequest) returns (InitializeResponse) {}
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
-}
-
-message Error {
-  string message = 1;
-}
-
-enum ResponseStatus {
-  UNKNOWN = 0;
-  ERROR = 1;
-  SUCCESS = 2;
 }
 
 message InitializeRequest {
