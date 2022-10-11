@@ -12,8 +12,9 @@ enum ContentKind {
 }
 
 message PutRequest {
-  ContentKind kind = 1;
-  bytes bytes = 2;
+  string owner = 1;
+  ContentKind kind = 2;
+  bytes bytes = 3;
 }
 
 message PutResponse {
@@ -36,10 +37,11 @@ enum SortDirection {
 }
 
 message ListRequest {
-  ContentKind kind = 1;
-  SortDirection sort = 2;
-  int64 offset = 3;
-  int64 limit = 4;
+  string owner = 1;
+  ContentKind kind = 2;
+  SortDirection sort = 3;
+  int64 offset = 4;
+  int64 limit = 5;
 }
 
 message ListResponse {
