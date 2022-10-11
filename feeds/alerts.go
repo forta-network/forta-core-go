@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/forta-network/forta-core-go/clients/graphql"
+	"github.com/forta-network/forta-core-go/protocol"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
@@ -32,11 +34,30 @@ type alertFeed struct {
 	handlers   []afHandler
 	handlersMu sync.RWMutex
 	alertCh    chan *domain.AlertEvent
+	client     *graphql.Client
+
+	botSubscriptions []string
+	botsMu           sync.RWMutex
+	// createdSince the earliest alert in milliseconds
+	createdSince uint
+}
+
+func (af *alertFeed) Bots() []string {
+	af.botsMu.RLock()
+	defer af.botsMu.RUnlock()
+	return af.botSubscriptions
+}
+
+func (af *alertFeed) SetBots(bots []string) {
+	af.botsMu.Lock()
+	defer af.botsMu.Unlock()
+	af.botSubscriptions = bots
 }
 
 type AlertFeedConfig struct {
 	Offset    int
 	RateLimit *time.Ticker
+	APIUrl    string
 }
 
 func (af *alertFeed) initialize() error {
@@ -97,13 +118,29 @@ func (af *alertFeed) forEachBlock() error {
 			<-af.rateLimit.C
 		}
 
-		evt := &domain.AlertEvent{}
-		af.handlersMu.RLock()
-		handlers := af.handlers
-		af.handlersMu.RUnlock()
-		for _, handler := range handlers {
-			if err := handler.Handler(evt); err != nil {
-				return err
+		af.botsMu.RLock()
+		alerts, err := af.client.GetAlerts(
+			af.ctx,
+			&graphql.AlertsInput{Bots: af.botSubscriptions},
+		)
+		af.botsMu.RUnlock()
+		if err != nil {
+			return err
+		}
+
+		for _, alert := range alerts {
+			evt := &domain.AlertEvent{
+				Alert: &protocol.AlertEvent{
+					Alert: alert,
+				},
+			}
+			af.handlersMu.RLock()
+			handlers := af.handlers
+			af.handlersMu.RUnlock()
+			for _, handler := range handlers {
+				if err := handler.Handler(evt); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -154,9 +191,12 @@ func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) 
 	if cfg.Offset < 0 {
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
+	ac := graphql.NewClient(cfg.APIUrl)
+
 	bf := &alertFeed{
 		offset:    cfg.Offset,
 		ctx:       ctx,
+		client:    ac,
 		cache:     utils.NewCache(10000),
 		rateLimit: cfg.RateLimit,
 	}
