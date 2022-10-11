@@ -87,9 +87,6 @@ func (af *alertFeed) loop() {
 	if err == nil {
 		return
 	}
-	if err != ErrEndBlockReached {
-		log.WithError(err).Warn("failed while processing blocks")
-	}
 	for _, handler := range af.handlers {
 		handler.ErrCh <- err
 	}
@@ -164,9 +161,7 @@ func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) erro
 			)
 			err := <-errCh
 			close(af.alertCh)
-			if err == ErrEndBlockReached {
-				return nil
-			}
+
 			return err
 		},
 	)
