@@ -139,12 +139,10 @@ func (af *alertFeed) forEachBlock() error {
 		if len(af.SubscribedBots()) == 0 {
 			continue
 		}
-		af.botsMu.RLock()
 		alerts, err := af.client.GetAlerts(
 			af.ctx,
 			&graphql.AlertsInput{Bots: af.SubscribedBots()},
 		)
-		af.botsMu.RUnlock()
 		if err != nil {
 			return err
 		}
