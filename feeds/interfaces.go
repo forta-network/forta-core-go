@@ -27,6 +27,7 @@ type AlertFeed interface {
 	Start()
 	AddSubscription(subscription, subscriber string)
 	RemoveSubscription(subscription, subscriber string)
+	SubscribedBots() []string
 	ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error
 	health.Reporter
 }

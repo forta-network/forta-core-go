@@ -47,6 +47,15 @@ func (af *alertFeed) Subscriptions() map[string][]string {
 	defer af.botsMu.RUnlock()
 	return af.botSubscriptions
 }
+func (af *alertFeed) SubscribedBots() (bots []string) {
+	af.botsMu.RLock()
+	defer af.botsMu.RUnlock()
+
+	for sub, _ := range af.botSubscriptions {
+		bots = append(bots, sub)
+	}
+	return
+}
 func (af *alertFeed) AddSubscription(subscription, subscriber string) {
 	af.botsMu.Lock()
 	defer af.botsMu.Unlock()
@@ -130,7 +139,7 @@ func (af *alertFeed) forEachBlock() error {
 		af.botsMu.RLock()
 		alerts, err := af.client.GetAlerts(
 			af.ctx,
-			&graphql.AlertsInput{Bots: af.botSubscriptions},
+			&graphql.AlertsInput{Bots: af.SubscribedBots()},
 		)
 		af.botsMu.RUnlock()
 		if err != nil {
