@@ -187,6 +187,7 @@ func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) 
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
 	ac := graphql.NewClient(cfg.APIUrl)
+	alerts := make(chan *domain.AlertEvent, 10)
 
 	bf := &alertFeed{
 		offset:    cfg.Offset,
@@ -194,6 +195,7 @@ func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) 
 		client:    ac,
 		cache:     utils.NewCache(10000),
 		rateLimit: cfg.RateLimit,
+		alertCh:   alerts,
 	}
 	return bf, nil
 }
