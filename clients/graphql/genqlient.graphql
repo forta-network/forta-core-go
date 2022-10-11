@@ -1,0 +1,58 @@
+query getAlerts($input: AlertsInput) {
+    alerts (input: $input){
+        pageInfo {
+            hasNextPage
+            endCursor {
+                alertId
+                blockNumber
+            }
+        }
+        alerts {
+            alertId
+            addresses
+            contracts {
+                name
+                projectId
+            }
+            createdAt
+            description
+            hash
+            metadata
+            name
+            projects {
+                id
+            }
+            protocol
+            scanNodeCount
+            severity
+            source {
+                transactionHash
+                bot {
+                    chainIds
+                    createdAt
+                    description
+                    developer
+                    developer
+                    docReference
+                    enabled
+                    id
+                    image
+                    name
+                    reference
+                    repository
+                    projects
+                    scanNodes
+                    version
+                }
+                block {
+                    number
+                    hash
+                    timestamp
+                    chainId
+                }
+            }
+            findingType
+
+        }
+    }
+}
