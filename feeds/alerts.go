@@ -7,9 +7,6 @@ import (
 	"time"
 
 	"github.com/forta-network/forta-core-go/clients/graphql"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/sync/errgroup"
-
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
@@ -51,7 +48,7 @@ func (af *alertFeed) SubscribedBots() (bots []string) {
 	af.botsMu.RLock()
 	defer af.botsMu.RUnlock()
 
-	for sub, _ := range af.botSubscriptions {
+	for sub := range af.botSubscriptions {
 		bots = append(bots, sub)
 	}
 	return
@@ -95,27 +92,7 @@ func (af *alertFeed) IsStarted() bool {
 }
 
 func (af *alertFeed) Start() {
-	if !af.started {
-		go af.loop()
-	}
-}
 
-func (af *alertFeed) loop() {
-	if err := af.initialize(); err != nil {
-		log.WithError(err).Panic("failed to initialize")
-	}
-
-	af.started = true
-	defer func() {
-		af.started = false
-	}()
-	err := af.forEachAlert()
-	if err == nil {
-		return
-	}
-	for _, handler := range af.handlers {
-		handler.ErrCh <- err
-	}
 }
 
 func (af *alertFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-chan error {
@@ -132,7 +109,7 @@ func (af *alertFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-cha
 	return errCh
 }
 
-func (af *alertFeed) forEachAlert() error {
+func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
 	for {
 		if af.ctx.Err() != nil {
 			return af.ctx.Err()
@@ -162,45 +139,14 @@ func (af *alertFeed) forEachAlert() error {
 			evt := &domain.AlertEvent{
 				Alert: alert,
 			}
-			af.handlersMu.RLock()
-			handlers := af.handlers
-			af.handlersMu.RUnlock()
-			for _, handler := range handlers {
-				if err := handler.Handler(evt); err != nil {
-					return err
-				}
+
+			if err := alertHandler(evt); err != nil {
+				return err
 			}
 
 			af.alertCache.Add(alert.AlertHash)
 		}
 	}
-}
-
-func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
-	grp, _ := errgroup.WithContext(af.ctx)
-
-	// iterate over alerts
-	grp.Go(
-		func() error {
-			errCh := af.Subscribe(
-				func(evt *domain.AlertEvent) error {
-					af.alertCh <- evt
-					var alertHandlerErr error
-					if alertHandler != nil {
-						alertHandlerErr = alertHandler(evt)
-					}
-					return alertHandlerErr
-				},
-			)
-			err := <-errCh
-			close(af.alertCh)
-
-			return err
-		},
-	)
-
-	// block until above all finish (when context is cancelled or error returns)
-	return grp.Wait()
 }
 
 // Name returns the name of this implementation.
