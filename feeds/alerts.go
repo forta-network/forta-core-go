@@ -39,6 +39,7 @@ type alertFeed struct {
 	botsMu           sync.RWMutex
 	// createdSince the earliest alert in milliseconds
 	createdSince uint
+	alertCache   utils.Cache
 }
 
 func (af *alertFeed) Subscriptions() map[string][]string {
@@ -154,6 +155,10 @@ func (af *alertFeed) forEachAlert() error {
 		}
 
 		for _, alert := range alerts {
+			if af.alertCache.Exists(alert.Alert.Id) {
+				continue
+			}
+
 			evt := &domain.AlertEvent{
 				Alert: alert,
 			}
@@ -165,6 +170,8 @@ func (af *alertFeed) forEachAlert() error {
 					return err
 				}
 			}
+
+			af.alertCache.Add(alert.Alert.Id)
 		}
 	}
 }
