@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/forta-network/forta-core-go/clients/graphql"
-	"github.com/forta-network/forta-core-go/protocol"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
@@ -140,10 +139,12 @@ func (af *alertFeed) forEachAlert() error {
 		if af.rateLimit != nil {
 			<-af.rateLimit.C
 		}
+
 		// skip query if there are no alert subscriptions
 		if len(af.SubscribedBots()) == 0 {
 			continue
 		}
+
 		alerts, err := af.client.GetAlerts(
 			af.ctx,
 			&graphql.AlertsInput{Bots: af.SubscribedBots()},
@@ -154,9 +155,7 @@ func (af *alertFeed) forEachAlert() error {
 
 		for _, alert := range alerts {
 			evt := &domain.AlertEvent{
-				Alert: &protocol.AlertEvent{
-					Alert: alert,
-				},
+				Alert: alert,
 			}
 			af.handlersMu.RLock()
 			handlers := af.handlers
