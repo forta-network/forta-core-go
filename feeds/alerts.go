@@ -109,7 +109,7 @@ func (af *alertFeed) loop() {
 	defer func() {
 		af.started = false
 	}()
-	err := af.forEachBlock()
+	err := af.forEachAlert()
 	if err == nil {
 		return
 	}
@@ -132,7 +132,7 @@ func (af *alertFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-cha
 	return errCh
 }
 
-func (af *alertFeed) forEachBlock() error {
+func (af *alertFeed) forEachAlert() error {
 	for {
 		if af.ctx.Err() != nil {
 			return af.ctx.Err()

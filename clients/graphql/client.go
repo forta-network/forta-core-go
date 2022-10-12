@@ -93,7 +93,7 @@ func ToProto(response getAlertsResponse) []*protocol.Alert {
 				Agent: &protocol.AgentInfo{
 					Image:     alert.Source.Bot.Image,
 					ImageHash: "",
-					Id:        alert.Source.Bot.Image,
+					Id:        alert.Source.Bot.Id,
 					IsTest:    false,
 					Manifest:  "",
 				},
