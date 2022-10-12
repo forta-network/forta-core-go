@@ -74,8 +74,6 @@ func ForAlertBotAlert(inputs *Inputs) string {
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
-			inputs.Transaction.Network.ChainId,
-			inputs.Transaction.Transaction.Hash,
 			inputs.Finding.Name,
 			inputs.Finding.Description,
 			inputs.Finding.Protocol,
