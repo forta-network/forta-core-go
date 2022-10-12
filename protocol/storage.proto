@@ -12,7 +12,7 @@ enum ContentKind {
 }
 
 message PutRequest {
-  string owner = 1;
+  string user = 1;
   ContentKind kind = 2;
   bytes bytes = 3;
 }
@@ -37,7 +37,7 @@ enum SortDirection {
 }
 
 message ListRequest {
-  string owner = 1;
+  string user = 1;
   ContentKind kind = 2;
   SortDirection sort = 3;
   int64 offset = 4;
