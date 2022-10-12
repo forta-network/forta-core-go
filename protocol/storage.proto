@@ -6,14 +6,9 @@ import public "response.proto";
 
 option go_package = "./;protocol";
 
-enum ContentKind {
-  CONTENT_UNKNOWN = 0;
-  CONTENT_BATCH_RECEIPT = 1;
-}
-
 message PutRequest {
   string user = 1;
-  ContentKind kind = 2;
+  string kind = 2;
   bytes bytes = 3;
 }
 
@@ -38,7 +33,7 @@ enum SortDirection {
 
 message ListRequest {
   string user = 1;
-  ContentKind kind = 2;
+  string kind = 2;
   SortDirection sort = 3;
   int64 offset = 4;
   int64 limit = 5;
