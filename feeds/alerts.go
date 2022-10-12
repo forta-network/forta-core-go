@@ -155,7 +155,7 @@ func (af *alertFeed) forEachAlert() error {
 		}
 
 		for _, alert := range alerts {
-			if af.alertCache.Exists(alert.Alert.Id) {
+			if af.alertCache.Exists(alert.AlertHash) {
 				continue
 			}
 
@@ -171,7 +171,7 @@ func (af *alertFeed) forEachAlert() error {
 				}
 			}
 
-			af.alertCache.Add(alert.Alert.Id)
+			af.alertCache.Add(alert.AlertHash)
 		}
 	}
 }

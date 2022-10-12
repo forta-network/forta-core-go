@@ -80,6 +80,7 @@ func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 		chainId := strconv.FormatUint(uint64(alert.Source.Block.ChainId), 10)
 		resp = append(
 			resp, &protocol.AlertEvent{
+				AlertHash: alert.Hash,
 				Alert: &protocol.Alert{
 					Id: alert.AlertId,
 					Finding: &protocol.Finding{

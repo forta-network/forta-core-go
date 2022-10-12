@@ -236,4 +236,5 @@ message AlertEvent {
 
   Network network = 2;
   Alert alert = 3;
+  string alertHash = 4;
 }
