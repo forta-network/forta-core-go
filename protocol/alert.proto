@@ -16,6 +16,7 @@ enum AlertType {
   TRANSACTION = 1;
   BLOCK = 2;
   PRIVATE = 3;
+  ALERT = 4;
 }
 
 message AgentInfo {

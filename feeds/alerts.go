@@ -173,17 +173,17 @@ func (af *alertFeed) forEachAlert() error {
 func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
 	grp, _ := errgroup.WithContext(af.ctx)
 
-	// iterate over blocks
+	// iterate over alerts
 	grp.Go(
 		func() error {
 			errCh := af.Subscribe(
 				func(evt *domain.AlertEvent) error {
 					af.alertCh <- evt
-					var blockHandlerErr error
+					var alertHandlerErr error
 					if alertHandler != nil {
-						blockHandlerErr = alertHandler(evt)
+						alertHandlerErr = alertHandler(evt)
 					}
-					return blockHandlerErr
+					return alertHandlerErr
 				},
 			)
 			err := <-errCh
