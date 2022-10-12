@@ -230,6 +230,7 @@ func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) 
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
 		botSubscriptions: map[string][]string{},
+		alertCache:       utils.NewCache(1e6),
 	}
 	return bf, nil
 }
