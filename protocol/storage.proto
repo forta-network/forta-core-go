@@ -15,10 +15,12 @@ message PutRequest {
 message PutResponse {
   Response response = 1;
   string contentId = 2;
+  string contentPath = 3;
 }
 
 message GetRequest {
   string contentId = 1;
+  string contentPath = 2;
 }
 
 message GetResponse {
@@ -39,9 +41,14 @@ message ListRequest {
   int64 limit = 5;
 }
 
+message ContentInfo {
+  string contentPath = 1;
+  string contentId = 2;
+}
+
 message ListResponse {
   Response response = 1;
-  repeated string contentIds = 2;
+  repeated ContentInfo contents = 2;
 }
 
 service Storage {
