@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package network.forta;
 
-import public "response.proto";
-
 option go_package = "./;protocol";
 
 message PutRequest {
@@ -13,9 +11,8 @@ message PutRequest {
 }
 
 message PutResponse {
-  Response response = 1;
-  string contentId = 2;
-  string contentPath = 3;
+  string contentId = 1;
+  string contentPath = 2;
 }
 
 message GetRequest {
@@ -24,8 +21,7 @@ message GetRequest {
 }
 
 message GetResponse {
-  Response response = 1;
-  bytes bytes = 2;
+  bytes bytes = 1;
 }
 
 enum SortDirection {
@@ -47,8 +43,7 @@ message ContentInfo {
 }
 
 message ListResponse {
-  Response response = 1;
-  repeated ContentInfo contents = 2;
+  repeated ContentInfo contents = 1;
 }
 
 service Storage {
