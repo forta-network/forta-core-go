@@ -18,6 +18,7 @@ message PutResponse {
 message GetRequest {
   string contentId = 1;
   string contentPath = 2;
+  bool download = 3;
 }
 
 message GetResponse {
