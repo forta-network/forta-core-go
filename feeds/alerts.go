@@ -6,9 +6,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/forta-network/forta-core-go/clients/graphql"
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -123,9 +125,21 @@ func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) erro
 			continue
 		}
 
-		alerts, err := af.client.GetAlerts(
-			af.ctx,
-			&graphql.AlertsInput{Bots: af.SubscribedBots()},
+		var alerts []*protocol.AlertEvent
+		bo := backoff.NewExponentialBackOff()
+		err := backoff.Retry(
+			func() error {
+				var cErr error
+				alerts, cErr = af.client.GetAlerts(
+					af.ctx,
+					&graphql.AlertsInput{Bots: af.SubscribedBots()},
+				)
+				if cErr != nil {
+					return cErr
+				}
+
+				return nil
+			}, bo,
 		)
 		if err != nil {
 			return err
