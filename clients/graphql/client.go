@@ -117,6 +117,15 @@ func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 					},
 				},
 				Network: &protocol.AlertEvent_Network{ChainId: chainId},
+				Source: &protocol.AlertEvent_Source{
+					TransactionHash: alert.Source.TransactionHash,
+					Block: &protocol.AlertEvent_Block{
+						Number:    uint64(alert.Source.Block.Number),
+						Hash:      alert.Source.Block.Hash,
+						Timestamp: alert.Source.Block.Timestamp,
+						ChainId:   uint64(alert.Source.Block.ChainId),
+					},
+				},
 			},
 		)
 	}
