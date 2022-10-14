@@ -18,6 +18,8 @@ message NotifyRequest {
   EvaluateBlockResponse evalBlockResponse = 5;
   AgentInfo agentInfo = 6;
   TrackingTimestamps timestamps = 7;
+  EvaluateAlertRequest evalAlertRequest = 8;
+  EvaluateAlertResponse evalAlertResponse = 9;
 }
 
 message NotifyResponse {}
