@@ -5,6 +5,7 @@ package network.forta;
 import public "publisher.proto";
 import public "agent.proto";
 import public "bot_metrics.proto";
+import public "alert.proto";
 
 option go_package = "./;protocol";
 
@@ -54,6 +55,7 @@ message AlertBatch {
   repeated AgentAlerts privateAlerts = 11;
   uint64 latestBlockInput = 12;
   InspectionResults inspectionResults = 13;
+  repeated MetaAlertResults MetaAlertResults = 14;
 }
 
 message BlockResults {
@@ -64,6 +66,11 @@ message BlockResults {
 
 message TransactionResults {
   TransactionEvent transaction = 1;
+  repeated AgentAlerts results = 2;
+}
+
+message MetaAlertResults {
+  AlertEvent alert = 1;
   repeated AgentAlerts results = 2;
 }
 
