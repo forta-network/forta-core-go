@@ -1062,7 +1062,6 @@ type AlertEvent struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//  Network network = 1;
 	Alert      *AlertEvent_Alert   `protobuf:"bytes,1,opt,name=alert,proto3" json:"alert,omitempty"`
 	Timestamps *TrackingTimestamps `protobuf:"bytes,2,opt,name=timestamps,proto3" json:"timestamps,omitempty"`
 }

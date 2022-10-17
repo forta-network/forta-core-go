@@ -290,9 +290,6 @@ message AlertEvent {
     string findingType = 13;
   }
 
-  //  Network network = 1;
   Alert alert = 1;
   TrackingTimestamps timestamps = 2;
-  //  string alertHash = 3;
-  //  Source source = 4;
 }

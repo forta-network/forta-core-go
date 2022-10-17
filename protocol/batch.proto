@@ -61,7 +61,7 @@ message BlockResults {
   Block block = 1;
   repeated AgentAlerts results = 2;
   repeated TransactionResults transactions = 3;
-  repeated  MetaAlertResults metaAlerts = 4;
+  repeated  CombinationAlertResults combinationAlerts = 4;
 }
 
 message TransactionResults {
@@ -69,7 +69,7 @@ message TransactionResults {
   repeated AgentAlerts results = 2;
 }
 
-message MetaAlertResults {
+message CombinationAlertResults {
   AlertEvent alertEvent = 1;
   repeated AgentAlerts results = 2;
 }

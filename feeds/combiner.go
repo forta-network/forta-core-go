@@ -14,12 +14,12 @@ import (
 	"github.com/forta-network/forta-core-go/utils"
 )
 
-type afHandler struct {
+type cfHandler struct {
 	Handler func(evt *domain.AlertEvent) error
 	ErrCh   chan<- error
 }
 
-type alertFeed struct {
+type combinerFeed struct {
 	offset    int
 	ctx       context.Context
 	cache     utils.Cache
@@ -29,7 +29,7 @@ type alertFeed struct {
 	lastAlert health.MessageTracker
 	workers   int
 
-	handlers   []afHandler
+	handlers   []cfHandler
 	handlersMu sync.RWMutex
 	alertCh    chan *domain.AlertEvent
 	client     *graphql.Client
@@ -41,69 +41,69 @@ type alertFeed struct {
 	alertCache   utils.Cache
 }
 
-func (af *alertFeed) Subscriptions() map[string][]string {
-	af.botsMu.RLock()
-	defer af.botsMu.RUnlock()
-	return af.botSubscriptions
+func (cf *combinerFeed) Subscriptions() map[string][]string {
+	cf.botsMu.RLock()
+	defer cf.botsMu.RUnlock()
+	return cf.botSubscriptions
 }
-func (af *alertFeed) SubscribedBots() (bots []string) {
-	af.botsMu.RLock()
-	defer af.botsMu.RUnlock()
+func (cf *combinerFeed) SubscribedBots() (bots []string) {
+	cf.botsMu.RLock()
+	defer cf.botsMu.RUnlock()
 
-	for sub := range af.botSubscriptions {
+	for sub := range cf.botSubscriptions {
 		bots = append(bots, sub)
 	}
 	return
 }
-func (af *alertFeed) AddSubscription(subscription, subscriber string) {
-	af.botsMu.Lock()
-	defer af.botsMu.Unlock()
-	for _, s := range af.botSubscriptions[subscription] {
+func (cf *combinerFeed) AddSubscription(subscription, subscriber string) {
+	cf.botsMu.Lock()
+	defer cf.botsMu.Unlock()
+	for _, s := range cf.botSubscriptions[subscription] {
 		if s == subscriber {
 			return
 		}
 	}
-	af.botSubscriptions[subscription] = append(af.botSubscriptions[subscription], subscriber)
+	cf.botSubscriptions[subscription] = append(cf.botSubscriptions[subscription], subscriber)
 }
-func (af *alertFeed) RemoveSubscription(subscription, subscriber string) {
-	af.botsMu.Lock()
-	defer af.botsMu.Unlock()
+func (cf *combinerFeed) RemoveSubscription(subscription, subscriber string) {
+	cf.botsMu.Lock()
+	defer cf.botsMu.Unlock()
 
-	for i, s := range af.botSubscriptions[subscription] {
+	for i, s := range cf.botSubscriptions[subscription] {
 		if s == subscriber {
-			af.botSubscriptions[subscription] = append(af.botSubscriptions[subscription][:i], af.botSubscriptions[subscription][i+1:]...)
+			cf.botSubscriptions[subscription] = append(cf.botSubscriptions[subscription][:i], cf.botSubscriptions[subscription][i+1:]...)
 		}
 	}
-	if len(af.botSubscriptions[subscription]) == 0 {
-		delete(af.botSubscriptions, subscription)
+	if len(cf.botSubscriptions[subscription]) == 0 {
+		delete(cf.botSubscriptions, subscription)
 	}
 }
 
-type AlertFeedConfig struct {
+type CombinerFeedConfig struct {
 	Offset    int
 	RateLimit *time.Ticker
 	APIUrl    string
 }
 
-func (af *alertFeed) initialize() error {
+func (cf *combinerFeed) initialize() error {
 	return nil
 }
 
-func (af *alertFeed) IsStarted() bool {
-	return af.started
+func (cf *combinerFeed) IsStarted() bool {
+	return cf.started
 }
 
-func (af *alertFeed) Start() {
+func (cf *combinerFeed) Start() {
 
 }
 
-func (af *alertFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-chan error {
-	af.handlersMu.Lock()
-	defer af.handlersMu.Unlock()
+func (cf *combinerFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-chan error {
+	cf.handlersMu.Lock()
+	defer cf.handlersMu.Unlock()
 
 	errCh := make(chan error)
-	af.handlers = append(
-		af.handlers, afHandler{
+	cf.handlers = append(
+		cf.handlers, cfHandler{
 			Handler: handler,
 			ErrCh:   errCh,
 		},
@@ -111,17 +111,17 @@ func (af *alertFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-cha
 	return errCh
 }
 
-func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
+func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
 	for {
-		if af.ctx.Err() != nil {
-			return af.ctx.Err()
+		if cf.ctx.Err() != nil {
+			return cf.ctx.Err()
 		}
-		if af.rateLimit != nil {
-			<-af.rateLimit.C
+		if cf.rateLimit != nil {
+			<-cf.rateLimit.C
 		}
 
 		// skip query if there are no alert subscriptions
-		if len(af.SubscribedBots()) == 0 {
+		if len(cf.SubscribedBots()) == 0 {
 			continue
 		}
 
@@ -130,9 +130,9 @@ func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) erro
 		err := backoff.Retry(
 			func() error {
 				var cErr error
-				alerts, cErr = af.client.GetAlerts(
-					af.ctx,
-					&graphql.AlertsInput{Bots: af.SubscribedBots()},
+				alerts, cErr = cf.client.GetAlerts(
+					cf.ctx,
+					&graphql.AlertsInput{Bots: cf.SubscribedBots()},
 				)
 				if cErr != nil {
 					return cErr
@@ -146,7 +146,7 @@ func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) erro
 		}
 
 		for _, alert := range alerts {
-			if af.alertCache.Exists(alert.Alert.Hash) {
+			if cf.alertCache.Exists(alert.Alert.Hash) {
 				continue
 			}
 
@@ -166,31 +166,31 @@ func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) erro
 				return err
 			}
 
-			af.alertCache.Add(alert.Alert.Hash)
+			cf.alertCache.Add(alert.Alert.Hash)
 		}
 	}
 }
 
 // Name returns the name of this implementation.
-func (af *alertFeed) Name() string {
+func (cf *combinerFeed) Name() string {
 	return "alert-feed"
 }
 
 // Health implements the health.Reporter interface.
-func (af *alertFeed) Health() health.Reports {
+func (cf *combinerFeed) Health() health.Reports {
 	return health.Reports{
-		af.lastAlert.GetReport("last-alert"),
+		cf.lastAlert.GetReport("last-alert"),
 	}
 }
 
-func NewAlertFeed(ctx context.Context, cfg AlertFeedConfig) (*alertFeed, error) {
+func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
 	if cfg.Offset < 0 {
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
 	ac := graphql.NewClient(cfg.APIUrl)
 	alerts := make(chan *domain.AlertEvent, 10)
 
-	bf := &alertFeed{
+	bf := &combinerFeed{
 		offset:           cfg.Offset,
 		ctx:              ctx,
 		client:           ac,
