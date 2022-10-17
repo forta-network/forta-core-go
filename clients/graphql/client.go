@@ -78,7 +78,7 @@ func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 	for _, alert := range response.Alerts.Alerts {
 		blockNum := hexutil.EncodeUint64(uint64(alert.Source.Block.Number))
 		chainId := hexutil.EncodeUint64(uint64(alert.Source.Block.ChainId))
-		
+
 		resp = append(
 			resp, &protocol.AlertEvent{
 				AlertHash: alert.Hash,

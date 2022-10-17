@@ -55,13 +55,13 @@ message AlertBatch {
   repeated AgentAlerts privateAlerts = 11;
   uint64 latestBlockInput = 12;
   InspectionResults inspectionResults = 13;
-  repeated MetaAlertResults MetaAlertResults = 14;
 }
 
 message BlockResults {
   Block block = 1;
   repeated AgentAlerts results = 2;
   repeated TransactionResults transactions = 3;
+  repeated  MetaAlertResults metaAlerts = 4;
 }
 
 message TransactionResults {
