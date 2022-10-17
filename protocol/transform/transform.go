@@ -54,6 +54,7 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 						batch.ChainId,
 						resultsForBlock.Block,
 						nil,
+						nil,
 					),
 				)
 			}
@@ -67,17 +68,28 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 							batch.ChainId,
 							resultsForBlock.Block,
 							resultsForTransaction.Transaction,
+							nil,
 						),
 					)
 				}
 			}
 		}
+
+		// handle meta alerts
+		for _, metaAlertResults := range resultsForBlock.MetaAlerts {
+			for _, result := range metaAlertResults.Results {
+				for _, alert := range result.Alerts {
+					alertList = append(alertList, ToWebhookAlert(alert.Alert, batch.ChainId, resultsForBlock.Block, nil, metaAlertResults.AlertEvent))
+				}
+			}
+		}
 	}
+
 	return alertList
 }
 
 // ToWebhookAlert converts given alert and extra data to webhook alert.
-func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block, transaction *protocol.TransactionEvent) *models.Alert {
+func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block, transaction *protocol.TransactionEvent, metaAlert *protocol.AlertEvent) *models.Alert {
 	webhookAlert := &models.Alert{
 		AlertID:     alert.Finding.AlertId,
 		CreatedAt:   alert.Timestamp,
@@ -108,6 +120,7 @@ func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block
 		webhookAlert.Addresses = utils.MapKeys(transaction.Addresses)
 		webhookAlert.Source.TransactionHash = transaction.Transaction.Hash
 	}
+
 	return webhookAlert
 }
 
