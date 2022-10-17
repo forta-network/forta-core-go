@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/protocol"
 )
 
@@ -73,58 +72,63 @@ func (ac *Client) GetAlerts(
 func (v getAlertsResponse) ToProto() []*protocol.AlertEvent {
 	return ToProto(v)
 }
+
 func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 	var resp []*protocol.AlertEvent
 	for _, alert := range response.Alerts.Alerts {
-		blockNum := hexutil.EncodeUint64(uint64(alert.Source.Block.Number))
-		chainId := hexutil.EncodeUint64(uint64(alert.Source.Block.ChainId))
-
+		contracts := make([]*protocol.AlertEvent_Alert_Contract, len(alert.Contracts))
+		projects := make([]*protocol.AlertEvent_Alert_Project, len(alert.Projects))
+		for i, contract := range alert.Contracts {
+			contracts[i] = &protocol.AlertEvent_Alert_Contract{
+				Name:      contract.Name,
+				ProjectId: contract.ProjectId,
+			}
+		}
+		for i, project := range alert.Projects {
+			projects[i] = &protocol.AlertEvent_Alert_Project{
+				Id: project.Id,
+			}
+		}
 		resp = append(
 			resp, &protocol.AlertEvent{
-				AlertHash: alert.Hash,
-				Alert: &protocol.Alert{
-					Id: alert.AlertId,
-					Finding: &protocol.Finding{
-						Protocol:    alert.Protocol,
-						Severity:    protocol.Finding_Severity(protocol.Finding_Severity_value[alert.Severity]),
-						Metadata:    alert.Metadata,
-						Type:        protocol.Finding_FindingType(protocol.Finding_FindingType_value[alert.FindingType]),
-						AlertId:     alert.AlertId,
-						Name:        alert.Name,
-						Description: alert.Description,
-						EverestId:   "",
-						Private:     false,
-						Addresses:   alert.Addresses,
-						Indicators:  nil,
+				Alert: &protocol.AlertEvent_Alert{
+					AlertId:       alert.AlertId,
+					Addresses:     alert.Addresses,
+					Contracts:     contracts,
+					CreatedAt:     alert.CreatedAt,
+					Description:   alert.Description,
+					Hash:          alert.Hash,
+					Metadata:      alert.Metadata,
+					Name:          alert.Name,
+					Projects:      projects,
+					ScanNodeCount: int32(alert.ScanNodeCount),
+					Severity:      alert.Severity,
+					Source: &protocol.AlertEvent_Alert_Source{
+						TransactionHash: alert.Source.TransactionHash,
+						Bot: &protocol.AlertEvent_Alert_Bot{
+							ChainIds:     alert.Source.Bot.ChainIds,
+							CreatedAt:    alert.Source.Bot.CreatedAt,
+							Description:  alert.Source.Bot.Description,
+							Developer:    alert.Source.Bot.Developer,
+							DocReference: alert.Source.Bot.DocReference,
+							Enabled:      alert.Source.Bot.Enabled,
+							Id:           alert.Source.Bot.Id,
+							Image:        alert.Source.Bot.Image,
+							Name:         alert.Source.Bot.Name,
+							Reference:    alert.Source.Bot.Reference,
+							Repository:   alert.Source.Bot.Repository,
+							Projects:     alert.Source.Bot.Projects,
+							ScanNodes:    alert.Source.Bot.ScanNodes,
+							Version:      alert.Source.Bot.Version,
+						},
+						Block: &protocol.AlertEvent_Alert_Block{
+							Number:    uint64(alert.Source.Block.Number),
+							Hash:      alert.Source.Block.Hash,
+							Timestamp: alert.Source.Block.Timestamp,
+							ChainId:   uint64(alert.Source.Block.ChainId),
+						},
 					},
-					Timestamp: alert.CreatedAt,
-					Metadata:  alert.Metadata,
-					Agent: &protocol.AgentInfo{
-						Image:     alert.Source.Bot.Image,
-						ImageHash: "",
-						Id:        alert.Source.Bot.Id,
-						IsTest:    false,
-						Manifest:  "",
-					},
-					Tags: nil,
-					Scanner: &protocol.ScannerInfo{
-						Address: "",
-					},
-					Timestamps: &protocol.TrackingTimestamps{
-						Block:       blockNum,
-						Feed:        "",
-						BotRequest:  "",
-						BotResponse: "",
-					},
-				},
-				Network: &protocol.AlertEvent_Network{ChainId: chainId},
-				Source: &protocol.AlertEvent_Source{
-					TransactionHash: alert.Source.TransactionHash,
-					Block: &protocol.AlertEvent_EthBlock{
-						BlockNumber:    blockNum,
-						BlockHash:      alert.Source.Block.Hash,
-						BlockTimestamp: alert.Source.Block.Timestamp,
-					},
+					FindingType: alert.FindingType,
 				},
 			},
 		)

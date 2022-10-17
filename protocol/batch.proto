@@ -70,7 +70,7 @@ message TransactionResults {
 }
 
 message MetaAlertResults {
-  AlertEvent alert = 1;
+  AlertEvent alertEvent = 1;
   repeated AgentAlerts results = 2;
 }
 

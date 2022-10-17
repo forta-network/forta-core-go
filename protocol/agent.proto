@@ -230,23 +230,69 @@ message TransactionEvent {
 }
 
 message AlertEvent {
-  message Network {
-    string chainId = 1;
+  message Alert {
+    message Contract {
+      string name = 1;
+      string projectId = 2;
+    }
+
+    message Project {
+      string id = 1;
+    }
+
+    message Block {
+      uint64 number = 1;
+      string hash = 2;
+      string timestamp = 3;
+      uint64 chainId = 4;
+    }
+
+    message Bot {
+      repeated string chainIds = 1;
+      string createdAt = 2;
+      string description = 3;
+      string developer = 4;
+      string DocReference = 5;
+      bool enabled = 6;
+      string id = 7;
+      string image = 8;
+      string name = 9;
+      string reference = 10;
+      string repository = 11;
+      repeated string projects = 12;
+      repeated string scanNodes = 13;
+      string version = 14;
+    }
+
+    message Source {
+      string transactionHash = 1;
+      Alert.Bot bot = 2;
+      Alert.Block block = 3;
+    }
+
+    // Unique string to identify this class of finding,
+    // primarily used to group similar findings for the end user
+    string alertId = 1;
+    // List of addresses involved in the alert
+    repeated string addresses = 2;
+    // List of contracts related to the alert
+    repeated Contract contracts = 3;
+    // Timestamp when the alert was published
+    string createdAt = 4;
+    string description = 5;
+    string hash = 6;
+    map<string, string> metadata = 7;
+    string name = 8;
+    repeated Project projects = 9;
+    int32 scanNodeCount = 10;
+    string severity = 11;
+    Source source = 12;
+    string findingType = 13;
   }
 
-  message EthBlock {
-    string blockHash = 1;
-    string blockNumber = 2;
-    string blockTimestamp = 3;
-  }
-
-  message Source{
-    string transactionHash = 1;
-    EthBlock block = 2;
-  }
-
-  Network network = 1;
-  Alert alert = 2;
-  string alertHash = 3;
-  Source source = 4;
+  //  Network network = 1;
+  Alert alert = 1;
+  TrackingTimestamps timestamps = 2;
+  //  string alertHash = 3;
+  //  Source source = 4;
 }

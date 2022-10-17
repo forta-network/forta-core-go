@@ -293,12 +293,12 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 
 type AlertEvent struct {
 	EventType  EventType
-	Alert      *protocol.AlertEvent
+	Event      *protocol.AlertEvent
 	Logs       []LogEntry
 	Timestamps *TrackingTimestamps
 }
 
 // ToMessage converts the AlertEvent to the protocol.TransactionEvent message
 func (t *AlertEvent) ToMessage() (*protocol.AlertEvent, error) {
-	return t.Alert, nil
+	return t.Event, nil
 }

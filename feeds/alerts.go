@@ -146,19 +146,27 @@ func (af *alertFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) erro
 		}
 
 		for _, alert := range alerts {
-			if af.alertCache.Exists(alert.AlertHash) {
+			if af.alertCache.Exists(alert.Alert.Hash) {
 				continue
 			}
 
+			alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
+			if err != nil {
+				return err
+			}
 			evt := &domain.AlertEvent{
-				Alert: alert,
+				Event: alert,
+				Timestamps: &domain.TrackingTimestamps{
+					Block: alertCA,
+					Feed:  time.Now().UTC(),
+				},
 			}
 
 			if err := alertHandler(evt); err != nil {
 				return err
 			}
 
-			af.alertCache.Add(alert.AlertHash)
+			af.alertCache.Add(alert.Alert.Hash)
 		}
 	}
 }
