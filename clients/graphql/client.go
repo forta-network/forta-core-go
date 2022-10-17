@@ -2,10 +2,10 @@ package graphql
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/protocol"
 )
 
@@ -76,8 +76,9 @@ func (v getAlertsResponse) ToProto() []*protocol.AlertEvent {
 func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 	var resp []*protocol.AlertEvent
 	for _, alert := range response.Alerts.Alerts {
-		blockNum := strconv.FormatUint(uint64(alert.Source.Block.Number), 10)
-		chainId := strconv.FormatUint(uint64(alert.Source.Block.ChainId), 10)
+		blockNum := hexutil.EncodeUint64(uint64(alert.Source.Block.Number))
+		chainId := hexutil.EncodeUint64(uint64(alert.Source.Block.ChainId))
+		
 		resp = append(
 			resp, &protocol.AlertEvent{
 				AlertHash: alert.Hash,
@@ -119,11 +120,10 @@ func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 				Network: &protocol.AlertEvent_Network{ChainId: chainId},
 				Source: &protocol.AlertEvent_Source{
 					TransactionHash: alert.Source.TransactionHash,
-					Block: &protocol.AlertEvent_Block{
-						Number:    uint64(alert.Source.Block.Number),
-						Hash:      alert.Source.Block.Hash,
-						Timestamp: alert.Source.Block.Timestamp,
-						ChainId:   uint64(alert.Source.Block.ChainId),
+					Block: &protocol.AlertEvent_EthBlock{
+						BlockNumber:    blockNum,
+						BlockHash:      alert.Source.Block.Hash,
+						BlockTimestamp: alert.Source.Block.Timestamp,
 					},
 				},
 			},

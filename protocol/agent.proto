@@ -233,16 +233,16 @@ message AlertEvent {
   message Network {
     string chainId = 1;
   }
-  message Block {
-    uint64 number = 1;
-    string hash = 2;
-    string timestamp = 3;
-    uint64 chainId = 4;
+
+  message EthBlock {
+    string blockHash = 1;
+    string blockNumber = 2;
+    string blockTimestamp = 3;
   }
 
   message Source{
     string transactionHash = 1;
-    Block block = 2;
+    EthBlock block = 2;
   }
 
   Network network = 1;
