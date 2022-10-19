@@ -12,6 +12,7 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type cfHandler struct {
@@ -135,6 +136,7 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 					&graphql.AlertsInput{Bots: cf.SubscribedBots()},
 				)
 				if cErr != nil {
+					logrus.WithError(cErr).Warn("error retrieving alerts")
 					return cErr
 				}
 

@@ -10,7 +10,7 @@ import (
 
 const (
 	DefaultLastNMinutes = time.Minute * 10
-	DefaultQueryLimit   = 5e3
+	DefaultQueryLimit   = 1e3
 )
 
 type GetAlertsResponse getAlertsResponse
