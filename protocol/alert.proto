@@ -91,4 +91,5 @@ message Finding {
   bool private = 9;
   repeated string addresses = 10;
   map<string, double> indicators = 11;
+  repeated string related_alerts = 12;
 }
