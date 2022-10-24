@@ -608,7 +608,7 @@ func (x *CombinationAlertResults) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CombinationAlertResults.ProtoReflect.Descriptor instead.
+// Deprecated: Use combinationResults.ProtoReflect.Descriptor instead.
 func (*CombinationAlertResults) Descriptor() ([]byte, []int) {
 	return file_batch_proto_rawDescGZIP(), []int{6}
 }
@@ -1227,7 +1227,7 @@ var file_batch_proto_goTypes = []interface{}{
 	(*AlertBatch)(nil),              // 4: network.forta.AlertBatch
 	(*BlockResults)(nil),            // 5: network.forta.BlockResults
 	(*TransactionResults)(nil),      // 6: network.forta.TransactionResults
-	(*CombinationAlertResults)(nil), // 7: network.forta.CombinationAlertResults
+	(*CombinationAlertResults)(nil), // 7: network.forta.combinationResults
 	(*AgentAlerts)(nil),             // 8: network.forta.AgentAlerts
 	(*Block)(nil),                   // 9: network.forta.Block
 	(*BatchAgent)(nil),              // 10: network.forta.BatchAgent
@@ -1259,11 +1259,11 @@ var file_batch_proto_depIdxs = []int32{
 	9,  // 11: network.forta.BlockResults.block:type_name -> network.forta.Block
 	8,  // 12: network.forta.BlockResults.results:type_name -> network.forta.AgentAlerts
 	6,  // 13: network.forta.BlockResults.transactions:type_name -> network.forta.TransactionResults
-	7,  // 14: network.forta.BlockResults.combinationAlerts:type_name -> network.forta.CombinationAlertResults
+	7,  // 14: network.forta.BlockResults.combinationAlerts:type_name -> network.forta.combinationResults
 	19, // 15: network.forta.TransactionResults.transaction:type_name -> network.forta.TransactionEvent
 	8,  // 16: network.forta.TransactionResults.results:type_name -> network.forta.AgentAlerts
-	20, // 17: network.forta.CombinationAlertResults.alertEvent:type_name -> network.forta.AlertEvent
-	8,  // 18: network.forta.CombinationAlertResults.results:type_name -> network.forta.AgentAlerts
+	20, // 17: network.forta.combinationResults.alertEvent:type_name -> network.forta.AlertEvent
+	8,  // 18: network.forta.combinationResults.results:type_name -> network.forta.AgentAlerts
 	21, // 19: network.forta.AgentAlerts.alerts:type_name -> network.forta.SignedAlert
 	22, // 20: network.forta.BatchAgent.info:type_name -> network.forta.AgentInfo
 	13, // 21: network.forta.InspectionResults.inputs:type_name -> network.forta.InspectionInputs

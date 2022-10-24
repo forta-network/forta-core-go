@@ -29,19 +29,22 @@ type BotInfo struct {
 
 // ForBlockAlert calculates the hash for the block alert.
 func ForBlockAlert(inputs *Inputs) string {
-	idStr := strings.Join([]string{
-		Version, "|",
-		inputs.Block.Network.ChainId,
-		inputs.Block.BlockHash,
-		inputs.Finding.AlertId,
-		inputs.Finding.Name,
-		inputs.Finding.Description,
-		inputs.Finding.Protocol,
-		inputs.Finding.Type.String(),
-		inputs.Finding.Severity.String(),
-		inputs.BotImage,
-		inputs.BotID,
-		strings.Join(inputs.Finding.Addresses, "")}, "")
+	idStr := strings.Join(
+		[]string{
+			Version, "|",
+			inputs.Block.Network.ChainId,
+			inputs.Block.BlockHash,
+			inputs.Finding.AlertId,
+			inputs.Finding.Name,
+			inputs.Finding.Description,
+			inputs.Finding.Protocol,
+			inputs.Finding.Type.String(),
+			inputs.Finding.Severity.String(),
+			inputs.BotImage,
+			inputs.BotID,
+			strings.Join(inputs.Finding.Addresses, ""),
+		}, "",
+	)
 	return crypto.Keccak256Hash([]byte(idStr)).Hex()
 }
 
@@ -49,21 +52,22 @@ func ForBlockAlert(inputs *Inputs) string {
 func ForTransactionAlert(inputs *Inputs) string {
 	txAddrs := utils.MapKeys(inputs.Transaction.TxAddresses)
 	sort.Strings(txAddrs)
-	idStr := strings.Join([]string{
-		Version, "|",
-		inputs.Transaction.Network.ChainId,
-		inputs.Transaction.Transaction.Hash,
-		inputs.Finding.Name,
-		inputs.Finding.Description,
-		inputs.Finding.Protocol,
-		inputs.Finding.Type.String(),
-		inputs.Finding.AlertId,
-		inputs.Finding.Severity.String(),
-		inputs.BotImage,
-		inputs.BotID,
-		strings.Join(txAddrs, ""),
-		strings.Join(inputs.Finding.Addresses, ""),
-	}, "",
+	idStr := strings.Join(
+		[]string{
+			Version, "|",
+			inputs.Transaction.Network.ChainId,
+			inputs.Transaction.Transaction.Hash,
+			inputs.Finding.Name,
+			inputs.Finding.Description,
+			inputs.Finding.Protocol,
+			inputs.Finding.Type.String(),
+			inputs.Finding.AlertId,
+			inputs.Finding.Severity.String(),
+			inputs.BotImage,
+			inputs.BotID,
+			strings.Join(txAddrs, ""),
+			strings.Join(inputs.Finding.Addresses, ""),
+		}, "",
 	)
 	return crypto.Keccak256Hash([]byte(idStr)).Hex()
 }
