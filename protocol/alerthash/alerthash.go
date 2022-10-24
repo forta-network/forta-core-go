@@ -68,9 +68,8 @@ func ForTransactionAlert(inputs *Inputs) string {
 	return crypto.Keccak256Hash([]byte(idStr)).Hex()
 }
 
-// ForAlertBotAlert calculates the hash for the alert handler alert.
-func ForAlertBotAlert(inputs *Inputs) string {
-	// TODO: consider changing this implementation
+// FortCombinationAlert calculates the hash for the alert handler alert.
+func FortCombinationAlert(inputs *Inputs) string {
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
@@ -83,6 +82,7 @@ func ForAlertBotAlert(inputs *Inputs) string {
 			inputs.BotImage,
 			inputs.BotID,
 			strings.Join(inputs.Finding.Addresses, ""),
+			strings.Join(inputs.Finding.RelatedAlerts, ""),
 		}, "",
 	)
 	return crypto.Keccak256Hash([]byte(idStr)).Hex()
