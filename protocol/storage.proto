@@ -47,8 +47,20 @@ message ListResponse {
   repeated ContentInfo contents = 1;
 }
 
+message ProviderRequest {}
+
+message Provider {
+  string id = 1;
+}
+
+message ProviderResponse {
+  Provider provider = 1;
+}
+
 service Storage {
   rpc Put (PutRequest) returns (PutResponse);
   rpc Get (GetRequest) returns (GetResponse);
   rpc List (ListRequest) returns (ListResponse);
+
+  rpc Provider(ProviderRequest) returns (ProviderResponse);
 }
