@@ -3,10 +3,11 @@ package registry
 import (
 	"context"
 	"errors"
-	"github.com/ethereum/go-ethereum/common"
-	"golang.org/x/sync/errgroup"
 	"math/big"
 	"sync"
+
+	"github.com/ethereum/go-ethereum/common"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 

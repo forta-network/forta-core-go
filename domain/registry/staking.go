@@ -3,10 +3,11 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ethereum/go-ethereum/common"
 	"math/big"
 	"strings"
 	"time"
+
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
