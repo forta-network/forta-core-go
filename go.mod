@@ -30,6 +30,7 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/showwin/speedtest-go v1.1.5
 	github.com/sirupsen/logrus v1.8.1
+	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969
 	github.com/stretchr/testify v1.8.0
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43
 	github.com/wealdtech/go-ens/v3 v3.5.2
