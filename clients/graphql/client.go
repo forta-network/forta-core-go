@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/protocol"
 )
 
@@ -89,6 +90,9 @@ func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 				Id: project.Id,
 			}
 		}
+
+		t, _ := time.Parse(time.RFC3339, alert.Source.Block.Timestamp)
+		blockTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
 		resp = append(
 			resp, &protocol.AlertEvent{
 				Alert: &protocol.AlertEvent_Alert{
@@ -124,7 +128,7 @@ func ToProto(response getAlertsResponse) []*protocol.AlertEvent {
 						Block: &protocol.AlertEvent_Alert_Block{
 							Number:    uint64(alert.Source.Block.Number),
 							Hash:      alert.Source.Block.Hash,
-							Timestamp: alert.Source.Block.Timestamp,
+							Timestamp: blockTimestamp,
 							ChainId:   uint64(alert.Source.Block.ChainId),
 						},
 					},
