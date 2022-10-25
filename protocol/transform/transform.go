@@ -74,17 +74,16 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 				}
 			}
 		}
+	}
 
-		// handle combiner alerts
-		for _, CombinationAlertResults := range resultsForBlock.CombinationAlerts {
-			for _, result := range CombinationAlertResults.Results {
-				for _, alert := range result.Alerts {
-					alertList = append(alertList, ToWebhookAlert(alert.Alert, batch.ChainId, resultsForBlock.Block, nil, CombinationAlertResults.AlertEvent))
-				}
+	// handle combiner alerts
+	for _, CombinationAlertResults := range batch.CombinationAlerts {
+		for _, result := range CombinationAlertResults.Results {
+			for _, alert := range result.Alerts {
+				alertList = append(alertList, ToWebhookAlert(alert.Alert, batch.ChainId, nil, nil, CombinationAlertResults.AlertEvent))
 			}
 		}
 	}
-
 	return alertList
 }
 
