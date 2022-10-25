@@ -2,7 +2,6 @@ package graphql
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,7 +40,7 @@ func TestAlertClient_GetAlerts(t *testing.T) {
 
 				ctx := context.Background()
 				got, err := ac.GetAlerts(ctx, tt.args.input)
-				if !tt.wantErr(t, err, fmt.Sprintf("GetAlerts()")) {
+				if !tt.wantErr(t, err, "GetAlerts()") {
 					return
 				}
 				_ = got

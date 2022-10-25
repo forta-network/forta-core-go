@@ -15,11 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type cfHandler struct {
-	Handler func(evt *domain.AlertEvent) error
-	ErrCh   chan<- error
-}
-
 type combinerFeed struct {
 	offset    int
 	ctx       context.Context
@@ -28,20 +23,16 @@ type combinerFeed struct {
 	rateLimit *time.Ticker
 
 	lastAlert health.MessageTracker
-	workers   int
 
-	handlers   []cfHandler
-	handlersMu sync.RWMutex
-	alertCh    chan *domain.AlertEvent
-	client     *graphql.Client
+	alertCh chan *domain.AlertEvent
+	client  *graphql.Client
 
 	botSubscriptions map[string][]string
 	botsMu           sync.RWMutex
-	// createdSince the earliest alert in milliseconds
-	createdSince uint
-	alertCache   utils.Cache
+	alertCache       utils.Cache
 }
 
+// Subscriptions returns alert/combiner bot pairs,
 func (cf *combinerFeed) Subscriptions() map[string][]string {
 	cf.botsMu.RLock()
 	defer cf.botsMu.RUnlock()
@@ -86,30 +77,12 @@ type CombinerFeedConfig struct {
 	APIUrl    string
 }
 
-func (cf *combinerFeed) initialize() error {
-	return nil
-}
-
 func (cf *combinerFeed) IsStarted() bool {
 	return cf.started
 }
 
 func (cf *combinerFeed) Start() {
 
-}
-
-func (cf *combinerFeed) Subscribe(handler func(evt *domain.AlertEvent) error) <-chan error {
-	cf.handlersMu.Lock()
-	defer cf.handlersMu.Unlock()
-
-	errCh := make(chan error)
-	cf.handlers = append(
-		cf.handlers, cfHandler{
-			Handler: handler,
-			ErrCh:   errCh,
-		},
-	)
-	return errCh
 }
 
 func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
