@@ -88,7 +88,7 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 }
 
 // ToWebhookAlert converts given alert and extra data to webhook alert.
-func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block, transaction *protocol.TransactionEvent, combinationAlert *protocol.AlertEvent) *models.Alert {
+func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block, transaction *protocol.TransactionEvent, combinationFeed *protocol.AlertEvent) *models.Alert {
 	webhookAlert := &models.Alert{
 		AlertID:     alert.Finding.AlertId,
 		CreatedAt:   alert.Timestamp,

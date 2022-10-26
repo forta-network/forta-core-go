@@ -12,10 +12,20 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
+var (
+	ErrCombinerStopReached = fmt.Errorf("combiner stop reached")
+)
+
+type cfHandler struct {
+	Handler func(evt *domain.AlertEvent) error
+	ErrCh   chan<- error
+}
 type combinerFeed struct {
+	start     uint64
+	end       uint64
 	offset    int
 	ctx       context.Context
 	cache     utils.Cache
@@ -30,6 +40,9 @@ type combinerFeed struct {
 	botSubscriptions map[string][]string
 	botsMu           sync.RWMutex
 	alertCache       utils.Cache
+
+	handlers   []cfHandler
+	handlersMu sync.Mutex
 }
 
 // Subscriptions returns alert/combiner bot pairs,
@@ -70,11 +83,26 @@ func (cf *combinerFeed) RemoveSubscription(subscription, subscriber string) {
 		delete(cf.botSubscriptions, subscription)
 	}
 }
+func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent) error) <-chan error {
+	cf.handlersMu.Lock()
+	defer cf.handlersMu.Unlock()
+
+	errCh := make(chan error)
+	cf.handlers = append(
+		cf.handlers, cfHandler{
+			Handler: alertHandler,
+			ErrCh:   errCh,
+		},
+	)
+	return errCh
+}
 
 type CombinerFeedConfig struct {
 	Offset    int
 	RateLimit *time.Ticker
 	APIUrl    string
+	Start     uint64
+	End       uint64
 }
 
 func (cf *combinerFeed) IsStarted() bool {
@@ -82,7 +110,23 @@ func (cf *combinerFeed) IsStarted() bool {
 }
 
 func (cf *combinerFeed) Start() {
-
+	if !cf.started {
+		go cf.loop()
+	}
+}
+func (cf *combinerFeed) initialize() error {
+	if cf.start == 0 {
+		cf.start = uint64(time.Now().Add(time.Minute * -10).UnixMilli())
+	}
+	cf.rateLimit = time.NewTicker(time.Minute)
+	return nil
+}
+func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
+	if !cf.started {
+		cf.start = start
+		cf.end = end
+		go cf.loop()
+	}
 }
 
 func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
@@ -92,6 +136,16 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 		}
 		if cf.rateLimit != nil {
 			<-cf.rateLimit.C
+		}
+
+		logger := log.WithFields(
+			log.Fields{
+				"currentTimestamp": cf.start,
+			},
+		)
+
+		if cf.end != 0 && cf.start > cf.end {
+			logger.Info("end timestamp reached - exiting")
 		}
 
 		// skip query if there are no alert subscriptions
@@ -106,10 +160,10 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 				var cErr error
 				alerts, cErr = cf.client.GetAlerts(
 					cf.ctx,
-					&graphql.AlertsInput{Bots: cf.SubscribedBots()},
+					&graphql.AlertsInput{Bots: cf.SubscribedBots(), CreatedSince: uint(cf.start)},
 				)
 				if cErr != nil {
-					logrus.WithError(cErr).Warn("error retrieving alerts")
+					log.WithError(cErr).Warn("error retrieving alerts")
 					return cErr
 				}
 
@@ -146,6 +200,91 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 	}
 }
 
+func (cf *combinerFeed) forEachAlert() error {
+	currentTimestp := cf.start
+	for {
+		if cf.ctx.Err() != nil {
+			return cf.ctx.Err()
+		}
+
+		logger := log.WithFields(
+			log.Fields{
+				"currentTimestamp": currentTimestp,
+			},
+		)
+
+		if cf.end != 0 && currentTimestp > cf.end {
+			logger.Info("end timestamp reached - exiting")
+			return ErrCombinerStopReached
+		}
+
+		// skip query if there are no alert subscriptions
+		if len(cf.SubscribedBots()) == 0 {
+			continue
+		}
+
+		var alerts []*protocol.AlertEvent
+		bo := backoff.NewExponentialBackOff()
+		err := backoff.Retry(
+			func() error {
+				createdSince := time.Now().UnixMilli() - int64(cf.start)
+				var cErr error
+				alerts, cErr = cf.client.GetAlerts(
+					cf.ctx,
+					&graphql.AlertsInput{Bots: cf.SubscribedBots(), CreatedSince: uint(createdSince)},
+				)
+				if cErr != nil {
+					log.WithError(cErr).Warn("error retrieving alerts")
+					return cErr
+				}
+
+				return nil
+			}, bo,
+		)
+		if err != nil {
+			return err
+		}
+
+		for _, alert := range alerts {
+			if cf.alertCache.Exists(alert.Alert.Hash) {
+				continue
+			}
+
+			alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
+			if err != nil {
+				return err
+			}
+
+			// just for local purposes
+			if cf.end != 0 && alertCA.UnixMilli() > int64(cf.end) {
+				continue
+			}
+
+			evt := &domain.AlertEvent{
+				Event: alert,
+				Timestamps: &domain.TrackingTimestamps{
+					Block: alertCA,
+					Feed:  time.Now().UTC(),
+				},
+			}
+
+			for _, alertHandler := range cf.handlers {
+				if err := alertHandler.Handler(evt); err != nil {
+					return err
+				}
+			}
+
+			cf.alertCache.Add(alert.Alert.Hash)
+		}
+
+		currentTimestp += uint64(graphql.DefaultLastNMinutes.Milliseconds())
+
+		if cf.rateLimit != nil {
+			<-cf.rateLimit.C
+		}
+	}
+}
+
 // Name returns the name of this implementation.
 func (cf *combinerFeed) Name() string {
 	return "alert-feed"
@@ -158,6 +297,27 @@ func (cf *combinerFeed) Health() health.Reports {
 	}
 }
 
+func (cf *combinerFeed) loop() {
+	if err := cf.initialize(); err != nil {
+		log.WithError(err).Panic("failed to initialize")
+	}
+	cf.started = true
+	defer func() {
+		cf.started = false
+	}()
+
+	err := cf.forEachAlert()
+	if err == nil {
+		return
+	}
+	if err != ErrCombinerStopReached {
+		log.WithError(err).Warn("failed while processing blocks")
+	}
+	for _, handler := range cf.handlers {
+		handler.ErrCh <- err
+	}
+}
+
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
 	if cfg.Offset < 0 {
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
@@ -166,6 +326,8 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 	alerts := make(chan *domain.AlertEvent, 10)
 
 	bf := &combinerFeed{
+		start:            cfg.Start,
+		end:              cfg.End,
 		offset:           cfg.Offset,
 		ctx:              ctx,
 		client:           ac,

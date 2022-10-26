@@ -24,7 +24,7 @@ func TestAlertClient_GetAlerts(t *testing.T) {
 			name: "get alerts",
 			args: args{
 				input: &AlertsInput{
-					Bots: []string{"0xe66d22cdcfe0b7e03cbd01e554727fa760aa4170e3d565b7c5a2547f587225ad"},
+					Bots: []string{"0x5e13c2f3a97c292695b598090056ba5d52f9dcc7790bcdaa8b6cd87c1a1ebc0f"},
 				},
 			},
 			fields: fields{url: "https://api.forta.network/graphql"},
