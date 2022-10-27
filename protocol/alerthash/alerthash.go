@@ -74,6 +74,9 @@ func ForTransactionAlert(inputs *Inputs) string {
 
 // ForCombinationAlert calculates the hash for the alert handler alert.
 func ForCombinationAlert(inputs *Inputs) string {
+	sort.Strings(inputs.Finding.Addresses)
+	sort.Strings(inputs.Finding.RelatedAlerts)
+	
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
