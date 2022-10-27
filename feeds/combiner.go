@@ -11,7 +11,7 @@ import (
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
-	"github.com/forta-network/forta-core-go/utils"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,7 +28,6 @@ type combinerFeed struct {
 	end       uint64
 	offset    int
 	ctx       context.Context
-	cache     utils.Cache
 	started   bool
 	rateLimit *time.Ticker
 
@@ -39,7 +38,9 @@ type combinerFeed struct {
 
 	botSubscriptions map[string][]string
 	botsMu           sync.RWMutex
-	alertCache       utils.Cache
+	// bloom filter could be a better choice but the miss rate was too high
+	// and we don't know the expected item count
+	alertCache *cache.Cache
 
 	handlers   []cfHandler
 	handlersMu sync.Mutex
@@ -118,7 +119,7 @@ func (cf *combinerFeed) initialize() error {
 	if cf.start == 0 {
 		cf.start = uint64(time.Now().Add(time.Minute * -10).UnixMilli())
 	}
-	cf.rateLimit = time.NewTicker(time.Minute)
+	cf.rateLimit = time.NewTicker(time.Second)
 	return nil
 }
 func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
@@ -175,7 +176,7 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 		}
 
 		for _, alert := range alerts {
-			if cf.alertCache.Exists(alert.Alert.Hash) {
+			if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
 				continue
 			}
 
@@ -195,7 +196,7 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 				return err
 			}
 
-			cf.alertCache.Add(alert.Alert.Hash)
+			cf.alertCache.Set(alert.Alert.Hash, struct{}{}, cache.DefaultExpiration)
 		}
 	}
 }
@@ -203,6 +204,8 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 func (cf *combinerFeed) forEachAlert() error {
 	currentTimestp := cf.start
 	for {
+		c := 0
+
 		if cf.ctx.Err() != nil {
 			return cf.ctx.Err()
 		}
@@ -246,7 +249,7 @@ func (cf *combinerFeed) forEachAlert() error {
 		}
 
 		for _, alert := range alerts {
-			if cf.alertCache.Exists(alert.Alert.Hash) {
+			if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
 				continue
 			}
 
@@ -268,13 +271,14 @@ func (cf *combinerFeed) forEachAlert() error {
 				},
 			}
 
+			c++
 			for _, alertHandler := range cf.handlers {
 				if err := alertHandler.Handler(evt); err != nil {
 					return err
 				}
 			}
 
-			cf.alertCache.Add(alert.Alert.Hash)
+			cf.alertCache.Set(alert.Alert.Hash, struct{}{}, cache.DefaultExpiration)
 		}
 
 		currentTimestp += uint64(graphql.DefaultLastNMinutes.Milliseconds())
@@ -331,11 +335,10 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		offset:           cfg.Offset,
 		ctx:              ctx,
 		client:           ac,
-		cache:            utils.NewCache(10000),
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
 		botSubscriptions: map[string][]string{},
-		alertCache:       utils.NewCache(1e6),
+		alertCache:       cache.New(graphql.DefaultLastNMinutes, time.Minute),
 	}
 	return bf, nil
 }
