@@ -203,7 +203,6 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 func (cf *combinerFeed) forEachAlert() error {
 	currentTimestp := cf.start
 	for {
-		c := 0
 
 		if cf.ctx.Err() != nil {
 			return cf.ctx.Err()
@@ -270,7 +269,6 @@ func (cf *combinerFeed) forEachAlert() error {
 				},
 			}
 
-			c++
 			for _, alertHandler := range cf.handlers {
 				if err := alertHandler.Handler(evt); err != nil {
 					return err
@@ -333,7 +331,7 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
 		botSubscriptions: map[string][]string{},
-		alertCache:       cache.New(graphql.DefaultLastNMinutes, time.Minute),
+		alertCache:       cache.New(graphql.DefaultLastNMinutes*2, time.Minute),
 	}
 	return bf, nil
 }
