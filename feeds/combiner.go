@@ -26,7 +26,6 @@ type cfHandler struct {
 type combinerFeed struct {
 	start     uint64
 	end       uint64
-	offset    int
 	ctx       context.Context
 	started   bool
 	rateLimit *time.Ticker
