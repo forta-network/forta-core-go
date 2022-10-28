@@ -16,7 +16,7 @@ const Version = "1"
 type Inputs struct {
 	Block       *protocol.BlockEvent
 	Transaction *protocol.TransactionEvent
-	Alert       *protocol.AlertEvent
+	AlertEvent  *protocol.AlertEvent
 	Finding     *protocol.Finding
 	BotInfo
 }
@@ -76,7 +76,7 @@ func ForTransactionAlert(inputs *Inputs) string {
 func ForCombinationAlert(inputs *Inputs) string {
 	sort.Strings(inputs.Finding.Addresses)
 	sort.Strings(inputs.Finding.RelatedAlerts)
-	
+
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
@@ -88,6 +88,8 @@ func ForCombinationAlert(inputs *Inputs) string {
 			inputs.Finding.Severity.String(),
 			inputs.BotImage,
 			inputs.BotID,
+			inputs.AlertEvent.Alert.Hash,
+			// source alert hash
 			strings.Join(inputs.Finding.Addresses, ""),
 			strings.Join(inputs.Finding.RelatedAlerts, ""),
 		}, "",

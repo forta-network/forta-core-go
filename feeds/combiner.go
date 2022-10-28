@@ -99,7 +99,6 @@ func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent
 }
 
 type CombinerFeedConfig struct {
-	Offset    int
 	RateLimit *time.Ticker
 	APIUrl    string
 	Start     uint64
@@ -323,16 +322,12 @@ func (cf *combinerFeed) loop() {
 }
 
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
-	if cfg.Offset < 0 {
-		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
-	}
 	ac := graphql.NewClient(cfg.APIUrl)
 	alerts := make(chan *domain.AlertEvent, 10)
 
 	bf := &combinerFeed{
 		start:            cfg.Start,
 		end:              cfg.End,
-		offset:           cfg.Offset,
 		ctx:              ctx,
 		client:           ac,
 		rateLimit:        cfg.RateLimit,
