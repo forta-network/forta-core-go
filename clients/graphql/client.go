@@ -11,7 +11,7 @@ import (
 
 const (
 	DefaultLastNMinutes = time.Minute * 10
-	DefaultQueryLimit   = 1e3
+	DefaultPageSize     = 1e3
 )
 
 type GetAlertsResponse getAlertsResponse
@@ -40,7 +40,7 @@ func (ac *Client) GetAlerts(
 	}
 
 	if input.First == 0 {
-		input.First = DefaultQueryLimit
+		input.First = DefaultPageSize
 	}
 
 	var alerts []*protocol.AlertEvent
