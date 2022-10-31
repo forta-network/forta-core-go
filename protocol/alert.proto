@@ -9,6 +9,7 @@ message TrackingTimestamps {
   string feed = 2;
   string botRequest = 3;
   string botResponse = 4;
+  string sourceAlert = 5;
 }
 
 enum AlertType {

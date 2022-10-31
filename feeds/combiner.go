@@ -271,8 +271,8 @@ func (cf *combinerFeed) forEachAlert() error {
 			evt := &domain.AlertEvent{
 				Event: alert,
 				Timestamps: &domain.TrackingTimestamps{
-					Block: alertCA,
 					Feed:  time.Now().UTC(),
+					SourceAlert: alertCA,
 				},
 			}
 

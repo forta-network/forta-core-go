@@ -101,6 +101,8 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 
 	t, _ := time.Parse(time.RFC3339, alert.Source.Block.Timestamp)
 	blockTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
+	t, _ = time.Parse(time.RFC3339, alert.CreatedAt)
+	alertTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
 
 	a := &protocol.AlertEvent{
 		Alert: &protocol.AlertEvent_Alert{
@@ -142,6 +144,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			},
 			FindingType: alert.FindingType,
 		},
+		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
 	}
 
 	return a
