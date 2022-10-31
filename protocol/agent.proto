@@ -268,10 +268,16 @@ message AlertEvent {
       string version = 14;
     }
 
+    message SourceAlertEvent {
+      string botId = 1;
+      string alertHash = 2;
+    }
+
     message Source {
       string transactionHash = 1;
-      Alert.Bot bot = 2;
-      Alert.Block block = 3;
+      Bot bot = 2;
+      Block block = 3;
+      SourceAlertEvent sourceEvent = 4;
     }
 
     // Unique string to identify this class of finding,

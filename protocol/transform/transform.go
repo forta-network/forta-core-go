@@ -88,17 +88,22 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 }
 
 // ToWebhookAlert converts given alert and extra data to webhook alert.
-func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block, transaction *protocol.TransactionEvent, combinationFeed *protocol.AlertEvent) *models.Alert {
+func ToWebhookAlert(
+	alert *protocol.Alert, chainID uint64, block *protocol.Block,
+	transaction *protocol.TransactionEvent,
+	sourceAlertEvent *protocol.AlertEvent,
+) *models.Alert {
 	webhookAlert := &models.Alert{
-		AlertID:     alert.Finding.AlertId,
-		CreatedAt:   alert.Timestamp,
-		Description: alert.Finding.Description,
-		FindingType: alert.Finding.Type.String(),
-		Hash:        alert.Id,
-		Metadata:    alert.Finding.Metadata,
-		Name:        alert.Finding.Name,
-		Protocol:    alert.Finding.Protocol,
-		Severity:    alert.Finding.Severity.String(),
+		AlertID:       alert.Finding.AlertId,
+		CreatedAt:     alert.Timestamp,
+		Description:   alert.Finding.Description,
+		FindingType:   alert.Finding.Type.String(),
+		Hash:          alert.Id,
+		Metadata:      alert.Finding.Metadata,
+		Name:          alert.Finding.Name,
+		Protocol:      alert.Finding.Protocol,
+		Severity:      alert.Finding.Severity.String(),
+		RelatedAlerts: alert.Finding.RelatedAlerts,
 		Source: &models.AlertSource{
 			Bot: &models.AlertBot{
 				ID:        alert.Agent.Id,
@@ -118,6 +123,13 @@ func ToWebhookAlert(alert *protocol.Alert, chainID uint64, block *protocol.Block
 	if transaction != nil {
 		webhookAlert.Addresses = utils.MapKeys(transaction.Addresses)
 		webhookAlert.Source.TransactionHash = transaction.Transaction.Hash
+	}
+
+	if sourceAlertEvent != nil {
+		webhookAlert.Source.SourceEvent = &models.AlertSourceEvent{
+			AlertHash: sourceAlertEvent.Alert.Hash,
+			BotID:     sourceAlertEvent.Alert.Source.Bot.Id,
+		}
 	}
 
 	return webhookAlert
