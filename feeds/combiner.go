@@ -3,6 +3,7 @@ package feeds
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -60,27 +61,30 @@ func (cf *combinerFeed) SubscribedBots() (bots []string) {
 	}
 	return
 }
-func (cf *combinerFeed) AddSubscription(subscription, subscriber string) {
+func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscription, subscriber string) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
-	for _, s := range cf.botSubscriptions[subscription] {
+	subscriptionString := encodeSubscription(subscription)
+	for _, s := range cf.botSubscriptions[subscriptionString] {
 		if s == subscriber {
 			return
 		}
 	}
-	cf.botSubscriptions[subscription] = append(cf.botSubscriptions[subscription], subscriber)
+
+	cf.botSubscriptions[subscriptionString] = append(cf.botSubscriptions[subscriptionString], subscriber)
 }
-func (cf *combinerFeed) RemoveSubscription(subscription, subscriber string) {
+func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription, subscriber string) {
+	subscriptionString := encodeSubscription(subscription)
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
-	for i, s := range cf.botSubscriptions[subscription] {
+	for i, s := range cf.botSubscriptions[subscriptionString] {
 		if s == subscriber {
-			cf.botSubscriptions[subscription] = append(cf.botSubscriptions[subscription][:i], cf.botSubscriptions[subscription][i+1:]...)
+			cf.botSubscriptions[subscriptionString] = append(cf.botSubscriptions[subscriptionString][:i], cf.botSubscriptions[subscriptionString][i+1:]...)
 		}
 	}
-	if len(cf.botSubscriptions[subscription]) == 0 {
-		delete(cf.botSubscriptions, subscription)
+	if len(cf.botSubscriptions[encodeSubscription(subscription)]) == 0 {
+		delete(cf.botSubscriptions, subscriptionString)
 	}
 }
 func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent) error) <-chan error {
@@ -95,6 +99,10 @@ func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent
 		},
 	)
 	return errCh
+}
+
+func encodeSubscription(s *protocol.CombinerBotSubscription) string {
+	return strings.Join([]string{s.BotId}, ",")
 }
 
 type CombinerFeedConfig struct {

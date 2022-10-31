@@ -551,7 +551,6 @@ query getAlerts ($input: AlertsInput) {
 					createdAt
 					description
 					developer
-					developer
 					docReference
 					enabled
 					id

@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 	"time"
+
+	"github.com/forta-network/forta-core-go/protocol"
 )
 
 func Test_combinerFeed_StartRange(t *testing.T) {
@@ -38,7 +40,12 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				cf.AddSubscription("0x5e13c2f3a97c292695b598090056ba5d52f9dcc7790bcdaa8b6cd87c1a1ebc0f", "0xlocalbot")
+				cf.AddSubscription(
+					&protocol.CombinerBotSubscription{
+						BotId: "0x5e13c2f3a97c292695b598090056ba5d52f9dcc7790bcdaa8b6cd87c1a1ebc0f",
+					},
+					"0xlocalbot",
+				)
 				cf.StartRange(tt.args.start, tt.args.end, tt.args.rate)
 			},
 		)

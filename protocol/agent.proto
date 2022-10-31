@@ -37,7 +37,11 @@ message InitializeResponse {
 }
 
 message AlertConfig {
-  repeated string subscriptions = 1;
+  repeated CombinerBotSubscription subscriptions = 1;
+}
+
+message CombinerBotSubscription {
+  string botId = 1;
 }
 
 message EvaluateTxRequest {
