@@ -137,12 +137,7 @@ func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
 }
 
 func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
-	errCh := make(chan error)
-	go func() {
-		_ = <-errCh
-	}()
-
-	return cf.forEachAlert([]cfHandler{{Handler: alertHandler, ErrCh: errCh}})
+	return cf.forEachAlert([]cfHandler{{Handler: alertHandler}})
 }
 
 func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
@@ -261,7 +256,9 @@ func (cf *combinerFeed) loop() {
 		log.WithError(err).Warn("failed while processing blocks")
 	}
 	for _, handler := range cf.handlers {
-		handler.ErrCh <- err
+		if handler.ErrCh != nil {
+			handler.ErrCh <- err
+		}
 	}
 }
 
