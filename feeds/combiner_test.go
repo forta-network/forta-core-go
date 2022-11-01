@@ -21,8 +21,8 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 		{
 			name: "successfully feeds range",
 			args: args{
-				start: 1666766210406,
-				end:   uint64(1666766210406 + time.Minute.Milliseconds()),
+				start: uint64(time.Now().Add(-1 * time.Minute).UnixMilli()),
+				end:   uint64(time.Now().UnixMilli()),
 				rate:  0,
 			},
 		},
@@ -30,7 +30,10 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(
 			tt.name, func(t *testing.T) {
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+				ctx, cancel := context.WithTimeout(
+					context.Background(),
+					time.Second*5,
+				)
 				defer cancel()
 				cf, err := NewCombinerFeed(
 					ctx, CombinerFeedConfig{
@@ -47,6 +50,7 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 					"0xlocalbot",
 				)
 				cf.StartRange(tt.args.start, tt.args.end, tt.args.rate)
+				<-ctx.Done()
 			},
 		)
 	}

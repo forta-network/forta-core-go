@@ -18,6 +18,7 @@ import (
 
 var (
 	ErrCombinerStopReached = fmt.Errorf("combiner stop reached")
+	DefaultRatelimitDuration = time.Minute
 )
 
 type cfHandler struct {
@@ -125,7 +126,7 @@ func (cf *combinerFeed) initialize() error {
 	if cf.start == 0 {
 		cf.start = uint64(time.Now().Add(time.Minute * -10).UnixMilli())
 	}
-	cf.rateLimit = time.NewTicker(time.Second)
+	cf.rateLimit = time.NewTicker(DefaultRatelimitDuration)
 	return nil
 }
 func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
@@ -163,16 +164,22 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		if len(cf.SubscribedBots()) == 0 {
 			continue
 		}
+		createdSince := time.Now().UnixMilli() - int64(currentTimestp)
+		// TODO: needs changes in alerts-api
+		// createdBefore := createdSince - graphql.DefaultLastNMinutes.Milliseconds()
 
 		var alerts []*protocol.AlertEvent
 		bo := backoff.NewExponentialBackOff()
 		err := backoff.Retry(
 			func() error {
-				createdSince := time.Now().UnixMilli() - int64(cf.start)
 				var cErr error
 				alerts, cErr = cf.client.GetAlerts(
 					cf.ctx,
-					&graphql.AlertsInput{Bots: cf.SubscribedBots(), CreatedSince: uint(createdSince)},
+					&graphql.AlertsInput{
+						Bots: cf.SubscribedBots(),
+						CreatedSince:  uint(createdSince),
+						// CreatedBefore: uint(createdBefore), needs changes in alerts-api
+					},
 				)
 				if cErr != nil {
 					log.WithError(cErr).Warn("error retrieving alerts")
@@ -191,7 +198,9 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 				continue
 			}
 
-			cf.alertCache.Set(alert.Alert.Hash, struct{}{}, cache.DefaultExpiration)
+			cf.alertCache.Set(
+				alert.Alert.Hash, struct{}{}, cache.DefaultExpiration,
+			)
 
 			alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
 			if err != nil {
@@ -219,7 +228,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		}
 
-		currentTimestp += uint64(graphql.DefaultLastNMinutes.Milliseconds())
+		currentTimestp += uint64(DefaultRatelimitDuration.Milliseconds())
 
 		if cf.rateLimit != nil {
 			<-cf.rateLimit.C
