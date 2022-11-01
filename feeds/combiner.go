@@ -137,77 +137,15 @@ func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
 }
 
 func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
-	for {
-		if cf.ctx.Err() != nil {
-			return cf.ctx.Err()
-		}
-		if cf.rateLimit != nil {
-			<-cf.rateLimit.C
-		}
+	errCh := make(chan error)
+	go func() {
+		_ = <-errCh
+	}()
 
-		logger := log.WithFields(
-			log.Fields{
-				"currentTimestamp": cf.start,
-			},
-		)
-
-		if cf.end != 0 && cf.start > cf.end {
-			logger.Info("end timestamp reached - exiting")
-		}
-
-		// skip query if there are no alert subscriptions
-		if len(cf.SubscribedBots()) == 0 {
-			continue
-		}
-
-		var alerts []*protocol.AlertEvent
-		bo := backoff.NewExponentialBackOff()
-		err := backoff.Retry(
-			func() error {
-				var cErr error
-				alerts, cErr = cf.client.GetAlerts(
-					cf.ctx,
-					&graphql.AlertsInput{Bots: cf.SubscribedBots(), CreatedSince: uint(cf.start)},
-				)
-				if cErr != nil {
-					log.WithError(cErr).Warn("error retrieving alerts")
-					return cErr
-				}
-
-				return nil
-			}, bo,
-		)
-		if err != nil {
-			return err
-		}
-
-		for _, alert := range alerts {
-			if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
-				continue
-			}
-
-			alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
-			if err != nil {
-				return err
-			}
-			evt := &domain.AlertEvent{
-				Event: alert,
-				Timestamps: &domain.TrackingTimestamps{
-					Block: alertCA,
-					Feed:  time.Now().UTC(),
-				},
-			}
-
-			if err := alertHandler(evt); err != nil {
-				return err
-			}
-
-			cf.alertCache.Set(alert.Alert.Hash, struct{}{}, cache.DefaultExpiration)
-		}
-	}
+	return cf.forEachAlert([]cfHandler{{Handler: alertHandler, ErrCh: errCh}})
 }
 
-func (cf *combinerFeed) forEachAlert() error {
+func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 	currentTimestp := cf.start
 	for {
 
@@ -258,6 +196,8 @@ func (cf *combinerFeed) forEachAlert() error {
 				continue
 			}
 
+			cf.alertCache.Set(alert.Alert.Hash, struct{}{}, cache.DefaultExpiration)
+
 			alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
 			if err != nil {
 				return err
@@ -276,13 +216,12 @@ func (cf *combinerFeed) forEachAlert() error {
 				},
 			}
 
-			for _, alertHandler := range cf.handlers {
+			for _, alertHandler := range alertHandlers {
 				if err := alertHandler.Handler(evt); err != nil {
 					return err
 				}
 			}
 
-			cf.alertCache.Set(alert.Alert.Hash, struct{}{}, cache.DefaultExpiration)
 		}
 
 		currentTimestp += uint64(graphql.DefaultLastNMinutes.Milliseconds())
@@ -314,7 +253,7 @@ func (cf *combinerFeed) loop() {
 		cf.started = false
 	}()
 
-	err := cf.forEachAlert()
+	err := cf.forEachAlert(cf.handlers)
 	if err == nil {
 		return
 	}
