@@ -17,11 +17,15 @@ type InspectionConfig struct {
 	IsETH2      bool   `json:"isETH2"`
 }
 
+type PreValidations struct {
+	IsUpToDate bool `json:"is_up_to_date"`
+}
 // InspectionResults contains inspection results.
 type InspectionResults struct {
-	Inputs     InspectionConfig   `json:"inputs"`
-	Metadata   map[string]string  `json:"metadata"`
-	Indicators map[string]float64 `json:"indicators"`
+	Inputs         InspectionConfig   `json:"inputs"`
+	Metadata       map[string]string  `json:"metadata"`
+	Indicators     map[string]float64 `json:"indicators"`
+	PreValidations *PreValidations     `json:"pre_validations"`
 }
 
 // NewInspectionResults creates new InspectionResults.
