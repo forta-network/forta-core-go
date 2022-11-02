@@ -185,11 +185,12 @@ func NewValidator(ctx context.Context, inspectionCfg inspect.InspectionConfig) (
 	return &validator, nil
 }
 
-type referenceData struct {
-	scanApiBlockHash  string
-	proxyApiBlockHash string
-	traceApiBlockHash string
-	traceApiTraceHash string
+// HashReferences contains hash references that are used during inspection validation.
+type HashReferences struct {
+	ScanAPIBlockHash  string
+	ProxyAPIBlockHash string
+	TraceAPIBlockHash string
+	TraceAPITraceHash string
 }
 
 // Validate validates the inspection result. This is intended for using as a first check.
@@ -202,34 +203,40 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *inspect.Ins
 		resultErr = err
 		return
 	}
+	return ValidateHashReferences(results, &refData)
+}
+
+// ValidateHashReferences validates results against the references.
+func ValidateHashReferences(results *inspect.InspectionResults, refData *HashReferences) (validationErrs ValidationErrors, resultErr error) {
+	cfg := results.Inputs
 
 	// check if this validator is messing up
-	if (refData.scanApiBlockHash != refData.traceApiBlockHash && v.inspectionCfg.CheckTrace) ||
-		refData.scanApiBlockHash != refData.proxyApiBlockHash {
+	if (refData.ScanAPIBlockHash != refData.TraceAPIBlockHash && cfg.CheckTrace) ||
+		refData.ScanAPIBlockHash != refData.ProxyAPIBlockHash {
 		resultErr = multierror.Append(resultErr, ErrReferenceBlockMismatch)
 	}
 
 	// check if the inspected node is messing up
 	traceApiBlockHashIsDifferent := results.Metadata[inspect.MetadataScanAPIBlockByNumberHash] != results.Metadata[inspect.MetadataTraceAPIBlockByNumberHash] &&
-		v.inspectionCfg.CheckTrace
+		cfg.CheckTrace
 
 	proxyApiBlockHashIsDifferent := results.Metadata[inspect.MetadataScanAPIBlockByNumberHash] != results.Metadata[inspect.MetadataProxyAPIBlockByNumberHash]
 
 	if traceApiBlockHashIsDifferent || proxyApiBlockHashIsDifferent {
 		resultErr = multierror.Append(resultErr, ErrResultBlockMismatch)
 	}
-	if results.Metadata[inspect.MetadataScanAPIBlockByNumberHash] != refData.scanApiBlockHash {
+	if results.Metadata[inspect.MetadataScanAPIBlockByNumberHash] != refData.ScanAPIBlockHash {
 		resultErr = multierror.Append(resultErr, ErrResultScanAPIBlockMismatch)
 	}
-	if v.inspectionCfg.CheckTrace {
-		if results.Metadata[inspect.MetadataTraceAPIBlockByNumberHash] != refData.traceApiBlockHash {
+	if cfg.CheckTrace {
+		if results.Metadata[inspect.MetadataTraceAPIBlockByNumberHash] != refData.TraceAPIBlockHash {
 			resultErr = multierror.Append(resultErr, ErrResultTraceAPIBlockMismatch)
 		}
-		if results.Metadata[inspect.MetadataTraceAPITraceBlockHash] != refData.traceApiTraceHash {
+		if results.Metadata[inspect.MetadataTraceAPITraceBlockHash] != refData.TraceAPITraceHash {
 			resultErr = multierror.Append(resultErr, ErrResultTraceAPITraceBlockMismatch)
 		}
 	}
-	if results.Metadata[inspect.MetadataProxyAPIBlockByNumberHash] != refData.proxyApiBlockHash {
+	if results.Metadata[inspect.MetadataProxyAPIBlockByNumberHash] != refData.ProxyAPIBlockHash {
 		resultErr = multierror.Append(resultErr, ErrResultProxyAPIBlockMismatch)
 	}
 
@@ -237,34 +244,34 @@ func (v *InspectionValidator) Validate(ctx context.Context, results *inspect.Ins
 	return
 }
 
-func (v *InspectionValidator) getReferenceData(ctx context.Context, results *inspect.InspectionResults) (refData referenceData, resultErr error) {
+func (v *InspectionValidator) getReferenceData(ctx context.Context, results *inspect.InspectionResults) (refData HashReferences, resultErr error) {
 	blockNumber := results.Inputs.BlockNumber
 	blockNumberStr := strconv.FormatUint(blockNumber, 10)
 	if item, ok := v.cache.Get(blockNumberStr); ok {
-		return item.(referenceData), nil
+		return item.(HashReferences), nil
 	}
 
 	var err error
-	refData.scanApiBlockHash, err = inspect.GetBlockResponseHash(ctx, v.scanRpcClient, blockNumber)
+	refData.ScanAPIBlockHash, err = inspect.GetBlockResponseHash(ctx, v.scanRpcClient, blockNumber)
 	if err != nil {
-		log.WithError(err).Error("failed to get scanApiBlockHash api block response hash")
+		log.WithError(err).Error("failed to get scan api block response hash")
 		resultErr = multierror.Append(resultErr, ErrReferenceScanAPIBlock)
 	}
 
 	if v.inspectionCfg.CheckTrace {
-		refData.traceApiBlockHash, err = inspect.GetBlockResponseHash(ctx, v.traceRpcClient, blockNumber)
+		refData.TraceAPIBlockHash, err = inspect.GetBlockResponseHash(ctx, v.traceRpcClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api block response hash")
 			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPIBlock)
 		}
-		refData.traceApiTraceHash, err = inspect.GetTraceResponseHash(ctx, v.traceRpcClient, blockNumber)
+		refData.TraceAPITraceHash, err = inspect.GetTraceResponseHash(ctx, v.traceRpcClient, blockNumber)
 		if err != nil {
 			log.WithError(err).Error("failed to get trace api trace block response hash")
 			resultErr = multierror.Append(resultErr, ErrReferenceTraceAPITraceBlock)
 		}
 	}
 
-	refData.proxyApiBlockHash, err = inspect.GetBlockResponseHash(ctx, v.proxyRpcClient, blockNumber)
+	refData.ProxyAPIBlockHash, err = inspect.GetBlockResponseHash(ctx, v.proxyRpcClient, blockNumber)
 	if err != nil {
 		log.WithError(err).Error("failed to get proxy api block response hash")
 		resultErr = multierror.Append(resultErr, ErrReferenceProxyAPIBlock)
