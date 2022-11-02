@@ -1,9 +1,8 @@
-package apihash
+package inspect
 
 import (
 	"fmt"
 
-	"github.com/forta-network/forta-core-go/inspect"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -144,7 +143,7 @@ type HashReferences struct {
 }
 
 // ValidateHashReferences validates results against the references.
-func ValidateHashReferences(metadata map[string]string, cfg inspect.InspectionConfig, refData *HashReferences) (validationErrs ValidationErrors, resultErr error) {
+func ValidateHashReferences(metadata map[string]string, cfg InspectionConfig, refData *HashReferences) (validationErrs ValidationErrors, resultErr error) {
 	// check if this validator is messing up
 	if (refData.ScanAPIBlockHash != refData.TraceAPIBlockHash && cfg.CheckTrace) ||
 		refData.ScanAPIBlockHash != refData.ProxyAPIBlockHash {
@@ -152,26 +151,26 @@ func ValidateHashReferences(metadata map[string]string, cfg inspect.InspectionCo
 	}
 
 	// check if the inspected node is messing up
-	traceApiBlockHashIsDifferent := metadata[inspect.MetadataScanAPIBlockByNumberHash] != metadata[inspect.MetadataTraceAPIBlockByNumberHash] &&
+	traceApiBlockHashIsDifferent := metadata[MetadataScanAPIBlockByNumberHash] != metadata[MetadataTraceAPIBlockByNumberHash] &&
 		cfg.CheckTrace
 
-	proxyApiBlockHashIsDifferent := metadata[inspect.MetadataScanAPIBlockByNumberHash] != metadata[inspect.MetadataProxyAPIBlockByNumberHash]
+	proxyApiBlockHashIsDifferent := metadata[MetadataScanAPIBlockByNumberHash] != metadata[MetadataProxyAPIBlockByNumberHash]
 
 	if traceApiBlockHashIsDifferent || proxyApiBlockHashIsDifferent {
 		resultErr = multierror.Append(resultErr, ErrResultBlockMismatch)
 	}
-	if metadata[inspect.MetadataScanAPIBlockByNumberHash] != refData.ScanAPIBlockHash {
+	if metadata[MetadataScanAPIBlockByNumberHash] != refData.ScanAPIBlockHash {
 		resultErr = multierror.Append(resultErr, ErrResultScanAPIBlockMismatch)
 	}
 	if cfg.CheckTrace {
-		if metadata[inspect.MetadataTraceAPIBlockByNumberHash] != refData.TraceAPIBlockHash {
+		if metadata[MetadataTraceAPIBlockByNumberHash] != refData.TraceAPIBlockHash {
 			resultErr = multierror.Append(resultErr, ErrResultTraceAPIBlockMismatch)
 		}
-		if metadata[inspect.MetadataTraceAPITraceBlockHash] != refData.TraceAPITraceHash {
+		if metadata[MetadataTraceAPITraceBlockHash] != refData.TraceAPITraceHash {
 			resultErr = multierror.Append(resultErr, ErrResultTraceAPITraceBlockMismatch)
 		}
 	}
-	if metadata[inspect.MetadataProxyAPIBlockByNumberHash] != refData.ProxyAPIBlockHash {
+	if metadata[MetadataProxyAPIBlockByNumberHash] != refData.ProxyAPIBlockHash {
 		resultErr = multierror.Append(resultErr, ErrResultProxyAPIBlockMismatch)
 	}
 

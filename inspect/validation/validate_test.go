@@ -6,7 +6,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/forta-network/forta-core-go/inspect"
-	"github.com/forta-network/forta-core-go/inspect/apihash"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/stretchr/testify/require"
 )
@@ -97,12 +96,12 @@ func TestValidateInspectionFail(t *testing.T) {
 	r.NotContains(err.Error(), "code: 20")
 
 	// scan inspection should be fine
-	r.False(verrs.HasCode(apihash.ErrResultScanAPIBlockMismatch.Code()))
+	r.False(verrs.HasCode(inspect.ErrResultScanAPIBlockMismatch.Code()))
 
 	// trace inspection should have problems
-	r.True(verrs.HasCode(apihash.ErrResultBlockMismatch.Code()))
-	r.True(verrs.HasCode(apihash.ErrResultTraceAPIBlockMismatch.Code()))
-	r.True(verrs.HasCode(apihash.ErrResultTraceAPITraceBlockMismatch.Code()))
+	r.True(verrs.HasCode(inspect.ErrResultBlockMismatch.Code()))
+	r.True(verrs.HasCode(inspect.ErrResultTraceAPIBlockMismatch.Code()))
+	r.True(verrs.HasCode(inspect.ErrResultTraceAPITraceBlockMismatch.Code()))
 }
 
 func testGetRecentBlockNumber(r *require.Assertions, apiURL string) uint64 {
