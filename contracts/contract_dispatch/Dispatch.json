@@ -135,6 +135,45 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      }
+    ],
+    "name": "SetAgentRegistry",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      }
+    ],
+    "name": "SetScannerPoolRegistry",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "registry",
+        "type": "address"
+      }
+    ],
+    "name": "SetScannerRegistry",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "implementation",
@@ -289,15 +328,17 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "disableRouter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
         "name": "__manager",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__router",
         "type": "address"
       },
       {
@@ -308,6 +349,11 @@
       {
         "internalType": "address",
         "name": "__scanners",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "__scannerPools",
         "type": "address"
       }
     ],
@@ -472,6 +518,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "scannerPoolRegistry",
+    "outputs": [
+      {
+        "internalType": "contract ScannerPoolRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -513,13 +572,13 @@
       },
       {
         "internalType": "bool",
-        "name": "enabled",
+        "name": "operational",
         "type": "bool"
       },
       {
-        "internalType": "uint256",
-        "name": "disabledFlags",
-        "type": "uint256"
+        "internalType": "bool",
+        "name": "disabled",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -586,11 +645,11 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "newRouter",
+        "name": "newScannerPoolRegistry",
         "type": "address"
       }
     ],
-    "name": "setRouter",
+    "name": "setScannerPoolRegistry",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

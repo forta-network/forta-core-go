@@ -161,74 +161,25 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Released",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Rewarded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "router",
         "type": "address"
       }
     ],
     "name": "RouterUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "percent",
+        "type": "uint256"
+      }
+    ],
+    "name": "SlashDelegatorsPercentSet",
     "type": "event"
   },
   {
@@ -330,11 +281,23 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "newManager",
+        "name": "subjectGateway",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "allocator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "rewardsDistributor",
         "type": "address"
       }
     ],
-    "name": "StakeParamsManagerSet",
+    "name": "StakeHelpersConfigured",
     "type": "event"
   },
   {
@@ -539,6 +502,19 @@
   },
   {
     "inputs": [],
+    "name": "MAX_SLASHABLE_PERCENT",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "MAX_WITHDRAWAL_DELAY",
     "outputs": [
       {
@@ -614,35 +590,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "availableReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -691,6 +638,29 @@
   {
     "inputs": [
       {
+        "internalType": "contract IStakeSubjectGateway",
+        "name": "__subjectGateway",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IStakeAllocator",
+        "name": "__allocator",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IRewardsDistributor",
+        "name": "__distributor",
+        "type": "address"
+      }
+    ],
+    "name": "configureStakeHelpers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint8",
         "name": "subjectType",
         "type": "uint8"
@@ -714,6 +684,13 @@
         "type": "uint256"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disableRouter",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -757,6 +734,63 @@
     "name": "freeze",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getDelegatedSubjectType",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getDelegatorSubjectType",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getSubjectTypeAgency",
+    "outputs": [
+      {
+        "internalType": "enum SubjectTypeValidator.SubjectStakeAgency",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -844,8 +878,8 @@
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "__router",
+        "internalType": "contract IERC20",
+        "name": "__stakedToken",
         "type": "address"
       },
       {
@@ -856,11 +890,6 @@
       {
         "internalType": "address",
         "name": "__treasury",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__stakedToken",
         "type": "address"
       }
     ],
@@ -968,6 +997,39 @@
   {
     "inputs": [
       {
+        "internalType": "uint8",
+        "name": "oldSubjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "oldSubject",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "newSubjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newSubject",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      }
+    ],
+    "name": "migrate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes[]",
         "name": "data",
         "type": "bytes[]"
@@ -1026,58 +1088,6 @@
       }
     ],
     "name": "relayPermit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "releaseReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "reward",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1213,25 +1223,12 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "newRouter",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "percent",
+        "type": "uint256"
       }
     ],
-    "name": "setRouter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IStakeController",
-        "name": "newStakingParameters",
-        "type": "address"
-      }
-    ],
-    "name": "setStakingParametersManager",
+    "name": "setSlashDelegatorsPercent",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1331,6 +1328,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "slashDelegatorsPercent",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1384,6 +1394,19 @@
     "outputs": [
       {
         "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "subjectGateway",
+    "outputs": [
+      {
+        "internalType": "contract IStakeSubjectGateway",
         "name": "",
         "type": "address"
       }

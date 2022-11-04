@@ -326,21 +326,6 @@ func (mr *MockClientMockRecorder) PegLatestBlock() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PegLatestBlock", reflect.TypeOf((*MockClient)(nil).PegLatestBlock))
 }
 
-// RegisterScanner mocks base method.
-func (m *MockClient) RegisterScanner(ownerAddress string, chainID int64, metadata string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterScanner", ownerAddress, chainID, metadata)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RegisterScanner indicates an expected call of RegisterScanner.
-func (mr *MockClientMockRecorder) RegisterScanner(ownerAddress, chainID, metadata interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScanner", reflect.TypeOf((*MockClient)(nil).RegisterScanner), ownerAddress, chainID, metadata)
-}
-
 // RegistryContracts mocks base method.
 func (m *MockClient) RegistryContracts() *registry.RegistryContracts {
 	m.ctrl.T.Helper()

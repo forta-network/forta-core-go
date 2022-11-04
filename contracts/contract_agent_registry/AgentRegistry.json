@@ -223,19 +223,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newstakeController",
-        "type": "address"
-      }
-    ],
-    "name": "StakeControllerUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": false,
         "internalType": "uint256",
         "name": "min",
@@ -255,6 +242,19 @@
       }
     ],
     "name": "StakeThresholdChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newHandler",
+        "type": "address"
+      }
+    ],
+    "name": "SubjectHandlerUpdated",
     "type": "event"
   },
   {
@@ -374,6 +374,13 @@
       }
     ],
     "name": "disableAgent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disableRouter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -630,19 +637,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getStakeController",
-    "outputs": [
-      {
-        "internalType": "contract IStakeController",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -679,15 +673,23 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getSubjectHandler",
+    "outputs": [
+      {
+        "internalType": "contract IStakeSubjectGateway",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
         "name": "__manager",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__router",
         "type": "address"
       },
       {
@@ -842,7 +844,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "subject",
         "type": "uint256"
       }
     ],
@@ -999,32 +1001,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "newRouter",
-        "type": "address"
-      }
-    ],
-    "name": "setRouter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "stakeController",
-        "type": "address"
-      }
-    ],
-    "name": "setStakeController",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
           {
             "internalType": "uint256",
@@ -1048,6 +1024,19 @@
       }
     ],
     "name": "setStakeThreshold",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "subjectGateway",
+        "type": "address"
+      }
+    ],
+    "name": "setSubjectHandler",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

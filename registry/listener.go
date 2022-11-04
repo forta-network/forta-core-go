@@ -3,8 +3,9 @@ package registry
 import (
 	"context"
 	"errors"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 	"math/big"
+
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"

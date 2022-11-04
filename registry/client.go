@@ -11,7 +11,6 @@ import (
 	"github.com/forta-network/forta-core-go/domain/registry"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
@@ -71,7 +70,7 @@ type Client interface {
 	GetScanner(scannerID string) (*Scanner, error)
 
 	// RegisterScanner registers a scanner using private key.
-	RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
+	//RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
 	// RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
@@ -258,12 +257,12 @@ func (c *client) SetPrivateKey(privateKey *ecdsa.PrivateKey) {
 	c.privateKey = privateKey
 }
 
-//ResetOpts unsets the options for the store
+// ResetOpts unsets the options for the store
 func (c *client) ResetOpts() {
 	c.opts = nil
 }
 
-//latestOpts returns the callopts for the latest block so that calls can use a same block
+// latestOpts returns the callopts for the latest block so that calls can use a same block
 func (c *client) latestOpts() (*bind.CallOpts, error) {
 	blk, err := c.eth.BlockByNumber(c.ctx, nil)
 	if err != nil {
@@ -284,7 +283,7 @@ func (c *client) PegBlock(blockNum *big.Int) {
 	}
 }
 
-//PegLatestBlock will set the opts so that every call uses same block
+// PegLatestBlock will set the opts so that every call uses same block
 func (c *client) PegLatestBlock() error {
 	opts, err := c.latestOpts()
 	if err != nil {
@@ -529,7 +528,7 @@ func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner)
 		if err := handler(&Scanner{
 			ScannerID: utils.ScannerIDBigIntToHex(scn.ScannerId),
 			ChainID:   scn.ChainId.Int64(),
-			Enabled:   scn.Enabled,
+			Enabled:   scn.Operational,
 			Manifest:  scn.Metadata,
 			Owner:     scn.Owner.Hex(),
 		}); err != nil {
@@ -632,28 +631,28 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	}, nil
 }
 
-func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
-	if c.privateKey == nil {
-		return "", errors.New("no private key provided to the client")
-	}
-	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
-	if err != nil {
-		return "", fmt.Errorf("failed to create contract transactor: %v", err)
-	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
-	if err != nil {
-		return "", fmt.Errorf("failed to create transaction opts: %v", err)
-	}
-	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
-	}
-	tx, err := reg.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
-	if err != nil {
-		return "", fmt.Errorf("failed to send the transaction: %v", err)
-	}
-	return tx.Hash().Hex(), nil
-}
+// func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
+// 	if c.privateKey == nil {
+// 		return "", errors.New("no private key provided to the client")
+// 	}
+// 	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
+// 	}
+// 	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
+// 	}
+// 	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
+// 	}
+// 	tx, err := reg.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to send the transaction: %v", err)
+// 	}
+// 	return tx.Hash().Hex(), nil
+// }
 
 func (c *client) EnableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
 	if c.privateKey == nil {

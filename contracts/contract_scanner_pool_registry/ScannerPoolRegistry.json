@@ -5,6 +5,11 @@
         "internalType": "address",
         "name": "forwarder",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "stakeAllocator",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -109,32 +114,19 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
-        "name": "sunsettingTime",
+        "name": "scannerPoolId",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "scannerPoolRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "ConfiguredMigration",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
-        "name": "scannerId",
+        "name": "enabledScanners",
         "type": "uint256"
       }
     ],
-    "name": "DeregisteredScanner",
+    "name": "EnabledScannersChanged",
     "type": "event"
   },
   {
@@ -156,7 +148,38 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "scannerId",
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "min",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "max",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "activated",
+        "type": "bool"
+      }
+    ],
+    "name": "ManagedStakeThresholdChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "scannerPoolId",
         "type": "uint256"
       },
       {
@@ -173,6 +196,19 @@
       }
     ],
     "name": "ManagerEnabled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "delay",
+        "type": "uint256"
+      }
+    ],
+    "name": "RegistrationDelaySet",
     "type": "event"
   },
   {
@@ -205,18 +241,37 @@
       },
       {
         "indexed": false,
-        "internalType": "enum ScannerRegistryEnable.Permission",
-        "name": "permission",
-        "type": "uint8"
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
       },
       {
         "indexed": false,
         "internalType": "bool",
-        "name": "value",
+        "name": "disableFlag",
         "type": "bool"
       }
     ],
     "name": "ScannerEnabled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ScannerPoolRegistered",
     "type": "event"
   },
   {
@@ -239,40 +294,15 @@
         "internalType": "string",
         "name": "metadata",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "scannerPool",
+        "type": "uint256"
       }
     ],
     "name": "ScannerUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "min",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "max",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "activated",
-        "type": "bool"
-      }
-    ],
-    "name": "StakeThresholdChanged",
     "type": "event"
   },
   {
@@ -364,37 +394,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_sunsettingTime",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_scannerPoolRegistry",
-        "type": "address"
-      }
-    ],
-    "name": "configureMigration",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      }
-    ],
-    "name": "deregisterScannerNode",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "disableRouter",
     "outputs": [],
@@ -404,14 +403,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ScannerRegistryEnable.Permission",
-        "name": "permission",
-        "type": "uint8"
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
       }
     ],
     "name": "disableScanner",
@@ -422,14 +416,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "enum ScannerRegistryEnable.Permission",
-        "name": "permission",
-        "type": "uint8"
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
       }
     ],
     "name": "enableScanner",
@@ -460,151 +449,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "index",
+        "name": "managedId",
         "type": "uint256"
       }
     ],
-    "name": "getManagerAt",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getManagerCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getScanner",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "registered",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "metadata",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getScannerChainId",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getScannerState",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "registered",
-        "type": "bool"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "metadata",
-        "type": "string"
-      },
-      {
-        "internalType": "bool",
-        "name": "enabled",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "disabledFlags",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      }
-    ],
-    "name": "getStakeThreshold",
+    "name": "getManagedStakeThreshold",
     "outputs": [
       {
         "components": [
@@ -633,6 +482,139 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "getManagerAt",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getManagerCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      }
+    ],
+    "name": "getScanner",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "registered",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "disabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "scannerPoolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ScannerPoolRegistryCore.ScannerNode",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      }
+    ],
+    "name": "getScannerState",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "registered",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadata",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "operational",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "disabled",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getSubjectHandler",
     "outputs": [
@@ -646,13 +628,19 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "hasMigrationEnded",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTotalManagedSubjects",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -674,6 +662,16 @@
         "internalType": "string",
         "name": "__symbol",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "__stakeSubjectGateway",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "__registrationDelay",
+        "type": "uint256"
       }
     ],
     "name": "initialize",
@@ -709,26 +707,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      }
-    ],
-    "name": "isEnabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "scannerId",
+        "name": "scannerPoolId",
         "type": "uint256"
       },
       {
@@ -752,7 +731,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "scannerId",
+        "name": "scannerPoolId",
         "type": "uint256"
       }
     ],
@@ -770,12 +749,74 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      }
+    ],
+    "name": "isScannerDisabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      }
+    ],
+    "name": "isScannerOperational",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      }
+    ],
+    "name": "isScannerRegistered",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
-        "name": "subject",
+        "name": "scannerPoolId",
         "type": "uint256"
       }
     ],
-    "name": "isStakedOverMin",
+    "name": "isScannerRegisteredTo",
     "outputs": [
       {
         "internalType": "bool",
@@ -800,6 +841,25 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      }
+    ],
+    "name": "monitoredChainId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -841,25 +901,6 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "optingOutOfMigration",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
         "name": "subject",
         "type": "uint256"
       }
@@ -883,6 +924,227 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "scanner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "scannerPoolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ScannerPoolRegistryCore.ScannerNodeRegistration",
+        "name": "req",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bool",
+        "name": "disabled",
+        "type": "bool"
+      }
+    ],
+    "name": "registerMigratedScannerNode",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scannerPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      }
+    ],
+    "name": "registerMigratedScannerPool",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "scanner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "scannerPoolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ScannerPoolRegistryCore.ScannerNodeRegistration",
+        "name": "req",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "registerScannerNode",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      }
+    ],
+    "name": "registerScannerPool",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "registeredScannerAddressAtIndex",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "registeredScannerAtIndex",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "registered",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "disabled",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "scannerPoolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ScannerPoolRegistryCore.ScannerNode",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "registrationDelay",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -959,16 +1221,22 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "scannerPoolRegistry",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "scannerIdToAddress",
     "outputs": [
       {
-        "internalType": "contract ScannerPoolRegistry",
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -1005,42 +1273,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "scannerId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isOut",
-        "type": "bool"
-      }
-    ],
-    "name": "setMigrationPrefrence",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "ensRegistry",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "ensName",
-        "type": "string"
-      }
-    ],
-    "name": "setName",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
           {
             "internalType": "uint256",
@@ -1068,7 +1300,61 @@
         "type": "uint256"
       }
     ],
-    "name": "setStakeThreshold",
+    "name": "setManagedStakeThreshold",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "manager",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "enable",
+        "type": "bool"
+      }
+    ],
+    "name": "setManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "ensRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "ensName",
+        "type": "string"
+      }
+    ],
+    "name": "setName",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "delay",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRegistrationDelay",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1084,19 +1370,6 @@
     "name": "setSubjectHandler",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "sunsettingTime",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1135,6 +1408,49 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "tokenByIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "tokenOfOwnerByIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
       }
@@ -1145,6 +1461,38 @@
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerPoolId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalScannersRegistered",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1169,6 +1517,24 @@
       }
     ],
     "name": "transferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "scanner",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "metadata",
+        "type": "string"
+      }
+    ],
+    "name": "updateScannerMetadata",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -133,15 +133,17 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "disableRouter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
         "name": "__manager",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__router",
         "type": "address"
       }
     ],
@@ -254,19 +256,6 @@
       }
     ],
     "name": "setName",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newRouter",
-        "type": "address"
-      }
-    ],
-    "name": "setRouter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
