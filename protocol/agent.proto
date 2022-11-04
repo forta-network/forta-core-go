@@ -11,7 +11,7 @@ service Agent {
   rpc Initialize (InitializeRequest) returns (InitializeResponse) {}
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
-  rpc EvaluateCombination (EvaluateCombinationRequest) returns (EvaluateCombinationResponse) {}
+  rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
 }
 
 message Error {
@@ -54,7 +54,7 @@ message EvaluateBlockRequest {
   BlockEvent event = 2;
 }
 
-message EvaluateCombinationRequest {
+message EvaluateAlertRequest {
   string requestId = 1;
   AlertEvent event = 2;
 }
@@ -79,7 +79,7 @@ message EvaluateBlockResponse {
   bool private = 7;
 }
 
-message EvaluateCombinationResponse {
+message EvaluateAlertResponse {
   ResponseStatus status = 1;
   repeated Error errors = 2;
   repeated Finding findings = 3;

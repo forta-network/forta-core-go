@@ -26,7 +26,7 @@ type AgentClient interface {
 	Initialize(ctx context.Context, in *InitializeRequest, opts ...grpc.CallOption) (*InitializeResponse, error)
 	EvaluateTx(ctx context.Context, in *EvaluateTxRequest, opts ...grpc.CallOption) (*EvaluateTxResponse, error)
 	EvaluateBlock(ctx context.Context, in *EvaluateBlockRequest, opts ...grpc.CallOption) (*EvaluateBlockResponse, error)
-	EvaluateCombination(ctx context.Context, in *EvaluateCombinationRequest, opts ...grpc.CallOption) (*EvaluateCombinationResponse, error)
+	EvaluateAlert(ctx context.Context, in *EvaluateAlertRequest, opts ...grpc.CallOption) (*EvaluateAlertResponse, error)
 }
 
 type agentClient struct {
@@ -64,9 +64,9 @@ func (c *agentClient) EvaluateBlock(ctx context.Context, in *EvaluateBlockReques
 	return out, nil
 }
 
-func (c *agentClient) EvaluateCombination(ctx context.Context, in *EvaluateCombinationRequest, opts ...grpc.CallOption) (*EvaluateCombinationResponse, error) {
-	out := new(EvaluateCombinationResponse)
-	err := c.cc.Invoke(ctx, "/network.forta.Agent/EvaluateCombination", in, out, opts...)
+func (c *agentClient) EvaluateAlert(ctx context.Context, in *EvaluateAlertRequest, opts ...grpc.CallOption) (*EvaluateAlertResponse, error) {
+	out := new(EvaluateAlertResponse)
+	err := c.cc.Invoke(ctx, "/network.forta.Agent/EvaluateAlert", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ type AgentServer interface {
 	Initialize(context.Context, *InitializeRequest) (*InitializeResponse, error)
 	EvaluateTx(context.Context, *EvaluateTxRequest) (*EvaluateTxResponse, error)
 	EvaluateBlock(context.Context, *EvaluateBlockRequest) (*EvaluateBlockResponse, error)
-	EvaluateCombination(context.Context, *EvaluateCombinationRequest) (*EvaluateCombinationResponse, error)
+	EvaluateAlert(context.Context, *EvaluateAlertRequest) (*EvaluateAlertResponse, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -97,8 +97,8 @@ func (UnimplementedAgentServer) EvaluateTx(context.Context, *EvaluateTxRequest) 
 func (UnimplementedAgentServer) EvaluateBlock(context.Context, *EvaluateBlockRequest) (*EvaluateBlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EvaluateBlock not implemented")
 }
-func (UnimplementedAgentServer) EvaluateCombination(context.Context, *EvaluateCombinationRequest) (*EvaluateCombinationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EvaluateCombination not implemented")
+func (UnimplementedAgentServer) EvaluateAlert(context.Context, *EvaluateAlertRequest) (*EvaluateAlertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EvaluateAlert not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 
@@ -167,20 +167,20 @@ func _Agent_EvaluateBlock_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_EvaluateCombination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EvaluateCombinationRequest)
+func _Agent_EvaluateAlert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EvaluateAlertRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).EvaluateCombination(ctx, in)
+		return srv.(AgentServer).EvaluateAlert(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/network.forta.Agent/EvaluateCombination",
+		FullMethod: "/network.forta.Agent/EvaluateAlert",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).EvaluateCombination(ctx, req.(*EvaluateCombinationRequest))
+		return srv.(AgentServer).EvaluateAlert(ctx, req.(*EvaluateAlertRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -205,8 +205,8 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Agent_EvaluateBlock_Handler,
 		},
 		{
-			MethodName: "EvaluateCombination",
-			Handler:    _Agent_EvaluateCombination_Handler,
+			MethodName: "EvaluateAlert",
+			Handler:    _Agent_EvaluateAlert_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

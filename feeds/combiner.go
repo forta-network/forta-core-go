@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	ErrCombinerStopReached = fmt.Errorf("combiner stop reached")
+	ErrCombinerStopReached   = fmt.Errorf("combiner stop reached")
 	DefaultRatelimitDuration = time.Minute
 )
 
@@ -176,8 +176,8 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 				alerts, cErr = cf.client.GetAlerts(
 					cf.ctx,
 					&graphql.AlertsInput{
-						Bots: cf.SubscribedBots(),
-						CreatedSince:  uint(createdSince),
+						Bots:         cf.SubscribedBots(),
+						CreatedSince: uint(createdSince),
 						// CreatedBefore: uint(createdBefore), needs changes in alerts-api
 					},
 				)
