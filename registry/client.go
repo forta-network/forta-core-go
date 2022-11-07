@@ -11,6 +11,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/security/eip712"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -74,6 +75,9 @@ type Client interface {
 
 	// RegisterScanner registers a scanner by using operator private key.
 	RegisterScanner(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
+
+	// GenerateScannerRegistrationSignature generates a scanner registration signature from given data.
+	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error)
 
 	// RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
@@ -714,4 +718,8 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
 	}
 	return tx.Hash().Hex(), nil
+}
+
+func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error) {
+	return eip712.SignScannerRegistration(c.privateKey, c.contracts.ScannerPoolRegistry, reg)
 }

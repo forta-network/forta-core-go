@@ -12,6 +12,7 @@ import (
 	contract_scanner_registry "github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	registry "github.com/forta-network/forta-core-go/domain/registry"
 	registry0 "github.com/forta-network/forta-core-go/registry"
+	eip712 "github.com/forta-network/forta-core-go/security/eip712"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -178,6 +179,21 @@ func (m *MockClient) ForEachScannerSinceBlock(block uint64, handler func(*contra
 func (mr *MockClientMockRecorder) ForEachScannerSinceBlock(block, handler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachScannerSinceBlock", reflect.TypeOf((*MockClient)(nil).ForEachScannerSinceBlock), block, handler)
+}
+
+// GenerateScannerRegistrationSignature mocks base method.
+func (m *MockClient) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateScannerRegistrationSignature", reg)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GenerateScannerRegistrationSignature indicates an expected call of GenerateScannerRegistrationSignature.
+func (mr *MockClientMockRecorder) GenerateScannerRegistrationSignature(reg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateScannerRegistrationSignature", reflect.TypeOf((*MockClient)(nil).GenerateScannerRegistrationSignature), reg)
 }
 
 // GetAgent mocks base method.
