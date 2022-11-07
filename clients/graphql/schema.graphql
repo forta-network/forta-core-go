@@ -275,38 +275,37 @@ type Alert {
     """
     alertId: String
 
-    """List of addresses involved in the alert"""
+    "List of addresses involved in the alert"
     addresses: [String]
 
-    """List of contracts related to the alert"""
+    "List of contracts related to the alert"
     contracts: [Contract]
 
-    """Timestamp when the alert was published"""
+    "Timestamp when the alert was published"
     createdAt: String
 
-    """Text description of the alert"""
+    "Text description of the alert"
     description: String
 
-    """Alert hash identifier"""
+    "Alert hash identifier"
     hash: String
 
-    """Extra alert information"""
+    "Extra alert information"
     metadata: JSONObject
 
-    """Alert name"""
+    "Alert name"
     name: String
 
-    """List of Web3 projects related to the alert"""
+    "List of Web3 projects related to the alert"
     projects: [Project]
 
-    """Name of protocol being reported on"""
+    "Name of protocol being reported on"
     protocol: String
 
-    """Number of scanners that found the alert"""
+    "Number of scanners that found the alert"
     scanNodeCount: Int
 
-    """
-    Impact level of finding
+    """Impact level of finding
 
     CRITICAL - Exploitable vulnerabilities, massive impact on users/funds
 
@@ -320,11 +319,10 @@ type Alert {
     """
     severity: String
 
-    """Source where the alert was detected"""
+    "Source where the alert was detected"
     source: AlertSource
 
-    """
-    Type of finding
+    """Type of finding
 
     UNKNOWN_TYPE
 
@@ -337,6 +335,18 @@ type Alert {
     INFO
     """
     findingType: String
+
+    """Type of alert
+    UNKNOWN
+    PRIVATE
+    BLOCK
+    TRANSACTION
+    COMBINATION
+    """
+    alertDocumentType: String
+
+    """List of alerts involved in the alert"""
+    relatedAlerts: [String]
 }
 
 """Search after specified block number and alertId"""
@@ -379,14 +389,29 @@ type AlertsResponse {
 
 """Source where the threat was detected"""
 type AlertSource {
-    """Transaction where the threat was detected"""
+    "Transaction where the threat was detected"
     transactionHash: String
 
-    """Bot that triggered the alert"""
+    "Bot that triggered the alert"
     bot: Bot
 
-    """Block where the threat was detected"""
+    "Block where the threat was detected"
     block: Block
+
+    "Source alert event the threat was detected"
+    sourceAlert: SourceAlertEvent
+}
+
+"Source alert information"
+type SourceAlertEvent {
+    "Alert hash"
+    hash: String
+
+    "Bot id"
+    botId: String
+
+    "Alert timestamp"
+    timestamp: String
 }
 
 """Block information"""
@@ -504,6 +529,12 @@ input AlertsInput {
     """
     createdSince: NonNegativeInt
 
+    """
+    Indicate number of milliseconds
+    Alerts returned will be alerts created before the number of milliseconds indicated ago.
+    """
+    createdBefore: NonNegativeInt
+
     """Indicate max number of results."""
     first: NonNegativeInt
 
@@ -524,6 +555,10 @@ input AlertsInput {
     Alerts returned will only be from that transaction.
     """
     transactionHash: String
+    """
+    Filter alerts by multiple alert-ids.
+    """
+    alertIds: [String]
 }
 
 type Query {

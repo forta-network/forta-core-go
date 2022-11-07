@@ -45,9 +45,9 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 				}
 				cf.AddSubscription(
 					&protocol.CombinerBotSubscription{
-						BotId: "0x5e13c2f3a97c292695b598090056ba5d52f9dcc7790bcdaa8b6cd87c1a1ebc0f",
+						BotId:   "1",
+						AlertId: "COMBINATION_ALERT",
 					},
-					"0xlocalbot",
 				)
 				cf.StartRange(tt.args.start, tt.args.end, tt.args.rate)
 				<-ctx.Done()

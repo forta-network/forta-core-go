@@ -49,9 +49,15 @@ query getAlerts($input: AlertsInput) {
                     timestamp
                     chainId
                 }
+                sourceAlert {
+                    hash
+                    botId
+                    timestamp
+                }
             }
+            alertDocumentType
             findingType
-
+            relatedAlerts
         }
     }
 }

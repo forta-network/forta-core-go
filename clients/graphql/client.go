@@ -141,8 +141,14 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 					Timestamp: blockTimestamp,
 					ChainId:   uint64(alert.Source.Block.ChainId),
 				},
+				SourceEvent: &protocol.AlertEvent_Alert_SourceAlertEvent{
+					BotId:     alert.Source.SourceAlert.BotId,
+					AlertHash: alert.Source.SourceAlert.Hash,
+					Timestamp: alert.Source.SourceAlert.Timestamp,
+				},
 			},
-			FindingType: alert.FindingType,
+			FindingType:   alert.FindingType,
+			RelatedAlerts: alert.RelatedAlerts,
 		},
 		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
 	}

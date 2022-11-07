@@ -37,7 +37,7 @@ type combinerFeed struct {
 	alertCh chan *domain.AlertEvent
 	client  *graphql.Client
 
-	botSubscriptions map[string][]string
+	botSubscriptions []*protocol.CombinerBotSubscription
 	botsMu           sync.RWMutex
 	// bloom filter could be a better choice but the miss rate was too high
 	// and we don't know the expected item count
@@ -47,45 +47,52 @@ type combinerFeed struct {
 	handlersMu sync.Mutex
 }
 
-// Subscriptions returns alert/combiner bot pairs,
-func (cf *combinerFeed) Subscriptions() map[string][]string {
-	cf.botsMu.RLock()
-	defer cf.botsMu.RUnlock()
-	return cf.botSubscriptions
-}
 func (cf *combinerFeed) SubscribedBots() (bots []string) {
 	cf.botsMu.RLock()
 	defer cf.botsMu.RUnlock()
 
-	for sub := range cf.botSubscriptions {
-		bots = append(bots, sub)
+	for _, sub := range cf.botSubscriptions {
+		if sub.BotId == "" {
+			continue
+		}
+		bots = append(bots, sub.BotId)
 	}
 	return
 }
-func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscription, subscriber string) {
+func (cf *combinerFeed) SubscribedAlerts() (bots []string) {
+	cf.botsMu.RLock()
+	defer cf.botsMu.RUnlock()
+
+	for _, sub := range cf.botSubscriptions {
+		if sub.AlertId == "" {
+			continue
+		}
+		bots = append(bots, sub.AlertId)
+	}
+	return
+}
+func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscription) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
-	subscriptionString := encodeSubscription(subscription)
-	for _, s := range cf.botSubscriptions[subscriptionString] {
-		if s == subscriber {
+
+	for _, s := range cf.botSubscriptions {
+		if s.BotId == subscription.BotId && s.AlertId == subscription.AlertId {
 			return
 		}
 	}
 
-	cf.botSubscriptions[subscriptionString] = append(cf.botSubscriptions[subscriptionString], subscriber)
+	cf.botSubscriptions = append(cf.botSubscriptions, subscription)
 }
-func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription, subscriber string) {
-	subscriptionString := encodeSubscription(subscription)
+func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
-	for i, s := range cf.botSubscriptions[subscriptionString] {
-		if s == subscriber {
-			cf.botSubscriptions[subscriptionString] = append(cf.botSubscriptions[subscriptionString][:i], cf.botSubscriptions[subscriptionString][i+1:]...)
+	for i, s := range cf.botSubscriptions {
+		if s.BotId == subscription.BotId && s.AlertId == subscription.AlertId {
+			cf.botSubscriptions = append(
+				cf.botSubscriptions[:i], cf.botSubscriptions[i+1:]...,
+			)
 		}
-	}
-	if len(cf.botSubscriptions[encodeSubscription(subscription)]) == 0 {
-		delete(cf.botSubscriptions, subscriptionString)
 	}
 }
 func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent) error) <-chan error {
@@ -165,8 +172,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 			continue
 		}
 		createdSince := time.Now().UnixMilli() - int64(currentTimestp)
-		// TODO: needs changes in alerts-api
-		// createdBefore := createdSince - graphql.DefaultLastNMinutes.Milliseconds()
+		createdBefore := time.Now().UnixMilli() - int64(cf.end)
 
 		var alerts []*protocol.AlertEvent
 		bo := backoff.NewExponentialBackOff()
@@ -176,9 +182,10 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 				alerts, cErr = cf.client.GetAlerts(
 					cf.ctx,
 					&graphql.AlertsInput{
-						Bots:         cf.SubscribedBots(),
-						CreatedSince: uint(createdSince),
-						// CreatedBefore: uint(createdBefore), needs changes in alerts-api
+						Bots:          cf.SubscribedBots(),
+						CreatedSince:  uint(createdSince),
+						CreatedBefore: uint(createdBefore),
+						AlertIds:      cf.SubscribedAlerts(),
 					},
 				)
 				if cErr != nil {
@@ -282,7 +289,7 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		client:           ac,
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
-		botSubscriptions: map[string][]string{},
+		botSubscriptions: []*protocol.CombinerBotSubscription{},
 		alertCache:       cache.New(graphql.DefaultLastNMinutes*2, time.Minute),
 	}
 	return bf, nil

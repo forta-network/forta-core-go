@@ -42,6 +42,7 @@ message AlertConfig {
 
 message CombinerBotSubscription {
   string botId = 1;
+  string alertId = 2;
 }
 
 message EvaluateTxRequest {
@@ -271,6 +272,7 @@ message AlertEvent {
     message SourceAlertEvent {
       string botId = 1;
       string alertHash = 2;
+      string timestamp = 3;
     }
 
     message Source {
@@ -298,6 +300,7 @@ message AlertEvent {
     string severity = 11;
     Source source = 12;
     string findingType = 13;
+    repeated string relatedAlerts = 14;
   }
 
   Alert alert = 1;

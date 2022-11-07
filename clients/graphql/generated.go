@@ -57,6 +57,9 @@ type AlertsInput struct {
 	// Indicate number of milliseconds
 	// Alerts returned will be alerts created since the number of milliseconds indicated ago.
 	CreatedSince uint `json:"createdSince"`
+	// Indicate number of milliseconds
+	// Alerts returned will be alerts created before the number of milliseconds indicated ago.
+	CreatedBefore uint `json:"createdBefore"`
 	// Indicate max number of results.
 	First uint `json:"first"`
 	// Filter alerts by number of scan nodes confirming the alert.
@@ -66,6 +69,8 @@ type AlertsInput struct {
 	// Indicate a transaction hash
 	// Alerts returned will only be from that transaction.
 	TransactionHash string `json:"transactionHash"`
+	// Filter alerts by multiple alert-ids.
+	AlertIds []string `json:"alertIds"`
 }
 
 // GetAddresses returns AlertsInput.Addresses, and is useful for accessing the field via an interface.
@@ -104,6 +109,9 @@ func (v *AlertsInput) GetChainId() uint { return v.ChainId }
 // GetCreatedSince returns AlertsInput.CreatedSince, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetCreatedSince() uint { return v.CreatedSince }
 
+// GetCreatedBefore returns AlertsInput.CreatedBefore, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetCreatedBefore() uint { return v.CreatedBefore }
+
 // GetFirst returns AlertsInput.First, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetFirst() uint { return v.First }
 
@@ -115,6 +123,9 @@ func (v *AlertsInput) GetSeverities() []string { return v.Severities }
 
 // GetTransactionHash returns AlertsInput.TransactionHash, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetTransactionHash() string { return v.TransactionHash }
+
+// GetAlertIds returns AlertsInput.AlertIds, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetAlertIds() []string { return v.AlertIds }
 
 // Block range
 type BlockRange struct {
@@ -239,6 +250,13 @@ type getAlertsAlertsAlertsResponseAlertsAlert struct {
 	Severity string `json:"severity"`
 	// Source where the alert was detected
 	Source *getAlertsAlertsAlertsResponseAlertsAlertSource `json:"source"`
+	// Type of alert
+	// UNKNOWN
+	// PRIVATE
+	// BLOCK
+	// TRANSACTION
+	// COMBINATION
+	AlertDocumentType string `json:"alertDocumentType"`
 	// Type of finding
 	//
 	// UNKNOWN_TYPE
@@ -251,6 +269,8 @@ type getAlertsAlertsAlertsResponseAlertsAlert struct {
 	//
 	// INFO
 	FindingType string `json:"findingType"`
+	// List of alerts involved in the alert
+	RelatedAlerts []string `json:"relatedAlerts"`
 }
 
 // GetAlertId returns getAlertsAlertsAlertsResponseAlertsAlert.AlertId, and is useful for accessing the field via an interface.
@@ -298,8 +318,18 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetSource() *getAlertsAlertsA
 	return v.Source
 }
 
+// GetAlertDocumentType returns getAlertsAlertsAlertsResponseAlertsAlert.AlertDocumentType, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetAlertDocumentType() string {
+	return v.AlertDocumentType
+}
+
 // GetFindingType returns getAlertsAlertsAlertsResponseAlertsAlert.FindingType, and is useful for accessing the field via an interface.
 func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetFindingType() string { return v.FindingType }
+
+// GetRelatedAlerts returns getAlertsAlertsAlertsResponseAlertsAlert.RelatedAlerts, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetRelatedAlerts() []string {
+	return v.RelatedAlerts
+}
 
 // getAlertsAlertsAlertsResponseAlertsAlertContractsContract includes the requested fields of the GraphQL type Contract.
 // The GraphQL type's documentation follows.
@@ -343,6 +373,8 @@ type getAlertsAlertsAlertsResponseAlertsAlertSource struct {
 	Bot *getAlertsAlertsAlertsResponseAlertsAlertSourceBot `json:"bot"`
 	// Block where the threat was detected
 	Block *getAlertsAlertsAlertsResponseAlertsAlertSourceBlock `json:"block"`
+	// Source alert event the threat was detected
+	SourceAlert *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent `json:"sourceAlert"`
 }
 
 // GetTransactionHash returns getAlertsAlertsAlertsResponseAlertsAlertSource.TransactionHash, and is useful for accessing the field via an interface.
@@ -358,6 +390,11 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertSource) GetBot() *getAlertsAler
 // GetBlock returns getAlertsAlertsAlertsResponseAlertsAlertSource.Block, and is useful for accessing the field via an interface.
 func (v *getAlertsAlertsAlertsResponseAlertsAlertSource) GetBlock() *getAlertsAlertsAlertsResponseAlertsAlertSourceBlock {
 	return v.Block
+}
+
+// GetSourceAlert returns getAlertsAlertsAlertsResponseAlertsAlertSource.SourceAlert, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertSource) GetSourceAlert() *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent {
+	return v.SourceAlert
 }
 
 // getAlertsAlertsAlertsResponseAlertsAlertSourceBlock includes the requested fields of the GraphQL type Block.
@@ -468,6 +505,34 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceBot) GetScanNodes() []str
 // GetVersion returns getAlertsAlertsAlertsResponseAlertsAlertSourceBot.Version, and is useful for accessing the field via an interface.
 func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceBot) GetVersion() string { return v.Version }
 
+// getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent includes the requested fields of the GraphQL type SourceAlertEvent.
+// The GraphQL type's documentation follows.
+//
+// Source alert information
+type getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent struct {
+	// Alert hash
+	Hash string `json:"hash"`
+	// Bot id
+	BotId string `json:"botId"`
+	// Alert timestamp
+	Timestamp string `json:"timestamp"`
+}
+
+// GetHash returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.Hash, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetHash() string {
+	return v.Hash
+}
+
+// GetBotId returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.BotId, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetBotId() string {
+	return v.BotId
+}
+
+// GetTimestamp returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.Timestamp, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetTimestamp() string {
+	return v.Timestamp
+}
+
 // getAlertsAlertsAlertsResponsePageInfoAlertPageInfo includes the requested fields of the GraphQL type AlertPageInfo.
 type getAlertsAlertsAlertsResponsePageInfoAlertPageInfo struct {
 	HasNextPage bool                                                                       `json:"hasNextPage"`
@@ -568,8 +633,15 @@ query getAlerts ($input: AlertsInput) {
 					timestamp
 					chainId
 				}
+				sourceAlert {
+					hash
+					botId
+					timestamp
+				}
 			}
+			alertDocumentType
 			findingType
+			relatedAlerts
 		}
 	}
 }
