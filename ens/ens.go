@@ -13,12 +13,13 @@ import (
 )
 
 const (
-	DispatchContract           = "dispatch.forta.eth"
-	AgentRegistryContract      = "agents.registries.forta.eth"
-	ScannerRegistryContract    = "scanners.registries.forta.eth"
-	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
-	StakingContract            = "staking.forta.eth"
-	FortaContract              = "forta.eth"
+	DispatchContract            = "dispatch.forta.eth"
+	AgentRegistryContract       = "agents.registries.forta.eth"
+	ScannerRegistryContract     = "scanners.registries.forta.eth"
+	ScannerPoolRegistryContract = "scanners.registries.forta.eth" // "scanner-pools.registries.forta.eth"
+	ScannerNodeVersionContract  = "scanner-node-version.forta.eth"
+	StakingContract             = "staking.forta.eth"
+	FortaContract               = "forta.eth"
 )
 
 // ENS resolves inputs.
@@ -87,6 +88,11 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
+	scannerPoolReg, err := ensstore.Resolve(ScannerPoolRegistryContract)
+	if err != nil {
+		return nil, err
+	}
+
 	dispatch, err := ensstore.Resolve(DispatchContract)
 	if err != nil {
 		return nil, err
@@ -108,12 +114,13 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 	}
 
 	return &registry.RegistryContracts{
-		AgentRegistry:      agentReg,
-		ScannerRegistry:    scannerReg,
-		Dispatch:           dispatch,
-		ScannerNodeVersion: scannerNodeVersion,
-		FortaStaking:       fortaStaking,
-		Forta:              forta,
+		AgentRegistry:       agentReg,
+		ScannerRegistry:     scannerReg,
+		ScannerPoolRegistry: scannerPoolReg,
+		Dispatch:            dispatch,
+		ScannerNodeVersion:  scannerNodeVersion,
+		FortaStaking:        fortaStaking,
+		Forta:               forta,
 	}, nil
 
 }

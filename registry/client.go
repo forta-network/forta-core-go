@@ -6,11 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/domain/registry"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
@@ -69,8 +72,8 @@ type Client interface {
 	// GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
-	// RegisterScanner registers a scanner using private key.
-	//RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
+	// RegisterScanner registers a scanner by using operator private key.
+	RegisterScanner(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
 
 	// RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
@@ -119,14 +122,15 @@ type client struct {
 	opts       *bind.CallOpts
 	privateKey *ecdsa.PrivateKey
 
-	contracts *registry.RegistryContracts
-	ar        *contract_agent_registry.AgentRegistryCaller
-	sr        *contract_scanner_registry.ScannerRegistryCaller
-	dp        *contract_dispatch.DispatchCaller
-	sv        *contract_scanner_node_version.ScannerNodeVersionCaller
-	fs        *contract_forta_staking.FortaStakingCaller
-	srf       *contract_scanner_registry.ScannerRegistryFilterer
-	arf       *contract_agent_registry.AgentRegistryFilterer
+	contracts      *registry.RegistryContracts
+	agentReg       *contract_agent_registry.AgentRegistryCaller
+	scannerReg     *contract_scanner_registry.ScannerRegistryCaller
+	scannerPoolReg *contract_scanner_pool_registry.ScannerPoolRegistryCaller
+	dispatch       *contract_dispatch.DispatchCaller
+	scannerVersion *contract_scanner_node_version.ScannerNodeVersionCaller
+	fortaStaking   *contract_forta_staking.FortaStakingCaller
+	scannerRegFil  *contract_scanner_registry.ScannerRegistryFilterer
+	agentRegFil    *contract_agent_registry.AgentRegistryFilterer
 }
 
 var _ Client = &client{}
@@ -182,37 +186,42 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	}
 	ec := ethclient.NewClient(rpc)
 
-	ar, err := contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
+	agentReg, err := contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	sr, err := contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
+	scannerReg, err := contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	dp, err := contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
+	scannerPoolReg, err := contract_scanner_pool_registry.NewScannerPoolRegistryCaller(regContracts.ScannerPoolRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	sv, err := contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
+	dispatch, err := contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	fs, err := contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
+	scannerVersion, err := contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	srf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	fortaStaking, err := contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	arf, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
+	scannerRegFil, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	if err != nil {
+		return nil, err
+	}
+
+	agentRegFil, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
@@ -225,14 +234,15 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 
 		privateKey: cfg.PrivateKey,
 
-		contracts: regContracts,
-		sr:        sr,
-		ar:        ar,
-		dp:        dp,
-		sv:        sv,
-		fs:        fs,
-		srf:       srf,
-		arf:       arf,
+		contracts:      regContracts,
+		scannerReg:     scannerReg,
+		scannerPoolReg: scannerPoolReg,
+		agentReg:       agentReg,
+		dispatch:       dispatch,
+		scannerVersion: scannerVersion,
+		fortaStaking:   fortaStaking,
+		scannerRegFil:  scannerRegFil,
+		agentRegFil:    agentRegFil,
 	}, err
 }
 
@@ -295,7 +305,7 @@ func (c *client) PegLatestBlock() error {
 
 func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	res, err := c.sr.GetStakeThreshold(c.opts, sID)
+	res, err := c.scannerReg.GetStakeThreshold(c.opts, sID)
 	if err != nil {
 		return nil, err
 	}
@@ -303,23 +313,23 @@ func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error
 }
 
 func (c *client) GetScannerNodeVersion() (string, error) {
-	sv, err := c.sv.ScannerNodeVersion(c.opts)
+	scannerVersion, err := c.scannerVersion.ScannerNodeVersion(c.opts)
 	if err != nil {
 		return "", err
 	}
-	return sv, nil
+	return scannerVersion, nil
 }
 
 func (c *client) GetScannerNodePrereleaseVersion() (string, error) {
-	sv, err := c.sv.ScannerNodeBetaVersion(c.opts)
+	scannerVersion, err := c.scannerVersion.ScannerNodeBetaVersion(c.opts)
 	if err != nil {
 		return "", err
 	}
-	return sv, nil
+	return scannerVersion, nil
 }
 
 func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
-	sh, err := c.dp.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
+	sh, err := c.dispatch.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +349,7 @@ func (c *client) getOps() (*bind.CallOpts, error) {
 func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 	agtID := utils.AgentHexToBigInt(agentID)
 	scnID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.dp.AreTheyLinked(c.opts, agtID, scnID)
+	return c.dispatch.AreTheyLinked(c.opts, agtID, scnID)
 }
 
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
@@ -358,7 +368,7 @@ func (c *client) ForEachScannerSinceBlock(
 		return err
 	}
 
-	it, err := c.srf.FilterScannerUpdated(&bind.FilterOpts{
+	it, err := c.scannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
 	}, nil, nil)
@@ -369,7 +379,7 @@ func (c *client) ForEachScannerSinceBlock(
 
 	for it.Next() {
 		if it.Event != nil {
-			scn, err := c.sr.GetScannerState(opts, it.Event.ScannerId)
+			scn, err := c.scannerReg.GetScannerState(opts, it.Event.ScannerId)
 			if err != nil {
 				return err
 			}
@@ -395,18 +405,18 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 	}
 
 	cID := big.NewInt(chainID)
-	length, err := c.ar.GetAgentCountByChain(opts, cID)
+	length, err := c.agentReg.GetAgentCountByChain(opts, cID)
 	if err != nil {
 		return err
 	}
 
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agtID, err := c.ar.GetAgentByChainAndIndex(opts, cID, idx)
+		agtID, err := c.agentReg.GetAgentByChainAndIndex(opts, cID, idx)
 		if err != nil {
 			return err
 		}
-		agt, err := c.ar.GetAgentState(opts, agtID)
+		agt, err := c.agentReg.GetAgentState(opts, agtID)
 		if err != nil {
 			return err
 		}
@@ -430,14 +440,14 @@ func (c *client) ForEachAgentID(handler func(agentID string) error) error {
 		return err
 	}
 
-	length, err := c.ar.GetAgentCount(opts)
+	length, err := c.agentReg.GetAgentCount(opts)
 	if err != nil {
 		return err
 	}
 
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agtID, err := c.ar.GetAgentByIndex(opts, idx)
+		agtID, err := c.agentReg.GetAgentByIndex(opts, idx)
 		if err != nil {
 			return err
 		}
@@ -455,7 +465,7 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 	}
 
 	return c.ForEachAgentID(func(agentID string) error {
-		agt, err := c.ar.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
+		agt, err := c.agentReg.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
 		if err != nil {
 			return err
 		}
@@ -477,7 +487,7 @@ func (c *client) ForEachAgentSinceBlock(
 		return err
 	}
 
-	it, err := c.arf.FilterAgentUpdated(&bind.FilterOpts{
+	it, err := c.agentRegFil.FilterAgentUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
 	}, nil, nil)
@@ -488,7 +498,7 @@ func (c *client) ForEachAgentSinceBlock(
 
 	for it.Next() {
 		if it.Event != nil {
-			agt, err := c.ar.GetAgentState(opts, it.Event.AgentId)
+			agt, err := c.agentReg.GetAgentState(opts, it.Event.AgentId)
 			if err != nil {
 				return err
 			}
@@ -515,13 +525,13 @@ func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner)
 	}
 
 	aID := utils.AgentHexToBigInt(agentID)
-	length, err := c.dp.NumScannersFor(opts, aID)
+	length, err := c.dispatch.NumScannersFor(opts, aID)
 	if err != nil {
 		return err
 	}
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		scn, err := c.dp.ScannerRefAt(opts, aID, idx)
+		scn, err := c.dispatch.ScannerRefAt(opts, aID, idx)
 		if err != nil {
 			return err
 		}
@@ -546,13 +556,13 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 	}
 
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	length, err := c.dp.NumAgentsFor(opts, sID)
+	length, err := c.dispatch.NumAgentsFor(opts, sID)
 	if err != nil {
 		return err
 	}
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agt, err := c.dp.AgentRefAt(opts, sID, idx)
+		agt, err := c.dispatch.AgentRefAt(opts, sID, idx)
 		if err != nil {
 			return err
 		}
@@ -571,17 +581,17 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.sr.IsEnabled(c.opts, sID)
+	return c.scannerReg.IsEnabled(c.opts, sID)
 }
 
 func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.fs.ActiveStakeFor(c.opts, 0, sID)
+	return c.fortaStaking.ActiveStakeFor(c.opts, 0, sID)
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	scn, err := c.sr.GetScanner(c.opts, sID)
+	scn, err := c.scannerReg.GetScanner(c.opts, sID)
 
 	if err != nil {
 		return nil, err
@@ -591,7 +601,7 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 		return nil, nil
 	}
 
-	enabled, err := c.sr.IsEnabled(c.opts, sID)
+	enabled, err := c.scannerReg.IsEnabled(c.opts, sID)
 	if err != nil {
 		return nil, err
 	}
@@ -607,7 +617,7 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 
 func (c *client) GetAgent(agentID string) (*Agent, error) {
 	aID := utils.AgentHexToBigInt(agentID)
-	agt, err := c.ar.GetAgent(c.opts, aID)
+	agt, err := c.agentReg.GetAgent(c.opts, aID)
 	if err != nil {
 		return nil, err
 	}
@@ -617,7 +627,7 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		return nil, nil
 	}
 
-	enabled, err := c.ar.IsEnabled(c.opts, aID)
+	enabled, err := c.agentReg.IsEnabled(c.opts, aID)
 	if err != nil {
 		return nil, err
 	}
@@ -631,28 +641,34 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	}, nil
 }
 
-// func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
-// 	if c.privateKey == nil {
-// 		return "", errors.New("no private key provided to the client")
-// 	}
-// 	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
-// 	}
-// 	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
-// 	}
-// 	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
-// 	}
-// 	tx, err := reg.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to send the transaction: %v", err)
-// 	}
-// 	return tx.Hash().Hex(), nil
-// }
+func (c *client) RegisterScanner(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error) {
+	if c.privateKey == nil {
+		return "", errors.New("no operator private key provided to the client")
+	}
+	reg, err := contract_scanner_pool_registry.NewScannerPoolRegistryTransactor(c.contracts.ScannerPoolRegistry, c.ec)
+	if err != nil {
+		return "", fmt.Errorf("failed to create contract transactor: %v", err)
+	}
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	if err != nil {
+		return "", fmt.Errorf("failed to create transaction opts: %v", err)
+	}
+	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
+	}
+	tx, err := reg.RegisterScannerNode(opts, contract_scanner_pool_registry.ScannerPoolRegistryCoreScannerNodeRegistration{
+		Scanner:       common.HexToAddress(scannerAddress),
+		ScannerPoolId: poolID,
+		ChainId:       big.NewInt(int64(chainID)),
+		Metadata:      metadata,
+		Timestamp:     big.NewInt(time.Now().Unix()),
+	}, signature)
+	if err != nil {
+		return "", fmt.Errorf("failed to send the transaction: %v", err)
+	}
+	return tx.Hash().Hex(), nil
+}
 
 func (c *client) EnableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
 	if c.privateKey == nil {
