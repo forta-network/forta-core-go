@@ -4,8 +4,11 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 )
 
-const SubjectTypeScanner = 0
-const SubjectTypeAgent = 1
+const (
+	SubjectTypeScanner     = 0
+	SubjectTypeAgent       = 1
+	SubjectTypeScannerPool = 2
+)
 
 type Agent struct {
 	AgentID  string  `json:"agentId"`

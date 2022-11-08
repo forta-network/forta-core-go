@@ -36,6 +36,14 @@ func AgentHexToBigInt(hex string) *big.Int {
 	return common.HexToHash(hex).Big()
 }
 
+func PoolIDBigIntToHex(i *big.Int) string {
+	return BytesToHex(i.Bytes())
+}
+
+func PoolIDHexToBigInt(hex string) *big.Int {
+	return common.HexToHash(hex).Big()
+}
+
 func HexToBigInt(hex string) (*big.Int, error) {
 	return hexutil.DecodeBig(hex)
 }

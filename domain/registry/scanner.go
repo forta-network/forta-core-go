@@ -3,10 +3,10 @@ package registry
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
 
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/utils"
 	"github.com/goccy/go-json"
@@ -15,6 +15,7 @@ import (
 const SaveScanner = "SaveScanner"
 const EnableScanner = "EnableScanner"
 const DisableScanner = "DisableScanner"
+const UpdateScannerPool = "UpdateScannerPool"
 
 const ScannerPermissionAdmin = 0
 const ScannerPermissionSelf = 1
@@ -25,12 +26,21 @@ type ScannerMessage struct {
 	Message
 	ScannerID  string `json:"scannerId"`
 	Permission int    `json:"permission"`
+	Sender     string `json:"sender"`
 }
 
 type ScannerSaveMessage struct {
 	ScannerMessage
-	ChainID int64 `json:"chainId"`
-	Enabled bool  `json:"enabled"`
+	ChainID int64  `json:"chainId"`
+	PoolID  string `json:"poolId"`
+	Enabled bool   `json:"enabled"`
+}
+
+type UpdateScannerPoolMessage struct {
+	Message
+	PoolID  string  `json:"poolId"`
+	ChainID *int64  `json:"chainId,omitempty"`
+	Owner   *string `json:"owner,omitempty"`
 }
 
 func ParseScannerSave(msg string) (*ScannerSaveMessage, error) {
@@ -61,13 +71,22 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnab
 		evtName = EnableScanner
 	}
 	return &ScannerMessage{
-		Message: Message{
-			Timestamp: time.Now().UTC(),
-			Action:    evtName,
-			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
-		},
+		Message:    MessageFrom(evt.Raw.TxHash.Hex(), blk, evtName),
 		ScannerID:  strings.ToLower(scannerID),
 		Permission: int(evt.Permission),
+	}
+}
+
+func NewScannerMessageFromPool(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerEnabled, blk *domain.Block) *ScannerMessage {
+	scannerID := utils.HexAddr(evt.ScannerId)
+	evtName := DisableScanner
+	if evt.Enabled {
+		evtName = EnableScanner
+	}
+	return &ScannerMessage{
+		Message:   MessageFrom(evt.Raw.TxHash.Hex(), blk, evtName),
+		ScannerID: strings.ToLower(scannerID),
+		Sender:    evt.Sender.Hex(),
 	}
 }
 
@@ -76,13 +95,39 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScanner
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{
 			ScannerID: strings.ToLower(scannerID),
-			Message: Message{
-				Timestamp: time.Now().UTC(),
-				Action:    SaveScanner,
-				Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
-			},
+			Message:   MessageFrom(evt.Raw.TxHash.Hex(), blk, SaveScanner),
 		},
-		Enabled: enabled,
 		ChainID: evt.ChainId.Int64(),
+		Enabled: enabled,
+	}
+}
+
+func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, enabled bool, blk *domain.Block) *ScannerSaveMessage {
+	scannerID := utils.HexAddr(evt.ScannerId)
+	return &ScannerSaveMessage{
+		ScannerMessage: ScannerMessage{
+			ScannerID: strings.ToLower(scannerID),
+			Message:   MessageFrom(evt.Raw.TxHash.Hex(), blk, SaveScanner),
+		},
+		ChainID: evt.ChainId.Int64(),
+		PoolID:  utils.PoolIDBigIntToHex(evt.ScannerPool),
+		Enabled: enabled,
+	}
+}
+
+func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.ScannerPoolRegistryTransfer, blk *domain.Block) *UpdateScannerPoolMessage {
+	return &UpdateScannerPoolMessage{
+		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
+		PoolID:  utils.PoolIDBigIntToHex(evt.TokenId),
+		Owner:   utils.StringPtr(evt.To.Hex()),
+	}
+}
+
+func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerPoolRegistered, owner string, blk *domain.Block) *UpdateScannerPoolMessage {
+	return &UpdateScannerPoolMessage{
+		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
+		PoolID:  utils.PoolIDBigIntToHex(evt.ScannerPoolId),
+		Owner:   utils.StringPtr(owner),
+		ChainID: utils.Int64Ptr(evt.ChainId.Int64()),
 	}
 }

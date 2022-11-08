@@ -114,6 +114,9 @@ type Client interface {
 
 	// DisableScanner disables a scanner.
 	DisableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
+
+	// GetScannerPoolOwner finds out the owner of the scanner pool.
+	GetScannerPoolOwner(poolID *big.Int) (owner string, err error)
 }
 
 type client struct {
@@ -722,4 +725,12 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 
 func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error) {
 	return eip712.SignScannerRegistration(c.privateKey, c.contracts.ScannerPoolRegistry, reg)
+}
+
+func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {
+	addr, err := c.scannerPoolReg.OwnerOf(c.opts, poolID)
+	if err != nil {
+		return "", nil
+	}
+	return addr.Hex(), nil
 }

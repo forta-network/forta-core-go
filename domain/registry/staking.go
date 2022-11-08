@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
@@ -20,6 +21,7 @@ const ScannerStake = "ScannerStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
 const TransferShares = "TransferShares"
+const ScannerPoolStake = "ScannerPoolStake"
 
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
@@ -73,6 +75,11 @@ type AgentStakeMessage struct {
 type ScannerStakeMessage struct {
 	StakeMessage
 	ScannerID string `json:"scannerId"`
+}
+
+type ScannerPoolStakeMessage struct {
+	StakeMessage
+	PoolID string `json:"poolId"`
 }
 
 func valueString(v *big.Int) string {
@@ -174,6 +181,17 @@ func NewAgentStakeMessage(l types.Log, changeType, agentID string, value *big.In
 	}
 }
 
+func NewScannerPoolStakeMessage(l types.Log, changeType, poolID string, value *big.Int, blk *domain.Block) *ScannerPoolStakeMessage {
+	return &ScannerPoolStakeMessage{
+		StakeMessage: StakeMessage{
+			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerPoolStake),
+			ChangeType: changeType,
+			Amount:     valueString(value),
+		},
+		PoolID: strings.ToLower(poolID),
+	}
+}
+
 func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
@@ -190,6 +208,22 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistrySta
 }
 
 func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+	return &ScannerStakeThresholdMessage{
+		ThresholdMessage: ThresholdMessage{
+			Message: Message{
+				Action:    ScannerStakeThreshold,
+				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			Min:       valueString(evt.Min),
+			Max:       valueString(evt.Max),
+			Activated: evt.Activated,
+		},
+		ChainID: evt.ChainId.Int64(),
+	}
+}
+
+func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ScannerPoolRegistryManagedStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{
