@@ -3,6 +3,7 @@ package feeds
 import (
 	"context"
 	"fmt"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -174,7 +175,8 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 			continue
 		}
 		createdSince := time.Now().UnixMilli() - int64(currentTimestp)
-		createdBefore := time.Now().UnixMilli() - int64(cf.end)
+		createdBefore := time.Now().UnixMilli() - int64(currentTimestp) - graphql.DefaultLastNMinutes.Milliseconds()
+		createdBefore = int64(math.Max(0, float64(createdBefore)))
 
 		var alerts []*protocol.AlertEvent
 		bo := backoff.NewExponentialBackOff()
