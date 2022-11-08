@@ -12,6 +12,7 @@ import (
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/protocol/transform"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
@@ -76,19 +77,20 @@ func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscr
 	defer cf.botsMu.Unlock()
 
 	for _, s := range cf.botSubscriptions {
-		if s.BotId == subscription.BotId && s.AlertId == subscription.AlertId {
+		if transform.CompareCombinerBotSubscription(s, subscription) {
 			return
 		}
 	}
 
 	cf.botSubscriptions = append(cf.botSubscriptions, subscription)
 }
+
 func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
 	for i, s := range cf.botSubscriptions {
-		if s.BotId == subscription.BotId && s.AlertId == subscription.AlertId {
+		if transform.CompareCombinerBotSubscription(s, subscription) {
 			cf.botSubscriptions = append(
 				cf.botSubscriptions[:i], cf.botSubscriptions[i+1:]...,
 			)

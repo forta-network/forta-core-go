@@ -104,6 +104,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 	t, _ = time.Parse(time.RFC3339, alert.CreatedAt)
 	alertTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
 
+
 	a := &protocol.AlertEvent{
 		Alert: &protocol.AlertEvent_Alert{
 			AlertId:       alert.AlertId,
@@ -117,40 +118,58 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			Projects:      projects,
 			ScanNodeCount: int32(alert.ScanNodeCount),
 			Severity:      alert.Severity,
-			Source: &protocol.AlertEvent_Alert_Source{
-				TransactionHash: alert.Source.TransactionHash,
-				Bot: &protocol.AlertEvent_Alert_Bot{
-					ChainIds:     alert.Source.Bot.ChainIds,
-					CreatedAt:    alert.Source.Bot.CreatedAt,
-					Description:  alert.Source.Bot.Description,
-					Developer:    alert.Source.Bot.Developer,
-					DocReference: alert.Source.Bot.DocReference,
-					Enabled:      alert.Source.Bot.Enabled,
-					Id:           alert.Source.Bot.Id,
-					Image:        alert.Source.Bot.Image,
-					Name:         alert.Source.Bot.Name,
-					Reference:    alert.Source.Bot.Reference,
-					Repository:   alert.Source.Bot.Repository,
-					Projects:     alert.Source.Bot.Projects,
-					ScanNodes:    alert.Source.Bot.ScanNodes,
-					Version:      alert.Source.Bot.Version,
-				},
-				Block: &protocol.AlertEvent_Alert_Block{
-					Number:    uint64(alert.Source.Block.Number),
-					Hash:      alert.Source.Block.Hash,
-					Timestamp: blockTimestamp,
-					ChainId:   uint64(alert.Source.Block.ChainId),
-				},
-				SourceEvent: &protocol.AlertEvent_Alert_SourceAlertEvent{
-					BotId:     alert.Source.SourceAlert.BotId,
-					AlertHash: alert.Source.SourceAlert.Hash,
-					Timestamp: alert.Source.SourceAlert.Timestamp,
-				},
-			},
 			FindingType:   alert.FindingType,
 			RelatedAlerts: alert.RelatedAlerts,
 		},
 		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
+	}
+
+	a.Alert.Source = &protocol.AlertEvent_Alert_Source{
+		TransactionHash: alert.Source.TransactionHash,
+	}
+
+	if alert.Source == nil {
+		return a
+	}
+
+	// fill source bot
+	if alert.Source.Bot != nil {
+		a.Alert.Source.Bot = &protocol.AlertEvent_Alert_Bot{
+			ChainIds:     alert.Source.Bot.ChainIds,
+			CreatedAt:    alert.Source.Bot.CreatedAt,
+			Description:  alert.Source.Bot.Description,
+			Developer:    alert.Source.Bot.Developer,
+			DocReference: alert.Source.Bot.DocReference,
+			Enabled:      alert.Source.Bot.Enabled,
+			Id:           alert.Source.Bot.Id,
+			Image:        alert.Source.Bot.Image,
+			Name:         alert.Source.Bot.Name,
+			Reference:    alert.Source.Bot.Reference,
+			Repository:   alert.Source.Bot.Repository,
+			Projects:     alert.Source.Bot.Projects,
+			ScanNodes:    alert.Source.Bot.ScanNodes,
+			Version:      alert.Source.Bot.Version,
+		}
+	}
+
+	// fill source block
+	if alert.Source.Block != nil {
+		a.Alert.Source.Block = &protocol.AlertEvent_Alert_Block{
+			Number:    uint64(alert.Source.Block.Number),
+			Hash:      alert.Source.Block.Hash,
+			Timestamp: blockTimestamp,
+			ChainId:   uint64(alert.Source.Block.ChainId),
+		}
+	}
+
+	// fill source alert
+	if alert.Source.SourceAlert != nil {
+		a.Alert.Source.SourceEvent = &protocol.
+		AlertEvent_Alert_SourceAlertEvent{
+			BotId:     alert.Source.SourceAlert.BotId,
+			AlertHash: alert.Source.SourceAlert.Hash,
+			Timestamp: alert.Source.SourceAlert.Timestamp,
+		}
 	}
 
 	return a
