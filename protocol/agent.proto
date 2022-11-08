@@ -67,9 +67,10 @@ message Label {
     MIXER = 6;
     DEX = 7;
     CEX = 8;
-    VICTIM = 9;
-    EOA = 10;
-    CONTRACT = 11;
+    ATTACKER = 9;
+    VICTIM = 10;
+    EOA = 11;
+    CONTRACT = 12;
   }
 
   EntityType entityType = 1;
