@@ -12,6 +12,13 @@ import (
 	"time"
 
 	ipfsapi "github.com/ipfs/go-ipfs-api"
+	files "github.com/ipfs/go-ipfs-files"
+	coreiface "github.com/ipfs/interface-go-ipfs-core"
+	"github.com/ipfs/interface-go-ipfs-core/options"
+	config "github.com/ipfs/kubo/config"
+	"github.com/ipfs/kubo/core"
+	"github.com/ipfs/kubo/core/coreapi"
+	"github.com/ipfs/kubo/repo"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -31,6 +38,7 @@ type Client interface {
 
 type client struct {
 	ipfsGateway string
+	coreApi     coreiface.CoreAPI
 	*ipfsapi.Shell
 }
 
@@ -55,7 +63,15 @@ func (c *client) AddFile(payload []byte) (string, error) {
 
 func (c *client) CalculateFileHash(payload []byte) (string, error) {
 	b := createFileBytes(payload)
-	return c.Add(bytes.NewReader(b), ipfsapi.OnlyHash(true))
+	path, err := c.coreApi.Unixfs().Add(
+		context.Background(),
+		files.NewBytesFile(b),
+		options.Unixfs.HashOnly(true),
+	)
+	if err != nil {
+		return "", err
+	}
+	return path.Cid().String(), nil
 }
 
 func (c *client) UnmarshalJson(ctx context.Context, reference string, target interface{}) error {
@@ -104,8 +120,18 @@ func (c *client) GetBytes(ctx context.Context, reference string) ([]byte, error)
 }
 
 func NewClient(ipfsGateway string) (*client, error) {
+	coreApi, err := coreapi.NewCoreAPI(&core.IpfsNode{
+		Repo: &repo.Mock{
+			C: config.Config{},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create core api: %v", err)
+	}
+
 	return &client{
 		ipfsGateway: ipfsGateway,
+		coreApi:     coreApi,
 		Shell:       ipfsapi.NewShell(ipfsGateway),
 	}, nil
 }

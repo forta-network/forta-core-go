@@ -26,14 +26,16 @@ func ToWebhookBotMetricsList(batch *protocol.AlertBatch) models.BotMetricsList {
 			Timestamp: metric.Timestamp,
 		}
 		for _, metricSummary := range metric.Metrics {
-			webhookMetric.Metrics = append(webhookMetric.Metrics, &models.BotMetricSummary{
-				Name:    metricSummary.Name,
-				Count:   float64(metricSummary.Count),
-				Max:     metricSummary.Max,
-				Average: metricSummary.Average,
-				Sum:     metricSummary.Sum,
-				P95:     metricSummary.P95,
-			})
+			webhookMetric.Metrics = append(
+				webhookMetric.Metrics, &models.BotMetricSummary{
+					Name:    metricSummary.Name,
+					Count:   float64(metricSummary.Count),
+					Max:     metricSummary.Max,
+					Average: metricSummary.Average,
+					Sum:     metricSummary.Sum,
+					P95:     metricSummary.P95,
+				},
+			)
 		}
 		metricsList = append(metricsList, webhookMetric)
 	}
@@ -46,23 +48,27 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 	for _, resultsForBlock := range batch.Results {
 		for _, blockResult := range resultsForBlock.Results {
 			for _, alert := range blockResult.Alerts {
-				alertList = append(alertList, ToWebhookAlert(
-					alert.Alert,
-					batch.ChainId,
-					resultsForBlock.Block,
-					nil,
-				))
+				alertList = append(
+					alertList, ToWebhookAlert(
+						alert.Alert,
+						batch.ChainId,
+						resultsForBlock.Block,
+						nil,
+					),
+				)
 			}
 		}
 		for _, resultsForTransaction := range resultsForBlock.Transactions {
 			for _, transactionResult := range resultsForTransaction.Results {
 				for _, alert := range transactionResult.Alerts {
-					alertList = append(alertList, ToWebhookAlert(
-						alert.Alert,
-						batch.ChainId,
-						resultsForBlock.Block,
-						resultsForTransaction.Transaction,
-					))
+					alertList = append(
+						alertList, ToWebhookAlert(
+							alert.Alert,
+							batch.ChainId,
+							resultsForBlock.Block,
+							resultsForTransaction.Transaction,
+						),
+					)
 				}
 			}
 		}

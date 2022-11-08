@@ -7,6 +7,10 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
+const (
+	IndicatorValidAPIReferences = "api.refs.valid"
+)
+
 // InspectionConfig contains the parameters for all inspections.
 type InspectionConfig struct {
 	BlockNumber uint64 `json:"blockNumber"`
@@ -14,6 +18,7 @@ type InspectionConfig struct {
 	ProxyAPIURL string `json:"proxyApiUrl"` // JSON-RPC API for bots
 	TraceAPIURL string `json:"traceApiUrl"`
 	CheckTrace  bool   `json:"checkTrace"`
+	IsETH2      bool   `json:"isETH2"`
 }
 
 // InspectionResults contains inspection results.
@@ -72,6 +77,19 @@ func InspectAll(ctx context.Context, inspectors []Inspector, inspectionCfg Inspe
 			resultError = multierror.Append(resultError, fmt.Errorf("'%s' inspection error: %w", inspector.Name(), err))
 		}
 		allResults.CopyFrom(results)
+	}
+
+	// keep the hash references the same as in result metadata: allows cross-checking only
+	_, err := ValidateHashReferences(allResults.Metadata, allResults.Inputs, &HashReferences{
+		ScanAPIBlockHash:  allResults.Metadata[MetadataScanAPIBlockByNumberHash],
+		ProxyAPIBlockHash: allResults.Metadata[MetadataProxyAPIBlockByNumberHash],
+		TraceAPIBlockHash: allResults.Metadata[MetadataTraceAPIBlockByNumberHash],
+		TraceAPITraceHash: allResults.Metadata[MetadataTraceAPITraceBlockHash],
+	})
+	if err != nil {
+		allResults.Indicators[IndicatorValidAPIReferences] = ResultFailure
+	} else {
+		allResults.Indicators[IndicatorValidAPIReferences] = ResultSuccess
 	}
 
 	return

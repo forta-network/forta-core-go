@@ -271,6 +271,21 @@ func (mr *MockClientMockRecorder) GetScannerNodeVersion() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerNodeVersion", reflect.TypeOf((*MockClient)(nil).GetScannerNodeVersion))
 }
 
+// GetScannerPoolOwner mocks base method.
+func (m *MockClient) GetScannerPoolOwner(poolID *big.Int) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetScannerPoolOwner", poolID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetScannerPoolOwner indicates an expected call of GetScannerPoolOwner.
+func (mr *MockClientMockRecorder) GetScannerPoolOwner(poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerPoolOwner", reflect.TypeOf((*MockClient)(nil).GetScannerPoolOwner), poolID)
+}
+
 // GetStakingThreshold mocks base method.
 func (m *MockClient) GetStakingThreshold(scannerID string) (*registry0.StakingThreshold, error) {
 	m.ctrl.T.Helper()

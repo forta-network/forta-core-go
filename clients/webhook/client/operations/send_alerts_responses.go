@@ -57,7 +57,8 @@ func NewSendAlertsOK() *SendAlertsOK {
 	return &SendAlertsOK{}
 }
 
-/* SendAlertsOK describes a response with status code 200, with default header values.
+/*
+	SendAlertsOK describes a response with status code 200, with default header values.
 
 Successfully sent alerts
 */
@@ -78,7 +79,8 @@ func NewSendAlertsBadRequest() *SendAlertsBadRequest {
 	return &SendAlertsBadRequest{}
 }
 
-/* SendAlertsBadRequest describes a response with status code 400, with default header values.
+/*
+	SendAlertsBadRequest describes a response with status code 400, with default header values.
 
 Bad request
 */
@@ -110,7 +112,8 @@ func NewSendAlertsInternalServerError() *SendAlertsInternalServerError {
 	return &SendAlertsInternalServerError{}
 }
 
-/* SendAlertsInternalServerError describes a response with status code 500, with default header values.
+/*
+	SendAlertsInternalServerError describes a response with status code 500, with default header values.
 
 Internal error
 */
@@ -131,7 +134,8 @@ func NewSendAlertsBadGateway() *SendAlertsBadGateway {
 	return &SendAlertsBadGateway{}
 }
 
-/* SendAlertsBadGateway describes a response with status code 502, with default header values.
+/*
+	SendAlertsBadGateway describes a response with status code 502, with default header values.
 
 Bad gateway
 */
@@ -147,7 +151,8 @@ func (o *SendAlertsBadGateway) readResponse(response runtime.ClientResponse, con
 	return nil
 }
 
-/*SendAlertsBadRequestBody send alerts bad request body
+/*
+SendAlertsBadRequestBody send alerts bad request body
 swagger:model SendAlertsBadRequestBody
 */
 type SendAlertsBadRequestBody struct {

@@ -7,7 +7,7 @@ import (
 	"github.com/forta-network/forta-core-go/utils"
 )
 
-//Block is the intersection between parity and go-ethereum block
+// Block is the intersection between parity and go-ethereum block
 type Block struct {
 	Difficulty       *string       `json:"difficulty"`
 	ExtraData        *string       `json:"extraData"`
@@ -50,7 +50,7 @@ func (b *Block) GetTimestamp() (*time.Time, error) {
 	return &result, nil
 }
 
-//Transaction is the intersection between parity and go-ethereum transactions
+// Transaction is the intersection between parity and go-ethereum transactions
 type Transaction struct {
 	BlockHash        string  `json:"blockHash"`
 	BlockNumber      string  `json:"blockNumber"`
@@ -68,7 +68,7 @@ type Transaction struct {
 	S                string  `json:"s"`
 }
 
-//LogEntry is a log item inside a receipt
+// LogEntry is a log item inside a receipt
 type LogEntry struct {
 	Address          *string   `json:"address"`
 	BlockHash        *string   `json:"blockHash"`
@@ -81,7 +81,7 @@ type LogEntry struct {
 	TransactionIndex *string   `json:"transactionIndex"`
 }
 
-//TransactionReceipt is a result of a eth_getTransactionReceipt call
+// TransactionReceipt is a result of a eth_getTransactionReceipt call
 type TransactionReceipt struct {
 	BlockHash         *string    `json:"blockHash"`
 	BlockNumber       *string    `json:"blockNumber"`
@@ -97,7 +97,7 @@ type TransactionReceipt struct {
 	TransactionIndex  *string    `json:"transactionIndex"`
 }
 
-//TraceAction is an element of a trace_block Trace response
+// TraceAction is an element of a trace_block Trace response
 type TraceAction struct {
 	CallType      *string `json:"callType"`
 	To            *string `json:"to"`
@@ -111,7 +111,7 @@ type TraceAction struct {
 	RefundAddress *string `json:"refundAddress"`
 }
 
-//TraceResult is a result element of a trace_block Trace response
+// TraceResult is a result element of a trace_block Trace response
 type TraceResult struct {
 	Output  *string `json:"output"`
 	GasUsed *string `json:"gasUsed"`
@@ -119,7 +119,7 @@ type TraceResult struct {
 	Code    *string `json:"code"`
 }
 
-//Trace is a specific traced action in a transaction
+// Trace is a specific traced action in a transaction
 type Trace struct {
 	Action              TraceAction  `json:"action"`
 	BlockHash           *string      `json:"blockHash"`

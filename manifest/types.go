@@ -2,7 +2,7 @@ package manifest
 
 import "github.com/forta-network/forta-core-go/utils"
 
-//AgentManifest represents the dev-provided properties of an agent
+// AgentManifest represents the dev-provided properties of an agent
 type AgentManifest struct {
 	From           *string `json:"from"`
 	Name           *string `json:"name"`

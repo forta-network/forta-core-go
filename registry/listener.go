@@ -5,10 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"sync"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
@@ -219,7 +222,11 @@ func (l *listener) handleAgentRegistryEvent(le types.Log, blk *domain.Block, log
 			return err
 		}
 		if l.cfg.Handlers.SaveAgentHandler != nil {
-			return l.cfg.Handlers.SaveAgentHandler(logger, registry.NewAgentSaveMessage(au, blk))
+			agt, err := l.client.GetAgent(utils.AgentBigIntToHex(au.AgentId))
+			if err != nil {
+				return err
+			}
+			return l.cfg.Handlers.SaveAgentHandler(logger, registry.NewAgentSaveMessage(au, agt.Enabled, blk))
 		}
 
 	case contract_agent_registry.AgentEnabledTopic:
@@ -248,6 +255,7 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 	var subjectID *big.Int
 	var changeType string
 	var value *big.Int
+	var acct common.Address
 
 	switch getTopic(le) {
 	case contract_forta_staking.StakeDepositedTopic:
@@ -258,6 +266,7 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		subjectType = evt.SubjectType
 		subjectID = evt.Subject
 		value = evt.Amount
+		acct = evt.Account
 		changeType = registry.ChangeTypeDeposit
 
 	case contract_forta_staking.WithdrawalInitiatedTopic:
@@ -320,13 +329,13 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 	case SubjectTypeScanner:
 		scannerID := utils.ScannerIDBigIntToHex(subjectID)
 		if l.cfg.Handlers.ScannerStakeHandler != nil {
-			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(le, changeType, scannerID, value, blk))
+			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(le, changeType, acct, scannerID, value, blk))
 		}
 
 	case SubjectTypeAgent:
 		agentID := utils.AgentBigIntToHex(subjectID)
 		if l.cfg.Handlers.AgentStakeHandler != nil {
-			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, agentID, value, blk))
+			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, acct, agentID, value, blk))
 		}
 
 	default:
@@ -391,37 +400,76 @@ func (l *listener) handleAfterBlock(blk *domain.Block) error {
 	return nil
 }
 
+type page struct {
+	Start int64
+	End   int64
+}
+
 // ProcessBlockRange pages over a range of blocks, 10k blocks per page
 func (l *listener) ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error {
 	start := startBlock
 	pageSize := big.NewInt(10000)
-	end := math.BigMin(big.NewInt(0).Add(start, pageSize), endBlock)
-	for end.Cmp(endBlock) <= 0 {
-		logs, err := l.logs.GetLogsForRange(start, end)
+	if endBlock == nil {
+		bn, err := l.eth.BlockNumber(context.Background())
 		if err != nil {
 			return err
 		}
-		var block *domain.Block
-		for _, lg := range logs {
-			if block == nil || block.Number != utils.BigIntToHex(big.NewInt(int64(lg.BlockNumber))) {
-				blk, err := l.eth.BlockByNumber(l.ctx, big.NewInt(int64(lg.BlockNumber)))
+		endBlock = bn
+	}
+	end := math.BigMin(big.NewInt(0).Add(start, pageSize), endBlock)
+	pages := make(chan page)
+	grp, ctx := errgroup.WithContext(l.ctx)
+	mux := sync.Mutex{}
+
+	for i := 0; i < 25; i++ {
+		grp.Go(func() error {
+			for p := range pages {
+				if ctx.Err() != nil {
+					return ctx.Err()
+				}
+				logs, err := l.logs.GetLogsForRange(big.NewInt(p.Start), big.NewInt(p.End))
 				if err != nil {
 					return err
 				}
-				block = blk
+				var block *domain.Block
+				for _, lg := range logs {
+					if block == nil || block.Number != utils.BigIntToHex(big.NewInt(int64(lg.BlockNumber))) {
+						blk, err := l.eth.BlockByNumber(l.ctx, big.NewInt(int64(lg.BlockNumber)))
+						if err != nil {
+							return err
+						}
+						block = blk
+					}
+					// avoids concurrent handleLogs
+					mux.Lock()
+					err := l.handleLog(block, lg)
+					mux.Unlock()
+					if err != nil {
+						return err
+					}
+				}
 			}
-
-			if err := l.handleLog(block, lg); err != nil {
-				return err
-			}
-		}
-		if end.Cmp(endBlock) == 0 {
 			return nil
-		}
-		start = big.NewInt(0).Add(end, big.NewInt(1))
-		end = math.BigMin(big.NewInt(0).Add(start, pageSize), endBlock)
+		})
 	}
-	return nil
+
+	grp.Go(func() error {
+		defer close(pages)
+		for end.Cmp(endBlock) <= 0 {
+			pages <- page{
+				Start: start.Int64(),
+				End:   end.Int64(),
+			}
+			if end.Cmp(endBlock) == 0 {
+				return nil
+			}
+			start = big.NewInt(0).Add(end, big.NewInt(1))
+			end = math.BigMin(big.NewInt(0).Add(start, pageSize), endBlock)
+		}
+		return nil
+	})
+
+	return grp.Wait()
 }
 
 // ProcessLastBlocks fetches the logs in a single pass and calls handlers for them

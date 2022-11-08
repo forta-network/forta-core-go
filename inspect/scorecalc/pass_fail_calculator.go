@@ -63,5 +63,17 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 		return 0, nil
 	}
 
+	if results.Inputs.IsETH2 && results.Indicators[inspect.IndicatorScanAPIIsETH2] == inspect.ResultFailure {
+		return 0, nil
+	}
+
+	if results.Inputs.CheckTrace && results.Inputs.IsETH2 && results.Indicators[inspect.IndicatorTraceAPIIsETH2] == inspect.ResultFailure {
+		return 0, nil
+	}
+
+	if results.Indicators[inspect.IndicatorValidAPIReferences] == inspect.ResultFailure {
+		return 0, nil
+	}
+
 	return 1, nil
 }
