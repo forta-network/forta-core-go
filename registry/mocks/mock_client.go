@@ -226,6 +226,21 @@ func (mr *MockClientMockRecorder) GetAssignmentHash(scannerID interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignmentHash", reflect.TypeOf((*MockClient)(nil).GetAssignmentHash), scannerID)
 }
 
+// GetPoolScanner mocks base method.
+func (m *MockClient) GetPoolScanner(scannerID string) (*registry0.Scanner, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPoolScanner", scannerID)
+	ret0, _ := ret[0].(*registry0.Scanner)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPoolScanner indicates an expected call of GetPoolScanner.
+func (mr *MockClientMockRecorder) GetPoolScanner(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPoolScanner", reflect.TypeOf((*MockClient)(nil).GetPoolScanner), scannerID)
+}
+
 // GetScanner mocks base method.
 func (m *MockClient) GetScanner(scannerID string) (*registry0.Scanner, error) {
 	m.ctrl.T.Helper()
@@ -357,19 +372,19 @@ func (mr *MockClientMockRecorder) PegLatestBlock() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PegLatestBlock", reflect.TypeOf((*MockClient)(nil).PegLatestBlock))
 }
 
-// RegisterScanner mocks base method.
-func (m *MockClient) RegisterScanner(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (string, error) {
+// RegisterScannerToPool mocks base method.
+func (m *MockClient) RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterScanner", scannerAddress, poolID, chainID, metadata, signature)
+	ret := m.ctrl.Call(m, "RegisterScannerToPool", scannerAddress, poolID, chainID, metadata, signature)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// RegisterScanner indicates an expected call of RegisterScanner.
-func (mr *MockClientMockRecorder) RegisterScanner(scannerAddress, poolID, chainID, metadata, signature interface{}) *gomock.Call {
+// RegisterScannerToPool indicates an expected call of RegisterScannerToPool.
+func (mr *MockClientMockRecorder) RegisterScannerToPool(scannerAddress, poolID, chainID, metadata, signature interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScanner", reflect.TypeOf((*MockClient)(nil).RegisterScanner), scannerAddress, poolID, chainID, metadata, signature)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScannerToPool", reflect.TypeOf((*MockClient)(nil).RegisterScannerToPool), scannerAddress, poolID, chainID, metadata, signature)
 }
 
 // RegistryContracts mocks base method.

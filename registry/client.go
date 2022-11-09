@@ -73,8 +73,11 @@ type Client interface {
 	// GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
-	// RegisterScanner registers a scanner by using operator private key.
-	RegisterScanner(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
+	// GetPoolScanner returns a scanner
+	GetPoolScanner(scannerID string) (*Scanner, error)
+
+	// RegisterScannerToPool registers a scanner to a pool by using scanner's signature and operator private key.
+	RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
 
 	// GenerateScannerRegistrationSignature generates a scanner registration signature from given data.
 	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error)
@@ -622,6 +625,38 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 	}, nil
 }
 
+func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
+	sID := common.HexToAddress(scannerID)
+	scn, err := c.scannerPoolReg.GetScanner(c.opts, sID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !scn.Registered {
+		return nil, nil
+	}
+
+	enabled, err := c.scannerPoolReg.IsScannerOperational(c.opts, sID)
+	if err != nil {
+		return nil, err
+	}
+
+	owner, err := c.scannerPoolReg.OwnerOf(c.opts, scn.ScannerPoolId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Scanner{
+		ScannerID: sID.Hex(),
+		ChainID:   scn.ChainId.Int64(),
+		Enabled:   enabled,
+		Manifest:  scn.Metadata,
+		Owner:     owner.Hex(),
+		PoolID:    utils.PoolIDBigIntToHex(scn.ScannerPoolId),
+	}, nil
+}
+
 func (c *client) GetAgent(agentID string) (*Agent, error) {
 	aID := utils.AgentHexToBigInt(agentID)
 	agt, err := c.agentReg.GetAgent(c.opts, aID)
@@ -648,7 +683,7 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	}, nil
 }
 
-func (c *client) RegisterScanner(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error) {
+func (c *client) RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error) {
 	if c.privateKey == nil {
 		return "", errors.New("no operator private key provided to the client")
 	}

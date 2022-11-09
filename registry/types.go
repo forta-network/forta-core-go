@@ -24,6 +24,7 @@ type Scanner struct {
 	Enabled   bool   `json:"enabled"`
 	Manifest  string `json:"manifest"`
 	Owner     string `json:"owner"`
+	PoolID    string `json:"poolId"`
 }
 
 type AssignmentHash struct {
