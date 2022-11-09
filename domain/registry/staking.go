@@ -186,12 +186,13 @@ func NewAgentStakeMessage(l types.Log, changeType string, account common.Address
 	}
 }
 
-func NewScannerPoolStakeMessage(l types.Log, changeType, poolID string, value *big.Int, blk *domain.Block) *ScannerPoolStakeMessage {
+func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.Address, poolID string, value *big.Int, blk *domain.Block) *ScannerPoolStakeMessage {
 	return &ScannerPoolStakeMessage{
 		StakeMessage: StakeMessage{
 			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerPoolStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
+			Account:    strings.ToLower(account.Hex()),
 		},
 		PoolID: strings.ToLower(poolID),
 	}

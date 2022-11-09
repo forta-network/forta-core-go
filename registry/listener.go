@@ -65,9 +65,10 @@ type Handlers struct {
 	DispatchHandler func(logger *log.Entry, msg *registry.DispatchMessage) error
 
 	// staking
-	AgentStakeHandler     func(logger *log.Entry, msg *registry.AgentStakeMessage) error
-	ScannerStakeHandler   func(logger *log.Entry, msg *registry.ScannerStakeMessage) error
-	TransferSharesHandler func(logger *log.Entry, msg *registry.TransferSharesMessage) error
+	AgentStakeHandler       func(logger *log.Entry, msg *registry.AgentStakeMessage) error
+	ScannerStakeHandler     func(logger *log.Entry, msg *registry.ScannerStakeMessage) error
+	TransferSharesHandler   func(logger *log.Entry, msg *registry.TransferSharesMessage) error
+	ScannerPoolStakeHandler func(logger *log.Entry, msg *registry.ScannerPoolStakeMessage) error
 
 	AgentStakeThresholdHandler   func(logger *log.Entry, msg *registry.AgentStakeThresholdMessage) error
 	ScannerStakeThresholdHandler func(logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error
@@ -336,6 +337,12 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		agentID := utils.AgentBigIntToHex(subjectID)
 		if l.cfg.Handlers.AgentStakeHandler != nil {
 			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, acct, agentID, value, blk))
+		}
+
+	case SubjectTypeScannerPool:
+		poolID := utils.PoolIDBigIntToHex(subjectID)
+		if l.cfg.Handlers.ScannerPoolStakeHandler != nil {
+			return l.cfg.Handlers.ScannerPoolStakeHandler(logger, registry.NewScannerPoolStakeMessage(le, changeType, acct, poolID, value, blk))
 		}
 
 	default:
