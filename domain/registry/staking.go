@@ -157,11 +157,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 func NewScannerStakeMessage(l types.Log, changeType string, account common.Address, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
-			Message: Message{
-				Action:    ScannerStake,
-				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
-			},
+			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -173,11 +169,7 @@ func NewScannerStakeMessage(l types.Log, changeType string, account common.Addre
 func NewAgentStakeMessage(l types.Log, changeType string, account common.Address, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
-			Message: Message{
-				Action:    AgentStake,
-				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
-			},
+			Message:    MessageFrom(l.TxHash.Hex(), blk, AgentStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
