@@ -58,6 +58,9 @@ type Client interface {
 	// IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
 
+	// IsOperationalScanner returns true if the scanner exists and is enabled
+	IsOperationalScanner(scannerID string) (bool, error)
+
 	// GetScannerNodeVersion returns the current ipfs reference for the latest scanner node release
 	GetScannerNodeVersion() (string, error)
 
@@ -642,6 +645,10 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
 	return c.scannerReg.IsEnabled(c.opts, sID)
+}
+
+func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
+	return c.scannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
 func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {

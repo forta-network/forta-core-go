@@ -361,6 +361,21 @@ func (mr *MockClientMockRecorder) IsEnabledScanner(scannerID interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEnabledScanner", reflect.TypeOf((*MockClient)(nil).IsEnabledScanner), scannerID)
 }
 
+// IsOperationalScanner mocks base method.
+func (m *MockClient) IsOperationalScanner(scannerID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsOperationalScanner", scannerID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsOperationalScanner indicates an expected call of IsOperationalScanner.
+func (mr *MockClientMockRecorder) IsOperationalScanner(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsOperationalScanner", reflect.TypeOf((*MockClient)(nil).IsOperationalScanner), scannerID)
+}
+
 // PegBlock mocks base method.
 func (m *MockClient) PegBlock(blockNum *big.Int) {
 	m.ctrl.T.Helper()
