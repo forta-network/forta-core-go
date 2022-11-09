@@ -106,6 +106,9 @@ type Client interface {
 	// ForEachScannerSinceBlock loops over all scanners since a provided block number
 	ForEachScannerSinceBlock(block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error) error
 
+	// ForEachPoolScannerSinceBlock loops over all scanners since a provided block number
+	ForEachPoolScannerSinceBlock(block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error) error
+
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
 
@@ -132,15 +135,16 @@ type client struct {
 	opts       *bind.CallOpts
 	privateKey *ecdsa.PrivateKey
 
-	contracts      *registry.RegistryContracts
-	agentReg       *contract_agent_registry.AgentRegistryCaller
-	scannerReg     *contract_scanner_registry.ScannerRegistryCaller
-	scannerPoolReg *contract_scanner_pool_registry.ScannerPoolRegistryCaller
-	dispatch       *contract_dispatch.DispatchCaller
-	scannerVersion *contract_scanner_node_version.ScannerNodeVersionCaller
-	fortaStaking   *contract_forta_staking.FortaStakingCaller
-	scannerRegFil  *contract_scanner_registry.ScannerRegistryFilterer
-	agentRegFil    *contract_agent_registry.AgentRegistryFilterer
+	contracts         *registry.RegistryContracts
+	agentReg          *contract_agent_registry.AgentRegistryCaller
+	scannerReg        *contract_scanner_registry.ScannerRegistryCaller
+	scannerPoolReg    *contract_scanner_pool_registry.ScannerPoolRegistryCaller
+	dispatch          *contract_dispatch.DispatchCaller
+	scannerVersion    *contract_scanner_node_version.ScannerNodeVersionCaller
+	fortaStaking      *contract_forta_staking.FortaStakingCaller
+	scannerRegFil     *contract_scanner_registry.ScannerRegistryFilterer
+	scannerPoolRegFil *contract_scanner_pool_registry.ScannerPoolRegistryFilterer
+	agentRegFil       *contract_agent_registry.AgentRegistryFilterer
 }
 
 var _ Client = &client{}
@@ -231,6 +235,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 
+	scannerPoolRegFil, err := contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(regContracts.ScannerPoolRegistry, ec)
+	if err != nil {
+		return nil, err
+	}
+
 	agentRegFil, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
@@ -244,15 +253,16 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 
 		privateKey: cfg.PrivateKey,
 
-		contracts:      regContracts,
-		scannerReg:     scannerReg,
-		scannerPoolReg: scannerPoolReg,
-		agentReg:       agentReg,
-		dispatch:       dispatch,
-		scannerVersion: scannerVersion,
-		fortaStaking:   fortaStaking,
-		scannerRegFil:  scannerRegFil,
-		agentRegFil:    agentRegFil,
+		contracts:         regContracts,
+		scannerReg:        scannerReg,
+		scannerPoolReg:    scannerPoolReg,
+		agentReg:          agentReg,
+		dispatch:          dispatch,
+		scannerVersion:    scannerVersion,
+		fortaStaking:      fortaStaking,
+		scannerRegFil:     scannerRegFil,
+		scannerPoolRegFil: scannerPoolRegFil,
+		agentRegFil:       agentRegFil,
 	}, err
 }
 
@@ -399,6 +409,46 @@ func (c *client) ForEachScannerSinceBlock(
 				Enabled:   scn.Enabled,
 				Manifest:  scn.Metadata,
 				Owner:     scn.Owner.Hex(),
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (c *client) ForEachPoolScannerSinceBlock(
+	block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error,
+) error {
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	it, err := c.scannerPoolRegFil.FilterScannerUpdated(&bind.FilterOpts{
+		Start:   block,
+		Context: c.ctx,
+	}, nil, nil)
+
+	if err != nil {
+		return err
+	}
+
+	for it.Next() {
+		if it.Event != nil {
+			scannerAddr := common.HexToAddress(utils.ScannerIDBigIntToHex(it.Event.ScannerId))
+			scn, err := c.scannerPoolReg.GetScannerState(opts, scannerAddr)
+			if err != nil {
+				return err
+			}
+			if err := handler(it.Event, &Scanner{
+				ScannerID: utils.ScannerIDBigIntToHex(it.Event.ScannerId),
+				ChainID:   scn.ChainId.Int64(),
+				Enabled:   scn.Operational,
+				Manifest:  scn.Metadata,
+				Owner:     scn.Owner.Hex(),
+				PoolID:    utils.PoolIDBigIntToHex(it.Event.ScannerPool),
 			}); err != nil {
 				return err
 			}

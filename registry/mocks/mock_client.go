@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	contract_agent_registry "github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	contract_scanner_pool_registry "github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	contract_scanner_registry "github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	registry "github.com/forta-network/forta-core-go/domain/registry"
 	registry0 "github.com/forta-network/forta-core-go/registry"
@@ -151,6 +152,20 @@ func (m *MockClient) ForEachChainAgent(chainID int64, handler func(*registry0.Ag
 func (mr *MockClientMockRecorder) ForEachChainAgent(chainID, handler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachChainAgent", reflect.TypeOf((*MockClient)(nil).ForEachChainAgent), chainID, handler)
+}
+
+// ForEachPoolScannerSinceBlock mocks base method.
+func (m *MockClient) ForEachPoolScannerSinceBlock(block uint64, handler func(*contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, *registry0.Scanner) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachPoolScannerSinceBlock", block, handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachPoolScannerSinceBlock indicates an expected call of ForEachPoolScannerSinceBlock.
+func (mr *MockClientMockRecorder) ForEachPoolScannerSinceBlock(block, handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachPoolScannerSinceBlock", reflect.TypeOf((*MockClient)(nil).ForEachPoolScannerSinceBlock), block, handler)
 }
 
 // ForEachScanner mocks base method.
