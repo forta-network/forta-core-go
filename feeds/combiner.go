@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"strings"
 	"sync"
 	"time"
 
@@ -110,10 +109,6 @@ func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent
 		},
 	)
 	return errCh
-}
-
-func encodeSubscription(s *protocol.CombinerBotSubscription) string {
-	return strings.Join([]string{s.BotId}, ",")
 }
 
 type CombinerFeedConfig struct {
