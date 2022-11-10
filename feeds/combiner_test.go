@@ -25,7 +25,7 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 				end:   uint64(time.Now().UnixMilli()),
 				rate:  0,
 			},
-		},{
+		}, {
 			name: "no range",
 			args: args{
 				start: 0,

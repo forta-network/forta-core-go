@@ -104,7 +104,6 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 	t, _ = time.Parse(time.RFC3339, alert.CreatedAt)
 	alertTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
 
-
 	a := &protocol.AlertEvent{
 		Alert: &protocol.AlertEvent_Alert{
 			AlertId:       alert.AlertId,
@@ -165,7 +164,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 	// fill source alert
 	if alert.Source.SourceAlert != nil {
 		a.Alert.Source.SourceEvent = &protocol.
-		AlertEvent_Alert_SourceAlertEvent{
+			AlertEvent_Alert_SourceAlertEvent{
 			BotId:     alert.Source.SourceAlert.BotId,
 			AlertHash: alert.Source.SourceAlert.Hash,
 			Timestamp: alert.Source.SourceAlert.Timestamp,
