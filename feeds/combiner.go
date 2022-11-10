@@ -136,13 +136,18 @@ func (cf *combinerFeed) initialize() error {
 	if cf.start == 0 {
 		cf.start = uint64(time.Now().Add(time.Minute * -10).UnixMilli())
 	}
-	cf.rateLimit = time.NewTicker(DefaultRatelimitDuration)
+	if cf.rateLimit == nil {
+		cf.rateLimit = time.NewTicker(DefaultRatelimitDuration)
+	}
 	return nil
 }
 func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
 	if !cf.started {
 		cf.start = start
 		cf.end = end
+		if rate > 0 {
+			cf.rateLimit = time.NewTicker((time.Duration)(rate))
+		}
 		go cf.loop()
 	}
 }
@@ -273,7 +278,7 @@ func (cf *combinerFeed) loop() {
 		return
 	}
 	if err != ErrCombinerStopReached {
-		log.WithError(err).Warn("failed while processing blocks")
+		log.WithError(err).Warn("failed while processing alerts")
 	}
 	for _, handler := range cf.handlers {
 		if handler.ErrCh != nil {

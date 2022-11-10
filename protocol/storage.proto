@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package network.forta;
+
+option go_package = "./;protocol";
+
+message PutRequest {
+  string user = 1;
+  string kind = 2;
+  bytes bytes = 3;
+}
+
+message PutResponse {
+  string contentId = 1;
+  string contentPath = 2;
+}
+
+message GetRequest {
+  string contentId = 1;
+  string contentPath = 2;
+  bool download = 3;
+}
+
+message GetResponse {
+  bytes bytes = 1;
+}
+
+enum SortDirection {
+  DESC = 0;
+  ASC = 1;
+}
+
+message ListRequest {
+  string user = 1;
+  string kind = 2;
+  SortDirection sort = 3;
+  int64 offset = 4;
+  int64 limit = 5;
+}
+
+message ContentInfo {
+  string contentPath = 1;
+  string contentId = 2;
+}
+
+message ListResponse {
+  repeated ContentInfo contents = 1;
+}
+
+message ProviderRequest {}
+
+message Provider {
+  string id = 1;
+}
+
+message ProviderResponse {
+  Provider provider = 1;
+}
+
+service Storage {
+  rpc Put (PutRequest) returns (PutResponse);
+  rpc Get (GetRequest) returns (GetResponse);
+  rpc List (ListRequest) returns (ListResponse);
+
+  rpc Provider(ProviderRequest) returns (ProviderResponse);
+}
