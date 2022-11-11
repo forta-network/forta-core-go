@@ -77,10 +77,10 @@ func ToWebhookAlertList(batch *protocol.AlertBatch) models.AlertList {
 	}
 
 	// handle combiner alerts
-	for _, CombinationAlertResults := range batch.CombinationAlerts {
-		for _, result := range CombinationAlertResults.Results {
+	for _, combinationAlertResults := range batch.CombinationAlerts {
+		for _, result := range combinationAlertResults.Results {
 			for _, alert := range result.Alerts {
-				alertList = append(alertList, ToWebhookAlert(alert.Alert, batch.ChainId, nil, nil, CombinationAlertResults.AlertEvent))
+				alertList = append(alertList, ToWebhookAlert(alert.Alert, batch.ChainId, nil, nil, combinationAlertResults.AlertEvent))
 			}
 		}
 	}

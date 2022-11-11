@@ -14,10 +14,10 @@ const Version = "1"
 
 // Inputs hold all the possible inputs for alert hash calculation.
 type Inputs struct {
-	Block       *protocol.BlockEvent
-	Transaction *protocol.TransactionEvent
-	AlertEvent  *protocol.AlertEvent
-	Finding     *protocol.Finding
+	BlockEvent       *protocol.BlockEvent
+	TransactionEvent *protocol.TransactionEvent
+	AlertEvent       *protocol.AlertEvent
+	Finding          *protocol.Finding
 	BotInfo
 }
 
@@ -32,8 +32,8 @@ func ForBlockAlert(inputs *Inputs) string {
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
-			inputs.Block.Network.ChainId,
-			inputs.Block.BlockHash,
+			inputs.BlockEvent.Network.ChainId,
+			inputs.BlockEvent.BlockHash,
 			inputs.Finding.AlertId,
 			inputs.Finding.Name,
 			inputs.Finding.Description,
@@ -50,13 +50,13 @@ func ForBlockAlert(inputs *Inputs) string {
 
 // ForTransactionAlert calculates the hash for the transaction alert.
 func ForTransactionAlert(inputs *Inputs) string {
-	txAddrs := utils.MapKeys(inputs.Transaction.TxAddresses)
+	txAddrs := utils.MapKeys(inputs.TransactionEvent.TxAddresses)
 	sort.Strings(txAddrs)
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
-			inputs.Transaction.Network.ChainId,
-			inputs.Transaction.Transaction.Hash,
+			inputs.TransactionEvent.Network.ChainId,
+			inputs.TransactionEvent.Transaction.Hash,
 			inputs.Finding.Name,
 			inputs.Finding.Description,
 			inputs.Finding.Protocol,
@@ -80,6 +80,7 @@ func ForCombinationAlert(inputs *Inputs) string {
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
+			inputs.AlertEvent.Alert.Hash,
 			inputs.Finding.Name,
 			inputs.Finding.Description,
 			inputs.Finding.Protocol,
@@ -88,7 +89,6 @@ func ForCombinationAlert(inputs *Inputs) string {
 			inputs.Finding.Severity.String(),
 			inputs.BotImage,
 			inputs.BotID,
-			inputs.AlertEvent.Alert.Hash,
 			// source alert hash
 			strings.Join(inputs.Finding.Addresses, ""),
 			strings.Join(inputs.Finding.RelatedAlerts, ""),

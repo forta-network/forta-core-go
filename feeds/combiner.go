@@ -77,7 +77,7 @@ func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscr
 	defer cf.botsMu.Unlock()
 
 	for _, s := range cf.botSubscriptions {
-		if transform.CompareCombinerBotSubscription(s, subscription) {
+		if transform.IsSameBotSubscription(s, subscription) {
 			return
 		}
 	}
@@ -90,7 +90,7 @@ func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSub
 	defer cf.botsMu.Unlock()
 
 	for i, s := range cf.botSubscriptions {
-		if transform.CompareCombinerBotSubscription(s, subscription) {
+		if transform.IsSameBotSubscription(s, subscription) {
 			cf.botSubscriptions = append(
 				cf.botSubscriptions[:i], cf.botSubscriptions[i+1:]...,
 			)

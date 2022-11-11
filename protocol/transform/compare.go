@@ -2,7 +2,7 @@ package transform
 
 import "github.com/forta-network/forta-core-go/protocol"
 
-func CompareCombinerBotSubscription(a, b *protocol.CombinerBotSubscription) bool {
+func IsSameBotSubscription(a, b *protocol.CombinerBotSubscription) bool {
 	if a == nil || b == nil {
 		return false
 	}
