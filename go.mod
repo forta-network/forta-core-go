@@ -3,6 +3,7 @@ module github.com/forta-network/forta-core-go
 go 1.19
 
 require (
+	github.com/Khan/genqlient v0.5.0
 	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/go-openapi/errors v0.20.2
@@ -27,7 +28,6 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/showwin/speedtest-go v1.1.5
 	github.com/sirupsen/logrus v1.8.1
-	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969
 	github.com/stretchr/testify v1.8.0
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43
 	github.com/wealdtech/go-ens/v3 v3.5.2
@@ -207,6 +207,7 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
+	github.com/vektah/gqlparser/v2 v2.4.5 // indirect
 	github.com/wI2L/jsondiff v0.2.0 // indirect
 	github.com/wealdtech/go-multicodec v1.4.0 // indirect
 	github.com/whyrusleeping/base32 v0.0.0-20170828182744-c30ac30633cc // indirect

@@ -124,6 +124,14 @@ definitions:
         example:
           - '0x98883145049dec03c00cb7708cbc938058802520'
           - '0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3'
+      relatedAlerts:
+        type: array
+        items:
+          type: string
+        description: Related alerts involved in the source of this alert
+        example:
+          - '0xe9cfda18f167de5cdd63c101e38ec0d4cb0a1c2dea80921ecc4405c2b010855f'
+          - '0x533c100d5d7a56ee8448b6b08b5b1ce41ea9d1667086e1d2d4c1f03d09d191b9'
 
   AlertSource:
     type: object
@@ -135,6 +143,19 @@ definitions:
         $ref: '#/definitions/AlertBot'
       block:
         $ref: '#/definitions/AlertBlock'
+      sourceEvent:
+        $ref: '#/definitions/AlertSourceEvent'
+
+  AlertSourceEvent:
+    type: object
+    properties:
+      botId:
+        type: string
+        example: '0x17381ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049'
+      alertHash:
+        type: string
+        description: Deterministic alert hash
+        example: '0xe9cfda18f167de5cdd63c101e38ec0d4cb0a1c2dea80921ecc4405c2b010855f'
 
   AlertBot:
     type: object

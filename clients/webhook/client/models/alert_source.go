@@ -24,6 +24,9 @@ type AlertSource struct {
 	// bot
 	Bot *AlertBot `json:"bot,omitempty"`
 
+	// source event
+	SourceEvent *AlertSourceEvent `json:"sourceEvent,omitempty"`
+
 	// transaction hash
 	// Example: 0x7040dd33cbfd3e9d880da80cb5f3697a717fc329abd0251f3dcd51599ab67b0a
 	TransactionHash string `json:"transactionHash,omitempty"`
@@ -38,6 +41,10 @@ func (m *AlertSource) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateBot(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSourceEvent(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -85,6 +92,25 @@ func (m *AlertSource) validateBot(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *AlertSource) validateSourceEvent(formats strfmt.Registry) error {
+	if swag.IsZero(m.SourceEvent) { // not required
+		return nil
+	}
+
+	if m.SourceEvent != nil {
+		if err := m.SourceEvent.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("sourceEvent")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("sourceEvent")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this alert source based on the context it is used
 func (m *AlertSource) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -94,6 +120,10 @@ func (m *AlertSource) ContextValidate(ctx context.Context, formats strfmt.Regist
 	}
 
 	if err := m.contextValidateBot(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSourceEvent(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -127,6 +157,22 @@ func (m *AlertSource) contextValidateBot(ctx context.Context, formats strfmt.Reg
 				return ve.ValidateName("bot")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("bot")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *AlertSource) contextValidateSourceEvent(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.SourceEvent != nil {
+		if err := m.SourceEvent.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("sourceEvent")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("sourceEvent")
 			}
 			return err
 		}

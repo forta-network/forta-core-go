@@ -60,6 +60,10 @@ type Alert struct {
 	// Example: ethereum
 	Protocol string `json:"protocol,omitempty"`
 
+	// Related alerts involved in the source of this alert
+	// Example: ["0xe9cfda18f167de5cdd63c101e38ec0d4cb0a1c2dea80921ecc4405c2b010855f","0x533c100d5d7a56ee8448b6b08b5b1ce41ea9d1667086e1d2d4c1f03d09d191b9"]
+	RelatedAlerts []string `json:"relatedAlerts"`
+
 	// severity
 	// Enum: [UNKNOWN INFO LOW MEDIUM HIGH CRITICAL]
 	Severity string `json:"severity,omitempty"`
