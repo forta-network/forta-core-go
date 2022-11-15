@@ -93,6 +93,7 @@ message Label {
   LabelType labelType = 3;
   float confidence = 4;
   string customValue = 5;
+  bool remove = 6;
 }
 
 message Finding {
