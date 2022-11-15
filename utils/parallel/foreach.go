@@ -6,6 +6,7 @@ import (
 )
 
 // ForEachString is a utility wrapper to help with pointer-izing a string (common scenario)
+// WARNING: handler is not threadsafe. You may need to lock non-threadsafe resources or use other techniques
 func ForEachString(ctx context.Context, workers int, items []string, handler func(ctx context.Context, item string) error) error {
 	var ptrs []*string
 	for _, s := range items {
@@ -18,6 +19,7 @@ func ForEachString(ctx context.Context, workers int, items []string, handler fun
 }
 
 // ForEach executes a handler function in parallel for each item in the items list
+// WARNING: handler is not threadsafe. You may need to lock non-threadsafe resources or use other techniques
 func ForEach[T any](ctx context.Context, workers int, items []*T, handler func(ctx context.Context, item *T) error) error {
 	grp, ctx := errgroup.WithContext(ctx)
 	ch := make(chan *T)
