@@ -2,8 +2,10 @@ package feeds
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"sync"
 	"time"
 
@@ -26,6 +28,7 @@ type cfHandler struct {
 	Handler func(evt *domain.AlertEvent) error
 	ErrCh   chan<- error
 }
+
 type combinerFeed struct {
 	start     uint64
 	end       uint64
@@ -46,6 +49,7 @@ type combinerFeed struct {
 
 	handlers   []cfHandler
 	handlersMu sync.Mutex
+	cfg        CombinerFeedConfig
 }
 
 func (cf *combinerFeed) SubscribedBots() (bots []string) {
@@ -112,10 +116,11 @@ func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent
 }
 
 type CombinerFeedConfig struct {
-	RateLimit *time.Ticker
-	APIUrl    string
-	Start     uint64
-	End       uint64
+	RateLimit      *time.Ticker
+	APIUrl         string
+	Start          uint64
+	End               uint64
+	CombinerCachePath string
 }
 
 func (cf *combinerFeed) IsStarted() bool {
@@ -174,6 +179,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		if len(cf.SubscribedBots()) == 0 {
 			continue
 		}
+
 		createdSince := time.Now().UnixMilli() - int64(currentTimestp)
 		createdBefore := time.Now().UnixMilli() - int64(currentTimestp) - graphql.DefaultLastNMinutes.Milliseconds()
 		createdBefore = int64(math.Max(0, float64(createdBefore)))
@@ -241,6 +247,17 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		currentTimestp += uint64(DefaultRatelimitDuration.Milliseconds())
 
+		if cf.cfg.CombinerCachePath != "" {
+			d, err := json.Marshal(cf.alertCache.Items())
+			if err != nil {
+				log.Panic(err)
+			}
+			err = os.WriteFile(cf.cfg.CombinerCachePath, d, 0644)
+			if err != nil {
+				log.Panic(err)
+			}
+		}
+		
 		if cf.rateLimit != nil {
 			<-cf.rateLimit.C
 		}
@@ -286,6 +303,25 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 	ac := graphql.NewClient(cfg.APIUrl)
 	alerts := make(chan *domain.AlertEvent, 10)
 
+	var alertCache *cache.Cache
+	if cfg.CombinerCachePath != "" {
+		d, err := os.ReadFile(cfg.CombinerCachePath)
+		if err != nil {
+			return nil, err
+		}
+
+		var m map[string]cache.Item
+
+		err = json.Unmarshal(d, &m)
+		if err != nil {
+			return nil, err
+		}
+
+		alertCache = cache.NewFrom(graphql.DefaultLastNMinutes*2, time.Minute, m)
+	} else {
+		alertCache = cache.New(graphql.DefaultLastNMinutes*2, time.Minute)
+	}
+
 	bf := &combinerFeed{
 		start:            cfg.Start,
 		end:              cfg.End,
@@ -294,7 +330,8 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
 		botSubscriptions: []*protocol.CombinerBotSubscription{},
-		alertCache:       cache.New(graphql.DefaultLastNMinutes*2, time.Minute),
+		cfg:              cfg,
+		alertCache:       alertCache,
 	}
 	return bf, nil
 }
