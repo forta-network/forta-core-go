@@ -1,22 +1,21 @@
 package settings
 
-const defaultBlockOffset = 0
-
 var defaultRateLimiting = &RateLimit{
 	Rate:  50, // 0.347, // 30k/day
 	Burst: 50, // 100,
 }
 
-const defaultInspectionInterval = 100
-
 // ChainSettings contains chain-specific settings.
 type ChainSettings struct {
-	Name                string
 	ChainID             int
+	Name                string
 	EnableTrace         bool
-	Offset              int
 	JsonRpcRateLimiting *RateLimit
 	InspectionInterval  int // in block number
+
+	DefaultOffset   int
+	SafeOffset      int
+	RewardThreshold int
 }
 
 // RateLimit is token bucket algorithm parameters.
@@ -25,58 +24,104 @@ type RateLimit struct {
 	Burst int
 }
 
+// sorted by chain ID
+// inspection intervals are determined to cover around 10-15m per chain
+// reward thresholds are determined from network stats (at least 10)
+// safe offsets are adjusted to be 5-10% of the reward threshold (at least 1)
 var allChainSettings = []ChainSettings{
 	{
-		Name:                "Ethereum Mainnet",
 		ChainID:             1,
+		Name:                "Ethereum Mainnet",
 		EnableTrace:         true,
-		Offset:              defaultBlockOffset,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  50,
+
+		DefaultOffset:   0,
+		SafeOffset:      1,
+		RewardThreshold: 10,
 	},
 	{
-		Name:                "BSC",
-		ChainID:             56,
-		Offset:              defaultBlockOffset,
-		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  250,
-	},
-	{
-		Name:                "Polygon",
-		ChainID:             137,
-		Offset:              defaultBlockOffset,
-		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  350,
-	},
-	{
-		Name:                "Avalanche",
-		ChainID:             43114,
-		Offset:              defaultBlockOffset,
-		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  350,
-	},
-	{
-		Name:                "Arbitrum",
-		ChainID:             42161,
-		Offset:              defaultBlockOffset,
-		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  1500,
-	},
-	{
-		Name:                "Optimism",
 		ChainID:             10,
-		Offset:              defaultBlockOffset,
+		Name:                "Optimism",
+		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  5000,
+
+		DefaultOffset:   0,
+		SafeOffset:      50,
+		RewardThreshold: 1000,
 	},
 	{
-		Name:                "Fantom",
+		ChainID:             56,
+		Name:                "BSC",
+		EnableTrace:         false,
+		JsonRpcRateLimiting: defaultRateLimiting,
+		InspectionInterval:  250,
+
+		DefaultOffset:   0,
+		SafeOffset:      2,
+		RewardThreshold: 20,
+	},
+	{
+		ChainID:             137,
+		Name:                "Polygon",
+		EnableTrace:         false,
+		JsonRpcRateLimiting: defaultRateLimiting,
+		InspectionInterval:  350,
+
+		DefaultOffset:   0,
+		SafeOffset:      2,
+		RewardThreshold: 25,
+	},
+	{
 		ChainID:             250,
+		Name:                "Fantom",
 		EnableTrace:         true,
-		Offset:              defaultBlockOffset,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  750,
+
+		DefaultOffset:   0,
+		SafeOffset:      2,
+		RewardThreshold: 40,
 	},
+	{
+		ChainID:             42161,
+		Name:                "Arbitrum",
+		EnableTrace:         false,
+		JsonRpcRateLimiting: defaultRateLimiting,
+		InspectionInterval:  1500,
+
+		DefaultOffset:   0,
+		SafeOffset:      10,
+		RewardThreshold: 200,
+	},
+	{
+		ChainID:             43114,
+		Name:                "Avalanche",
+		EnableTrace:         false,
+		JsonRpcRateLimiting: defaultRateLimiting,
+		InspectionInterval:  350,
+
+		DefaultOffset:   0,
+		SafeOffset:      2,
+		RewardThreshold: 30,
+	},
+}
+
+// ValidateChainSettings validates chain settings.
+func ValidateChainSettings(chainID int) bool {
+	settings := GetChainSettings(chainID)
+	if settings.SafeOffset < 1 {
+		return false
+	}
+	if settings.RewardThreshold <= 0 {
+		return false
+	}
+	safeOffsetRate := float64(settings.SafeOffset) / float64(settings.RewardThreshold)
+	if safeOffsetRate < 0.05 || safeOffsetRate > 0.1 {
+		return false
+	}
+	return true
 }
 
 // GetChainSettings returns the settings for the chain.
@@ -89,13 +134,16 @@ func GetChainSettings(chainID int) *ChainSettings {
 	return &ChainSettings{
 		Name:                "Unknown chain",
 		ChainID:             chainID,
-		Offset:              defaultBlockOffset,
 		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  defaultInspectionInterval,
+		InspectionInterval:  50, // arbitrary value - not reliable
+
+		DefaultOffset:   0,
+		SafeOffset:      2,
+		RewardThreshold: 10,
 	}
 }
 
-// GetBlockOffset returns the block offset for a chain.
+// GetDefaultBlockOffset returns the block offset for a chain.
 func GetBlockOffset(chainID int) int {
-	return GetChainSettings(chainID).Offset
+	return GetChainSettings(chainID).DefaultOffset
 }
