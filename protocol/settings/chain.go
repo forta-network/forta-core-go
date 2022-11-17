@@ -48,8 +48,8 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  5000,
 
 		DefaultOffset:   0,
-		SafeOffset:      50,
-		RewardThreshold: 1000,
+		SafeOffset:      250,
+		RewardThreshold: 5000,
 	},
 	{
 		ChainID:             56,
@@ -59,19 +59,19 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  250,
 
 		DefaultOffset:   0,
-		SafeOffset:      2,
-		RewardThreshold: 20,
+		SafeOffset:      3,
+		RewardThreshold: 50,
 	},
 	{
 		ChainID:             137,
 		Name:                "Polygon",
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  350,
+		InspectionInterval:  70,
 
 		DefaultOffset:   0,
-		SafeOffset:      2,
-		RewardThreshold: 25,
+		SafeOffset:      4,
+		RewardThreshold: 70,
 	},
 	{
 		ChainID:             250,
@@ -81,8 +81,8 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  750,
 
 		DefaultOffset:   0,
-		SafeOffset:      2,
-		RewardThreshold: 40,
+		SafeOffset:      5,
+		RewardThreshold: 100,
 	},
 	{
 		ChainID:             42161,
@@ -92,8 +92,8 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  1500,
 
 		DefaultOffset:   0,
-		SafeOffset:      10,
-		RewardThreshold: 200,
+		SafeOffset:      30,
+		RewardThreshold: 600,
 	},
 	{
 		ChainID:             43114,
@@ -103,8 +103,8 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  350,
 
 		DefaultOffset:   0,
-		SafeOffset:      2,
-		RewardThreshold: 30,
+		SafeOffset:      4,
+		RewardThreshold: 70,
 	},
 }
 
