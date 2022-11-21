@@ -26,6 +26,7 @@ const TimeTrackingTimestampFormat = time.RFC3339Nano
 
 type TrackingTimestamps struct {
 	Block       time.Time
+	SourceAlert time.Time
 	Feed        time.Time
 	BotRequest  time.Time
 	BotResponse time.Time
@@ -35,6 +36,7 @@ func (tt *TrackingTimestamps) ToMessage() *protocol.TrackingTimestamps {
 	return &protocol.TrackingTimestamps{
 		Block:       tt.Block.Format(TimeTrackingTimestampFormat),
 		Feed:        tt.Feed.Format(TimeTrackingTimestampFormat),
+		SourceAlert: tt.SourceAlert.Format(TimeTrackingTimestampFormat),
 		BotRequest:  tt.BotRequest.Format(TimeTrackingTimestampFormat),
 		BotResponse: tt.BotResponse.Format(TimeTrackingTimestampFormat),
 	}
@@ -57,6 +59,7 @@ func TrackingTimestampsFromMessage(tt *protocol.TrackingTimestamps) *TrackingTim
 	return &TrackingTimestamps{
 		Block:       TimeFromString(tt.Block),
 		Feed:        TimeFromString(tt.Feed),
+		SourceAlert: TimeFromString(tt.SourceAlert),
 		BotRequest:  TimeFromString(tt.BotRequest),
 		BotResponse: TimeFromString(tt.BotResponse),
 	}
@@ -287,6 +290,21 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			BlockNumber:    t.BlockEvt.Block.Number,
 			BlockTimestamp: t.BlockEvt.Block.Timestamp,
 		},
+		Timestamps: t.Timestamps.ToMessage(),
+	}, nil
+}
+
+type AlertEvent struct {
+	EventType  EventType
+	Event      *protocol.AlertEvent
+	Logs       []LogEntry
+	Timestamps *TrackingTimestamps
+}
+
+// ToMessage converts the AlertEvent to the protocol.TransactionEvent message
+func (t *AlertEvent) ToMessage() (*protocol.AlertEvent, error) {
+	return &protocol.AlertEvent{
+		Alert:      t.Event.Alert,
 		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
 }

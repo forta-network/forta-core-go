@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHexToBigInt(t *testing.T) {
@@ -30,4 +31,41 @@ func TestScannerBigIntToHex(t *testing.T) {
 	res := ScannerIDHexToBigInt(scannerID)
 	str := ScannerIDBigIntToHex(res)
 	assert.Equal(t, scannerID, str)
+}
+
+func TestIsValidBotID(t *testing.T) {
+	testCases := []struct {
+		name    string
+		id      string
+		success bool
+	}{
+		{
+			name:    "valid",
+			id:      "0x023dfceebe145aac511e103d9665163f87fa432bbc73d55d64d1b15ddd9184c9",
+			success: true,
+		},
+		{
+			name:    "too long",
+			id:      "0x023dfceebe145aac511e103d9665163f87fa432bbc73d55d64d1b15ddd9184c99",
+			success: false,
+		},
+		{
+			name:    "too short",
+			id:      "0x023dfceebe145aac511e103d9665163f87fa432bbc73d55d64d1b15ddd918",
+			success: false,
+		},
+		{
+			name:    "invalid prefix",
+			id:      "023dfceebe145aac511e103d9665163f87fa432bbc73d55d64d1b15ddd9184c9",
+			success: false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			r := require.New(t)
+
+			r.Equal(testCase.success, IsValidBotID(testCase.id))
+		})
+	}
 }
