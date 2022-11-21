@@ -35,6 +35,7 @@ type blockFeed struct {
 	cache       utils.Cache
 	chainID     *big.Int
 	tracing     bool
+	logs        bool
 	started     bool
 	rateLimit   *time.Ticker
 	maxBlockAge *time.Duration
@@ -52,6 +53,7 @@ type BlockFeedConfig struct {
 	ChainID             *big.Int
 	RateLimit           *time.Ticker
 	Tracing             bool
+	DisableLogs         bool
 	SkipBlocksOlderThan *time.Duration
 }
 
@@ -237,10 +239,13 @@ func (bf *blockFeed) forEachBlock() error {
 			traces = nil
 		}
 
-		logs, err := bf.logsForBlock(blockNumToAnalyze)
-		if err != nil {
-			logger.WithError(err).Errorf("error getting logs for block")
-			continue
+		var logs []domain.LogEntry
+		if bf.logs {
+			logs, err = bf.logsForBlock(blockNumToAnalyze)
+			if err != nil {
+				logger.WithError(err).Errorf("error getting logs for block")
+				continue
+			}
 		}
 
 		blockTs, err := block.GetTimestamp()
@@ -314,6 +319,7 @@ func NewBlockFeed(ctx context.Context, client ethereum.Client, traceClient ether
 		cache:       utils.NewCache(10000),
 		chainID:     cfg.ChainID,
 		tracing:     cfg.Tracing,
+		logs:        !cfg.DisableLogs,
 		rateLimit:   cfg.RateLimit,
 		maxBlockAge: cfg.SkipBlocksOlderThan,
 	}
