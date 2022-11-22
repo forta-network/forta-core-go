@@ -64,6 +64,15 @@ func ParseScannerMessage(msg string) (*ScannerMessage, error) {
 	return &m, nil
 }
 
+func ParseUpdateScannerPoolMessage(msg string) (*UpdateScannerPoolMessage, error) {
+	var m UpdateScannerPoolMessage
+	err := json.Unmarshal([]byte(msg), &m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
 func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnabled, blk *domain.Block) *ScannerMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	evtName := DisableScanner
