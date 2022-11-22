@@ -86,6 +86,7 @@ message Label {
     VICTIM = 10;
     EOA = 11;
     CONTRACT = 12;
+    GOOD = 13;
   }
 
   EntityType entityType = 1;
