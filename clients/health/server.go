@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	_ "net/http/pprof"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -95,6 +97,7 @@ func MakeHandler(healthChecker HealthChecker) http.Handler {
 // Handle transforms and registers health checker to http.DefaultServeMux.
 func Handle(mux *http.ServeMux, healthChecker HealthChecker) {
 	mux.Handle("/health", MakeHandler(healthChecker))
+	mux.Handle("/debug", http.DefaultServeMux)
 }
 
 // Service is a service implementation of a health server, to make things easier.
