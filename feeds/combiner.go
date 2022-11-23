@@ -158,12 +158,14 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 
 func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 	currentTimestp := cf.start
+	firstRun := true
 	for {
 		if cf.ctx.Err() != nil {
 			return cf.ctx.Err()
 		}
 
-		if cf.rateLimit != nil {
+		if cf.rateLimit != nil || !firstRun {
+			firstRun = false
 			<-cf.rateLimit.C
 		}
 
