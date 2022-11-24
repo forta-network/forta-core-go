@@ -72,18 +72,18 @@ test:
 abigen: pull-contracts
 	rm -rf contracts
 	./scripts/abigen.sh forta-contracts components/staking/FortaStaking.sol FortaStaking forta_staking
+	./scripts/abigen.sh forta-contracts components/staking/allocation/StakeAllocator.sol StakeAllocator stake_allocator
 	./scripts/abigen.sh forta-contracts components/agents/AgentRegistry.sol AgentRegistry agent_registry
 	./scripts/abigen.sh forta-contracts components/dispatch/Dispatch.sol Dispatch dispatch
 	./scripts/abigen.sh forta-contracts components/scanners/ScannerNodeVersion.sol ScannerNodeVersion scanner_node_version
 	./scripts/abigen.sh forta-contracts components/scanners/ScannerRegistry.sol ScannerRegistry scanner_registry "--alias _register=underscoreRegister"
 	./scripts/abigen.sh forta-contracts components/scanner_pools/ScannerPoolRegistry.sol ScannerPoolRegistry scanner_pool_registry "--alias _register=underscoreRegister"
 	./scripts/abigen.sh forta-contracts components/access/AccessManager.sol AccessManager access_manager
-	# ./scripts/abigen.sh forta-contracts components/router/Router.sol Router router
 	./scripts/abigen.sh forta-contracts token/Forta.sol Forta forta
 
 .PHONY: pull-contracts
 pull-contracts:
-	./scripts/pull-contracts.sh forta-contracts refactor/rename_NodeRunnerRegistry
+	./scripts/pull-contracts.sh forta-contracts dev
 
 .PHONY: swagger
 swagger: require-tools
