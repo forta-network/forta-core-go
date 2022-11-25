@@ -443,3 +443,18 @@ func (mr *MockClientMockRecorder) ResetOpts() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOpts", reflect.TypeOf((*MockClient)(nil).ResetOpts))
 }
+
+// WillNewScannerShutdownPool mocks base method.
+func (m *MockClient) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WillNewScannerShutdownPool", poolID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// WillNewScannerShutdownPool indicates an expected call of WillNewScannerShutdownPool.
+func (mr *MockClientMockRecorder) WillNewScannerShutdownPool(poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WillNewScannerShutdownPool", reflect.TypeOf((*MockClient)(nil).WillNewScannerShutdownPool), poolID)
+}

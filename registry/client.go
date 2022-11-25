@@ -126,6 +126,9 @@ type Client interface {
 
 	// GetScannerPoolOwner finds out the owner of the scanner pool.
 	GetScannerPoolOwner(poolID *big.Int) (owner string, err error)
+
+	// WillNewScannerShutdownPool tells if registering a new scanner could shutdown a pool.
+	WillNewScannerShutdownPool(poolID *big.Int) (bool, error)
 }
 
 type client struct {
@@ -829,4 +832,8 @@ func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) 
 		return "", nil
 	}
 	return addr.Hex(), nil
+}
+
+func (c *client) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
+	return c.scannerPoolReg.WillNewScannerShutdownPool(c.opts, poolID)
 }
