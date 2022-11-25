@@ -27,7 +27,7 @@ func TestSignScannerRegistration(t *testing.T) {
 	ts, err := time.Parse(time.RFC3339, "2022-11-07T00:00:00Z")
 	r.NoError(err)
 
-	sig, err := SignScannerRegistration(scannerKey, testVerifyingContract, &ScannerNodeRegistration{
+	encodedData, sig, err := SignScannerRegistration(scannerKey, testVerifyingContract, &ScannerNodeRegistration{
 		Scanner:       testScannerAddress,
 		ScannerPoolId: big.NewInt(123),
 		ChainId:       big.NewInt(1),
@@ -35,6 +35,8 @@ func TestSignScannerRegistration(t *testing.T) {
 		Timestamp:     big.NewInt(ts.Unix()),
 	})
 	r.NoError(err)
+	r.NotNil(encodedData)
+	r.NotNil(sig)
 
 	encoded, err := security.EncodeEthereumSignature(sig)
 	r.NoError(err)

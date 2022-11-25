@@ -24,7 +24,7 @@ type ScannerNodeRegistration contract_scanner_pool_registry.ScannerPoolRegistryC
 // typed structured data encoding rules and signs.
 func SignScannerRegistration(
 	scannerKey *ecdsa.PrivateKey, verifyingContract common.Address, reg *ScannerNodeRegistration,
-) ([]byte, error) {
+) ([]byte, []byte, error) {
 	data := &apitypes.TypedData{
 		Types: apitypes.Types{
 			"EIP712Domain": {
@@ -84,26 +84,27 @@ func SignScannerRegistration(
 		},
 	}
 
-	hash, err := hashTypedData(data)
+	encoded, hash, err := hashTypedData(data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	sig, err := crypto.Sign(hash, scannerKey)
 	if err != nil {
-		return nil, err
+		return encoded, nil, err
 	}
 
-	return sig, nil
+	return encoded, sig, nil
 }
 
-func hashTypedData(data *apitypes.TypedData) ([]byte, error) {
+func hashTypedData(data *apitypes.TypedData) ([]byte, []byte, error) {
 	separator, err := data.HashStruct("EIP712Domain", data.Domain.Map())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	hash, err := data.HashStruct(data.PrimaryType, data.Message)
+	encoded, err := data.EncodeData(data.PrimaryType, data.Message, 1)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return crypto.Keccak256([]byte(fmt.Sprintf("\x19\x01%s%s", string(separator), string(hash)))), nil
+	hash := crypto.Keccak256(encoded)
+	return encoded, crypto.Keccak256([]byte(fmt.Sprintf("\x19\x01%s%s", string(separator), string(hash)))), nil
 }

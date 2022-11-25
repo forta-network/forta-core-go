@@ -83,7 +83,7 @@ type Client interface {
 	RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
 
 	// GenerateScannerRegistrationSignature generates a scanner registration signature from given data.
-	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error)
+	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (encodedData []byte, sig []byte, err error)
 
 	// RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
@@ -815,7 +815,7 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 	return tx.Hash().Hex(), nil
 }
 
-func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, error) {
+func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
 	return eip712.SignScannerRegistration(c.privateKey, c.contracts.ScannerPoolRegistry, reg)
 }
 
