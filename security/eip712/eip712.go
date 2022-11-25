@@ -86,8 +86,6 @@ func SignScannerRegistration(
 		},
 	}
 
-	fmt.Println(data.Message)
-
 	encoded, hash, err := hashTypedData(data)
 	if err != nil {
 		return nil, nil, err
