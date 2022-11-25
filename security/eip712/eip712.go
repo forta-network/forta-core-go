@@ -3,6 +3,7 @@ package eip712
 import (
 	"crypto/ecdsa"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -23,7 +24,8 @@ type ScannerNodeRegistration contract_scanner_pool_registry.ScannerPoolRegistryC
 // SignScannerRegistration encodes registration data using EIP712
 // typed structured data encoding rules and signs.
 func SignScannerRegistration(
-	scannerKey *ecdsa.PrivateKey, verifyingContract common.Address, reg *ScannerNodeRegistration,
+	scannerKey *ecdsa.PrivateKey, verifyingContract common.Address, verifyingContractChainID *big.Int,
+	reg *ScannerNodeRegistration,
 ) ([]byte, []byte, error) {
 	data := &apitypes.TypedData{
 		Types: apitypes.Types{
@@ -71,7 +73,7 @@ func SignScannerRegistration(
 		Domain: apitypes.TypedDataDomain{
 			Name:              "ScannerPoolRegistry",
 			Version:           "1",
-			ChainId:           (*math.HexOrDecimal256)(reg.ChainId),
+			ChainId:           (*math.HexOrDecimal256)(verifyingContractChainID),
 			VerifyingContract: verifyingContract.Hex(),
 		},
 		PrimaryType: "ScannerNodeRegistration",
@@ -83,6 +85,8 @@ func SignScannerRegistration(
 			"timestamp":     (*hexutil.Big)(reg.Timestamp).String(),
 		},
 	}
+
+	fmt.Println(data.Message)
 
 	encoded, hash, err := hashTypedData(data)
 	if err != nil {

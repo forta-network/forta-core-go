@@ -816,7 +816,11 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 }
 
 func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
-	return eip712.SignScannerRegistration(c.privateKey, c.contracts.ScannerPoolRegistry, reg)
+	chainID, err := c.eth.ChainID(c.ctx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to determine registry chain id: %v", chainID)
+	}
+	return eip712.SignScannerRegistration(c.privateKey, c.contracts.ScannerPoolRegistry, chainID, reg)
 }
 
 func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {
