@@ -74,7 +74,7 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 	}
 }
 
-func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated, blk *domain.Block) *AgentSaveMessage {
+func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated, enabled bool, blk *domain.Block) *AgentSaveMessage {
 	agentID := utils.Hex(evt.AgentId)
 	return &AgentSaveMessage{
 		AgentMessage: AgentMessage{
@@ -86,7 +86,7 @@ func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated,
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},
-		Enabled:  true,
+		Enabled:  enabled,
 		Name:     evt.Metadata,
 		ChainIDs: utils.IntArray(evt.ChainIds),
 		Metadata: evt.Metadata,

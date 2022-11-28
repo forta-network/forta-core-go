@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
@@ -63,6 +65,7 @@ type StakeMessage struct {
 	Message
 	ChangeType string `json:"changeType"`
 	Amount     string `json:"amount"`
+	Account    string `json:"account"`
 }
 
 type AgentStakeMessage struct {
@@ -144,7 +147,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 	return res, nil
 }
 
-func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
+func NewScannerStakeMessage(l types.Log, changeType string, account common.Address, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
@@ -154,12 +157,13 @@ func NewScannerStakeMessage(l types.Log, changeType, scannerID string, value *bi
 			},
 			ChangeType: changeType,
 			Amount:     valueString(value),
+			Account:    strings.ToLower(account.Hex()),
 		},
 		ScannerID: strings.ToLower(scannerID),
 	}
 }
 
-func NewAgentStakeMessage(l types.Log, changeType, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
+func NewAgentStakeMessage(l types.Log, changeType string, account common.Address, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
 			Message: Message{
@@ -169,6 +173,7 @@ func NewAgentStakeMessage(l types.Log, changeType, agentID string, value *big.In
 			},
 			ChangeType: changeType,
 			Amount:     valueString(value),
+			Account:    strings.ToLower(account.Hex()),
 		},
 		AgentID: agentID,
 	}

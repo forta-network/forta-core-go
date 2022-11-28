@@ -15,8 +15,8 @@ var (
 )
 
 // ValidateImageRef validates an image reference. Supported formats:
-//  - IPFS CID v1: bafy...@sha256:<digest>
-//  - Any reference with digest: registry.hub.docker.com/library/busybox@sha256:<digest>
+//   - IPFS CID v1: bafy...@sha256:<digest>
+//   - Any reference with digest: registry.hub.docker.com/library/busybox@sha256:<digest>
 func ValidateImageRef(defaultRegistry, ref string) (string, bool) {
 	imageRef, digest := SplitImageRef(ref)
 	if len(imageRef) == 0 || len(digest) == 0 {

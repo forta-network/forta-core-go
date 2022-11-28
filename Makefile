@@ -4,6 +4,10 @@ LINT = $(GOBIN)/golangci-lint
 FORMAT = $(GOBIN)/goimports
 
 SWAGGER = $(GOBIN)/swagger
+PROTOC_GEN_GO = $(GOBIN)/protoc-gen-go
+PROTOC_GEN_GO_GRPC = $(GOBIN)/protoc-gen-go-grpc
+
+PROTOC = protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GO_GRPC)
 
 .PHONY: require-tools
 require-tools: tools
@@ -12,6 +16,10 @@ require-tools: tools
 	@file $(FORMAT) > /dev/null
 
 	@file $(SWAGGER) > /dev/null
+
+	@file $(PROTOC_GEN_GO) > /dev/null
+	@file $(PROTOC_GEN_GO_GRPC) > /dev/null
+
 	@echo "All tools found in $(GOBIN)!"
 
 .PHONY: tools
@@ -22,6 +30,9 @@ tools:
 	@go install golang.org/x/tools/cmd/goimports@v0.1.11
 
 	@go install github.com/go-swagger/go-swagger/cmd/swagger@v0.29.0
+
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 
 .PHONY: fmt
 fmt: require-tools
@@ -37,10 +48,12 @@ proto: protogen fmt
 
 .PHONY: protogen
 protogen: require-tools
-	protoc -I=protocol --go_out=protocol/. protocol/agent_metrics.proto
-	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/agent.proto
-	protoc -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/publisher.proto
-	protoc -I=protocol --go_out=protocol/. protocol/batch.proto
+	$(PROTOC) -I=protocol --go_out=protocol/. protocol/bot_metrics.proto
+	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/alert.proto
+	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/agent.proto
+	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/publisher.proto
+	$(PROTOC) -I=protocol --go_out=protocol/. protocol/batch.proto
+	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/storage.proto
 
 .PHONY: mocks
 mocks:

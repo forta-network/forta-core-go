@@ -102,7 +102,7 @@ func (bf *blockFeed) Start() {
 	}
 }
 
-//StartRange runs a specific set of blocks synchronously
+// StartRange runs a specific set of blocks synchronously
 func (bf *blockFeed) StartRange(start int64, end int64, rate int64) {
 	if !bf.started {
 		if rate > 0 {

@@ -3,9 +3,10 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 	"github.com/forta-network/forta-core-go/domain"
-	"time"
 )
 
 const ScannerNodeVersionUpdated = "ScannerNodeVersionUpdated"

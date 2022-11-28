@@ -4,7 +4,9 @@ package network.forta;
 
 import public "publisher.proto";
 import public "agent.proto";
-import public "agent_metrics.proto";
+import public "bot_metrics.proto";
+import public "alert.proto";
+import public "storage.proto";
 
 option go_package = "./;protocol";
 
@@ -19,6 +21,8 @@ message BatchSummary {
   string previousReceipt = 7;
   uint64 latestBlockInput = 8;
   string timestamp = 9;
+  InspectionResults inspectionResults = 13;
+  Provider provider = 14;
 }
 
 //an analyzer endpoint encodes this into a SignedPayload of type BATCH_RECEIPT
@@ -54,6 +58,8 @@ message AlertBatch {
   repeated AgentAlerts privateAlerts = 11;
   uint64 latestBlockInput = 12;
   InspectionResults inspectionResults = 13;
+  repeated CombinationAlertResults combinationAlerts = 14;
+  Provider provider = 15;
 }
 
 message BlockResults {
@@ -64,6 +70,11 @@ message BlockResults {
 
 message TransactionResults {
   TransactionEvent transaction = 1;
+  repeated AgentAlerts results = 2;
+}
+
+message CombinationAlertResults {
+  AlertEvent alertEvent = 1;
   repeated AgentAlerts results = 2;
 }
 
@@ -82,6 +93,7 @@ message BatchAgent {
   AgentInfo info = 1;
   repeated uint64 blocks = 2;
   repeated string transactions = 3;
+  repeated string combinations = 4;
 }
 
 message ScannerVersion {
