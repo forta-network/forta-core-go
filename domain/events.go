@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/goccy/go-json"
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/prysmaticlabs/prysm/v3/consensus-types/interfaces"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/protocol"
@@ -72,6 +73,7 @@ type BlockEvent struct {
 	Logs       []LogEntry
 	Traces     []Trace
 	Timestamps *TrackingTimestamps
+	BeaconData interfaces.SignedBeaconBlock
 }
 
 func str(val *string) string {

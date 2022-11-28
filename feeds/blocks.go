@@ -10,6 +10,8 @@ import (
 
 	eth "github.com/ethereum/go-ethereum"
 	"github.com/goccy/go-json"
+	"github.com/prysmaticlabs/prysm/v3/api/client/beacon"
+	"github.com/prysmaticlabs/prysm/v3/consensus-types/interfaces"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/clients/health"
@@ -26,23 +28,25 @@ type bfHandler struct {
 }
 
 type blockFeed struct {
-	start       *big.Int
-	end         *big.Int
-	offset      int
-	ctx         context.Context
-	client      ethereum.Client
-	traceClient ethereum.Client
-	cache       utils.Cache
-	chainID     *big.Int
-	tracing     bool
-	started     bool
-	rateLimit   *time.Ticker
-	maxBlockAge *time.Duration
+	start        *big.Int
+	end          *big.Int
+	offset       int
+	ctx          context.Context
+	client       ethereum.Client
+	traceClient  ethereum.Client
+	beaconClient ethereum.BeaconClient
+	cache        utils.Cache
+	chainID      *big.Int
+	tracing      bool
+	started      bool
+	rateLimit    *time.Ticker
+	maxBlockAge  *time.Duration
 
 	lastBlock health.MessageTracker
 
-	handlers   []bfHandler
-	handlersMu sync.RWMutex
+	handlers      []bfHandler
+	handlersMu    sync.RWMutex
+	beaconSupport bool
 }
 
 type BlockFeedConfig struct {
@@ -52,6 +56,7 @@ type BlockFeedConfig struct {
 	ChainID             *big.Int
 	RateLimit           *time.Ticker
 	Tracing             bool
+	BeaconSupport       bool
 	SkipBlocksOlderThan *time.Duration
 }
 
@@ -230,6 +235,14 @@ func (bf *blockFeed) forEachBlock() error {
 			}
 		}
 
+		var beaconData interfaces.SignedBeaconBlock
+		if bf.beaconSupport {
+			beaconData, err = bf.beaconClient.GetBlock(bf.ctx, beacon.StateOrBlockId(blockNumToAnalyze.String()))
+			if err != nil {
+				logger.WithError(err).Error("error getting beacon data")
+			}
+		}
+
 		if len(traces) > 0 && block.Hash != utils.String(traces[0].BlockHash) {
 			logger.WithFields(log.Fields{
 				"traceBlockHash": utils.String(traces[0].BlockHash),
@@ -250,11 +263,12 @@ func (bf *blockFeed) forEachBlock() error {
 		}
 
 		evt := &domain.BlockEvent{
-			EventType: domain.EventTypeBlock,
-			Block:     block,
-			ChainID:   bf.chainID,
-			Traces:    traces,
-			Logs:      logs,
+			EventType:  domain.EventTypeBlock,
+			Block:      block,
+			ChainID:    bf.chainID,
+			Traces:     traces,
+			Logs:       logs,
+			BeaconData: beaconData,
 			Timestamps: &domain.TrackingTimestamps{
 				Block: *blockTs,
 				Feed:  time.Now().UTC(),
@@ -300,22 +314,24 @@ func (bf *blockFeed) Health() health.Reports {
 	}
 }
 
-func NewBlockFeed(ctx context.Context, client ethereum.Client, traceClient ethereum.Client, cfg BlockFeedConfig) (*blockFeed, error) {
+func NewBlockFeed(ctx context.Context, client ethereum.Client, traceClient ethereum.Client, beaconClient ethereum.BeaconClient, cfg BlockFeedConfig) (*blockFeed, error) {
 	if cfg.Offset < 0 {
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
 	bf := &blockFeed{
-		start:       cfg.Start,
-		end:         cfg.End,
-		offset:      cfg.Offset,
-		ctx:         ctx,
-		client:      client,
-		traceClient: traceClient,
-		cache:       utils.NewCache(10000),
-		chainID:     cfg.ChainID,
-		tracing:     cfg.Tracing,
-		rateLimit:   cfg.RateLimit,
-		maxBlockAge: cfg.SkipBlocksOlderThan,
+		start:         cfg.Start,
+		end:           cfg.End,
+		offset:        cfg.Offset,
+		ctx:           ctx,
+		client:        client,
+		traceClient:   traceClient,
+		beaconClient:  beaconClient,
+		cache:         utils.NewCache(10000),
+		chainID:       cfg.ChainID,
+		tracing:       cfg.Tracing,
+		beaconSupport: cfg.BeaconSupport,
+		rateLimit:     cfg.RateLimit,
+		maxBlockAge:   cfg.SkipBlocksOlderThan,
 	}
 	return bf, nil
 }
