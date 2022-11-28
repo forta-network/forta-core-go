@@ -10,7 +10,7 @@ import (
 
 // BeaconClient is an interface encompassing all ethereum consensus actions
 type BeaconClient interface {
-	GetBlock(ctx context.Context, slot string) (interfaces.SignedBeaconBlock, error)
+	GetBlock(ctx context.Context, slot beacon.StateOrBlockId) (interfaces.SignedBeaconBlock, error)
 }
 
 // beaconClient wraps an ethereum client purpose-built for communicating with consensus layer.
@@ -56,7 +56,7 @@ func (c *beaconClient) getVersionedUnmarshaler(ctx context.Context, state beacon
 }
 
 // NewBeaconClient creates a new ethereum client
-func NewBeaconClient(apiName, url string) (*beaconClient, error) {
+func NewBeaconClient(apiName, url string) (BeaconClient, error) {
 	bClient, err := beacon.NewClient(url)
 	if err != nil {
 		return nil, err

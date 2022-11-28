@@ -68,10 +68,10 @@ func (ensstore *ENSStore) Resolve(input string) (common.Address, error) {
 	// Resolve the domain
 	address, err := resolver.Address()
 	if err != nil {
-		return ens.UnknownAddress, err
+		return common.Address(ens.UnknownAddress), err
 	}
 	if bytes.Equal(address.Bytes(), ens.UnknownAddress.Bytes()) {
-		return ens.UnknownAddress, errors.New("no address")
+		return common.Address(ens.UnknownAddress), errors.New("no address")
 	}
 	return address, nil
 }

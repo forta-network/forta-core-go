@@ -10,6 +10,7 @@ import (
 
 	eth "github.com/ethereum/go-ethereum"
 	"github.com/goccy/go-json"
+	"github.com/prysmaticlabs/prysm/v3/api/client/beacon"
 	"github.com/prysmaticlabs/prysm/v3/consensus-types/interfaces"
 	log "github.com/sirupsen/logrus"
 
@@ -236,7 +237,7 @@ func (bf *blockFeed) forEachBlock() error {
 
 		var beaconData interfaces.SignedBeaconBlock
 		if bf.beaconSupport {
-			beaconData, err = bf.beaconClient.GetBlock(bf.ctx, blockNumToAnalyze.String())
+			beaconData, err = bf.beaconClient.GetBlock(bf.ctx, beacon.StateOrBlockId(blockNumToAnalyze.String()))
 			if err != nil {
 				logger.WithError(err).Error("error getting beacon data")
 			}
