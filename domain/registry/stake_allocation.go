@@ -5,6 +5,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/contract_stake_allocator"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
+	"github.com/goccy/go-json"
 )
 
 const (
@@ -27,4 +28,13 @@ func NewScannerPoolAllocationMessage(l types.Log, blk *domain.Block, evt *contra
 		TotalAmount:  evt.TotalAllocated.String(),
 		Increase:     evt.Increase,
 	}
+}
+
+func ParseScannerPoolAllocationMessage(msg string) (*ScannerPoolAllocationMessage, error) {
+	var m ScannerPoolAllocationMessage
+	err := json.Unmarshal([]byte(msg), &m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
 }
