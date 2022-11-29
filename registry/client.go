@@ -10,6 +10,7 @@ import (
 
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_stake_allocator"
 	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/security/eip712"
 
@@ -30,6 +31,11 @@ const (
 	scannerRegistryChainID     = 137
 	scannerRegistryDeployBlock = 20187154
 	defaultEnsAddress          = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
+)
+
+// Registry errors
+var (
+	ErrContractNotReady = errors.New("contract not ready")
 )
 
 // ScannerPermission is an alias to use for enums.
@@ -141,16 +147,23 @@ type client struct {
 	opts       *bind.CallOpts
 	privateKey *ecdsa.PrivateKey
 
-	contracts         *registry.RegistryContracts
-	agentReg          *contract_agent_registry.AgentRegistryCaller
-	scannerReg        *contract_scanner_registry.ScannerRegistryCaller
-	scannerPoolReg    *contract_scanner_pool_registry.ScannerPoolRegistryCaller
-	dispatch          *contract_dispatch.DispatchCaller
-	scannerVersion    *contract_scanner_node_version.ScannerNodeVersionCaller
-	fortaStaking      *contract_forta_staking.FortaStakingCaller
-	scannerRegFil     *contract_scanner_registry.ScannerRegistryFilterer
+	contracts      *registry.RegistryContracts
+	agentReg       *contract_agent_registry.AgentRegistryCaller
+	scannerReg     *contract_scanner_registry.ScannerRegistryCaller
+	dispatch       *contract_dispatch.DispatchCaller
+	scannerVersion *contract_scanner_node_version.ScannerNodeVersionCaller
+	fortaStaking   *contract_forta_staking.FortaStakingCaller
+
+	scannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
+	agentRegFil   *contract_agent_registry.AgentRegistryFilterer
+
+	// new contracts
+
+	scannerPoolReg *contract_scanner_pool_registry.ScannerPoolRegistryCaller
+	stakeAllocator *contract_stake_allocator.StakeAllocatorCaller
+
 	scannerPoolRegFil *contract_scanner_pool_registry.ScannerPoolRegistryFilterer
-	agentRegFil       *contract_agent_registry.AgentRegistryFilterer
+	stakeAllocatorFil *contract_stake_allocator.StakeAllocatorFilterer
 }
 
 var _ Client = &client{}
@@ -216,11 +229,6 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 
-	scannerPoolReg, err := contract_scanner_pool_registry.NewScannerPoolRegistryCaller(regContracts.ScannerPoolRegistry, ec)
-	if err != nil {
-		return nil, err
-	}
-
 	dispatch, err := contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
@@ -241,17 +249,12 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 
-	scannerPoolRegFil, err := contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(regContracts.ScannerPoolRegistry, ec)
-	if err != nil {
-		return nil, err
-	}
-
 	agentRegFil, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	return &client{
+	cl := &client{
 		ctx: ctx,
 		cfg: cfg,
 		eth: eth,
@@ -259,17 +262,39 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 
 		privateKey: cfg.PrivateKey,
 
-		contracts:         regContracts,
-		scannerReg:        scannerReg,
-		scannerPoolReg:    scannerPoolReg,
-		agentReg:          agentReg,
-		dispatch:          dispatch,
-		scannerVersion:    scannerVersion,
-		fortaStaking:      fortaStaking,
-		scannerRegFil:     scannerRegFil,
-		scannerPoolRegFil: scannerPoolRegFil,
-		agentRegFil:       agentRegFil,
-	}, err
+		contracts:      regContracts,
+		scannerReg:     scannerReg,
+		agentReg:       agentReg,
+		dispatch:       dispatch,
+		scannerVersion: scannerVersion,
+		fortaStaking:   fortaStaking,
+		scannerRegFil:  scannerRegFil,
+		agentRegFil:    agentRegFil,
+	}
+
+	if regContracts.ScannerPoolRegistry != nil {
+		cl.scannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(*regContracts.ScannerPoolRegistry, ec)
+		if err != nil {
+			return nil, err
+		}
+		cl.scannerPoolRegFil, err = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(*regContracts.ScannerPoolRegistry, ec)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if regContracts.ScannerPoolRegistry != nil {
+		cl.stakeAllocator, err = contract_stake_allocator.NewStakeAllocatorCaller(*regContracts.StakeAllocator, ec)
+		if err != nil {
+			return nil, err
+		}
+		cl.stakeAllocatorFil, err = contract_stake_allocator.NewStakeAllocatorFilterer(*regContracts.StakeAllocator, ec)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return cl, err
 }
 
 func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
@@ -427,6 +452,10 @@ func (c *client) ForEachScannerSinceBlock(
 func (c *client) ForEachPoolScannerSinceBlock(
 	block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error,
 ) error {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return ErrContractNotReady
+	}
+
 	opts, err := c.getOps()
 	if err != nil {
 		return err
@@ -454,7 +483,7 @@ func (c *client) ForEachPoolScannerSinceBlock(
 				Enabled:   scn.Operational,
 				Manifest:  scn.Metadata,
 				Owner:     scn.Owner.Hex(),
-				PoolID:    utils.PoolIDBigIntToHex(it.Event.ScannerPool),
+				PoolID:    it.Event.ScannerPool.String(),
 			}); err != nil {
 				return err
 			}
@@ -651,6 +680,9 @@ func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 }
 
 func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return false, ErrContractNotReady
+	}
 	return c.scannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
@@ -686,6 +718,10 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 }
 
 func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return nil, ErrContractNotReady
+	}
+
 	sID := common.HexToAddress(scannerID)
 	scn, err := c.scannerPoolReg.GetScanner(c.opts, sID)
 
@@ -713,7 +749,7 @@ func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
 		Enabled:   enabled,
 		Manifest:  scn.Metadata,
 		Owner:     owner.Hex(),
-		PoolID:    utils.PoolIDBigIntToHex(scn.ScannerPoolId),
+		PoolID:    scn.ScannerPoolId.String(),
 	}, nil
 }
 
@@ -744,10 +780,14 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 }
 
 func (c *client) RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error) {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return "", ErrContractNotReady
+	}
+
 	if c.privateKey == nil {
 		return "", errors.New("no operator private key provided to the client")
 	}
-	reg, err := contract_scanner_pool_registry.NewScannerPoolRegistryTransactor(c.contracts.ScannerPoolRegistry, c.ec)
+	reg, err := contract_scanner_pool_registry.NewScannerPoolRegistryTransactor(*c.contracts.ScannerPoolRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
@@ -819,11 +859,14 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 }
 
 func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
+	if c.contracts.ScannerPoolRegistry == nil {
+		return nil, nil, ErrContractNotReady
+	}
 	chainID, err := c.eth.ChainID(c.ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to determine registry chain id: %v", chainID)
 	}
-	return eip712.SignScannerRegistration(c.privateKey, c.contracts.ScannerPoolRegistry, chainID, reg)
+	return eip712.SignScannerRegistration(c.privateKey, *c.contracts.ScannerPoolRegistry, chainID, reg)
 }
 
 func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {

@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/hex"
 	"math/big"
+	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -37,8 +38,13 @@ func AgentHexToBigInt(hex string) *big.Int {
 	return common.HexToHash(hex).Big()
 }
 
-func PoolIDBigIntToHex(i *big.Int) string {
-	return BytesToHex(i.Bytes())
+func PoolIDToBigInt(s string) *big.Int {
+	i, _ := strconv.ParseUint(s, 10, 64)
+	return big.NewInt(0).SetUint64(i)
+}
+
+func PoolIDToString(i *big.Int) string {
+	return i.String()
 }
 
 func PoolIDHexToBigInt(hex string) *big.Int {

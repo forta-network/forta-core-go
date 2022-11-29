@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/sirupsen/logrus"
 	"github.com/wealdtech/go-ens/v3"
 )
 
@@ -114,11 +115,6 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
-	scannerPoolReg, err := ensstore.Resolve(ScannerPoolRegistryContract)
-	if err != nil {
-		return nil, err
-	}
-
 	dispatch, err := ensstore.Resolve(DispatchContract)
 	if err != nil {
 		return nil, err
@@ -139,21 +135,29 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
-	stakeAllocator, err := ensstore.Resolve(StakeAllocatorContract)
-	if err != nil {
-		return nil, err
-	}
-
-	return &registry.RegistryContracts{
+	regContracts := &registry.RegistryContracts{
 		AgentRegistry:      agentReg,
 		ScannerRegistry:    scannerReg,
 		Dispatch:           dispatch,
 		ScannerNodeVersion: scannerNodeVersion,
 		FortaStaking:       fortaStaking,
 		Forta:              forta,
+	}
 
-		ScannerPoolRegistry: scannerPoolReg,
-		StakeAllocator:      stakeAllocator,
-	}, nil
+	scannerPoolReg, err := ensstore.Resolve(ScannerPoolRegistryContract)
+	if err != nil {
+		logrus.WithError(err).Warn("failed to resolve scanner pool registry from ens - ignoring")
+	} else {
+		regContracts.ScannerPoolRegistry = &scannerPoolReg
+	}
+
+	stakeAllocator, err := ensstore.Resolve(StakeAllocatorContract)
+	if err != nil {
+		logrus.WithError(err).Warn("failed to resolve stake allocator from ens - ignoring")
+	} else {
+		regContracts.StakeAllocator = &stakeAllocator
+	}
+
+	return regContracts, nil
 
 }

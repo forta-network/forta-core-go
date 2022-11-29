@@ -19,6 +19,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_stake_allocator"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/ethereum"
@@ -34,11 +35,12 @@ type listener struct {
 	eth    ethereum.Client
 
 	scannerAddr        string
-	scannerPoolAddr    string
 	scannerVersionAddr string
 	agentAddr          string
 	dispatchAddr       string
 	fortaStakingAddr   string
+	scannerPoolAddr    *string
+	stakeAllocatorAddr *string
 
 	fortaStakingFilterer   *contract_forta_staking.FortaStakingFilterer
 	scannerFilterer        *contract_scanner_registry.ScannerRegistryFilterer
@@ -46,6 +48,7 @@ type listener struct {
 	agentsFilterer         *contract_agent_registry.AgentRegistryFilterer
 	dispatchFilterer       *contract_dispatch.DispatchFilterer
 	scannerVersionFilterer *contract_scanner_node_version.ScannerNodeVersionFilterer
+	stakeAllocatorFilterer *contract_stake_allocator.StakeAllocatorFilterer
 }
 
 type Handlers struct {
@@ -72,6 +75,8 @@ type Handlers struct {
 
 	AgentStakeThresholdHandler   func(logger *log.Entry, msg *registry.AgentStakeThresholdMessage) error
 	ScannerStakeThresholdHandler func(logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error
+
+	ScannerPoolAllocationHandler func(logger *log.Entry, msg *registry.ScannerPoolAllocationMessage) error
 }
 
 type ContractFilter struct {
@@ -81,6 +86,7 @@ type ContractFilter struct {
 	DispatchRegistry    bool
 	FortaStaking        bool
 	ScannerVersion      bool
+	StakeAllocator      bool
 }
 
 type ListenerConfig struct {
@@ -340,13 +346,27 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		}
 
 	case SubjectTypeScannerPool:
-		poolID := utils.PoolIDBigIntToHex(subjectID)
+		poolID := subjectID.String()
 		if l.cfg.Handlers.ScannerPoolStakeHandler != nil {
 			return l.cfg.Handlers.ScannerPoolStakeHandler(logger, registry.NewScannerPoolStakeMessage(le, changeType, acct, poolID, value, blk))
 		}
 
 	default:
 		logger.WithField("subjectID", subjectType).Warn("unhandled subject ID, ignoring")
+	}
+	return nil
+}
+
+func (l *listener) handleStakeAllocatorEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_stake_allocator.AllocatedStakeTopic:
+		evt, err := l.stakeAllocatorFilterer.ParseAllocatedStake(le)
+		if err != nil {
+			return err
+		}
+		if l.cfg.Handlers.ScannerPoolAllocationHandler != nil {
+			return l.cfg.Handlers.ScannerPoolAllocationHandler(logger, registry.NewScannerPoolAllocationMessage(le, blk, evt))
+		}
 	}
 	return nil
 }
@@ -393,6 +413,12 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	}
 	if equalsAddress(le.Address, l.fortaStakingAddr) {
 		return l.handleFortaStakingEvent(le, blk, logger)
+	}
+	if l.scannerPoolAddr != nil && equalsAddress(le.Address, *l.scannerPoolAddr) {
+		return l.handleScannerPoolRegistryEvent(le, blk, logger)
+	}
+	if l.stakeAllocatorAddr != nil && equalsAddress(le.Address, *l.stakeAllocatorAddr) {
+		return l.handleStakeAllocatorEvent(le, blk, logger)
 	}
 	return nil
 }
@@ -537,11 +563,6 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, err
 	}
 
-	spf, err := contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(regContracts.ScannerPoolRegistry, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	snv, err := contract_scanner_node_version.NewScannerNodeVersionFilterer(regContracts.ScannerNodeVersion, nil)
 	if err != nil {
 		return nil, err
@@ -562,6 +583,22 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, err
 	}
 
+	var spf *contract_scanner_pool_registry.ScannerPoolRegistryFilterer
+	if regContracts.ScannerPoolRegistry != nil {
+		spf, err = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(*regContracts.ScannerPoolRegistry, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var saf *contract_stake_allocator.StakeAllocatorFilterer
+	if regContracts.StakeAllocator != nil {
+		saf, err = contract_stake_allocator.NewStakeAllocatorFilterer(*regContracts.StakeAllocator, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	var addrs []string
 	if cfg.ContractFilter != nil {
 		if cfg.ContractFilter.AgentRegistry {
@@ -569,9 +606,6 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		}
 		if cfg.ContractFilter.ScannerRegistry {
 			addrs = append(addrs, regContracts.ScannerRegistry.Hex())
-		}
-		if cfg.ContractFilter.ScannerPoolRegistry {
-			addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
 		}
 		if cfg.ContractFilter.FortaStaking {
 			addrs = append(addrs, regContracts.FortaStaking.Hex())
@@ -582,15 +616,26 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		if cfg.ContractFilter.ScannerVersion {
 			addrs = append(addrs, regContracts.ScannerNodeVersion.Hex())
 		}
+		if cfg.ContractFilter.ScannerPoolRegistry && regContracts.ScannerPoolRegistry != nil {
+			addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
+		}
+		if cfg.ContractFilter.StakeAllocator && regContracts.StakeAllocator != nil {
+			addrs = append(addrs, regContracts.StakeAllocator.Hex())
+		}
 
 	} else {
 		addrs = []string{
 			regContracts.AgentRegistry.Hex(),
 			regContracts.ScannerRegistry.Hex(),
-			regContracts.ScannerPoolRegistry.Hex(),
 			regContracts.Dispatch.Hex(),
 			regContracts.FortaStaking.Hex(),
 			regContracts.ScannerNodeVersion.Hex(),
+		}
+		if regContracts.ScannerPoolRegistry != nil {
+			addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
+		}
+		if regContracts.StakeAllocator != nil {
+			addrs = append(addrs, regContracts.StakeAllocator.Hex())
 		}
 	}
 
@@ -611,23 +656,36 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, err
 	}
 
+	var scannerPoolAddr string
+	if regContracts.ScannerPoolRegistry != nil {
+		scannerPoolAddr = regContracts.ScannerPoolRegistry.Hex()
+	}
+	var stakeAllocatorAddr string
+	if regContracts.StakeAllocator != nil {
+		stakeAllocatorAddr = regContracts.StakeAllocator.Hex()
+	}
+
 	return &listener{
-		ctx:                    ctx,
-		client:                 regClient,
-		cfg:                    cfg,
-		logs:                   logFeed,
-		eth:                    ethClient,
-		scannerAddr:            regContracts.ScannerRegistry.Hex(),
-		scannerPoolAddr:        regContracts.ScannerPoolRegistry.Hex(),
-		scannerVersionAddr:     regContracts.ScannerNodeVersion.Hex(),
-		agentAddr:              regContracts.AgentRegistry.Hex(),
-		dispatchAddr:           regContracts.Dispatch.Hex(),
-		fortaStakingAddr:       regContracts.FortaStaking.Hex(),
+		ctx:    ctx,
+		client: regClient,
+		cfg:    cfg,
+		logs:   logFeed,
+		eth:    ethClient,
+
+		scannerAddr:        regContracts.ScannerRegistry.Hex(),
+		scannerVersionAddr: regContracts.ScannerNodeVersion.Hex(),
+		agentAddr:          regContracts.AgentRegistry.Hex(),
+		dispatchAddr:       regContracts.Dispatch.Hex(),
+		fortaStakingAddr:   regContracts.FortaStaking.Hex(),
+		scannerPoolAddr:    &scannerPoolAddr,
+		stakeAllocatorAddr: &stakeAllocatorAddr,
+
 		scannerFilterer:        sf,
-		scannerPoolFilterer:    spf,
 		scannerVersionFilterer: snv,
 		agentsFilterer:         af,
 		dispatchFilterer:       df,
 		fortaStakingFilterer:   stkf,
+		scannerPoolFilterer:    spf,
+		stakeAllocatorFilterer: saf,
 	}, nil
 }

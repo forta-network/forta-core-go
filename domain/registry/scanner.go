@@ -119,7 +119,7 @@ func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerPo
 			Message:   MessageFrom(evt.Raw.TxHash.Hex(), blk, SaveScanner),
 		},
 		ChainID: evt.ChainId.Int64(),
-		PoolID:  utils.PoolIDBigIntToHex(evt.ScannerPool),
+		PoolID:  utils.PoolIDToString(evt.ScannerPool),
 		Enabled: enabled,
 	}
 }
@@ -127,7 +127,7 @@ func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerPo
 func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.ScannerPoolRegistryTransfer, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
-		PoolID:  utils.PoolIDBigIntToHex(evt.TokenId),
+		PoolID:  utils.PoolIDToString(evt.TokenId),
 		Owner:   utils.StringPtr(evt.To.Hex()),
 	}
 }
@@ -135,7 +135,7 @@ func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.Scann
 func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerPoolRegistered, owner string, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
-		PoolID:  utils.PoolIDBigIntToHex(evt.ScannerPoolId),
+		PoolID:  utils.PoolIDToString(evt.ScannerPoolId),
 		Owner:   utils.StringPtr(owner),
 		ChainID: utils.Int64Ptr(evt.ChainId.Int64()),
 	}

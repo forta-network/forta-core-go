@@ -10,6 +10,6 @@ type RegistryContracts struct {
 	FortaStaking       common.Address
 	Forta              common.Address
 
-	ScannerPoolRegistry common.Address
-	StakeAllocator      common.Address
+	ScannerPoolRegistry *common.Address
+	StakeAllocator      *common.Address
 }
