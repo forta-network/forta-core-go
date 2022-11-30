@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hashicorp/go-multierror"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -86,13 +87,23 @@ func (pai *OffsetInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 		// check scan and trace are in sync
 		err = checkJsonRPCOffset(ctx, scanClient, traceClient)
 		if err != nil {
-			resultErr = multierror.Append(resultErr, fmt.Errorf("detected offset between scan api and trace api: %v", err))
+			resultErr = multierror.Append(
+				resultErr, fmt.Errorf("detected offset between scan api and trace api: %v", err),
+			)
 			results.Indicators[IndicatorOffsetScanTraceSynced] = ResultFailure
 		} else {
 			results.Indicators[IndicatorOffsetScanTraceSynced] = ResultSuccess
 		}
 	}
 
+	scanBlock, proxyBlock, traceBlock, err := pai.fetchLatestBlocks(ctx, inspectionCfg)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, err)
+	} else {
+		results.Indicators[IndicatorOffsetScanBlockNumber] = float64(scanBlock)
+		results.Indicators[IndicatorOffsetProxyBlockNumber] = float64(proxyBlock)
+		results.Indicators[IndicatorOffsetTraceBlockNumber] = float64(traceBlock)
+	}
 	return
 }
 
@@ -128,4 +139,76 @@ func checkJsonRPCOffset(
 
 		}
 	}
+}
+
+func (pai *OffsetInspector) fetchLatestBlocks(ctx context.Context, inspectionCfg InspectionConfig) (
+	uint64, uint64, uint64, error,
+) {
+	var resultErr error
+
+	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial proxy json-rpc api %w", err))
+		return 0, 0, 0, nil
+	}
+	proxyClient := ethclient.NewClient(proxyRPCClient)
+
+	scanRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial scan json-rpc api %w", err))
+		return 0, 0, 0, nil
+	}
+	scanClient := ethclient.NewClient(scanRPCClient)
+
+	g, ctx := errgroup.WithContext(ctx)
+
+	var (
+		proxyBlock, scanBlock, traceBlock uint64
+	)
+
+	// fetch latest block for proxy api
+	g.Go(
+		func() (err error) {
+			proxyBlock, err = proxyClient.BlockNumber(ctx)
+			return
+		},
+	)
+
+	// fetch latest block for scan api
+	g.Go(
+		func() (err error) {
+			scanBlock, err = scanClient.BlockNumber(ctx)
+			return
+		},
+	)
+
+	if inspectionCfg.CheckTrace {
+		traceRPCClient, err := rpc.DialContext(ctx, inspectionCfg.TraceAPIURL)
+		if err != nil {
+			resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial trace json-rpc api %w", err))
+			return 0, 0, 0, nil
+		}
+		traceClient := ethclient.NewClient(traceRPCClient)
+		// fetch latest block for trace api
+		g.Go(
+			func() (err error) {
+				traceBlock, err = traceClient.BlockNumber(ctx)
+				return
+			},
+		)
+	}
+
+	err = g.Wait()
+	if err != nil {
+		resultErr = multierror.Append(resultErr, err)
+	}
+
+	return scanBlock, proxyBlock, traceBlock, resultErr
+}
+
+func calculateOffsets(scanBlock, proxyBlock, traceBlock uint64) (scanProxyOffset, scanTraceOffset uint64) {
+	scanProxyOffset = scanBlock - proxyBlock
+	scanTraceOffset = scanBlock - traceBlock
+
+	return
 }
