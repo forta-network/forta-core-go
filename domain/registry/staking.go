@@ -100,7 +100,7 @@ func extractStakeType(id *big.Int) (string, error) {
 		return ScannerStake, nil
 	case 1:
 		return AgentStake, nil
-	case 3:
+	case 2:
 		return ScannerPoolStake, nil
 	default:
 		return "", fmt.Errorf("invalid stake type '%d': %s", lastByte, id.String())
