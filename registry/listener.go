@@ -556,10 +556,10 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, err
 	}
 
-	return NewListenerWithRegistryClient(ctx, cfg, ethClient, regClient)
+	return NewListenerWithClients(ctx, cfg, ethClient, regClient)
 }
 
-func NewListenerWithRegistryClient(ctx context.Context, cfg ListenerConfig, ethClient ethereum.Client, regClient Client) (*listener, error) {
+func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient ethereum.Client, regClient Client) (*listener, error) {
 	regContracts := regClient.RegistryContracts()
 
 	sf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, nil)
