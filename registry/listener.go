@@ -160,15 +160,6 @@ func (l *listener) handleScannerPoolRegistryEvent(le types.Log, blk *domain.Bloc
 			return l.cfg.Handlers.SaveScannerHandler(logger, registry.NewScannerSaveMessageFromPool(su, enabled, blk))
 		}
 
-	case contract_scanner_pool_registry.ScannerEnabledTopic:
-		se, err := l.scannerPoolFilterer.ParseScannerEnabled(le)
-		if err != nil {
-			return err
-		}
-		if l.cfg.Handlers.ScannerActionHandler != nil {
-			return l.cfg.Handlers.ScannerActionHandler(logger, registry.NewScannerMessageFromPool(se, blk))
-		}
-
 	case contract_scanner_pool_registry.ManagedStakeThresholdChangedTopic:
 		evt, err := l.scannerPoolFilterer.ParseManagedStakeThresholdChanged(le)
 		if err != nil {
@@ -202,6 +193,15 @@ func (l *listener) handleScannerPoolRegistryEvent(le types.Log, blk *domain.Bloc
 		}
 		if l.cfg.Handlers.UpdateScannerPoolHandler != nil {
 			return l.cfg.Handlers.UpdateScannerPoolHandler(logger, registry.NewScannerPoolMessageFromRegistration(evt, owner, blk))
+		}
+
+	case contract_scanner_pool_registry.EnabledScannersChangedTopic:
+		evt, err := l.scannerPoolFilterer.ParseEnabledScannersChanged(le)
+		if err != nil {
+			return err
+		}
+		if l.cfg.Handlers.UpdateScannerPoolHandler != nil {
+			return l.cfg.Handlers.UpdateScannerPoolHandler(logger, registry.NewScannerPoolMessageFromEnablement(evt, blk))
 		}
 	}
 	return nil

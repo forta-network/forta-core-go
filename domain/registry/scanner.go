@@ -140,3 +140,10 @@ func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.S
 		ChainID: utils.Int64Ptr(evt.ChainId.Int64()),
 	}
 }
+
+func NewScannerPoolMessageFromEnablement(evt *contract_scanner_pool_registry.ScannerPoolRegistryEnabledScannersChanged, blk *domain.Block) *UpdateScannerPoolMessage {
+	return &UpdateScannerPoolMessage{
+		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
+		PoolID:  utils.PoolIDToString(evt.ScannerPoolId),
+	}
+}
