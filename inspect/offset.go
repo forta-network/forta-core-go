@@ -25,7 +25,8 @@ const (
 
 var (
 	offsetIndicators = []string{
-		IndicatorOffsetScanProxySynced,
+		IndicatorOffsetScanProxySynced, IndicatorOffsetScanTraceSynced, IndicatorOffsetScanBlockNumber,
+		IndicatorOffsetProxyBlockNumber, IndicatorOffsetTraceBlockNumber,
 	}
 )
 
