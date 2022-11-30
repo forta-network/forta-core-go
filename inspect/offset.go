@@ -150,14 +150,14 @@ func (pai *OffsetInspector) fetchLatestBlocks(ctx context.Context, inspectionCfg
 	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial proxy json-rpc api %w", err))
-		return 0, 0, 0, nil
+		return 0, 0, 0, resultErr
 	}
 	proxyClient := ethclient.NewClient(proxyRPCClient)
 
 	scanRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial scan json-rpc api %w", err))
-		return 0, 0, 0, nil
+		return 0, 0, 0, resultErr
 	}
 	scanClient := ethclient.NewClient(scanRPCClient)
 
@@ -187,7 +187,7 @@ func (pai *OffsetInspector) fetchLatestBlocks(ctx context.Context, inspectionCfg
 		traceRPCClient, err := rpc.DialContext(ctx, inspectionCfg.TraceAPIURL)
 		if err != nil {
 			resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial trace json-rpc api %w", err))
-			return 0, 0, 0, nil
+			return 0, 0, 0, resultErr
 		}
 		traceClient := ethclient.NewClient(traceRPCClient)
 		// fetch latest block for trace api
@@ -205,11 +205,4 @@ func (pai *OffsetInspector) fetchLatestBlocks(ctx context.Context, inspectionCfg
 	}
 
 	return scanBlock, proxyBlock, traceBlock, resultErr
-}
-
-func calculateOffsets(scanBlock, proxyBlock, traceBlock uint64) (scanProxyOffset, scanTraceOffset uint64) {
-	scanProxyOffset = scanBlock - proxyBlock
-	scanTraceOffset = scanBlock - traceBlock
-
-	return
 }
