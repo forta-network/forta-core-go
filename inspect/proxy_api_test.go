@@ -3,6 +3,7 @@ package inspect
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/kelseyhightower/envconfig"
@@ -64,4 +65,71 @@ func Test_findOldestSupportedBlock(t *testing.T) {
 
 	result := findOldestSupportedBlock(context.Background(), cli, 0, latestBlockNum)
 	r.Equal(testProxyAPIOldestSupportedBlock, result)
+}
+
+
+
+func TestProxyAPIInspector_detectOffset(t *testing.T) {
+	type args struct {
+		ctx           context.Context
+		inspectionCfg InspectionConfig
+	}
+
+	tests := []struct {
+		name        string
+		args        args
+	}{
+		{
+			name: "different apis",
+			args: args{
+				ctx: context.Background(),
+				inspectionCfg: InspectionConfig{
+					ScanAPIURL:  "http://172.31.84.3:8545",
+					ProxyAPIURL: "http://172.31.71.62:8545",
+				},
+			},
+		}, {
+			name: "dns",
+			args: args{
+				ctx: context.Background(),
+				inspectionCfg: InspectionConfig{
+					ScanAPIURL:  "http://erigon-eth-prod.forta.internal:8545",
+					ProxyAPIURL: "http://erigon-eth-prod.forta.internal:8545",
+				},
+			},
+		}, {
+			name: "same node",
+			args: args{
+				ctx: context.Background(),
+				inspectionCfg: InspectionConfig{
+					ScanAPIURL:  "http://172.31.84.3:8545",
+					ProxyAPIURL: "http://172.31.84.3:8545",
+				},
+			},
+		}, {
+			name: "free and full combo",
+			args: args{
+				ctx: context.Background(),
+				inspectionCfg: InspectionConfig{
+					ScanAPIURL:  "https://cloudflare-eth.com",
+					ProxyAPIURL: "http://erigon-eth-prod.forta.internal:8545",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(
+			tt.name, func(t *testing.T) {
+				pai := &ProxyAPIInspector{}
+				stats, err := pai.detectOffset(tt.args.ctx, tt.args.inspectionCfg)
+				if err != nil {
+					t.Log(err)
+				}
+
+				t.Log(stats)
+
+				time.Sleep(time.Millisecond * 500)
+			},
+		)
+	}
 }

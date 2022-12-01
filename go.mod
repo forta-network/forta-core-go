@@ -24,6 +24,7 @@ require (
 	github.com/ipfs/interface-go-ipfs-core v0.7.0
 	github.com/ipfs/kubo v0.16.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/showwin/speedtest-go v1.1.5
