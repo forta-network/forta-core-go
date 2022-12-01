@@ -128,6 +128,14 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, blk *domain.Block, l
 		if err != nil {
 			return err
 		}
+
+		// enforce latest state to take sunsetting into account
+		enabled, err := l.client.IsEnabledScanner(utils.ScannerIDBigIntToHex(se.ScannerId))
+		if err != nil {
+			return err
+		}
+		se.Enabled = enabled
+
 		if l.cfg.Handlers.ScannerActionHandler != nil {
 			return l.cfg.Handlers.ScannerActionHandler(logger, registry.NewScannerMessage(se, blk))
 		}

@@ -680,8 +680,17 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 }
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
-	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.scannerReg.IsEnabled(c.opts, sID)
+	if c.migrationEnded() && c.scannerPoolReg != nil {
+		return c.scannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
+	}
+	return c.scannerReg.IsEnabled(c.opts, utils.ScannerIDHexToBigInt(scannerID))
+}
+
+func (c *client) migrationEnded() bool {
+	// ignoring error here because the old contract doesn't have this method in its ABI
+	// only successful request and a "true" in response is true
+	migrationEnded, _ := c.scannerReg.HasMigrationEnded(c.opts)
+	return migrationEnded
 }
 
 func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
@@ -697,6 +706,10 @@ func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
+	if c.migrationEnded() {
+		return c.GetPoolScanner(scannerID)
+	}
+
 	sID := utils.ScannerIDHexToBigInt(scannerID)
 	scn, err := c.scannerReg.GetScanner(c.opts, sID)
 
@@ -841,6 +854,9 @@ func (c *client) RegisterScannerToPool(scannerAddress string, poolID *big.Int, c
 }
 
 func (c *client) EnableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
+	if c.migrationEnded() {
+		return "", errors.New("migration ended")
+	}
 	if c.privateKey == nil {
 		return "", errors.New("no private key provided to the client")
 	}
@@ -898,6 +914,9 @@ func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeReg
 }
 
 func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {
+	if c.scannerPoolReg == nil {
+		return "", ErrContractNotReady
+	}
 	addr, err := c.scannerPoolReg.OwnerOf(c.opts, poolID)
 	if err != nil {
 		return "", nil
