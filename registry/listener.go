@@ -134,7 +134,7 @@ func (l *listener) handleScannerRegistryEvent(le types.Log, blk *domain.Block, l
 		if err != nil {
 			return err
 		}
-		se.Enabled = enabled
+		se.Enabled = enabled && se.Enabled
 
 		if l.cfg.Handlers.ScannerActionHandler != nil {
 			return l.cfg.Handlers.ScannerActionHandler(logger, registry.NewScannerMessage(se, blk))
