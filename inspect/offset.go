@@ -40,7 +40,7 @@ func collectOffsetData(ctx context.Context, primaryClient *ethclient.Client, sec
 	t := time.NewTicker(time.Millisecond * 300)
 
 	// initialize data
-	
+
 	// get the next block in line, so that we can observe exactly how much delay both APIs have after
 	// the block creation
 	blockToQuery, err := primaryClient.BlockNumber(ctx)
@@ -91,6 +91,7 @@ func collectOffsetData(ctx context.Context, primaryClient *ethclient.Client, sec
 			}
 
 			var offset = float64(secondaryAPIDelay) - float64(primaryAPIDelay)
+
 			dataPoints = append(dataPoints, offset)
 			blockToQuery++
 		}
@@ -115,7 +116,7 @@ func measureBlockDelay(ctx context.Context, client *ethclient.Client, blockNum u
 	}
 
 exit:
-	return time.Now().Sub(start).Milliseconds(), nil
+	return time.Since(start).Milliseconds(), nil
 }
 func extractStats(ds []float64) offsetStats {
 	os := offsetStats{}
