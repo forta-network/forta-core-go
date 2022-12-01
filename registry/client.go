@@ -283,7 +283,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		}
 	}
 
-	if regContracts.ScannerPoolRegistry != nil {
+	if regContracts.StakeAllocator != nil {
 		cl.stakeAllocator, err = contract_stake_allocator.NewStakeAllocatorCaller(*regContracts.StakeAllocator, ec)
 		if err != nil {
 			return nil, err
