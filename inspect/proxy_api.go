@@ -27,10 +27,11 @@ const (
 	// IndicatorProxyAPIIsETH2 is upgraded to Ethereum 2.0.
 	IndicatorProxyAPIIsETH2 = "proxy-api.is-eth2"
 
-	// IndicatorProxyAPIScanOffsetMean offset information between scan and proxy
-	IndicatorProxyAPIScanOffsetMean   = "proxy-api.offset.scan.mean"
-	IndicatorProxyAPIScanOffsetMax    = "proxy-api.offset.scan.max"
-	IndicatorProxyAPIScanOffsetMedian = "proxy-api.offset.scan.median"
+	// IndicatorProxyAPIOffsetScanMean offset information between scan and proxy
+	IndicatorProxyAPIOffsetScanMean    = "proxy-api.offset.scan.mean"
+	IndicatorProxyAPIOffsetScanMax     = "proxy-api.offset.scan.max"
+	IndicatorProxyAPIOffsetScanMedian  = "proxy-api.offset.scan.median"
+	IndicatorProxyAPIOffsetScanSamples = "proxy-api.offset.scan.samples"
 
 	// MetadataProxyAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataProxyAPIBlockByNumberHash = "proxy-api.block-by-number.hash"
@@ -128,9 +129,10 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset %w", err))
 	} else {
-		results.Indicators[IndicatorProxyAPIScanOffsetMean] = stats.Mean
-		results.Indicators[IndicatorProxyAPIScanOffsetMedian] = stats.Median
-		results.Indicators[IndicatorProxyAPIScanOffsetMax] = stats.Max
+		results.Indicators[IndicatorProxyAPIOffsetScanMean] = stats.Mean
+		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = stats.Median
+		results.Indicators[IndicatorProxyAPIOffsetScanMax] = stats.Max
+		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = stats.SampleCount
 	}
 
 	return
@@ -140,7 +142,7 @@ func (pai *ProxyAPIInspector) detectOffset(
 	ctx context.Context,
 	inspectionCfg InspectionConfig,
 ) (os offsetStats, resultErr error) {
-	proxyCtx, cancel := context.WithTimeout(ctx, time.Second*20)
+	proxyCtx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 
 	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
