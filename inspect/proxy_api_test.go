@@ -3,7 +3,6 @@ package inspect
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/kelseyhightower/envconfig"
@@ -127,8 +126,6 @@ func TestProxyAPIInspector_detectOffset(t *testing.T) {
 				}
 
 				t.Log(stats)
-
-				time.Sleep(time.Millisecond * 500)
 			},
 		)
 	}
