@@ -25,6 +25,8 @@ import (
 	"github.com/forta-network/forta-core-go/ens"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/utils"
+
+	contract_scanner_registry_old "github.com/forta-network/forta-core-go/oldcontracts/contract_scanner_registry"
 )
 
 const (
@@ -84,6 +86,9 @@ type Client interface {
 
 	// GetPoolScanner returns a scanner
 	GetPoolScanner(scannerID string) (*Scanner, error)
+
+	// RegisterScannerOld executes the pre-delegated-staking registration.
+	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
 	// RegisterScannerToPool registers a scanner to a pool by using scanner's signature and operator private key.
 	RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
@@ -777,6 +782,29 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		Manifest: agt.Metadata,
 		Owner:    agt.Owner.Hex(),
 	}, nil
+}
+
+func (c *client) RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
+	if c.privateKey == nil {
+		return "", errors.New("no private key provided to the client")
+	}
+	reg, err := contract_scanner_registry_old.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+	if err != nil {
+		return "", fmt.Errorf("failed to create contract transactor: %v", err)
+	}
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	if err != nil {
+		return "", fmt.Errorf("failed to create transaction opts: %v", err)
+	}
+	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
+	}
+	tx, err := reg.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
+	if err != nil {
+		return "", fmt.Errorf("failed to send the transaction: %v", err)
+	}
+	return tx.Hash().Hex(), nil
 }
 
 func (c *client) RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error) {
