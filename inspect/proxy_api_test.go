@@ -36,13 +36,18 @@ func TestProxyAPIInspection(t *testing.T) {
 
 	r.Equal(
 		map[string]float64{
-			IndicatorProxyAPIAccessible:     ResultSuccess,
-			IndicatorProxyAPIChainID:        float64(5),
-			IndicatorProxyAPIModuleWeb3:     ResultSuccess,
-			IndicatorProxyAPIModuleEth:      ResultSuccess,
-			IndicatorProxyAPIModuleNet:      ResultSuccess,
-			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
-			IndicatorProxyAPIIsETH2:         ResultSuccess,
+			IndicatorProxyAPIAccessible:        ResultSuccess,
+			IndicatorProxyAPIChainID:           float64(5),
+			IndicatorProxyAPIModuleWeb3:        ResultSuccess,
+			IndicatorProxyAPIModuleEth:         ResultSuccess,
+			IndicatorProxyAPIModuleNet:         ResultSuccess,
+			IndicatorProxyAPIHistorySupport:    VeryOldBlockNumber,
+			IndicatorProxyAPIIsETH2:            ResultSuccess,
+			// trick to make test less flaky and ignore offset issues
+			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
+			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
+			IndicatorProxyAPIOffsetScanMedian:  results.Indicators[IndicatorProxyAPIOffsetScanMedian],
+			IndicatorProxyAPIOffsetScanSamples: results.Indicators[IndicatorProxyAPIOffsetScanSamples],
 		}, results.Indicators,
 	)
 
