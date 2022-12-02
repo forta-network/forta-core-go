@@ -73,6 +73,7 @@ abigen: pull-contracts
 	rm -rf contracts
 	./scripts/abigen.sh forta-contracts components/staking/FortaStaking.sol FortaStaking forta_staking
 	./scripts/abigen.sh forta-contracts components/staking/allocation/StakeAllocator.sol StakeAllocator stake_allocator
+	./scripts/abigen.sh forta-contracts components/staking/rewards/RewardsDistributor.sol RewardsDistributor rewards_distributor
 	./scripts/abigen.sh forta-contracts components/staking/stake_subjects/StakeSubjectGateway.sol StakeSubjectGateway stake_subject_gateway
 	./scripts/abigen.sh forta-contracts components/agents/AgentRegistry.sol AgentRegistry agent_registry
 	./scripts/abigen.sh forta-contracts components/dispatch/Dispatch.sol Dispatch dispatch
