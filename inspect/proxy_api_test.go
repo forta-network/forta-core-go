@@ -28,6 +28,7 @@ func TestProxyAPIInspection(t *testing.T) {
 	results, err := inspector.Inspect(
 		context.Background(), InspectionConfig{
 			ProxyAPIURL: testProxyEnv.ProxyAPI,
+			ScanAPIURL:  testProxyEnv.ProxyAPI,
 			BlockNumber: testProxyAPIOldestSupportedBlock,
 		},
 	)
@@ -65,8 +66,6 @@ func Test_findOldestSupportedBlock(t *testing.T) {
 	result := findOldestSupportedBlock(context.Background(), cli, 0, latestBlockNum)
 	r.Equal(testProxyAPIOldestSupportedBlock, result)
 }
-
-
 
 func TestProxyAPIInspector_detectOffset(t *testing.T) {
 	type args struct {
