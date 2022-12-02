@@ -289,12 +289,6 @@
         "internalType": "address",
         "name": "allocator",
         "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "rewardsDistributor",
-        "type": "address"
       }
     ],
     "name": "StakeHelpersConfigured",
@@ -588,6 +582,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "allocator",
+    "outputs": [
+      {
+        "internalType": "contract IStakeAllocator",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -639,17 +646,12 @@
     "inputs": [
       {
         "internalType": "contract IStakeSubjectGateway",
-        "name": "__subjectGateway",
+        "name": "_subjectGateway",
         "type": "address"
       },
       {
         "internalType": "contract IStakeAllocator",
-        "name": "__allocator",
-        "type": "address"
-      },
-      {
-        "internalType": "contract IRewardsDistributor",
-        "name": "__distributor",
+        "name": "_allocator",
         "type": "address"
       }
     ],

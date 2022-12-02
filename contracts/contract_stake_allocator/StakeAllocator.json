@@ -3,17 +3,17 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "forwarder",
+        "name": "_forwarder",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "subjectGateway",
+        "name": "__subjectGateway",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "rewardsDistributor",
+        "name": "_rewardsDistributor",
         "type": "address"
       }
     ],
@@ -538,6 +538,19 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewardsDistributor",
+    "outputs": [
+      {
+        "internalType": "contract IRewardsDistributor",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
