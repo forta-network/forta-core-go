@@ -79,39 +79,12 @@ func TestProxyAPIInspector_detectOffset(t *testing.T) {
 		args        args
 	}{
 		{
-			name: "different apis",
-			args: args{
-				ctx: context.Background(),
-				inspectionCfg: InspectionConfig{
-					ScanAPIURL:  "http://172.31.84.3:8545",
-					ProxyAPIURL: "http://172.31.71.62:8545",
-				},
-			},
-		}, {
-			name: "dns",
-			args: args{
-				ctx: context.Background(),
-				inspectionCfg: InspectionConfig{
-					ScanAPIURL:  "http://erigon-eth-prod.forta.internal:8545",
-					ProxyAPIURL: "http://erigon-eth-prod.forta.internal:8545",
-				},
-			},
-		}, {
-			name: "same node",
-			args: args{
-				ctx: context.Background(),
-				inspectionCfg: InspectionConfig{
-					ScanAPIURL:  "http://172.31.84.3:8545",
-					ProxyAPIURL: "http://172.31.84.3:8545",
-				},
-			},
-		}, {
-			name: "free and full combo",
+			name: "free and free combo",
 			args: args{
 				ctx: context.Background(),
 				inspectionCfg: InspectionConfig{
 					ScanAPIURL:  "https://cloudflare-eth.com",
-					ProxyAPIURL: "http://erigon-eth-prod.forta.internal:8545",
+					ProxyAPIURL: "https://cloudflare-eth.com",
 				},
 			},
 		},
