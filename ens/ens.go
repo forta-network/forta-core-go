@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/domain/registry"
-	"github.com/sirupsen/logrus"
 	"github.com/wealdtech/go-ens/v3"
 )
 
@@ -20,10 +19,6 @@ const (
 	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
 	StakingContract            = "staking.forta.eth"
 	FortaContract              = "forta.eth"
-
-	// TODO: Fix these names when they are set in dev
-	ScannerPoolRegistryContract = "scanner-pools.registries.forta.eth"
-	StakeAllocatorContract      = "stake-allocator.forta.eth"
 )
 
 // ENS resolves inputs.
@@ -142,20 +137,6 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		ScannerNodeVersion: scannerNodeVersion,
 		FortaStaking:       fortaStaking,
 		Forta:              forta,
-	}
-
-	scannerPoolReg, err := ensstore.Resolve(ScannerPoolRegistryContract)
-	if err != nil {
-		logrus.WithError(err).Warn("failed to resolve scanner pool registry from ens - ignoring")
-	} else {
-		regContracts.ScannerPoolRegistry = &scannerPoolReg
-	}
-
-	stakeAllocator, err := ensstore.Resolve(StakeAllocatorContract)
-	if err != nil {
-		logrus.WithError(err).Warn("failed to resolve stake allocator from ens - ignoring")
-	} else {
-		regContracts.StakeAllocator = &stakeAllocator
 	}
 
 	return regContracts, nil

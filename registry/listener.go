@@ -561,7 +561,7 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		Name:       "registry-listener",
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create registry client: %v", err)
 	}
 
 	return NewListenerWithClients(ctx, cfg, ethClient, regClient)

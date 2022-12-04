@@ -277,29 +277,23 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		agentRegFil:    agentRegFil,
 	}
 
-	if regContracts.ScannerPoolRegistry != nil {
-		cl.scannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(*regContracts.ScannerPoolRegistry, ec)
-		if err != nil {
-			return nil, err
-		}
-		cl.scannerPoolRegFil, err = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(*regContracts.ScannerPoolRegistry, ec)
-		if err != nil {
-			return nil, err
-		}
+	// find out post-delegated-staking-migration contracts from known contracts
+
+	scannerPoolRegAddr, err := scannerReg.ScannerPoolRegistry(cl.opts)
+	if err == nil && scannerPoolRegAddr.Hex() != utils.ZeroAddress {
+		regContracts.ScannerPoolRegistry = &scannerPoolRegAddr
+		cl.scannerPoolReg, _ = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, ec)
+		cl.scannerPoolRegFil, _ = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(scannerPoolRegAddr, ec)
 	}
 
-	if regContracts.StakeAllocator != nil {
-		cl.stakeAllocator, err = contract_stake_allocator.NewStakeAllocatorCaller(*regContracts.StakeAllocator, ec)
-		if err != nil {
-			return nil, err
-		}
-		cl.stakeAllocatorFil, err = contract_stake_allocator.NewStakeAllocatorFilterer(*regContracts.StakeAllocator, ec)
-		if err != nil {
-			return nil, err
-		}
+	stakeAllocatorAddr, err := fortaStaking.Allocator(cl.opts)
+	if err == nil && stakeAllocatorAddr.Hex() != utils.ZeroAddress {
+		regContracts.StakeAllocator = &stakeAllocatorAddr
+		cl.stakeAllocator, _ = contract_stake_allocator.NewStakeAllocatorCaller(stakeAllocatorAddr, ec)
+		cl.stakeAllocatorFil, _ = contract_stake_allocator.NewStakeAllocatorFilterer(stakeAllocatorAddr, ec)
 	}
 
-	return cl, err
+	return cl, nil
 }
 
 func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
@@ -310,7 +304,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}
 	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, ensAddr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to dial ens store: %v", err)
 	}
 	return NewClientWithENSStore(ctx, cfg, ensStore)
 }
