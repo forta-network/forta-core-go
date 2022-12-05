@@ -116,9 +116,9 @@ func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent
 }
 
 type CombinerFeedConfig struct {
-	RateLimit      *time.Ticker
-	APIUrl         string
-	Start          uint64
+	RateLimit         *time.Ticker
+	APIUrl            string
+	Start             uint64
 	End               uint64
 	CombinerCachePath string
 }
