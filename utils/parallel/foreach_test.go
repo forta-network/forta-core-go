@@ -3,10 +3,11 @@ package parallel
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func strArrs(count int) ([]string, []*string) {
