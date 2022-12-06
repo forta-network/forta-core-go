@@ -303,6 +303,7 @@ message AlertEvent {
     Source source = 12;
     string findingType = 13;
     repeated string relatedAlerts = 14;
+    uint64 chainId = 15;
   }
 
   Alert alert = 1;

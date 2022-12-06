@@ -412,6 +412,9 @@ type SourceAlertEvent {
 
     "Alert timestamp"
     timestamp: String
+
+    "Source chain id"
+    chainId: String
 }
 
 """Block information"""

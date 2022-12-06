@@ -516,6 +516,8 @@ type getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent s
 	BotId string `json:"botId"`
 	// Alert timestamp
 	Timestamp string `json:"timestamp"`
+	// Source chain id
+	ChainId string `json:"chainId"`
 }
 
 // GetHash returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.Hash, and is useful for accessing the field via an interface.
@@ -531,6 +533,11 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEve
 // GetTimestamp returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.Timestamp, and is useful for accessing the field via an interface.
 func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetTimestamp() string {
 	return v.Timestamp
+}
+
+// GetChainId returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.ChainId, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetChainId() string {
+	return v.ChainId
 }
 
 // getAlertsAlertsAlertsResponsePageInfoAlertPageInfo includes the requested fields of the GraphQL type AlertPageInfo.
@@ -574,14 +581,8 @@ type getAlertsResponse struct {
 // GetAlerts returns getAlertsResponse.Alerts, and is useful for accessing the field via an interface.
 func (v *getAlertsResponse) GetAlerts() *getAlertsAlertsAlertsResponse { return v.Alerts }
 
-func getAlerts(
-	ctx context.Context,
-	client graphql.Client,
-	input *AlertsInput,
-) (*getAlertsResponse, error) {
-	req := &graphql.Request{
-		OpName: "getAlerts",
-		Query: `
+// The query or mutation executed by getAlerts.
+const getAlerts_Operation = `
 query getAlerts ($input: AlertsInput) {
 	alerts(input: $input) {
 		pageInfo {
@@ -637,6 +638,7 @@ query getAlerts ($input: AlertsInput) {
 					hash
 					botId
 					timestamp
+					chainId
 				}
 			}
 			alertDocumentType
@@ -645,7 +647,16 @@ query getAlerts ($input: AlertsInput) {
 		}
 	}
 }
-`,
+`
+
+func getAlerts(
+	ctx context.Context,
+	client graphql.Client,
+	input *AlertsInput,
+) (*getAlertsResponse, error) {
+	req := &graphql.Request{
+		OpName: "getAlerts",
+		Query:  getAlerts_Operation,
 		Variables: &__getAlertsInput{
 			Input: input,
 		},
