@@ -119,6 +119,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			Severity:      alert.Severity,
 			FindingType:   alert.FindingType,
 			RelatedAlerts: alert.RelatedAlerts,
+			ChainId:       uint64(alert.ChainId),
 		},
 		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
 	}

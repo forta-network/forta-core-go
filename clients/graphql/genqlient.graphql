@@ -59,6 +59,7 @@ query getAlerts($input: AlertsInput) {
             alertDocumentType
             findingType
             relatedAlerts
+            chainId
         }
     }
 }

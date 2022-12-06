@@ -271,6 +271,8 @@ type getAlertsAlertsAlertsResponseAlertsAlert struct {
 	FindingType string `json:"findingType"`
 	// List of alerts involved in the alert
 	RelatedAlerts []string `json:"relatedAlerts"`
+	// Alert chain id
+	ChainId uint `json:"chainId"`
 }
 
 // GetAlertId returns getAlertsAlertsAlertsResponseAlertsAlert.AlertId, and is useful for accessing the field via an interface.
@@ -330,6 +332,9 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetFindingType() string { ret
 func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetRelatedAlerts() []string {
 	return v.RelatedAlerts
 }
+
+// GetChainId returns getAlertsAlertsAlertsResponseAlertsAlert.ChainId, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetChainId() uint { return v.ChainId }
 
 // getAlertsAlertsAlertsResponseAlertsAlertContractsContract includes the requested fields of the GraphQL type Contract.
 // The GraphQL type's documentation follows.
@@ -644,6 +649,7 @@ query getAlerts ($input: AlertsInput) {
 			alertDocumentType
 			findingType
 			relatedAlerts
+			chainId
 		}
 	}
 }
