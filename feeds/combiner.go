@@ -52,29 +52,10 @@ type combinerFeed struct {
 	cfg        CombinerFeedConfig
 }
 
-func (cf *combinerFeed) SubscribedBots() (bots []string) {
+func (cf *combinerFeed) Subscriptions() []*protocol.CombinerBotSubscription {
 	cf.botsMu.RLock()
 	defer cf.botsMu.RUnlock()
-
-	for _, sub := range cf.botSubscriptions {
-		if sub.BotId == "" {
-			continue
-		}
-		bots = append(bots, sub.BotId)
-	}
-	return
-}
-func (cf *combinerFeed) SubscribedAlerts() (bots []string) {
-	cf.botsMu.RLock()
-	defer cf.botsMu.RUnlock()
-
-	for _, sub := range cf.botSubscriptions {
-		if sub.AlertId == "" {
-			continue
-		}
-		bots = append(bots, sub.AlertId)
-	}
-	return
+	return cf.botSubscriptions
 }
 func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscription) {
 	cf.botsMu.Lock()
@@ -88,7 +69,6 @@ func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscr
 
 	cf.botSubscriptions = append(cf.botSubscriptions, subscription)
 }
-
 func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
@@ -101,6 +81,7 @@ func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSub
 		}
 	}
 }
+
 func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent) error) <-chan error {
 	cf.handlersMu.Lock()
 	defer cf.handlersMu.Unlock()
@@ -166,6 +147,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		if cf.rateLimit != nil || !firstRun {
 			firstRun = false
+			// wait for the ratelimit
 			<-cf.rateLimit.C
 		}
 
@@ -181,77 +163,27 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		}
 
 		// skip query if there are no alert subscriptions
-		if len(cf.SubscribedBots()) == 0 {
+		if len(cf.Subscriptions()) == 0 {
 			continue
 		}
 
+		// setup time range
 		createdSince := time.Now().UnixMilli() - int64(currentTimestp)
 		createdBefore := time.Now().UnixMilli() - int64(currentTimestp) - graphql.DefaultLastNMinutes.Milliseconds()
 		createdBefore = int64(math.Max(0, float64(createdBefore)))
 
-		var alerts []*protocol.AlertEvent
-		bo := backoff.NewExponentialBackOff()
-		err := backoff.Retry(
-			func() error {
-				var cErr error
-				alerts, cErr = cf.client.GetAlerts(
-					cf.ctx,
-					&graphql.AlertsInput{
-						Bots:          cf.SubscribedBots(),
-						CreatedSince:  uint(createdSince),
-						CreatedBefore: uint(createdBefore),
-						AlertIds:      cf.SubscribedAlerts(),
-					},
-				)
-				if cErr != nil {
-					log.WithError(cErr).Warn("error retrieving alerts")
-					return cErr
-				}
-
-				return nil
-			}, bo,
-		)
-		if err != nil {
-			return err
-		}
-
-		for _, alert := range alerts {
-			if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
-				continue
-			}
-
-			cf.alertCache.Set(
-				alert.Alert.Hash, struct{}{}, cache.DefaultExpiration,
-			)
-
-			alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
+		// query all subscriptions and push
+		for _, subscription := range cf.Subscriptions() {
+			err := cf.fetchAlertsAndHandle(alertHandlers, subscription, createdSince, createdBefore)
 			if err != nil {
 				return err
 			}
-
-			// just for local purposes
-			if cf.end != 0 && alertCA.UnixMilli() > int64(cf.end) {
-				continue
-			}
-
-			evt := &domain.AlertEvent{
-				Event: alert,
-				Timestamps: &domain.TrackingTimestamps{
-					Feed:        time.Now().UTC(),
-					SourceAlert: alertCA,
-				},
-			}
-
-			for _, alertHandler := range alertHandlers {
-				if err := alertHandler.Handler(evt); err != nil {
-					return err
-				}
-			}
-
 		}
 
+		// increase current timestamp
 		currentTimestp += uint64(DefaultRatelimitDuration.Milliseconds())
 
+		// dump cache to persistent file
 		if cf.cfg.CombinerCachePath != "" {
 			d, err := json.Marshal(cf.alertCache.Items())
 			if err != nil {
@@ -263,6 +195,74 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 			}
 		}
 	}
+}
+
+func (cf *combinerFeed) fetchAlertsAndHandle(
+	alertHandlers []cfHandler, subscription *protocol.CombinerBotSubscription, createdSince int64, createdBefore int64,
+) error {
+	var alerts []*protocol.AlertEvent
+
+	bo := backoff.NewExponentialBackOff()
+	err := backoff.Retry(
+		func() error {
+			var cErr error
+			alerts, cErr = cf.client.GetAlerts(
+				cf.ctx,
+				&graphql.AlertsInput{
+					Bots:          []string{subscription.BotId},
+					CreatedSince:  uint(createdSince),
+					CreatedBefore: uint(createdBefore),
+					AlertIds:      subscription.AlertIds,
+					AlertId:       subscription.AlertId,
+				},
+			)
+			if cErr != nil {
+				log.WithError(cErr).Warn("error retrieving alerts")
+				return cErr
+			}
+
+			return nil
+		}, bo,
+	)
+	if err != nil {
+		return err
+	}
+
+	for _, alert := range alerts {
+		if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
+			continue
+		}
+
+		cf.alertCache.Set(
+			alert.Alert.Hash, struct{}{}, cache.DefaultExpiration,
+		)
+
+		alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
+		if err != nil {
+			return err
+		}
+
+		// just for local purposes
+		if cf.end != 0 && alertCA.UnixMilli() > int64(cf.end) {
+			continue
+		}
+
+		evt := &domain.AlertEvent{
+			Event: alert,
+			Timestamps: &domain.TrackingTimestamps{
+				Feed:        time.Now().UTC(),
+				SourceAlert: alertCA,
+			},
+		}
+
+		for _, alertHandler := range alertHandlers {
+			if err := alertHandler.Handler(evt); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // Name returns the name of this implementation.
