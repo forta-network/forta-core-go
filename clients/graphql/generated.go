@@ -613,7 +613,6 @@ query getAlerts ($input: AlertsInput) {
 				id
 			}
 			protocol
-			scanNodeCount
 			severity
 			source {
 				transactionHash
