@@ -8,6 +8,7 @@ import (
 	context "context"
 	big "math/big"
 	reflect "reflect"
+	time "time"
 
 	ethereum "github.com/ethereum/go-ethereum"
 	types "github.com/ethereum/go-ethereum/core/types"
@@ -206,6 +207,18 @@ func (m *MockClient) Name() string {
 func (mr *MockClientMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockClient)(nil).Name))
+}
+
+// SetRetryInterval mocks base method.
+func (m *MockClient) SetRetryInterval(arg0 time.Duration) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetRetryInterval", arg0)
+}
+
+// SetRetryInterval indicates an expected call of SetRetryInterval.
+func (mr *MockClientMockRecorder) SetRetryInterval(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRetryInterval", reflect.TypeOf((*MockClient)(nil).SetRetryInterval), arg0)
 }
 
 // TraceBlock mocks base method.

@@ -30,6 +30,7 @@ type rpcClient interface {
 // Client is an interface encompassing all ethereum actions
 type Client interface {
 	Close()
+	SetRetryInterval(time.Duration)
 	BlockByHash(ctx context.Context, hash string) (*domain.Block, error)
 	BlockByNumber(ctx context.Context, number *big.Int) (*domain.Block, error)
 	BlockNumber(ctx context.Context) (*big.Int, error)
@@ -47,6 +48,8 @@ const getLogs = "eth_getLogs"
 const transactionReceipt = "eth_getTransactionReceipt"
 const traceBlock = "trace_block"
 const chainId = "eth_chainId"
+
+const defaultRetryInterval = time.Second * 15
 
 var ErrNotFound = fmt.Errorf("not found")
 
@@ -67,8 +70,9 @@ var maxBackoff = 1 * time.Minute
 
 // streamEthClient wraps a go-ethereum client purpose-built for streaming txs (with long retries/timeouts)
 type streamEthClient struct {
-	apiName   string
-	rpcClient rpcClient
+	apiName       string
+	rpcClient     rpcClient
+	retryInterval time.Duration
 
 	lastBlockByNumberReq         health.TimeTracker
 	lastBlockByNumberErr         health.ErrorTracker
@@ -87,6 +91,10 @@ type RetryOptions struct {
 // Close invokes close on the underlying client
 func (e *streamEthClient) Close() {
 	e.rpcClient.Close()
+}
+
+func (e *streamEthClient) SetRetryInterval(d time.Duration) {
+	e.retryInterval = d
 }
 
 func isPermanentError(err error) bool {
@@ -193,9 +201,9 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 		}
 		return nil
 	}, RetryOptions{
-		MinBackoff:     pointDur(15 * time.Second),
+		MinBackoff:     pointDur(e.retryInterval),
 		MaxElapsedTime: pointDur(1 * time.Minute),
-		MaxBackoff:     pointDur(15 * time.Second),
+		MaxBackoff:     pointDur(e.retryInterval),
 	}, &e.lastTraceBlockReq, &e.lastTraceBlockErr)
 	return result, err
 }
@@ -214,7 +222,7 @@ func (e *streamEthClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) (
 	err = withBackoff(ctx, name, func(ctx context.Context) error {
 		return e.rpcClient.CallContext(ctx, &result, getLogs, args)
 	}, RetryOptions{
-		MinBackoff:     pointDur(5 * time.Second),
+		MinBackoff:     pointDur(e.retryInterval),
 		MaxElapsedTime: pointDur(12 * time.Hour),
 		MaxBackoff:     pointDur(15 * time.Second),
 	}, nil, nil)
@@ -224,15 +232,19 @@ func (e *streamEthClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) (
 // BlockByNumber returns the block by number
 func (e *streamEthClient) BlockByNumber(ctx context.Context, number *big.Int) (*domain.Block, error) {
 	var result domain.Block
-	num := "latest"
+	var (
+		numArg     = "latest"
+		numDisplay = numArg
+	)
 	if number != nil {
-		num = utils.BigIntToHex(number)
+		numArg = utils.BigIntToHex(number) // hex representation
+		numDisplay = number.String()       // integer representation
 	}
-	name := fmt.Sprintf("%s(%s)", blocksByNumber, num)
+	name := fmt.Sprintf("%s(%s)", blocksByNumber, numDisplay)
 	log.Debugf(name)
 
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, blocksByNumber, num, true)
+		err := e.rpcClient.CallContext(ctx, &result, blocksByNumber, numArg, true)
 		if err != nil {
 			return err
 		}
@@ -241,9 +253,9 @@ func (e *streamEthClient) BlockByNumber(ctx context.Context, number *big.Int) (*
 		}
 		return nil
 	}, RetryOptions{
-		MinBackoff:     pointDur(15 * time.Second),
+		MinBackoff:     pointDur(e.retryInterval),
 		MaxElapsedTime: pointDur(12 * time.Hour),
-		MaxBackoff:     pointDur(15 * time.Second),
+		MaxBackoff:     pointDur(e.retryInterval),
 	}, &e.lastBlockByNumberReq, &e.lastBlockByNumberErr)
 	return &result, err
 }
@@ -338,5 +350,5 @@ func NewStreamEthClient(ctx context.Context, apiName, url string) (*streamEthCli
 		return nil, err
 	}
 	rpcClient.SetHeader("Content-Type", "application/json")
-	return &streamEthClient{apiName: apiName, rpcClient: rpcClient}, nil
+	return &streamEthClient{apiName: apiName, rpcClient: rpcClient, retryInterval: defaultRetryInterval}, nil
 }
