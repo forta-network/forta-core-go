@@ -1,14 +1,14 @@
 {
   "chainId": 1,
-  "blockStart": 23840455,
-  "blockEnd": 23840469,
-  "alertCount": 84,
+  "blockStart": 16219663,
+  "blockEnd": 16219663,
+  "alertCount": 1,
   "maxSeverity": 1,
   "results": [
     {
       "block": {
-        "blockHash": "0x828025408935027f58d6767fcfdddaf464a9b6e4196ddadfc5691f2f9ae25f1e",
-        "blockNumber": 23840455,
+        "blockHash": "0x8a8d9bb8f34ac122ef73acef34425b4d99e853c0640070e19948d2984a92a9db",
+        "blockNumber": 16219663,
         "blockTimestamp": "0x63a07ce8"
       },
       "transactions": [
@@ -355,7 +355,7 @@
               "alerts": [
                 {
                   "alert": {
-                    "id": "0xa7dd05b671c5cc00ce3fb84c58fd967d30336aef64967e0d932aab6be72e889c",
+                    "id": "0xf8dd05b671c5cc00ce3fb84c58fd967d30336aef64967e0d932aab6be72e889c",
                     "type": 1,
                     "finding": {
                       "protocol": "ethereum",
@@ -371,7 +371,7 @@
                       "name": "Transfer Event",
                       "description": "Detected Transfer event"
                     },
-                    "timestamp": "2022-12-19T15:02:22.288529696Z",
+                    "timestamp": "2022-12-19T15:39:22.288529696Z",
                     "agent": {
                       "image": "disco.forta.network/bafybeicsotph3ivavt6pynvo3hx3ywhuuwta7qmivcuinpjg2phz4lieom@sha256:5226bd1eb709e79d4f43293dbae70705d1d300ae416a39d1a759b48390e3830d",
                       "imageHash": "5226bd1eb709e79d4f43293dbae70705d1d300ae416a39d1a759b48390e3830d",
@@ -383,17 +383,17 @@
                       "agentImage": "disco.forta.network/bafybeicsotph3ivavt6pynvo3hx3ywhuuwta7qmivcuinpjg2phz4lieom@sha256:5226bd1eb709e79d4f43293dbae70705d1d300ae416a39d1a759b48390e3830d",
                       "blockHash": "0x828025408935027f58d6767fcfdddaf464a9b6e4196ddadfc5691f2f9ae25f1e",
                       "blockNumber": "23840455",
-                      "chainId": "43114",
+                      "chainId": "1",
                       "txHash": "0x24bd46dd3c73617afe3aa5ee57325f45ef56815f1e36f5af3d4ecec9a605b046"
                     },
                     "scanner": {
                       "address": "0xF001F6ac59fBc5B5E9a24cBfE242EBF00065a1f1"
                     },
                     "timestamps": {
-                      "block": "2022-12-19T15:02:00Z",
-                      "feed": "2022-12-19T15:02:22.284218026Z",
-                      "botRequest": "2022-12-19T15:02:22.284932793Z",
-                      "botResponse": "2022-12-19T15:02:22.288498807Z",
+                      "block": "2022-12-19T15:38:00Z",
+                      "feed": "2022-12-19T15:38:00Z",
+                      "botRequest": "2022-12-19T15:38:00Z",
+                      "botResponse": "2022-12-19T15:38:00Z",
                       "sourceAlert": "0001-01-01T00:00:00Z"
                     }
                   },
@@ -418,10 +418,10 @@
     "version": "v0.6.2"
   },
   "parent": "QmVArujj92nRDmjM3mDQT9nHgnQhrsaP47MdPNJEGviZ32",
-  "latestBlockInput": 23840469,
+  "latestBlockInput": 16219663,
   "inspectionResults": {
     "inputs": {
-      "blockNumber": 23839900,
+      "blockNumber": 16219660,
       "scanApiHost": "api.avax.network",
       "proxyApiHost": "api.avax.network",
       "traceApiHost": "null"
@@ -436,7 +436,7 @@
       "network.speed.download": -3,
       "network.speed.upload": -3,
       "proxy-api.accessible": 1,
-      "proxy-api.chain-id": 43114,
+      "proxy-api.chain-id": 1,
       "proxy-api.history-support": 1,
       "proxy-api.is-eth2": -1,
       "proxy-api.module.eth": 1,
@@ -449,7 +449,7 @@
       "resources.storage.available": 161001639936,
       "resources.storage.total": 143772467200,
       "scan-api.accessible": 1,
-      "scan-api.chain-id": 43114,
+      "scan-api.chain-id": 1,
       "scan-api.is-eth2": -1,
       "scan-api.module.eth": 1,
       "scan-api.module.net": 1,
