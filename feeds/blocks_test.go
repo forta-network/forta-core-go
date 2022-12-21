@@ -152,8 +152,9 @@ func TestBlockFeed_ForEachBlock(t *testing.T) {
 	assertEvts(t, evts, blockEvent(block1), blockEvent(block2), blockEvent(block3))
 }
 
-func TestBlockFeed_ForEachBlock_Websocket(t *testing.T) {
+func TestBlockFeed_ForEachBlock_SubscriptionMode(t *testing.T) {
 	bf, client, traceClient, ctx, cancel := getTestBlockFeed(t)
+	bf.subscriptionMode = true
 
 	block1 := blockWithParent(startHash, 1)
 	block2 := blockWithParent(block1.Hash, 2)
@@ -188,7 +189,7 @@ func TestBlockFeed_ForEachBlock_Websocket(t *testing.T) {
 		}
 		return nil
 	})
-	go bf.listenToLatestBlock()
+	go bf.subscribeToLatestBlocks()
 	res := bf.forEachBlock()
 	assert.Error(t, testErr, res)
 	assert.Equal(t, 2, len(evts))

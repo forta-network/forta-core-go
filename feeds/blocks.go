@@ -26,18 +26,19 @@ type bfHandler struct {
 }
 
 type blockFeed struct {
-	start       *big.Int
-	end         *big.Int
-	offset      int
-	ctx         context.Context
-	client      ethereum.Client
-	traceClient ethereum.Client
-	cache       utils.Cache
-	chainID     *big.Int
-	tracing     bool
-	started     bool
-	rateLimit   *time.Ticker
-	maxBlockAge *time.Duration
+	start            *big.Int
+	end              *big.Int
+	offset           int
+	ctx              context.Context
+	client           ethereum.Client
+	traceClient      ethereum.Client
+	cache            utils.Cache
+	chainID          *big.Int
+	tracing          bool
+	started          bool
+	rateLimit        *time.Ticker
+	maxBlockAge      *time.Duration
+	subscriptionMode bool
 
 	lastBlock health.MessageTracker
 
@@ -118,8 +119,8 @@ func (bf *blockFeed) loop() {
 		log.WithError(err).Panic("failed to initialize")
 	}
 
-	if bf.client.IsWebsocket() {
-		go bf.listenToLatestBlock()
+	if bf.subscriptionMode {
+		go bf.subscribeToLatestBlocks()
 	}
 
 	bf.started = true
@@ -138,7 +139,7 @@ func (bf *blockFeed) loop() {
 	}
 }
 
-func (bf *blockFeed) listenToLatestBlock() {
+func (bf *blockFeed) subscribeToLatestBlocks() {
 	for {
 		select {
 		case <-bf.ctx.Done():
@@ -155,11 +156,17 @@ func (bf *blockFeed) listenToLatestBlock() {
 			continue
 		}
 
+		var alive bool
 		for header := range headers {
+			alive = true
 			bf.chainLatestMu.Lock()
 			log.WithField("chainLatestBlock", header.Number.Uint64()).Debug("got new header from subscription")
 			bf.chainLatestBlockNum = header.Number
 			bf.chainLatestMu.Unlock()
+		}
+
+		if !alive {
+			panic("dead subscription detected")
 		}
 
 		// subscription channel was closed (due to an error or timeout)
@@ -167,17 +174,28 @@ func (bf *blockFeed) listenToLatestBlock() {
 	}
 }
 
-func (bf *blockFeed) isHigherThanChainLatest(currentBlockNum *big.Int) bool {
-	bf.chainLatestMu.RLock()
-	if bf.chainLatestBlockNum != nil {
-		log.WithFields(log.Fields{
-			"currentBlock":     currentBlockNum.Uint64(),
-			"chainLatestBlock": bf.chainLatestBlockNum.Uint64(),
-		}).Debug("comparing current to latest")
+func (bf *blockFeed) isBlockAvailable(currentBlockNum *big.Int) bool {
+	if !bf.subscriptionMode {
+		// if we are not running in the subscription mode, current block should be considered
+		// always available because we will never have a reference to check against
+		return true
 	}
-	isHigher := bf.chainLatestBlockNum != nil && currentBlockNum.Cmp(bf.chainLatestBlockNum) > 0
-	bf.chainLatestMu.RUnlock()
-	return isHigher
+
+	bf.chainLatestMu.RLock()
+	defer bf.chainLatestMu.RUnlock()
+
+	if bf.chainLatestBlockNum == nil {
+		log.Debug("chain latest not known yet")
+		// if we don't know the chain latest yet, consider current unavailable
+		return false
+	}
+
+	log.WithFields(log.Fields{
+		"currentBlock":     currentBlockNum.Uint64(),
+		"chainLatestBlock": bf.chainLatestBlockNum.Uint64(),
+	}).Debug("comparing current to latest")
+
+	return currentBlockNum.Cmp(bf.chainLatestBlockNum) < 1 // current needs to be smaller or equal
 }
 
 func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-chan error {
@@ -240,7 +258,7 @@ func (bf *blockFeed) forEachBlock() error {
 			continue
 		}
 
-		if bf.isHigherThanChainLatest(currentBlockNum) {
+		if !bf.isBlockAvailable(currentBlockNum) {
 			logger.Debug("current block is not available yet - will retry")
 			time.Sleep(time.Second)
 			continue
@@ -360,17 +378,18 @@ func NewBlockFeed(ctx context.Context, client ethereum.Client, traceClient ether
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
 	bf := &blockFeed{
-		start:       cfg.Start,
-		end:         cfg.End,
-		offset:      cfg.Offset,
-		ctx:         ctx,
-		client:      client,
-		traceClient: traceClient,
-		cache:       utils.NewCache(10000),
-		chainID:     cfg.ChainID,
-		tracing:     cfg.Tracing,
-		rateLimit:   cfg.RateLimit,
-		maxBlockAge: cfg.SkipBlocksOlderThan,
+		start:            cfg.Start,
+		end:              cfg.End,
+		offset:           cfg.Offset,
+		ctx:              ctx,
+		client:           client,
+		traceClient:      traceClient,
+		cache:            utils.NewCache(10000),
+		chainID:          cfg.ChainID,
+		tracing:          cfg.Tracing,
+		rateLimit:        cfg.RateLimit,
+		maxBlockAge:      cfg.SkipBlocksOlderThan,
+		subscriptionMode: client.IsWebsocket(),
 	}
 	return bf, nil
 }
