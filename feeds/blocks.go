@@ -43,6 +43,9 @@ type blockFeed struct {
 
 	handlers   []bfHandler
 	handlersMu sync.RWMutex
+
+	chainLatestBlockNum *big.Int
+	chainLatestMu       sync.RWMutex
 }
 
 type BlockFeedConfig struct {
@@ -115,6 +118,10 @@ func (bf *blockFeed) loop() {
 		log.WithError(err).Panic("failed to initialize")
 	}
 
+	if bf.client.IsWebsocket() {
+		go bf.listenToLatestBlock()
+	}
+
 	bf.started = true
 	defer func() {
 		bf.started = false
@@ -129,6 +136,48 @@ func (bf *blockFeed) loop() {
 	for _, handler := range bf.handlers {
 		handler.ErrCh <- err
 	}
+}
+
+func (bf *blockFeed) listenToLatestBlock() {
+	for {
+		select {
+		case <-bf.ctx.Done():
+			return
+		default:
+		}
+
+		time.Sleep(time.Second) // slow down retries
+
+		headers, err := bf.client.SubscribeToHead(bf.ctx)
+		if err != nil {
+			log.WithError(err).Error("failed to subscribe to blockchain head - retrying")
+			time.Sleep(time.Second)
+			continue
+		}
+
+		for header := range headers {
+			bf.chainLatestMu.Lock()
+			log.WithField("chainLatestBlock", header.Number.Uint64()).Debug("got new header from subscription")
+			bf.chainLatestBlockNum = header.Number
+			bf.chainLatestMu.Unlock()
+		}
+
+		// subscription channel was closed (due to an error or timeout)
+		// continuing infinite loop by creating a new subscription
+	}
+}
+
+func (bf *blockFeed) isHigherThanChainLatest(currentBlockNum *big.Int) bool {
+	bf.chainLatestMu.RLock()
+	if bf.chainLatestBlockNum != nil {
+		log.WithFields(log.Fields{
+			"currentBlock":     currentBlockNum.Uint64(),
+			"chainLatestBlock": bf.chainLatestBlockNum.Uint64(),
+		}).Debug("comparing current to latest")
+	}
+	isHigher := bf.chainLatestBlockNum != nil && currentBlockNum.Cmp(bf.chainLatestBlockNum) > 0
+	bf.chainLatestMu.RUnlock()
+	return isHigher
 }
 
 func (bf *blockFeed) Subscribe(handler func(evt *domain.BlockEvent) error) <-chan error {
@@ -188,6 +237,12 @@ func (bf *blockFeed) forEachBlock() error {
 		if bf.cache.Exists(blockNumToAnalyze.String()) {
 			logger.Info("already analyzed block - skipping")
 			currentBlockNum.Add(currentBlockNum, increment)
+			continue
+		}
+
+		if bf.isHigherThanChainLatest(currentBlockNum) {
+			logger.Debug("current block is not available yet - will retry")
+			time.Sleep(time.Second)
 			continue
 		}
 

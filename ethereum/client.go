@@ -7,10 +7,13 @@ import (
 	"math/big"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v4"
+	"github.com/gorilla/websocket"
 
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
@@ -22,15 +25,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type rpcClient interface {
+// RPCClient is a wrapper implementation of the RPC client.
+type RPCClient interface {
 	Close()
 	CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error
+	Subscribe(ctx context.Context, channel interface{}, args ...interface{}) (domain.ClientSubscription, error)
 }
 
 // Client is an interface encompassing all ethereum actions
 type Client interface {
 	Close()
 	SetRetryInterval(time.Duration)
+	IsWebsocket() bool
+
 	BlockByHash(ctx context.Context, hash string) (*domain.Block, error)
 	BlockByNumber(ctx context.Context, number *big.Int) (*domain.Block, error)
 	BlockNumber(ctx context.Context) (*big.Int, error)
@@ -38,6 +45,8 @@ type Client interface {
 	ChainID(ctx context.Context) (*big.Int, error)
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
 	GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
+	SubscribeToHead(ctx context.Context) (domain.HeaderCh, error)
+
 	health.Reporter
 }
 
@@ -71,8 +80,9 @@ var maxBackoff = 1 * time.Minute
 // streamEthClient wraps a go-ethereum client purpose-built for streaming txs (with long retries/timeouts)
 type streamEthClient struct {
 	apiName       string
-	rpcClient     rpcClient
+	rpcClient     RPCClient
 	retryInterval time.Duration
+	isWebsocket   bool
 
 	lastBlockByNumberReq         health.TimeTracker
 	lastBlockByNumberErr         health.ErrorTracker
@@ -95,6 +105,10 @@ func (e *streamEthClient) Close() {
 
 func (e *streamEthClient) SetRetryInterval(d time.Duration) {
 	e.retryInterval = d
+}
+
+func (e *streamEthClient) IsWebsocket() bool {
+	return e.isWebsocket
 }
 
 func isPermanentError(err error) bool {
@@ -309,6 +323,40 @@ func (e *streamEthClient) TransactionReceipt(ctx context.Context, txHash string)
 	return &result, err
 }
 
+// SubscribeToHead subscribes to the blockchain head and returns a channel which provides
+// the latest block headers. The channel is closed when subscription encounters an error
+// or becomes inactive (e.g. due to a hanging connection).
+func (e *streamEthClient) SubscribeToHead(ctx context.Context) (domain.HeaderCh, error) {
+	log.Debug("subscribing to blockchain head")
+	ch := make(chan *types.Header)
+	sub, err := e.rpcClient.Subscribe(ctx, ch, "newHeads")
+	if err != nil {
+		return nil, fmt.Errorf("failed to subscribe: %v", err)
+	}
+	go e.listenToSubscription(ctx, sub, ch)
+	return ch, nil
+}
+
+func (e *streamEthClient) listenToSubscription(ctx context.Context, sub domain.ClientSubscription, ch chan *types.Header) {
+	defer close(ch)
+	for {
+		select {
+		case <-ctx.Done():
+			log.WithError(ctx.Err()).Info("exiting subscription")
+			return
+
+		case <-time.After(time.Minute): // this avoids getting stuck when connection hangs
+			log.Warn("subscription is inactive! exiting loop")
+			sub.Unsubscribe()
+			return
+
+		case err := <-sub.Err():
+			log.WithError(err).Error("subscription returned an error")
+			return
+		}
+	}
+}
+
 // Name returns the name of this implementation.
 func (e *streamEthClient) Name() string {
 	return fmt.Sprintf("%s-json-rpc-client", e.apiName)
@@ -326,7 +374,27 @@ func (e *streamEthClient) Health() health.Reports {
 	}
 }
 
-func NewRpcClient(url string) (*rpc.Client, error) {
+type rpcClient struct {
+	*rpc.Client
+}
+
+func (rc *rpcClient) Subscribe(ctx context.Context, channel interface{}, args ...interface{}) (domain.ClientSubscription, error) {
+	sub, err := rc.EthSubscribe(ctx, channel, args...)
+	return sub, err
+}
+
+var wsBufferPool = new(sync.Pool)
+
+func NewRpcClient(ctx context.Context, url string) (*rpc.Client, error) {
+	if isWebsocket(url) {
+		dialer := *websocket.DefaultDialer
+		dialer.WriteBufferSize = 1024
+		dialer.ReadBufferSize = 1024
+		dialer.WriteBufferPool = wsBufferPool
+		dialer.HandshakeTimeout = time.Second * 10
+		return rpc.DialWebsocketWithDialer(ctx, url, "", dialer)
+	}
+
 	tr := &http.Transport{
 		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
@@ -342,13 +410,25 @@ func NewRpcClient(url string) (*rpc.Client, error) {
 }
 
 // NewStreamEthClient creates a new ethereum client
-func NewStreamEthClient(ctx context.Context, apiName, url string) (*streamEthClient, error) {
-	//TODO: consider NewClient with a custom RPC so that one can inject headers
-	rpcClient, err := NewRpcClient(url)
-
+func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEthClient, error) {
+	rClient, err := NewRpcClient(ctx, apiURL)
 	if err != nil {
 		return nil, err
 	}
-	rpcClient.SetHeader("Content-Type", "application/json")
-	return &streamEthClient{apiName: apiName, rpcClient: rpcClient, retryInterval: defaultRetryInterval}, nil
+	rClient.SetHeader("Content-Type", "application/json")
+
+	return &streamEthClient{
+		apiName:       apiName,
+		rpcClient:     &rpcClient{Client: rClient},
+		retryInterval: defaultRetryInterval,
+		isWebsocket:   isWebsocket(apiURL),
+	}, nil
+}
+
+func isWebsocket(apiURL string) bool {
+	u, err := url.Parse(apiURL)
+	if err != nil {
+		return false
+	}
+	return u.Scheme == "ws" || u.Scheme == "wss"
 }

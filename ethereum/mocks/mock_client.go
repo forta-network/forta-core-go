@@ -17,31 +17,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockrpcClient is a mock of rpcClient interface.
-type MockrpcClient struct {
+// MockRPCClient is a mock of RPCClient interface.
+type MockRPCClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockrpcClientMockRecorder
+	recorder *MockRPCClientMockRecorder
 }
 
-// MockrpcClientMockRecorder is the mock recorder for MockrpcClient.
-type MockrpcClientMockRecorder struct {
-	mock *MockrpcClient
+// MockRPCClientMockRecorder is the mock recorder for MockRPCClient.
+type MockRPCClientMockRecorder struct {
+	mock *MockRPCClient
 }
 
-// NewMockrpcClient creates a new mock instance.
-func NewMockrpcClient(ctrl *gomock.Controller) *MockrpcClient {
-	mock := &MockrpcClient{ctrl: ctrl}
-	mock.recorder = &MockrpcClientMockRecorder{mock}
+// NewMockRPCClient creates a new mock instance.
+func NewMockRPCClient(ctrl *gomock.Controller) *MockRPCClient {
+	mock := &MockRPCClient{ctrl: ctrl}
+	mock.recorder = &MockRPCClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockrpcClient) EXPECT() *MockrpcClientMockRecorder {
+func (m *MockRPCClient) EXPECT() *MockRPCClientMockRecorder {
 	return m.recorder
 }
 
 // CallContext mocks base method.
-func (m *MockrpcClient) CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error {
+func (m *MockRPCClient) CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, result, method}
 	for _, a := range args {
@@ -53,22 +53,42 @@ func (m *MockrpcClient) CallContext(ctx context.Context, result interface{}, met
 }
 
 // CallContext indicates an expected call of CallContext.
-func (mr *MockrpcClientMockRecorder) CallContext(ctx, result, method interface{}, args ...interface{}) *gomock.Call {
+func (mr *MockRPCClientMockRecorder) CallContext(ctx, result, method interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, result, method}, args...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CallContext", reflect.TypeOf((*MockrpcClient)(nil).CallContext), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CallContext", reflect.TypeOf((*MockRPCClient)(nil).CallContext), varargs...)
 }
 
 // Close mocks base method.
-func (m *MockrpcClient) Close() {
+func (m *MockRPCClient) Close() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Close")
 }
 
 // Close indicates an expected call of Close.
-func (mr *MockrpcClientMockRecorder) Close() *gomock.Call {
+func (mr *MockRPCClientMockRecorder) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockrpcClient)(nil).Close))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRPCClient)(nil).Close))
+}
+
+// Subscribe mocks base method.
+func (m *MockRPCClient) Subscribe(ctx context.Context, channel interface{}, args ...interface{}) (domain.ClientSubscription, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, channel}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Subscribe", varargs...)
+	ret0, _ := ret[0].(domain.ClientSubscription)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Subscribe indicates an expected call of Subscribe.
+func (mr *MockRPCClientMockRecorder) Subscribe(ctx, channel interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, channel}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockRPCClient)(nil).Subscribe), varargs...)
 }
 
 // MockClient is a mock of Client interface.
@@ -195,6 +215,20 @@ func (mr *MockClientMockRecorder) Health() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockClient)(nil).Health))
 }
 
+// IsWebsocket mocks base method.
+func (m *MockClient) IsWebsocket() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsWebsocket")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsWebsocket indicates an expected call of IsWebsocket.
+func (mr *MockClientMockRecorder) IsWebsocket() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsWebsocket", reflect.TypeOf((*MockClient)(nil).IsWebsocket))
+}
+
 // Name mocks base method.
 func (m *MockClient) Name() string {
 	m.ctrl.T.Helper()
@@ -219,6 +253,21 @@ func (m *MockClient) SetRetryInterval(arg0 time.Duration) {
 func (mr *MockClientMockRecorder) SetRetryInterval(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRetryInterval", reflect.TypeOf((*MockClient)(nil).SetRetryInterval), arg0)
+}
+
+// SubscribeToHead mocks base method.
+func (m *MockClient) SubscribeToHead(ctx context.Context) (domain.HeaderCh, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SubscribeToHead", ctx)
+	ret0, _ := ret[0].(domain.HeaderCh)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SubscribeToHead indicates an expected call of SubscribeToHead.
+func (mr *MockClientMockRecorder) SubscribeToHead(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeToHead", reflect.TypeOf((*MockClient)(nil).SubscribeToHead), ctx)
 }
 
 // TraceBlock mocks base method.
