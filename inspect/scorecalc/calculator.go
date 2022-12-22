@@ -97,7 +97,7 @@ func (s *scoreCalculator) getChainScoreCalculator(chainID uint64) (*chainPassFai
 
 // DefaultScoreCalculatorConfig returns a ScoreCalculatorConfig with the chain id and all default limits.
 func DefaultScoreCalculatorConfig(
-	chainID uint64, modifiers ...func(config ScoreCalculatorConfig),
+	chainID uint64, modifiers ...func(config *ScoreCalculatorConfig),
 ) ScoreCalculatorConfig {
 	s := ScoreCalculatorConfig{
 		ChainID:                chainID,
@@ -109,7 +109,7 @@ func DefaultScoreCalculatorConfig(
 	}
 
 	for _, modifier := range modifiers {
-		modifier(s)
+		modifier(&s)
 	}
 
 	return s
