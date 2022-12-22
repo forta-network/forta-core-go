@@ -328,22 +328,27 @@ func (e *streamEthClient) TransactionReceipt(ctx context.Context, txHash string)
 // or becomes inactive (e.g. due to a hanging connection).
 func (e *streamEthClient) SubscribeToHead(ctx context.Context) (domain.HeaderCh, error) {
 	log.Debug("subscribing to blockchain head")
-	ch := make(chan *types.Header)
-	sub, err := e.rpcClient.Subscribe(ctx, ch, "newHeads")
+	recvCh := make(chan *types.Header)
+	sendCh := make(chan *types.Header)
+	sub, err := e.rpcClient.Subscribe(ctx, recvCh, "newHeads")
 	if err != nil {
 		return nil, fmt.Errorf("failed to subscribe: %v", err)
 	}
-	go e.listenToSubscription(ctx, sub, ch)
-	return ch, nil
+	go e.listenToSubscription(ctx, sub, recvCh, sendCh)
+	return sendCh, nil
 }
 
-func (e *streamEthClient) listenToSubscription(ctx context.Context, sub domain.ClientSubscription, ch chan *types.Header) {
-	defer close(ch)
+func (e *streamEthClient) listenToSubscription(ctx context.Context, sub domain.ClientSubscription, recvCh, sendCh chan *types.Header) {
+	defer close(recvCh)
+	defer close(sendCh)
 	for {
 		select {
 		case <-ctx.Done():
 			log.WithError(ctx.Err()).Info("exiting subscription")
 			return
+
+		case header := <-recvCh:
+			sendCh <- header
 
 		case <-time.After(time.Minute): // this avoids getting stuck when connection hangs
 			log.Warn("subscription is inactive! exiting loop")
