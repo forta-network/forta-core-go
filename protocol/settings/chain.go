@@ -92,7 +92,7 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  1500,
 
 		DefaultOffset:   0,
-		SafeOffset:      30,
+		SafeOffset:      60,
 		RewardThreshold: 1200,
 	},
 	{
