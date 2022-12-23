@@ -149,6 +149,7 @@ func (bf *blockFeed) subscribeToLatestBlocks() {
 
 		time.Sleep(time.Second) // slow down retries
 
+		log.Info("creating new header subscription...")
 		headers, err := bf.client.SubscribeToHead(bf.ctx)
 		if err != nil {
 			log.WithError(err).Error("failed to subscribe to blockchain head - retrying")
@@ -164,6 +165,8 @@ func (bf *blockFeed) subscribeToLatestBlocks() {
 			bf.chainLatestBlockNum = header.Number
 			bf.chainLatestMu.Unlock()
 		}
+
+		log.Warn("header notification channel is closed!")
 
 		if !alive {
 			panic("dead subscription detected")
