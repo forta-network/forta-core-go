@@ -93,7 +93,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:   0,
 		SafeOffset:      30,
-		RewardThreshold: 600,
+		RewardThreshold: 1200,
 	},
 	{
 		ChainID:             43114,
