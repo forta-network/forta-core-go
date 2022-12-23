@@ -177,7 +177,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 
-	rpc, err := ethereum.NewRpcClient(cfg.JsonRpcUrl)
+	rpc, err := ethereum.NewRpcClient(ctx, cfg.JsonRpcUrl)
 	if err != nil {
 		return nil, err
 	}

@@ -11,6 +11,7 @@ import (
 	types "github.com/ethereum/go-ethereum/core/types"
 	health "github.com/forta-network/forta-core-go/clients/health"
 	domain "github.com/forta-network/forta-core-go/domain"
+	protocol "github.com/forta-network/forta-core-go/protocol"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -152,6 +153,147 @@ func (m *MockTransactionFeed) ForEachTransaction(blockHandler func(*domain.Block
 func (mr *MockTransactionFeedMockRecorder) ForEachTransaction(blockHandler, txHandler interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachTransaction", reflect.TypeOf((*MockTransactionFeed)(nil).ForEachTransaction), blockHandler, txHandler)
+}
+
+// MockAlertFeed is a mock of AlertFeed interface.
+type MockAlertFeed struct {
+	ctrl     *gomock.Controller
+	recorder *MockAlertFeedMockRecorder
+}
+
+// MockAlertFeedMockRecorder is the mock recorder for MockAlertFeed.
+type MockAlertFeedMockRecorder struct {
+	mock *MockAlertFeed
+}
+
+// NewMockAlertFeed creates a new mock instance.
+func NewMockAlertFeed(ctrl *gomock.Controller) *MockAlertFeed {
+	mock := &MockAlertFeed{ctrl: ctrl}
+	mock.recorder = &MockAlertFeedMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockAlertFeed) EXPECT() *MockAlertFeedMockRecorder {
+	return m.recorder
+}
+
+// AddSubscription mocks base method.
+func (m *MockAlertFeed) AddSubscription(subscription *protocol.CombinerBotSubscription) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AddSubscription", subscription)
+}
+
+// AddSubscription indicates an expected call of AddSubscription.
+func (mr *MockAlertFeedMockRecorder) AddSubscription(subscription interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSubscription", reflect.TypeOf((*MockAlertFeed)(nil).AddSubscription), subscription)
+}
+
+// ForEachAlert mocks base method.
+func (m *MockAlertFeed) ForEachAlert(alertHandler func(*domain.AlertEvent) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachAlert", alertHandler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachAlert indicates an expected call of ForEachAlert.
+func (mr *MockAlertFeedMockRecorder) ForEachAlert(alertHandler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAlert", reflect.TypeOf((*MockAlertFeed)(nil).ForEachAlert), alertHandler)
+}
+
+// Health mocks base method.
+func (m *MockAlertFeed) Health() health.Reports {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Health")
+	ret0, _ := ret[0].(health.Reports)
+	return ret0
+}
+
+// Health indicates an expected call of Health.
+func (mr *MockAlertFeedMockRecorder) Health() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockAlertFeed)(nil).Health))
+}
+
+// Name mocks base method.
+func (m *MockAlertFeed) Name() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Name")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Name indicates an expected call of Name.
+func (mr *MockAlertFeedMockRecorder) Name() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockAlertFeed)(nil).Name))
+}
+
+// RegisterHandler mocks base method.
+func (m *MockAlertFeed) RegisterHandler(alertHandler func(*domain.AlertEvent) error) <-chan error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegisterHandler", alertHandler)
+	ret0, _ := ret[0].(<-chan error)
+	return ret0
+}
+
+// RegisterHandler indicates an expected call of RegisterHandler.
+func (mr *MockAlertFeedMockRecorder) RegisterHandler(alertHandler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterHandler", reflect.TypeOf((*MockAlertFeed)(nil).RegisterHandler), alertHandler)
+}
+
+// RemoveSubscription mocks base method.
+func (m *MockAlertFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RemoveSubscription", subscription)
+}
+
+// RemoveSubscription indicates an expected call of RemoveSubscription.
+func (mr *MockAlertFeedMockRecorder) RemoveSubscription(subscription interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveSubscription", reflect.TypeOf((*MockAlertFeed)(nil).RemoveSubscription), subscription)
+}
+
+// Start mocks base method.
+func (m *MockAlertFeed) Start() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Start")
+}
+
+// Start indicates an expected call of Start.
+func (mr *MockAlertFeedMockRecorder) Start() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockAlertFeed)(nil).Start))
+}
+
+// StartRange mocks base method.
+func (m *MockAlertFeed) StartRange(start, end uint64, rate int64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "StartRange", start, end, rate)
+}
+
+// StartRange indicates an expected call of StartRange.
+func (mr *MockAlertFeedMockRecorder) StartRange(start, end, rate interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartRange", reflect.TypeOf((*MockAlertFeed)(nil).StartRange), start, end, rate)
+}
+
+// SubscribedBots mocks base method.
+func (m *MockAlertFeed) SubscribedBots() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SubscribedBots")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// SubscribedBots indicates an expected call of SubscribedBots.
+func (mr *MockAlertFeedMockRecorder) SubscribedBots() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribedBots", reflect.TypeOf((*MockAlertFeed)(nil).SubscribedBots))
 }
 
 // MockLogFeed is a mock of LogFeed interface.
