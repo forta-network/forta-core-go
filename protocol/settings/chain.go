@@ -92,8 +92,8 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  1500,
 
 		DefaultOffset:   0,
-		SafeOffset:      30,
-		RewardThreshold: 600,
+		SafeOffset:      60,
+		RewardThreshold: 1200,
 	},
 	{
 		ChainID:             43114,
