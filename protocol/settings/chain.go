@@ -36,7 +36,7 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  50,
 
-		DefaultOffset:   0,
+		DefaultOffset:   1,
 		SafeOffset:      1,
 		RewardThreshold: 20,
 	},
