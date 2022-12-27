@@ -85,7 +85,7 @@ abigen: pull-contracts
 
 .PHONY: pull-contracts
 pull-contracts:
-	./scripts/pull-contracts.sh forta-contracts dev
+	./scripts/pull-contracts.sh forta-contracts master
 
 .PHONY: swagger
 swagger: require-tools
