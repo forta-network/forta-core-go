@@ -60,7 +60,7 @@ func (i *combinerIterator) UpperBound() (upperBound int64) {
 	//
 	// if there is no end specified, no need to account the end value
 	if i.end == 0 || i.end > i.head+combinerInterval {
-		upperBound = now - i.head - interval
+		upperBound = now - i.head - combinerInterval
 	} else {
 		upperBound = now - i.end
 	}
