@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math"
 	"os"
 	"sync"
 	"time"
@@ -30,8 +29,6 @@ type cfHandler struct {
 }
 
 type combinerFeed struct {
-	start     uint64
-	end       uint64
 	ctx       context.Context
 	started   bool
 	rateLimit *time.Ticker
@@ -47,9 +44,11 @@ type combinerFeed struct {
 	// and we don't know the expected item count
 	alertCache *cache.Cache
 
-	handlers   []cfHandler
-	handlersMu sync.Mutex
-	cfg        CombinerFeedConfig
+	handlers    []cfHandler
+	handlersMu  sync.Mutex
+	cfg         CombinerFeedConfig
+	iterator    Iterator
+	maxAlertAge *time.Duration
 }
 
 func (cf *combinerFeed) Subscriptions() []*protocol.CombinerBotSubscription {
@@ -113,9 +112,12 @@ func (cf *combinerFeed) Start() {
 		go cf.loop()
 	}
 }
+
 func (cf *combinerFeed) initialize() error {
-	if cf.start == 0 {
-		cf.start = uint64(time.Now().Add(time.Minute * -10).UnixMilli())
+	if cf.iterator == nil {
+		cf.iterator = NewCombinerIterator(
+			time.Now().Add(time.Minute*-10).UnixMilli(), 0, DefaultRatelimitDuration.Milliseconds(),
+		)
 	}
 	if cf.rateLimit == nil {
 		cf.rateLimit = time.NewTicker(DefaultRatelimitDuration)
@@ -124,8 +126,7 @@ func (cf *combinerFeed) initialize() error {
 }
 func (cf *combinerFeed) StartRange(start uint64, end uint64, rate int64) {
 	if !cf.started {
-		cf.start = start
-		cf.end = end
+		cf.iterator = NewCombinerIterator(int64(start), int64(end), DefaultRatelimitDuration.Milliseconds())
 		if rate > 0 {
 			cf.rateLimit = time.NewTicker((time.Duration)(rate))
 		}
@@ -138,7 +139,6 @@ func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) e
 }
 
 func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
-	currentTimestp := cf.start
 	firstRun := true
 	for {
 		if cf.ctx.Err() != nil {
@@ -153,11 +153,11 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		logger := log.WithFields(
 			log.Fields{
-				"currentTimestamp": currentTimestp,
+				"currentTimestamp": cf.iterator.Head(),
 			},
 		)
 
-		if cf.end != 0 && currentTimestp > cf.end {
+		if cf.iterator != nil && !cf.iterator.HasNext() {
 			logger.Info("end timestamp reached - exiting")
 			return ErrCombinerStopReached
 		}
@@ -167,21 +167,18 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 			continue
 		}
 
-		// setup time range
-		createdSince := time.Now().UnixMilli() - int64(currentTimestp)
-		createdBefore := time.Now().UnixMilli() - int64(currentTimestp) - graphql.DefaultLastNMinutes.Milliseconds()
-		createdBefore = int64(math.Max(0, float64(createdBefore)))
-
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
-			err := cf.fetchAlertsAndHandle(alertHandlers, subscription, createdSince, createdBefore)
+			err := cf.fetchAlertsAndHandle(
+				alertHandlers, subscription, cf.iterator.LowerBound(), cf.iterator.UpperBound(),
+			)
 			if err != nil {
 				return err
 			}
 		}
 
 		// increase current timestamp
-		currentTimestp += uint64(DefaultRatelimitDuration.Milliseconds())
+		cf.iterator.Next()
 
 		// dump cache to persistent file
 		if cf.cfg.CombinerCachePath != "" {
@@ -203,6 +200,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 	var alerts []*protocol.AlertEvent
 
 	bo := backoff.NewExponentialBackOff()
+	b := backoff.WithContext(bo, cf.ctx)
 	err := backoff.Retry(
 		func() error {
 			var cErr error
@@ -222,13 +220,23 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 			}
 
 			return nil
-		}, bo,
+		}, b,
 	)
 	if err != nil {
 		return err
 	}
 
 	for _, alert := range alerts {
+		if tooOld, age := alertIsTooOld(alert, cf.maxAlertAge); tooOld {
+			log.WithField("age", age).Warnf(
+				"alert is older than %v - setting current alert iterator head to now", cf.maxAlertAge,
+			)
+
+			cf.iterator.SetHead(time.Now().Add(time.Minute * -10).UnixMilli())
+
+			continue
+		}
+
 		if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
 			continue
 		}
@@ -243,7 +251,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 		}
 
 		// just for local purposes
-		if cf.end != 0 && alertCA.UnixMilli() > int64(cf.end) {
+		if cf.iterator != nil && alertCA.UnixMilli() > cf.iterator.End() {
 			continue
 		}
 
@@ -300,6 +308,24 @@ func (cf *combinerFeed) loop() {
 	}
 }
 
+func alertIsTooOld(alert *protocol.AlertEvent, maxAge *time.Duration) (bool, *time.Duration) {
+	if maxAge == nil {
+		return false, nil
+	}
+	createdAt, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
+	age := time.Since(createdAt)
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"alertHash": alert.Alert.Hash,
+			},
+		).WithError(err).Errorf("error getting age of block")
+		return false, &age
+	}
+
+	return age > *maxAge, &age
+}
+
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
 	ac := graphql.NewClient(cfg.APIUrl)
 	alerts := make(chan *domain.AlertEvent, 10)
@@ -323,9 +349,17 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		alertCache = cache.New(graphql.DefaultLastNMinutes*2, time.Minute)
 	}
 
+	var start int64
+	if cfg.Start == 0 {
+		start = time.Now().Add(time.Minute * -10).UnixMilli()
+	} else {
+		start = int64(cfg.Start)
+	}
+
 	bf := &combinerFeed{
-		start:            cfg.Start,
-		end:              cfg.End,
+		iterator: NewCombinerIterator(
+			start, int64(cfg.End), DefaultRatelimitDuration.Milliseconds(),
+		),
 		ctx:              ctx,
 		client:           ac,
 		rateLimit:        cfg.RateLimit,
@@ -334,5 +368,6 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		cfg:              cfg,
 		alertCache:       alertCache,
 	}
+
 	return bf, nil
 }

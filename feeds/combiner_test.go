@@ -25,20 +25,20 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 		{
 			name: "successfully feeds range",
 			args: args{
-				start:               uint64(time.Now().Add(time.Second * -15).UnixMilli()),
-				end:                 uint64(time.Now().UnixMilli()),
+				start:               uint64(time.Now().Add(time.Minute * -15).UnixMilli()),
+				end:                 uint64(time.Now().Add(time.Minute * -5).UnixMilli()),
 				rate:                int64(time.Nanosecond),
 				stopAfterFirstAlert: false,
 				expectErr:           ErrCombinerStopReached,
 			},
 		}, {
-			name: "no range",
+			name: "start but no end",
 			args: args{
-				start:               0,
+				start:               uint64(time.Now().Add(time.Minute * -15).UnixMilli()),
 				end:                 0,
 				rate:                int64(time.Nanosecond),
 				stopAfterFirstAlert: true,
-				expectErr:           context.Canceled,
+				expectErr:           context.DeadlineExceeded,
 			},
 		},
 	}
