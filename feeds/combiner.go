@@ -48,7 +48,7 @@ type combinerFeed struct {
 	handlersMu  sync.Mutex
 	cfg         CombinerFeedConfig
 	iterator    Iterator
-	maxAlertAge *time.Duration
+	maxAlertAge time.Duration
 }
 
 func (cf *combinerFeed) Subscriptions() []*protocol.CombinerBotSubscription {
@@ -308,10 +308,11 @@ func (cf *combinerFeed) loop() {
 	}
 }
 
-func alertIsTooOld(alert *protocol.AlertEvent, maxAge *time.Duration) (bool, *time.Duration) {
-	if maxAge == nil {
+func alertIsTooOld(alert *protocol.AlertEvent, maxAge time.Duration) (bool, *time.Duration) {
+	if maxAge == 0 {
 		return false, nil
 	}
+
 	createdAt, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
 	age := time.Since(createdAt)
 	if err != nil {
@@ -323,7 +324,7 @@ func alertIsTooOld(alert *protocol.AlertEvent, maxAge *time.Duration) (bool, *ti
 		return false, &age
 	}
 
-	return age > *maxAge, &age
+	return age > maxAge, &age
 }
 
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
@@ -360,6 +361,7 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		iterator: NewCombinerIterator(
 			start, int64(cfg.End), DefaultRatelimitDuration.Milliseconds(),
 		),
+		maxAlertAge:      time.Minute * 20,
 		ctx:              ctx,
 		client:           ac,
 		rateLimit:        cfg.RateLimit,
