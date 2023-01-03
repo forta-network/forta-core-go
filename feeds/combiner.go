@@ -3,6 +3,7 @@ package feeds
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -130,10 +131,12 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 			return cf.ctx.Err()
 		}
 
-		if cf.rateLimit != nil || !firstRun {
+		if cf.rateLimit != nil {
+			if !firstRun {
+				// wait for the ratelimit
+				<-cf.rateLimit.C
+			}
 			firstRun = false
-			// wait for the ratelimit
-			<-cf.rateLimit.C
 		}
 
 		// skip query if there are no alert subscriptions
@@ -168,12 +171,13 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 }
 
 func (cf *combinerFeed) fetchAlertsAndHandle(
-	alertHandlers []cfHandler, subscription *protocol.CombinerBotSubscription, createdSince int64, createdBefore int64,
+	ctx context.Context, alertHandlers []cfHandler, subscription *protocol.CombinerBotSubscription, createdSince int64,
+	createdBefore int64,
 ) error {
 	var alerts []*protocol.AlertEvent
 
-	bo := backoff.NewExponentialBackOff()
-	b := backoff.WithContext(bo, cf.ctx)
+	bo := backoff.WithContext(backoff.NewExponentialBackOff(), ctx)
+
 	err := backoff.Retry(
 		func() error {
 			var cErr error
@@ -187,7 +191,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 					AlertId:       subscription.AlertId,
 				},
 			)
-			if cErr != nil {
+			if cErr != nil && errors.Is(cErr, context.DeadlineExceeded) {
 				log.WithError(cErr).Warn("error retrieving alerts")
 				return cErr
 			}
