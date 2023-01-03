@@ -149,6 +149,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
 			err := cf.fetchAlertsAndHandle(
+				cf.ctx,
 				alertHandlers, subscription, lowerBound.Milliseconds(), upperBound,
 			)
 			if err != nil {
@@ -197,7 +198,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 			}
 
 			return nil
-		}, b,
+		}, bo,
 	)
 	if err != nil {
 		return err
