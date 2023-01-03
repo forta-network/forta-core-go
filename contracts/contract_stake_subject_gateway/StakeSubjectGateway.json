@@ -1,0 +1,643 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newAddressManager",
+        "type": "address"
+      }
+    ],
+    "name": "AccessManagerUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "router",
+        "type": "address"
+      }
+    ],
+    "name": "RouterUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newHandler",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldHandler",
+        "type": "address"
+      }
+    ],
+    "name": "StakeSubjectChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "activeStakeFor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "allocator",
+        "type": "address"
+      }
+    ],
+    "name": "canManageAllocation",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disableRouter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getDelegatedSubjectType",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getDelegatorSubjectType",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getStakeSubject",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getSubjectTypeAgency",
+    "outputs": [
+      {
+        "internalType": "enum SubjectTypeValidator.SubjectStakeAgency",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "__manager",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "__fortaStaking",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "isRegistered",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "isStakeActivatedFor",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "forwarder",
+        "type": "address"
+      }
+    ],
+    "name": "isTrustedForwarder",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "maxManagedStakeFor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "maxStakeFor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "minManagedStakeFor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "minStakeFor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "data",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "multicall",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "results",
+        "type": "bytes[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "ownerOf",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newManager",
+        "type": "address"
+      }
+    ],
+    "name": "setAccessManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "ensRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "ensName",
+        "type": "string"
+      }
+    ],
+    "name": "setName",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "subject",
+        "type": "address"
+      }
+    ],
+    "name": "setStakeSubject",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalManagedSubjects",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalStakeFor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "unsetStakeSubject",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

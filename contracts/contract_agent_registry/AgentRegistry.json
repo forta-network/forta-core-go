@@ -197,13 +197,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "router",
-        "type": "address"
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
       }
     ],
-    "name": "RouterUpdated",
+    "name": "Initialized",
     "type": "event"
   },
   {
@@ -212,11 +212,11 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "newstakeController",
+        "name": "router",
         "type": "address"
       }
     ],
-    "name": "StakeControllerUpdated",
+    "name": "RouterUpdated",
     "type": "event"
   },
   {
@@ -242,6 +242,19 @@
       }
     ],
     "name": "StakeThresholdChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newHandler",
+        "type": "address"
+      }
+    ],
+    "name": "SubjectHandlerUpdated",
     "type": "event"
   },
   {
@@ -328,7 +341,7 @@
       },
       {
         "internalType": "address",
-        "name": "owner",
+        "name": "",
         "type": "address"
       },
       {
@@ -361,6 +374,13 @@
       }
     ],
     "name": "disableAgent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disableRouter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -408,7 +428,7 @@
     "outputs": [
       {
         "internalType": "bool",
-        "name": "created",
+        "name": "registered",
         "type": "bool"
       },
       {
@@ -522,7 +542,7 @@
     "outputs": [
       {
         "internalType": "bool",
-        "name": "created",
+        "name": "registered",
         "type": "bool"
       },
       {
@@ -549,6 +569,11 @@
         "internalType": "bool",
         "name": "enabled",
         "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "disabledFlags",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -593,13 +618,19 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getStakeController",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "agentId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDisableFlags",
     "outputs": [
       {
-        "internalType": "contract IStakeController",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -642,15 +673,23 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getSubjectHandler",
+    "outputs": [
+      {
+        "internalType": "contract IStakeSubjectGateway",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
         "name": "__manager",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__router",
         "type": "address"
       },
       {
@@ -701,7 +740,7 @@
         "type": "uint256"
       }
     ],
-    "name": "isCreated",
+    "name": "isEnabled",
     "outputs": [
       {
         "internalType": "bool",
@@ -720,7 +759,7 @@
         "type": "uint256"
       }
     ],
-    "name": "isEnabled",
+    "name": "isRegistered",
     "outputs": [
       {
         "internalType": "bool",
@@ -805,7 +844,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "subject",
         "type": "uint256"
       }
     ],
@@ -829,6 +868,42 @@
       }
     ],
     "name": "prepareAgent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "agentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadata",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "chainIds",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "registerAgent",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -875,7 +950,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "_data",
+        "name": "data",
         "type": "bytes"
       }
     ],
@@ -949,32 +1024,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "newRouter",
-        "type": "address"
-      }
-    ],
-    "name": "setRouter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "stakeController",
-        "type": "address"
-      }
-    ],
-    "name": "setStakeController",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
           {
             "internalType": "uint256",
@@ -998,6 +1047,19 @@
       }
     ],
     "name": "setStakeThreshold",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "subjectGateway",
+        "type": "address"
+      }
+    ],
+    "name": "setSubjectHandler",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

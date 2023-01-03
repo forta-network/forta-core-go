@@ -12,11 +12,11 @@ func equalsAddress(address common.Address, addr string) bool {
 	return strings.EqualFold(address.Hex(), addr)
 }
 
-func isEvent(le types.Log, topic string) bool {
-	if len(le.Topics) == 0 {
-		return false
+func getTopic(log types.Log) string {
+	if len(log.Topics) == 0 {
+		return ""
 	}
-	return strings.EqualFold(le.Topics[0].Hex(), topic)
+	return strings.ToLower(log.Topics[0].Hex())
 }
 
 func getLoggerForLog(le types.Log) *log.Entry {

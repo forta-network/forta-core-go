@@ -6,9 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
+	"github.com/forta-network/forta-core-go/contracts/contract_stake_allocator"
 	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/security/eip712"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -21,12 +25,19 @@ import (
 	"github.com/forta-network/forta-core-go/ens"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/utils"
+
+	contract_scanner_registry_old "github.com/forta-network/forta-core-go/oldcontracts/contract_scanner_registry"
 )
 
 const (
 	scannerRegistryChainID     = 137
 	scannerRegistryDeployBlock = 20187154
 	defaultEnsAddress          = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
+)
+
+// Registry errors
+var (
+	ErrContractNotReady = errors.New("contract not ready")
 )
 
 // ScannerPermission is an alias to use for enums.
@@ -55,6 +66,9 @@ type Client interface {
 	// IsEnabledScanner returns true if the scanner exists and is enabled
 	IsEnabledScanner(scannerID string) (bool, error)
 
+	// IsOperationalScanner returns true if the scanner exists and is enabled
+	IsOperationalScanner(scannerID string) (bool, error)
+
 	// GetScannerNodeVersion returns the current ipfs reference for the latest scanner node release
 	GetScannerNodeVersion() (string, error)
 
@@ -70,8 +84,17 @@ type Client interface {
 	// GetScanner returns a scanner
 	GetScanner(scannerID string) (*Scanner, error)
 
-	// RegisterScanner registers a scanner using private key.
-	RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
+	// GetPoolScanner returns a scanner
+	GetPoolScanner(scannerID string) (*Scanner, error)
+
+	// RegisterScannerOld executes the pre-delegated-staking registration.
+	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
+
+	// RegisterScannerToPool registers a scanner to a pool by using scanner's signature and operator private key.
+	RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error)
+
+	// GenerateScannerRegistrationSignature generates a scanner registration signature from given data.
+	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (encodedData []byte, sig []byte, err error)
 
 	// RegistryContracts returns the ens-resolved registry contracts
 	RegistryContracts() *registry.RegistryContracts
@@ -97,6 +120,9 @@ type Client interface {
 	// ForEachScannerSinceBlock loops over all scanners since a provided block number
 	ForEachScannerSinceBlock(block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error) error
 
+	// ForEachPoolScannerSinceBlock loops over all scanners since a provided block number
+	ForEachPoolScannerSinceBlock(block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error) error
+
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
 
@@ -108,6 +134,12 @@ type Client interface {
 
 	// DisableScanner disables a scanner.
 	DisableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
+
+	// GetScannerPoolOwner finds out the owner of the scanner pool.
+	GetScannerPoolOwner(poolID *big.Int) (owner string, err error)
+
+	// WillNewScannerShutdownPool tells if registering a new scanner could shutdown a pool.
+	WillNewScannerShutdownPool(poolID *big.Int) (bool, error)
 }
 
 type client struct {
@@ -120,14 +152,23 @@ type client struct {
 	opts       *bind.CallOpts
 	privateKey *ecdsa.PrivateKey
 
-	contracts *registry.RegistryContracts
-	ar        *contract_agent_registry.AgentRegistryCaller
-	sr        *contract_scanner_registry.ScannerRegistryCaller
-	dp        *contract_dispatch.DispatchCaller
-	sv        *contract_scanner_node_version.ScannerNodeVersionCaller
-	fs        *contract_forta_staking.FortaStakingCaller
-	srf       *contract_scanner_registry.ScannerRegistryFilterer
-	arf       *contract_agent_registry.AgentRegistryFilterer
+	contracts      *registry.RegistryContracts
+	agentReg       *contract_agent_registry.AgentRegistryCaller
+	scannerReg     *contract_scanner_registry.ScannerRegistryCaller
+	dispatch       *contract_dispatch.DispatchCaller
+	scannerVersion *contract_scanner_node_version.ScannerNodeVersionCaller
+	fortaStaking   *contract_forta_staking.FortaStakingCaller
+
+	scannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
+	agentRegFil   *contract_agent_registry.AgentRegistryFilterer
+
+	// new contracts
+
+	scannerPoolReg *contract_scanner_pool_registry.ScannerPoolRegistryCaller
+	stakeAllocator *contract_stake_allocator.StakeAllocatorCaller
+
+	scannerPoolRegFil *contract_scanner_pool_registry.ScannerPoolRegistryFilterer
+	stakeAllocatorFil *contract_stake_allocator.StakeAllocatorFilterer
 }
 
 var _ Client = &client{}
@@ -183,42 +224,42 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	}
 	ec := ethclient.NewClient(rpc)
 
-	ar, err := contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
+	agentReg, err := contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	sr, err := contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
+	scannerReg, err := contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	dp, err := contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
+	dispatch, err := contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	sv, err := contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
+	scannerVersion, err := contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	fs, err := contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
+	fortaStaking, err := contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	srf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	scannerRegFil, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	arf, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
+	agentRegFil, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
 
-	return &client{
+	cl := &client{
 		ctx: ctx,
 		cfg: cfg,
 		eth: eth,
@@ -226,15 +267,33 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 
 		privateKey: cfg.PrivateKey,
 
-		contracts: regContracts,
-		sr:        sr,
-		ar:        ar,
-		dp:        dp,
-		sv:        sv,
-		fs:        fs,
-		srf:       srf,
-		arf:       arf,
-	}, err
+		contracts:      regContracts,
+		scannerReg:     scannerReg,
+		agentReg:       agentReg,
+		dispatch:       dispatch,
+		scannerVersion: scannerVersion,
+		fortaStaking:   fortaStaking,
+		scannerRegFil:  scannerRegFil,
+		agentRegFil:    agentRegFil,
+	}
+
+	// find out post-delegated-staking-migration contracts from known contracts
+
+	scannerPoolRegAddr, err := scannerReg.ScannerPoolRegistry(cl.opts)
+	if err == nil && scannerPoolRegAddr.Hex() != utils.ZeroAddress {
+		regContracts.ScannerPoolRegistry = &scannerPoolRegAddr
+		cl.scannerPoolReg, _ = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, ec)
+		cl.scannerPoolRegFil, _ = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(scannerPoolRegAddr, ec)
+	}
+
+	stakeAllocatorAddr, err := fortaStaking.Allocator(cl.opts)
+	if err == nil && stakeAllocatorAddr.Hex() != utils.ZeroAddress {
+		regContracts.StakeAllocator = &stakeAllocatorAddr
+		cl.stakeAllocator, _ = contract_stake_allocator.NewStakeAllocatorCaller(stakeAllocatorAddr, ec)
+		cl.stakeAllocatorFil, _ = contract_stake_allocator.NewStakeAllocatorFilterer(stakeAllocatorAddr, ec)
+	}
+
+	return cl, nil
 }
 
 func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
@@ -245,7 +304,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	}
 	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, ensAddr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to dial ens store: %v", err)
 	}
 	return NewClientWithENSStore(ctx, cfg, ensStore)
 }
@@ -296,7 +355,7 @@ func (c *client) PegLatestBlock() error {
 
 func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	res, err := c.sr.GetStakeThreshold(c.opts, sID)
+	res, err := c.scannerReg.GetStakeThreshold(c.opts, sID)
 	if err != nil {
 		return nil, err
 	}
@@ -304,23 +363,23 @@ func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error
 }
 
 func (c *client) GetScannerNodeVersion() (string, error) {
-	sv, err := c.sv.ScannerNodeVersion(c.opts)
+	scannerVersion, err := c.scannerVersion.ScannerNodeVersion(c.opts)
 	if err != nil {
 		return "", err
 	}
-	return sv, nil
+	return scannerVersion, nil
 }
 
 func (c *client) GetScannerNodePrereleaseVersion() (string, error) {
-	sv, err := c.sv.ScannerNodeBetaVersion(c.opts)
+	scannerVersion, err := c.scannerVersion.ScannerNodeBetaVersion(c.opts)
 	if err != nil {
 		return "", err
 	}
-	return sv, nil
+	return scannerVersion, nil
 }
 
 func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
-	sh, err := c.dp.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
+	sh, err := c.dispatch.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +399,7 @@ func (c *client) getOps() (*bind.CallOpts, error) {
 func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 	agtID := utils.AgentHexToBigInt(agentID)
 	scnID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.dp.AreTheyLinked(c.opts, agtID, scnID)
+	return c.dispatch.AreTheyLinked(c.opts, agtID, scnID)
 }
 
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
@@ -359,7 +418,7 @@ func (c *client) ForEachScannerSinceBlock(
 		return err
 	}
 
-	it, err := c.srf.FilterScannerUpdated(&bind.FilterOpts{
+	it, err := c.scannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
 	}, nil, nil)
@@ -370,7 +429,7 @@ func (c *client) ForEachScannerSinceBlock(
 
 	for it.Next() {
 		if it.Event != nil {
-			scn, err := c.sr.GetScannerState(opts, it.Event.ScannerId)
+			scn, err := c.scannerReg.GetScannerState(opts, it.Event.ScannerId)
 			if err != nil {
 				return err
 			}
@@ -389,6 +448,50 @@ func (c *client) ForEachScannerSinceBlock(
 	return nil
 }
 
+func (c *client) ForEachPoolScannerSinceBlock(
+	block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error,
+) error {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return ErrContractNotReady
+	}
+
+	opts, err := c.getOps()
+	if err != nil {
+		return err
+	}
+
+	it, err := c.scannerPoolRegFil.FilterScannerUpdated(&bind.FilterOpts{
+		Start:   block,
+		Context: c.ctx,
+	}, nil, nil)
+
+	if err != nil {
+		return err
+	}
+
+	for it.Next() {
+		if it.Event != nil {
+			scannerAddr := common.HexToAddress(utils.ScannerIDBigIntToHex(it.Event.ScannerId))
+			scn, err := c.scannerPoolReg.GetScannerState(opts, scannerAddr)
+			if err != nil {
+				return err
+			}
+			if err := handler(it.Event, &Scanner{
+				ScannerID: utils.ScannerIDBigIntToHex(it.Event.ScannerId),
+				ChainID:   scn.ChainId.Int64(),
+				Enabled:   scn.Operational,
+				Manifest:  scn.Metadata,
+				Owner:     scn.Owner.Hex(),
+				PoolID:    it.Event.ScannerPool.String(),
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) error {
 	opts, err := c.getOps()
 	if err != nil {
@@ -396,18 +499,18 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 	}
 
 	cID := big.NewInt(chainID)
-	length, err := c.ar.GetAgentCountByChain(opts, cID)
+	length, err := c.agentReg.GetAgentCountByChain(opts, cID)
 	if err != nil {
 		return err
 	}
 
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agtID, err := c.ar.GetAgentByChainAndIndex(opts, cID, idx)
+		agtID, err := c.agentReg.GetAgentByChainAndIndex(opts, cID, idx)
 		if err != nil {
 			return err
 		}
-		agt, err := c.ar.GetAgentState(opts, agtID)
+		agt, err := c.agentReg.GetAgentState(opts, agtID)
 		if err != nil {
 			return err
 		}
@@ -431,14 +534,14 @@ func (c *client) ForEachAgentID(handler func(agentID string) error) error {
 		return err
 	}
 
-	length, err := c.ar.GetAgentCount(opts)
+	length, err := c.agentReg.GetAgentCount(opts)
 	if err != nil {
 		return err
 	}
 
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agtID, err := c.ar.GetAgentByIndex(opts, idx)
+		agtID, err := c.agentReg.GetAgentByIndex(opts, idx)
 		if err != nil {
 			return err
 		}
@@ -456,7 +559,7 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 	}
 
 	return c.ForEachAgentID(func(agentID string) error {
-		agt, err := c.ar.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
+		agt, err := c.agentReg.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
 		if err != nil {
 			return err
 		}
@@ -478,7 +581,7 @@ func (c *client) ForEachAgentSinceBlock(
 		return err
 	}
 
-	it, err := c.arf.FilterAgentUpdated(&bind.FilterOpts{
+	it, err := c.agentRegFil.FilterAgentUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
 	}, nil, nil)
@@ -489,7 +592,7 @@ func (c *client) ForEachAgentSinceBlock(
 
 	for it.Next() {
 		if it.Event != nil {
-			agt, err := c.ar.GetAgentState(opts, it.Event.AgentId)
+			agt, err := c.agentReg.GetAgentState(opts, it.Event.AgentId)
 			if err != nil {
 				return err
 			}
@@ -516,20 +619,20 @@ func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner)
 	}
 
 	aID := utils.AgentHexToBigInt(agentID)
-	length, err := c.dp.NumScannersFor(opts, aID)
+	length, err := c.dispatch.NumScannersFor(opts, aID)
 	if err != nil {
 		return err
 	}
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		scn, err := c.dp.ScannerRefAt(opts, aID, idx)
+		scn, err := c.dispatch.ScannerRefAt(opts, aID, idx)
 		if err != nil {
 			return err
 		}
 		if err := handler(&Scanner{
 			ScannerID: utils.ScannerIDBigIntToHex(scn.ScannerId),
 			ChainID:   scn.ChainId.Int64(),
-			Enabled:   scn.Enabled,
+			Enabled:   scn.Operational,
 			Manifest:  scn.Metadata,
 			Owner:     scn.Owner.Hex(),
 		}); err != nil {
@@ -547,13 +650,13 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 	}
 
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	length, err := c.dp.NumAgentsFor(opts, sID)
+	length, err := c.dispatch.NumAgentsFor(opts, sID)
 	if err != nil {
 		return err
 	}
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agt, err := c.dp.AgentRefAt(opts, sID, idx)
+		agt, err := c.dispatch.AgentRefAt(opts, sID, idx)
 		if err != nil {
 			return err
 		}
@@ -571,18 +674,38 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 }
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
-	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.sr.IsEnabled(c.opts, sID)
+	if c.migrationEnded() && c.scannerPoolReg != nil {
+		return c.scannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
+	}
+	return c.scannerReg.IsEnabled(c.opts, utils.ScannerIDHexToBigInt(scannerID))
+}
+
+func (c *client) migrationEnded() bool {
+	// ignoring error here because the old contract doesn't have this method in its ABI
+	// only successful request and a "true" in response is true
+	migrationEnded, _ := c.scannerReg.HasMigrationEnded(c.opts)
+	return migrationEnded
+}
+
+func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return false, ErrContractNotReady
+	}
+	return c.scannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
 func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.fs.ActiveStakeFor(c.opts, 0, sID)
+	return c.fortaStaking.ActiveStakeFor(c.opts, 0, sID)
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
+	if c.migrationEnded() {
+		return c.GetPoolScanner(scannerID)
+	}
+
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	scn, err := c.sr.GetScanner(c.opts, sID)
+	scn, err := c.scannerReg.GetScanner(c.opts, sID)
 
 	if err != nil {
 		return nil, err
@@ -592,7 +715,7 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 		return nil, nil
 	}
 
-	enabled, err := c.sr.IsEnabled(c.opts, sID)
+	enabled, err := c.scannerReg.IsEnabled(c.opts, sID)
 	if err != nil {
 		return nil, err
 	}
@@ -606,19 +729,55 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 	}, nil
 }
 
+func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return nil, ErrContractNotReady
+	}
+
+	sID := common.HexToAddress(scannerID)
+	scn, err := c.scannerPoolReg.GetScanner(c.opts, sID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !scn.Registered {
+		return nil, nil
+	}
+
+	enabled, err := c.scannerPoolReg.IsScannerOperational(c.opts, sID)
+	if err != nil {
+		return nil, err
+	}
+
+	owner, err := c.scannerPoolReg.OwnerOf(c.opts, scn.ScannerPoolId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Scanner{
+		ScannerID: sID.Hex(),
+		ChainID:   scn.ChainId.Int64(),
+		Enabled:   enabled,
+		Manifest:  scn.Metadata,
+		Owner:     owner.Hex(),
+		PoolID:    scn.ScannerPoolId.String(),
+	}, nil
+}
+
 func (c *client) GetAgent(agentID string) (*Agent, error) {
 	aID := utils.AgentHexToBigInt(agentID)
-	agt, err := c.ar.GetAgent(c.opts, aID)
+	agt, err := c.agentReg.GetAgent(c.opts, aID)
 	if err != nil {
 		return nil, err
 	}
 
 	// if agt does not exist, return nil
-	if !agt.Created {
+	if !agt.Registered {
 		return nil, nil
 	}
 
-	enabled, err := c.ar.IsEnabled(c.opts, aID)
+	enabled, err := c.agentReg.IsEnabled(c.opts, aID)
 	if err != nil {
 		return nil, err
 	}
@@ -632,11 +791,11 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 	}, nil
 }
 
-func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
+func (c *client) RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
 	if c.privateKey == nil {
 		return "", errors.New("no private key provided to the client")
 	}
-	reg, err := contract_scanner_registry.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
+	reg, err := contract_scanner_registry_old.NewScannerRegistryTransactor(c.contracts.ScannerRegistry, c.ec)
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
@@ -655,7 +814,43 @@ func (c *client) RegisterScanner(ownerAddress string, chainID int64, metadata st
 	return tx.Hash().Hex(), nil
 }
 
+func (c *client) RegisterScannerToPool(scannerAddress string, poolID *big.Int, chainID int64, metadata string, signature []byte) (txHash string, err error) {
+	if c.scannerPoolReg == nil || c.scannerPoolRegFil == nil {
+		return "", ErrContractNotReady
+	}
+
+	if c.privateKey == nil {
+		return "", errors.New("no operator private key provided to the client")
+	}
+	reg, err := contract_scanner_pool_registry.NewScannerPoolRegistryTransactor(*c.contracts.ScannerPoolRegistry, c.ec)
+	if err != nil {
+		return "", fmt.Errorf("failed to create contract transactor: %v", err)
+	}
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	if err != nil {
+		return "", fmt.Errorf("failed to create transaction opts: %v", err)
+	}
+	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
+	}
+	tx, err := reg.RegisterScannerNode(opts, contract_scanner_pool_registry.ScannerPoolRegistryCoreScannerNodeRegistration{
+		Scanner:       common.HexToAddress(scannerAddress),
+		ScannerPoolId: poolID,
+		ChainId:       big.NewInt(int64(chainID)),
+		Metadata:      metadata,
+		Timestamp:     big.NewInt(time.Now().Unix()),
+	}, signature)
+	if err != nil {
+		return "", fmt.Errorf("failed to send the transaction: %v", err)
+	}
+	return tx.Hash().Hex(), nil
+}
+
 func (c *client) EnableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
+	if c.migrationEnded() {
+		return "", errors.New("migration ended")
+	}
 	if c.privateKey == nil {
 		return "", errors.New("no private key provided to the client")
 	}
@@ -699,4 +894,30 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 		return "", fmt.Errorf("failed to send the transaction: %v", err)
 	}
 	return tx.Hash().Hex(), nil
+}
+
+func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
+	if c.contracts.ScannerPoolRegistry == nil {
+		return nil, nil, ErrContractNotReady
+	}
+	chainID, err := c.eth.ChainID(c.ctx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to determine registry chain id: %v", chainID)
+	}
+	return eip712.SignScannerRegistration(c.privateKey, *c.contracts.ScannerPoolRegistry, chainID, reg)
+}
+
+func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {
+	if c.scannerPoolReg == nil {
+		return "", ErrContractNotReady
+	}
+	addr, err := c.scannerPoolReg.OwnerOf(c.opts, poolID)
+	if err != nil {
+		return "", nil
+	}
+	return addr.Hex(), nil
+}
+
+func (c *client) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
+	return c.scannerPoolReg.WillNewScannerShutdownPool(c.opts, poolID)
 }

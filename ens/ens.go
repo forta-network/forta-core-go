@@ -2,7 +2,7 @@ package ens
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -23,19 +23,18 @@ const (
 
 // ENS resolves inputs.
 type ENS interface {
-	Resolve(input string) (common.Address, error)
+	Resolver
 	ResolveRegistryContracts() (*registry.RegistryContracts, error)
 }
 
 // ENSStore wraps the ENS client which interacts with namespace contract(s).
 type ENSStore struct {
-	backend      bind.ContractBackend
-	resolverAddr string
+	Resolver
 }
 
 // NewENSStore creates a new store.
 func NewENSStore(backend bind.ContractBackend) *ENSStore {
-	return &ENSStore{backend: backend}
+	return &ENSStore{Resolver: &ENSResolver{backend: backend}}
 }
 
 // DialENSStore dials an Ethereum API and creates a new store.
@@ -44,7 +43,7 @@ func DialENSStore(rpcUrl string) (*ENSStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ENSStore{backend: ethclient.NewClient(client)}, nil
+	return &ENSStore{Resolver: &ENSResolver{backend: ethclient.NewClient(client)}}, nil
 }
 
 // DialENSStoreAt dials an Ethereum API and creates a new store that works with a resolver at given address.
@@ -53,15 +52,31 @@ func DialENSStoreAt(rpcUrl, resolverAddr string) (*ENSStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ENSStore{backend: ethclient.NewClient(client), resolverAddr: resolverAddr}, nil
+	return &ENSStore{Resolver: &ENSResolver{backend: ethclient.NewClient(client), resolverAddr: resolverAddr}}, nil
+}
+
+// NewENStoreWithResolver creates a new store with custom resolver.
+func NewENStoreWithResolver(resolver Resolver) *ENSStore {
+	return &ENSStore{Resolver: resolver}
+}
+
+// Resolver resolves inputs.
+type Resolver interface {
+	Resolve(input string) (common.Address, error)
+}
+
+// ENSResolver resolves names from an ENS contract.
+type ENSResolver struct {
+	backend      bind.ContractBackend
+	resolverAddr string
 }
 
 // Resolve resolves an input to an address.
-func (ensstore *ENSStore) Resolve(input string) (common.Address, error) {
-	if len(ensstore.resolverAddr) == 0 {
-		return ens.Resolve(ensstore.backend, input)
+func (ensResolver *ENSResolver) Resolve(input string) (common.Address, error) {
+	if len(ensResolver.resolverAddr) == 0 {
+		return ens.Resolve(ensResolver.backend, input)
 	}
-	resolver, err := ens.NewResolverAt(ensstore.backend, input, common.HexToAddress(ensstore.resolverAddr))
+	resolver, err := ens.NewResolverAt(ensResolver.backend, input, common.HexToAddress(ensResolver.resolverAddr))
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -71,9 +86,17 @@ func (ensstore *ENSStore) Resolve(input string) (common.Address, error) {
 		return ens.UnknownAddress, err
 	}
 	if bytes.Equal(address.Bytes(), ens.UnknownAddress.Bytes()) {
-		return ens.UnknownAddress, errors.New("no address")
+		return ens.UnknownAddress, fmt.Errorf("no address for %s", input)
 	}
 	return address, nil
+}
+
+// ResolverFunc helps implementing a custom resolver with a function.
+type ResolverFunc func(input string) (common.Address, error)
+
+// Resolve implements the Resolver interface.
+func (rf ResolverFunc) Resolve(input string) (common.Address, error) {
+	return rf(input)
 }
 
 func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContracts, error) {
@@ -107,13 +130,15 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
-	return &registry.RegistryContracts{
+	regContracts := &registry.RegistryContracts{
 		AgentRegistry:      agentReg,
 		ScannerRegistry:    scannerReg,
 		Dispatch:           dispatch,
 		ScannerNodeVersion: scannerNodeVersion,
 		FortaStaking:       fortaStaking,
 		Forta:              forta,
-	}, nil
+	}
+
+	return regContracts, nil
 
 }

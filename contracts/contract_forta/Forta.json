@@ -110,6 +110,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "bytes32",
         "name": "role",
@@ -266,6 +279,19 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SUPPLY",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -508,20 +534,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "disableWhitelist",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "enableWhitelist",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -616,19 +628,6 @@
       }
     ],
     "name": "grantRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      }
-    ],
-    "name": "grantWhitelister",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -807,6 +806,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
@@ -909,7 +921,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "recipient",
+        "name": "to",
         "type": "address"
       },
       {
@@ -933,12 +945,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "sender",
+        "name": "from",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "recipient",
+        "name": "to",
         "type": "address"
       },
       {
@@ -1000,19 +1012,6 @@
       }
     ],
     "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "whitelistDisabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ]

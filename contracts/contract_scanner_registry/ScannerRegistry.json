@@ -109,6 +109,51 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sunsettingTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "scannerPoolRegistry",
+        "type": "address"
+      }
+    ],
+    "name": "ConfiguredMigration",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "scannerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "DeregisteredScanner",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "uint256",
         "name": "scannerId",
@@ -204,19 +249,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "newstakeController",
-        "type": "address"
-      }
-    ],
-    "name": "StakeControllerUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "uint256",
         "name": "chainId",
         "type": "uint256"
@@ -241,6 +273,19 @@
       }
     ],
     "name": "StakeThresholdChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newHandler",
+        "type": "address"
+      }
+    ],
+    "name": "SubjectHandlerUpdated",
     "type": "event"
   },
   {
@@ -285,57 +330,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "scanner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "metadata",
-        "type": "string"
-      }
-    ],
-    "name": "adminRegister",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "scanner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "metadata",
-        "type": "string"
-      }
-    ],
-    "name": "adminUpdate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "to",
         "type": "address"
       },
@@ -367,6 +361,44 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_sunsettingTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_scannerPoolRegistry",
+        "type": "address"
+      }
+    ],
+    "name": "configureMigration",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "scannerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "deregisterScannerNode",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disableRouter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -554,19 +586,11 @@
         "internalType": "bool",
         "name": "enabled",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getStakeController",
-    "outputs": [
+      },
       {
-        "internalType": "contract IStakeController",
-        "name": "",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "disabledFlags",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -609,15 +633,36 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getSubjectHandler",
+    "outputs": [
+      {
+        "internalType": "contract IStakeSubjectGateway",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "hasMigrationEnded",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
         "name": "__manager",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__router",
         "type": "address"
       },
       {
@@ -796,7 +841,26 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "optingOutOfMigration",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "subject",
         "type": "uint256"
       }
     ],
@@ -812,26 +876,16 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "chainId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "metadata",
-        "type": "string"
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
-    "name": "register",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -876,7 +930,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "_data",
+        "name": "data",
         "type": "bytes"
       }
     ],
@@ -902,6 +956,19 @@
       }
     ],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "scannerPoolRegistry",
+    "outputs": [
+      {
+        "internalType": "contract ScannerPoolRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -943,17 +1010,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "manager",
-        "type": "address"
-      },
-      {
         "internalType": "bool",
-        "name": "enable",
+        "name": "isOut",
         "type": "bool"
       }
     ],
-    "name": "setManager",
+    "name": "setMigrationPrefrence",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -972,32 +1034,6 @@
       }
     ],
     "name": "setName",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newRouter",
-        "type": "address"
-      }
-    ],
-    "name": "setRouter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "stakeController",
-        "type": "address"
-      }
-    ],
-    "name": "setStakeController",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1035,6 +1071,32 @@
     "name": "setStakeThreshold",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "subjectGateway",
+        "type": "address"
+      }
+    ],
+    "name": "setSubjectHandler",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sunsettingTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

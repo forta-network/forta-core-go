@@ -12,6 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
@@ -19,6 +20,7 @@ import (
 
 const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
+const ScannerPoolStake = "ScannerPoolStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
 const TransferShares = "TransferShares"
@@ -78,6 +80,11 @@ type ScannerStakeMessage struct {
 	ScannerID string `json:"scannerId"`
 }
 
+type ScannerPoolStakeMessage struct {
+	StakeMessage
+	PoolID string `json:"poolId"`
+}
+
 func valueString(v *big.Int) string {
 	if v == nil {
 		return ""
@@ -93,8 +100,10 @@ func extractStakeType(id *big.Int) (string, error) {
 		return ScannerStake, nil
 	case 1:
 		return AgentStake, nil
+	case 2:
+		return ScannerPoolStake, nil
 	default:
-		return "", fmt.Errorf("invalid stake type: %s", id.String())
+		return "", fmt.Errorf("invalid stake type '%d': %s", lastByte, id.String())
 	}
 }
 
@@ -150,11 +159,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 func NewScannerStakeMessage(l types.Log, changeType string, account common.Address, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
-			Message: Message{
-				Action:    ScannerStake,
-				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
-			},
+			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -166,16 +171,24 @@ func NewScannerStakeMessage(l types.Log, changeType string, account common.Addre
 func NewAgentStakeMessage(l types.Log, changeType string, account common.Address, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
-			Message: Message{
-				Action:    AgentStake,
-				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
-			},
+			Message:    MessageFrom(l.TxHash.Hex(), blk, AgentStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
 		},
 		AgentID: agentID,
+	}
+}
+
+func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.Address, poolID string, value *big.Int, blk *domain.Block) *ScannerPoolStakeMessage {
+	return &ScannerPoolStakeMessage{
+		StakeMessage: StakeMessage{
+			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerPoolStake),
+			ChangeType: changeType,
+			Amount:     valueString(value),
+			Account:    strings.ToLower(account.Hex()),
+		},
+		PoolID: strings.ToLower(poolID),
 	}
 }
 
@@ -195,6 +208,22 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistrySta
 }
 
 func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+	return &ScannerStakeThresholdMessage{
+		ThresholdMessage: ThresholdMessage{
+			Message: Message{
+				Action:    ScannerStakeThreshold,
+				Timestamp: time.Now().UTC(),
+				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			Min:       valueString(evt.Min),
+			Max:       valueString(evt.Max),
+			Activated: evt.Activated,
+		},
+		ChainID: evt.ChainId.Int64(),
+	}
+}
+
+func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ScannerPoolRegistryManagedStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{

@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "forwarder",
+        "name": "_forwarder",
         "type": "address"
       }
     ],
@@ -128,6 +128,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "uint8",
         "name": "subjectType",
@@ -148,74 +161,25 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Released",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Rewarded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "router",
         "type": "address"
       }
     ],
     "name": "RouterUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "percent",
+        "type": "uint256"
+      }
+    ],
+    "name": "SlashDelegatorsPercentSet",
     "type": "event"
   },
   {
@@ -267,6 +231,37 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "by",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "SlashedShareSent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "subject",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "account",
         "type": "address"
       },
@@ -286,11 +281,17 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "newManager",
+        "name": "subjectGateway",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "allocator",
         "type": "address"
       }
     ],
-    "name": "StakeParamsManagerSet",
+    "name": "StakeHelpersConfigured",
     "type": "event"
   },
   {
@@ -494,6 +495,69 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "MAX_SLASHABLE_PERCENT",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_WITHDRAWAL_DELAY",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_WITHDRAWAL_DELAY",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activeSharesId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "activeSharesToStake",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint8",
@@ -518,29 +582,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "availableReward",
+    "inputs": [],
+    "name": "allocator",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "contract IStakeAllocator",
         "name": "",
-        "type": "uint256"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -597,6 +645,24 @@
   {
     "inputs": [
       {
+        "internalType": "contract IStakeSubjectGateway",
+        "name": "_subjectGateway",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IStakeAllocator",
+        "name": "_allocator",
+        "type": "address"
+      }
+    ],
+    "name": "configureStakeHelpers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint8",
         "name": "subjectType",
         "type": "uint8"
@@ -620,6 +686,13 @@
         "type": "uint256"
       }
     ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "disableRouter",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -671,6 +744,63 @@
         "internalType": "uint8",
         "name": "subjectType",
         "type": "uint8"
+      }
+    ],
+    "name": "getDelegatedSubjectType",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getDelegatorSubjectType",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getSubjectTypeAgency",
+    "outputs": [
+      {
+        "internalType": "enum SubjectTypeValidator.SubjectStakeAgency",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "subjectType",
+        "type": "uint8"
       },
       {
         "internalType": "uint256",
@@ -684,6 +814,30 @@
       }
     ],
     "name": "inactiveSharesOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "inactiveSharesId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "inactiveSharesToStake",
     "outputs": [
       {
         "internalType": "uint256",
@@ -723,11 +877,6 @@
       {
         "internalType": "address",
         "name": "__manager",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "__router",
         "type": "address"
       },
       {
@@ -850,6 +999,39 @@
   {
     "inputs": [
       {
+        "internalType": "uint8",
+        "name": "oldSubjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "oldSubject",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "newSubjectType",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newSubject",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "staker",
+        "type": "address"
+      }
+    ],
+    "name": "migrate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes[]",
         "name": "data",
         "type": "bytes[]"
@@ -864,6 +1046,38 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "openProposals",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -895,58 +1109,6 @@
       }
     ],
     "name": "relayPermit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "releaseReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "subjectType",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "subject",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "reward",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1080,14 +1242,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newRouter",
-        "type": "address"
-      }
-    ],
-    "name": "setRouter",
+    "inputs": [],
+    "name": "setReentrancyGuard",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1095,12 +1251,12 @@
   {
     "inputs": [
       {
-        "internalType": "contract IStakeController",
-        "name": "newStakingParameters",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "percent",
+        "type": "uint256"
       }
     ],
-    "name": "setStakingParametersManager",
+    "name": "setSlashDelegatorsPercent",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1176,6 +1332,16 @@
         "internalType": "uint256",
         "name": "stakeValue",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "proposer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposerPercent",
+        "type": "uint256"
       }
     ],
     "name": "slash",
@@ -1191,10 +1357,84 @@
   },
   {
     "inputs": [],
+    "name": "slashDelegatorsPercent",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "activeSharesId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "stakeToActiveShares",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "inactiveSharesId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "stakeToInactiveShares",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "stakedToken",
     "outputs": [
       {
         "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "subjectGateway",
+    "outputs": [
+      {
+        "internalType": "contract IStakeSubjectGateway",
         "name": "",
         "type": "address"
       }
@@ -1333,6 +1573,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

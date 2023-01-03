@@ -35,6 +35,14 @@ func SourceFromBlock(txHash string, blk *domain.Block) Source {
 	}
 }
 
+func MessageFrom(txHash string, blk *domain.Block, action string) Message {
+	return Message{
+		Timestamp: time.Now().UTC(),
+		Action:    action,
+		Source:    SourceFromBlock(txHash, blk),
+	}
+}
+
 type Message struct {
 	Action    string    `json:"action"`
 	Timestamp time.Time `json:"timestamp"`

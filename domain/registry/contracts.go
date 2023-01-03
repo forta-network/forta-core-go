@@ -9,4 +9,7 @@ type RegistryContracts struct {
 	ScannerNodeVersion common.Address
 	FortaStaking       common.Address
 	Forta              common.Address
+
+	ScannerPoolRegistry *common.Address
+	StakeAllocator      *common.Address
 }
