@@ -10,10 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_combinerFeed_StartRange(t *testing.T) {
+func Test_combinerFeed_Start(t *testing.T) {
 	type args struct {
-		start               uint64
-		end                 uint64
 		rate                int64
 		stopAfterFirstAlert bool
 		expectErr           error
@@ -23,21 +21,10 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 		args args
 	}{
 		{
-			name: "successfully feeds range",
+			name: "successfully feeds alerts",
 			args: args{
-				start:               uint64(time.Now().Add(time.Minute * -15).UnixMilli()),
-				end:                 uint64(time.Now().Add(time.Minute * -5).UnixMilli()),
 				rate:                int64(time.Nanosecond),
 				stopAfterFirstAlert: false,
-				expectErr:           ErrCombinerStopReached,
-			},
-		}, {
-			name: "start but no end",
-			args: args{
-				start:               uint64(time.Now().Add(time.Minute * -15).UnixMilli()),
-				end:                 0,
-				rate:                int64(time.Nanosecond),
-				stopAfterFirstAlert: true,
 				expectErr:           context.DeadlineExceeded,
 			},
 		},
@@ -49,9 +36,12 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 
 				ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 				defer cancel()
+
+				rate := time.NewTicker(time.Duration(tt.args.rate))
 				cf, err := NewCombinerFeed(
 					ctx, CombinerFeedConfig{
-						APIUrl: "https://api.forta.network/graphql",
+						APIUrl:    "https://api.forta.network/graphql",
+						RateLimit: rate,
 					},
 				)
 				r.NoError(err)
@@ -61,14 +51,16 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 						AlertId: "FORTA-6",
 					},
 				)
-				errCh := cf.RegisterHandler(func(evt *domain.AlertEvent) error {
-					t.Logf("got alert: %s", evt.Event.Alert.Hash)
-					if tt.args.stopAfterFirstAlert {
-						cancel()
-					}
-					return nil
-				})
-				cf.StartRange(tt.args.start, tt.args.end, tt.args.rate)
+				errCh := cf.RegisterHandler(
+					func(evt *domain.AlertEvent) error {
+						t.Logf("got alert: %s, created at: %s", evt.Event.Alert.Hash, evt.Event.Alert.CreatedAt)
+						if tt.args.stopAfterFirstAlert {
+							cancel()
+						}
+						return nil
+					},
+				)
+				cf.Start()
 				r.Equal(tt.args.expectErr, <-errCh)
 			},
 		)
