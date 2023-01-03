@@ -347,6 +347,9 @@ type Alert {
 
     """List of alerts involved in the alert"""
     relatedAlerts: [String]
+
+    """Alert chain id"""
+    chainId: NonNegativeInt
 }
 
 """Search after specified block number and alertId"""
@@ -412,6 +415,9 @@ type SourceAlertEvent {
 
     "Alert timestamp"
     timestamp: String
+
+    "Source chain id"
+    chainId: String
 }
 
 """Block information"""

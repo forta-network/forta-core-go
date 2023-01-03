@@ -38,7 +38,7 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 				end:                 0,
 				rate:                int64(time.Nanosecond),
 				stopAfterFirstAlert: true,
-				expectErr:           context.Canceled,
+				expectErr:           context.DeadlineExceeded,
 			},
 		},
 	}
@@ -51,13 +51,13 @@ func Test_combinerFeed_StartRange(t *testing.T) {
 				defer cancel()
 				cf, err := NewCombinerFeed(
 					ctx, CombinerFeedConfig{
-						APIUrl: "https://api.forta.network/graphql",
+						APIUrl: "https://api-dev.forta.network/graphql",
 					},
 				)
 				r.NoError(err)
 				cf.AddSubscription(
 					&protocol.CombinerBotSubscription{
-						BotId:   "0x5e13c2f3a97c292695b598090056ba5d52f9dcc7790bcdaa8b6cd87c1a1ebc0f",
+						BotId:   "0x2bee737433c0c8cdbd924bbb68306cfd8abcf0e46a6ce8994fa7d474361bb186",
 						AlertId: "FORTA-6",
 					},
 				)

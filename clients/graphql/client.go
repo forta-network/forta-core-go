@@ -119,6 +119,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			Severity:      alert.Severity,
 			FindingType:   alert.FindingType,
 			RelatedAlerts: alert.RelatedAlerts,
+			ChainId:       uint64(alert.ChainId),
 		},
 		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
 	}
@@ -163,11 +164,11 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 
 	// fill source alert
 	if alert.Source.SourceAlert != nil {
-		a.Alert.Source.SourceEvent = &protocol.
-			AlertEvent_Alert_SourceAlertEvent{
+		a.Alert.Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
 			BotId:     alert.Source.SourceAlert.BotId,
 			AlertHash: alert.Source.SourceAlert.Hash,
 			Timestamp: alert.Source.SourceAlert.Timestamp,
+			ChainId:   alert.Source.SourceAlert.ChainId,
 		}
 	}
 
