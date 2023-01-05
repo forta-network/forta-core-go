@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
@@ -168,7 +169,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			BotId:     alert.Source.SourceAlert.BotId,
 			AlertHash: alert.Source.SourceAlert.Hash,
 			Timestamp: alert.Source.SourceAlert.Timestamp,
-			ChainId:   alert.Source.SourceAlert.ChainId,
+			ChainId:   fmt.Sprintf("%d", alert.Source.SourceAlert.ChainId),
 		}
 	}
 

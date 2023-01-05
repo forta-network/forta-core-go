@@ -522,7 +522,7 @@ type getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent s
 	// Alert timestamp
 	Timestamp string `json:"timestamp"`
 	// Source chain id
-	ChainId string `json:"chainId"`
+	ChainId uint `json:"chainId"`
 }
 
 // GetHash returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.Hash, and is useful for accessing the field via an interface.
@@ -541,7 +541,7 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEve
 }
 
 // GetChainId returns getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent.ChainId, and is useful for accessing the field via an interface.
-func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetChainId() string {
+func (v *getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent) GetChainId() uint {
 	return v.ChainId
 }
 
@@ -613,6 +613,7 @@ query getAlerts ($input: AlertsInput) {
 				id
 			}
 			protocol
+			scanNodeCount
 			severity
 			source {
 				transactionHash
