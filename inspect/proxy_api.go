@@ -128,6 +128,10 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	stats, err := pai.detectOffset(ctx, inspectionCfg)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset %w", err))
+		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
 	} else {
 		results.Indicators[IndicatorProxyAPIOffsetScanMean] = stats.Mean
 		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = stats.Median
