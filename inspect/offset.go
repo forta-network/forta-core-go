@@ -26,7 +26,8 @@ func calculateOffsetStats(
 	if err != nil {
 		return offsetStats{}, err
 	}
-	return extractStats(ds), nil
+
+	return extractStats(ds)
 }
 
 // collectOffsetData measures how long does it take to receive a recently created block and compares given eth clients.
@@ -118,13 +119,26 @@ func measureBlockDelay(ctx context.Context, client *ethclient.Client, blockNum u
 exit:
 	return time.Since(start).Milliseconds(), nil
 }
-func extractStats(ds []float64) offsetStats {
+func extractStats(ds []float64) (offsetStats, error) {
 	os := offsetStats{}
+	var err error
 
-	os.Mean, _ = stats.Mean(ds)
-	os.Median, _ = stats.Median(ds)
-	os.Max, _ = stats.Max(ds)
+	os.Mean, err = stats.Mean(ds)
+	if err != nil {
+		return os, err
+	}
+
+	os.Median, err = stats.Median(ds)
+	if err != nil {
+		return os, err
+	}
+
+	os.Max, err = stats.Max(ds)
+	if err != nil {
+		return os, err
+	}
+
 	os.SampleCount = float64(len(ds))
 
-	return os
+	return os, err
 }
