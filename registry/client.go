@@ -129,6 +129,9 @@ type Client interface {
 	// GetStakingThreshold returns the min/max/activated flag for a given address
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 
+	// GetActiveScannerStake returns the active stake for a scanner
+	GetActiveScannerStake(scannerID string) (*big.Int, error)
+
 	// EnableScanner enables a scanner.
 	EnableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
 
