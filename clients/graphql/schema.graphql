@@ -417,7 +417,7 @@ type SourceAlertEvent {
     timestamp: String
 
     "Source chain id"
-    chainId: String
+    chainId: NonNegativeInt
 }
 
 """Block information"""
