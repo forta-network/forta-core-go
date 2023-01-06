@@ -53,11 +53,13 @@ query getAlerts($input: AlertsInput) {
                     hash
                     botId
                     timestamp
+                    chainId
                 }
             }
             alertDocumentType
             findingType
             relatedAlerts
+            chainId
         }
     }
 }

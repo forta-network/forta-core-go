@@ -26,10 +26,9 @@ type TransactionFeed interface {
 // AlertFeed is a subscribable feed of alerts.
 type AlertFeed interface {
 	Start()
-	StartRange(start uint64, end uint64, rate int64)
 	AddSubscription(subscription *protocol.CombinerBotSubscription)
 	RemoveSubscription(subscription *protocol.CombinerBotSubscription)
-	SubscribedBots() []string
+	Subscriptions() []*protocol.CombinerBotSubscription
 	ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error
 	RegisterHandler(alertHandler func(evt *domain.AlertEvent) error) <-chan error
 	health.Reporter

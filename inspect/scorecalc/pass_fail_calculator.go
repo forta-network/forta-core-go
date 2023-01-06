@@ -6,11 +6,6 @@ import (
 	"github.com/forta-network/forta-core-go/inspect"
 )
 
-// constants
-const (
-	MinTotalMemoryRequired = 8e9 // 8 gigabytes
-)
-
 type chainPassFailCalculator struct {
 	config ScoreCalculatorConfig
 }
@@ -59,7 +54,7 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	}
 
 	// at least 50% of the required memory limit is required
-	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < MinTotalMemoryRequired {
+	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < c.config.MinTotalMemory {
 		return 0, nil
 	}
 

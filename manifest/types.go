@@ -14,6 +14,7 @@ type AgentManifest struct {
 	Repository     *string `json:"repository"`
 	Documentation  *string `json:"documentation"`
 	ChainIDs       []int64 `json:"chainIds"`
+	Redundancy     *int    `json:"redundancy"`
 }
 
 // SignedAgentManifest is the contents of an agent manifest

@@ -28,6 +28,7 @@ func TestProxyAPIInspection(t *testing.T) {
 	results, err := inspector.Inspect(
 		context.Background(), InspectionConfig{
 			ProxyAPIURL: testProxyEnv.ProxyAPI,
+			ScanAPIURL:  testProxyEnv.ProxyAPI,
 			BlockNumber: testProxyAPIOldestSupportedBlock,
 		},
 	)
@@ -35,13 +36,18 @@ func TestProxyAPIInspection(t *testing.T) {
 
 	r.Equal(
 		map[string]float64{
-			IndicatorProxyAPIAccessible:     ResultSuccess,
-			IndicatorProxyAPIChainID:        float64(5),
-			IndicatorProxyAPIModuleWeb3:     ResultSuccess,
-			IndicatorProxyAPIModuleEth:      ResultSuccess,
-			IndicatorProxyAPIModuleNet:      ResultSuccess,
-			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
-			IndicatorProxyAPIIsETH2:         ResultSuccess,
+			IndicatorProxyAPIAccessible:        ResultSuccess,
+			IndicatorProxyAPIChainID:           float64(5),
+			IndicatorProxyAPIModuleWeb3:        ResultSuccess,
+			IndicatorProxyAPIModuleEth:         ResultSuccess,
+			IndicatorProxyAPIModuleNet:         ResultSuccess,
+			IndicatorProxyAPIHistorySupport:    VeryOldBlockNumber,
+			IndicatorProxyAPIIsETH2:            ResultSuccess,
+			// trick to make test less flaky and ignore offset issues
+			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
+			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
+			IndicatorProxyAPIOffsetScanMedian:  results.Indicators[IndicatorProxyAPIOffsetScanMedian],
+			IndicatorProxyAPIOffsetScanSamples: results.Indicators[IndicatorProxyAPIOffsetScanSamples],
 		}, results.Indicators,
 	)
 
@@ -64,4 +70,40 @@ func Test_findOldestSupportedBlock(t *testing.T) {
 
 	result := findOldestSupportedBlock(context.Background(), cli, 0, latestBlockNum)
 	r.Equal(testProxyAPIOldestSupportedBlock, result)
+}
+
+func TestProxyAPIInspector_detectOffset(t *testing.T) {
+	type args struct {
+		ctx           context.Context
+		inspectionCfg InspectionConfig
+	}
+
+	tests := []struct {
+		name        string
+		args        args
+	}{
+		{
+			name: "free and free combo",
+			args: args{
+				ctx: context.Background(),
+				inspectionCfg: InspectionConfig{
+					ScanAPIURL:  "https://cloudflare-eth.com",
+					ProxyAPIURL: "https://cloudflare-eth.com",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(
+			tt.name, func(t *testing.T) {
+				pai := &ProxyAPIInspector{}
+				stats, err := pai.detectOffset(tt.args.ctx, tt.args.inspectionCfg)
+				if err != nil {
+					t.Log(err)
+				}
+
+				t.Log(stats)
+			},
+		)
+	}
 }

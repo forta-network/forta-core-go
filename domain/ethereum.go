@@ -4,6 +4,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -131,4 +132,13 @@ type Trace struct {
 	TransactionPosition *int         `json:"transactionPosition"`
 	Type                string       `json:"type"`
 	Error               *string      `json:"error"`
+}
+
+// HeaderCh provides new block headers.
+type HeaderCh <-chan *types.Header
+
+// ClientSubscription abstracts away the subscription implementation.
+type ClientSubscription interface {
+	Err() <-chan error
+	Unsubscribe()
 }

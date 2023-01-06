@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -149,6 +150,52 @@ func TestBlockFeed_ForEachBlock(t *testing.T) {
 	assert.Error(t, testErr, res)
 	assert.Equal(t, 3, len(evts))
 	assertEvts(t, evts, blockEvent(block1), blockEvent(block2), blockEvent(block3))
+}
+
+func TestBlockFeed_ForEachBlock_SubscriptionMode(t *testing.T) {
+	bf, client, traceClient, ctx, cancel := getTestBlockFeed(t)
+	bf.subscriptionMode = true
+
+	block1 := blockWithParent(startHash, 1)
+	block2 := blockWithParent(block1.Hash, 2)
+
+	headerCh := make(chan *types.Header, 1)
+	headerCh <- &types.Header{
+		Number: big.NewInt(1),
+	}
+	client.EXPECT().SubscribeToHead(ctx).Return(headerCh, nil)
+
+	client.EXPECT().BlockByNumber(ctx, big.NewInt(1)).Return(block1, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
+	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block1.Number)).Return(nil, nil).Times(1)
+
+	client.EXPECT().BlockByNumber(ctx, big.NewInt(2)).Return(block2, nil).Times(1)
+	client.EXPECT().GetLogs(ctx, gomock.Any()).Return(nil, nil).Times(1)
+	traceClient.EXPECT().TraceBlock(ctx, hexToBigInt(block2.Number)).Return(nil, nil).Times(1)
+
+	count := 0
+	var evts []*domain.BlockEvent
+	bf.Subscribe(func(evt *domain.BlockEvent) error {
+		count++
+		evts = append(evts, evt)
+		if count == 1 {
+			headerCh <- &types.Header{
+				Number: big.NewInt(2),
+			}
+			return nil
+		}
+		if count == 2 {
+			return testErr
+		}
+		return nil
+	})
+	go bf.subscribeToLatestBlocks()
+	res := bf.forEachBlock()
+	assert.Error(t, testErr, res)
+	assert.Equal(t, 2, len(evts))
+	assertEvts(t, evts, blockEvent(block1), blockEvent(block2))
+	cancel()
+	close(headerCh)
 }
 
 func TestBlockFeed_ForEachBlockWithOldBlock(t *testing.T) {

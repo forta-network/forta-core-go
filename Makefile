@@ -63,6 +63,7 @@ mocks:
 	mockgen -source registry/client.go -destination registry/mocks/mock_client.go
 	mockgen -source ipfs/client.go -destination ipfs/mocks/mock_client.go
 	mockgen -source release/client.go -destination release/mocks/mock_client.go
+	mockgen -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go
 
 .PHONY: test
 test:
