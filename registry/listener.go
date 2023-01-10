@@ -602,7 +602,6 @@ func (l *listener) setLogFilterAddrs() {
 		if filter.StakeAllocator && regContracts.StakeAllocator != nil {
 			addrs = append(addrs, regContracts.StakeAllocator.Hex())
 		}
-		return
 	} else {
 		// include all contracts
 		addrs = []string{
@@ -623,8 +622,6 @@ func (l *listener) setLogFilterAddrs() {
 	for _, addr := range addrs {
 		l.logs.AddAddress(addr)
 	}
-
-	return
 }
 
 func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient ethereum.Client, regClient Client) (*listener, error) {
