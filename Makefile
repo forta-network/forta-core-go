@@ -6,6 +6,7 @@ FORMAT = $(GOBIN)/goimports
 SWAGGER = $(GOBIN)/swagger
 PROTOC_GEN_GO = $(GOBIN)/protoc-gen-go
 PROTOC_GEN_GO_GRPC = $(GOBIN)/protoc-gen-go-grpc
+GOMERGETYPES = $(GOBIN)/gomergetypes
 
 PROTOC = protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GO_GRPC)
 
@@ -20,6 +21,8 @@ require-tools: tools
 	@file $(PROTOC_GEN_GO) > /dev/null
 	@file $(PROTOC_GEN_GO_GRPC) > /dev/null
 
+	@file $(GOMERGETYPES) > /dev/null
+
 	@echo "All tools found in $(GOBIN)!"
 
 .PHONY: tools
@@ -33,6 +36,8 @@ tools:
 
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+	@go install github.com/forta-network/go-merge-types/cmd/gomergetypes@master
 
 .PHONY: fmt
 fmt: require-tools
@@ -71,22 +76,52 @@ test:
 
 .PHONY: abigen
 abigen: pull-contracts
-	rm -rf contracts
-	./scripts/abigen.sh forta-contracts components/staking/FortaStaking.sol FortaStaking forta_staking
-	./scripts/abigen.sh forta-contracts components/staking/allocation/StakeAllocator.sol StakeAllocator stake_allocator
-	./scripts/abigen.sh forta-contracts components/staking/rewards/RewardsDistributor.sol RewardsDistributor rewards_distributor
-	./scripts/abigen.sh forta-contracts components/staking/stake_subjects/StakeSubjectGateway.sol StakeSubjectGateway stake_subject_gateway
-	./scripts/abigen.sh forta-contracts components/agents/AgentRegistry.sol AgentRegistry agent_registry
-	./scripts/abigen.sh forta-contracts components/dispatch/Dispatch.sol Dispatch dispatch
-	./scripts/abigen.sh forta-contracts components/scanners/ScannerNodeVersion.sol ScannerNodeVersion scanner_node_version
-	./scripts/abigen.sh forta-contracts components/scanners/ScannerRegistry.sol ScannerRegistry scanner_registry "--alias _register=underscoreRegister"
-	./scripts/abigen.sh forta-contracts components/scanner_pools/ScannerPoolRegistry.sol ScannerPoolRegistry scanner_pool_registry "--alias _register=underscoreRegister"
-	./scripts/abigen.sh forta-contracts components/access/AccessManager.sol AccessManager access_manager
-	./scripts/abigen.sh forta-contracts token/Forta.sol Forta forta
+	rm -rf contracts/generated
+	./scripts/abigen.sh forta-contracts components/staking/FortaStaking.sol FortaStaking FortaStaking forta_staking_0_1_2
+	./scripts/abigen.sh forta-contracts components/_old/staking/FortaStaking_0_1_1.sol FortaStaking_0_1_1 FortaStaking forta_staking_0_1_1
+	$(GOMERGETYPES) --config contracts/merged/contract_forta_staking/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_forta_staking/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/staking/allocation/StakeAllocator.sol StakeAllocator StakeAllocator stake_allocator_0_1_0
+	$(GOMERGETYPES) --config contracts/merged/contract_stake_allocator/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_stake_allocator/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/staking/rewards/RewardsDistributor.sol RewardsDistributor RewardsDistributor rewards_distributor_0_1_0
+	$(GOMERGETYPES) --config contracts/merged/contract_rewards_distributor/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_rewards_distributor/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/agents/AgentRegistry.sol AgentRegistry AgentRegistry agent_registry_0_1_6
+	./scripts/abigen.sh forta-contracts components/_old/agents/AgentRegistry_0_1_4.sol AgentRegistry_0_1_4 AgentRegistry agent_registry_0_1_4
+	$(GOMERGETYPES) --config contracts/merged/contract_agent_registry/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_agent_registry/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/scanners/ScannerNodeVersion.sol ScannerNodeVersion ScannerNodeVersion scanner_node_version_0_1_1
+	./scripts/abigen.sh forta-contracts components/_old/scanners/ScannerNodeVersion_0_1_0.sol ScannerNodeVersion_0_1_0 ScannerNodeVersion scanner_node_version_0_1_0
+	$(GOMERGETYPES) --config contracts/merged/contract_scanner_node_version/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_scanner_node_version/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/scanner_pools/ScannerPoolRegistry.sol ScannerPoolRegistry ScannerPoolRegistry scanner_pool_registry_0_1_0 "--alias _register=underscoreRegister"
+	$(GOMERGETYPES) --config contracts/merged/contract_scanner_pool_registry/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_scanner_pool_registry/filterer.yml
+
+	./scripts/abigen.sh forta-contracts token/Forta.sol Forta Forta forta_0_2_0
+	$(GOMERGETYPES) --config contracts/merged/contract_forta/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_forta/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/scanners/ScannerRegistry.sol ScannerRegistry ScannerRegistry scanner_registry_0_1_4 "--alias _register=underscoreRegister"
+	./scripts/abigen.sh forta-contracts components/_old/scanners/ScannerRegistry_0_1_3.sol ScannerRegistry_0_1_3 ScannerRegistry scanner_registry_0_1_3 "--alias _register=underscoreRegister"
+	$(GOMERGETYPES) --config contracts/merged/contract_scanner_registry/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_scanner_registry/filterer.yml
+
+	./scripts/abigen.sh forta-contracts components/dispatch/Dispatch.sol Dispatch Dispatch dispatch_0_1_5
+	./scripts/abigen.sh forta-contracts components/_old/dispatch/Dispatch_0_1_4.sol Dispatch_0_1_4 Dispatch dispatch_0_1_4
+	$(GOMERGETYPES) --config contracts/merged/contract_dispatch/caller.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_dispatch/filterer.yml
+
 
 .PHONY: pull-contracts
 pull-contracts:
-	./scripts/pull-contracts.sh forta-contracts master
+	./scripts/pull-contracts.sh forta-contracts caner/include-old-in-generated-abis
 
 .PHONY: swagger
 swagger: require-tools

@@ -127,7 +127,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 
 	stats, err := pai.detectOffset(ctx, inspectionCfg)
 	if err != nil {
-		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset %w", err))
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
 		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
 		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
 		results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
@@ -164,6 +164,7 @@ func (pai *ProxyAPIInspector) detectOffset(
 
 	return calculateOffsetStats(proxyCtx, scanClient, proxyClient)
 }
+
 // checkSupportedModules double-checks the functionality of modules that were declared as supported by
 // the node.
 func checkSupportedModules(

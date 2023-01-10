@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 )
 
 const (
@@ -33,4 +33,4 @@ type AssignmentHash struct {
 	Hash        string `json:"hash"`
 }
 
-type StakingThreshold contract_scanner_registry.IStakeSubjectStakeThreshold
+type StakingThreshold contract_scanner_registry.GetStakeThresholdOutput

@@ -1,0 +1,19 @@
+sources:
+  - type: FortaFilterer
+    tag: '0.2.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_forta_0_2_0
+      alias: forta020
+      sourceDir: ../../generated/contract_forta_0_2_0
+
+output:
+  type: FortaFilterer
+  defaultTag: '0.2.0'
+  package: contract_forta
+  file: filterer.go
+  rewrite:
+    - match: ^Parse([a-zA-Z]+)Output$
+      transform: $Event
+
+errors:
+  hide: true

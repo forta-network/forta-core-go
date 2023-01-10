@@ -1,0 +1,13 @@
+sources:
+  - type: ScannerPoolRegistryCaller
+    tag: '0.1.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0
+      alias: scannerpoolregistry010
+      sourceDir: ../../generated/contract_scanner_pool_registry_0_1_0
+
+output:
+  type: ScannerPoolRegistryCaller
+  defaultTag: '0.1.0'
+  package: contract_scanner_pool_registry
+  file: caller.go

@@ -9,7 +9,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_dispatch"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -34,7 +34,7 @@ func ParseDispatchMessage(msg string) (*DispatchMessage, error) {
 	return &m, nil
 }
 
-func NewDispatchMessage(evt *contract_dispatch.DispatchLink, blk *domain.Block) *DispatchMessage {
+func NewDispatchMessage(evt *contract_dispatch.LinkEvent, blk *domain.Block) *DispatchMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	agentID := utils.Hex(evt.AgentId)
 	evtName := Unlink
@@ -52,7 +52,7 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink, blk *domain.Block) 
 	}
 }
 
-func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinked, blk *domain.Block) *DispatchMessage {
+func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.AlreadyLinkedEvent, blk *domain.Block) *DispatchMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	agentID := utils.Hex(evt.AgentId)
 	evtName := Unlink

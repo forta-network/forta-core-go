@@ -1,0 +1,25 @@
+sources:
+  - type: DispatchFilterer
+    tag: '0.1.4'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4
+      alias: dispatch014
+      sourceDir: ../../generated/contract_dispatch_0_1_4
+  - type: DispatchFilterer
+    tag: '0.1.5'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_5
+      alias: dispatch015
+      sourceDir: ../../generated/contract_dispatch_0_1_5
+
+output:
+  type: DispatchFilterer
+  defaultTag: '0.1.4'
+  package: contract_dispatch
+  file: filterer.go
+  rewrite:
+    - match: ^Parse([a-zA-Z]+)Output$
+      transform: $Event
+
+errors:
+  hide: true

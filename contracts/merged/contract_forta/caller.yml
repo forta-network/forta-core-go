@@ -1,0 +1,13 @@
+sources:
+  - type: FortaCaller
+    tag: '0.2.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_forta_0_2_0
+      alias: forta020
+      sourceDir: ../../generated/contract_forta_0_2_0
+
+output:
+  type: FortaCaller
+  defaultTag: '0.2.0'
+  package: contract_forta
+  file: caller.go

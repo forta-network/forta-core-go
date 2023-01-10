@@ -1,0 +1,19 @@
+sources:
+  - type: ScannerNodeVersionCaller
+    tag: '0.1.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_0
+      alias: scannernodeversion010
+      sourceDir: ../../generated/contract_scanner_node_version_0_1_0
+  - type: ScannerNodeVersionCaller
+    tag: '0.1.1'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_1
+      alias: scannernodeversion011
+      sourceDir: ../../generated/contract_scanner_node_version_0_1_1
+
+output:
+  type: ScannerNodeVersionCaller
+  defaultTag: '0.1.0'
+  package: contract_scanner_node_version
+  file: caller.go

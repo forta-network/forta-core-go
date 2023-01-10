@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core/apitypes"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
+	contract_scanner_pool_registry "github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0"
 )
 
 // MessageHash calculates the hash for EIP-712 message.

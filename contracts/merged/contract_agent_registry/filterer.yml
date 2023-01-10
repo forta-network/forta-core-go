@@ -1,0 +1,25 @@
+sources:
+  - type: AgentRegistryFilterer
+    tag: '0.1.4'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4
+      alias: agentregistry014
+      sourceDir: ../../generated/contract_agent_registry_0_1_4
+  - type: AgentRegistryFilterer
+    tag: '0.1.6'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_6
+      alias: agentregistry016
+      sourceDir: ../../generated/contract_agent_registry_0_1_6
+
+output:
+  type: AgentRegistryFilterer
+  defaultTag: '0.1.4'
+  package: contract_agent_registry
+  file: filterer.go
+  rewrite:
+    - match: ^Parse([a-zA-Z]+)Output$
+      transform: $Event
+
+errors:
+  hide: true

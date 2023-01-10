@@ -10,10 +10,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_pool_registry"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
 )
@@ -112,7 +112,7 @@ func isActive(id *big.Int) bool {
 	return 0 == big.NewInt(0).And(id, one.Lsh(one, 8)).Cmp(big.NewInt(256))
 }
 
-func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.FortaStakingTransferSingle, blk *domain.Block) (*TransferSharesMessage, error) {
+func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.TransferSingleEvent, blk *domain.Block) (*TransferSharesMessage, error) {
 	st, err := extractStakeType(evt.Id)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 	}, nil
 }
 
-func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.FortaStakingTransferBatch, blk *domain.Block) ([]*TransferSharesMessage, error) {
+func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.TransferBatchEvent, blk *domain.Block) ([]*TransferSharesMessage, error) {
 	var res []*TransferSharesMessage
 	for i, id := range evt.Ids {
 		st, err := extractStakeType(id)
@@ -192,7 +192,7 @@ func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.A
 	}
 }
 
-func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
+func NewAgentStakeThresholdMessage(evt *contract_agent_registry.StakeThresholdChangedEvent, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{
@@ -207,7 +207,7 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistrySta
 	}
 }
 
-func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.StakeThresholdChangedEvent, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{
@@ -223,7 +223,7 @@ func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegis
 	}
 }
 
-func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ScannerPoolRegistryManagedStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ManagedStakeThresholdChangedEvent, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{

@@ -270,30 +270,18 @@ func (mr *MockAlertFeedMockRecorder) Start() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockAlertFeed)(nil).Start))
 }
 
-// StartRange mocks base method.
-func (m *MockAlertFeed) StartRange(start, end uint64, rate int64) {
+// Subscriptions mocks base method.
+func (m *MockAlertFeed) Subscriptions() []*protocol.CombinerBotSubscription {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "StartRange", start, end, rate)
-}
-
-// StartRange indicates an expected call of StartRange.
-func (mr *MockAlertFeedMockRecorder) StartRange(start, end, rate interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartRange", reflect.TypeOf((*MockAlertFeed)(nil).StartRange), start, end, rate)
-}
-
-// SubscribedBots mocks base method.
-func (m *MockAlertFeed) SubscribedBots() []string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SubscribedBots")
-	ret0, _ := ret[0].([]string)
+	ret := m.ctrl.Call(m, "Subscriptions")
+	ret0, _ := ret[0].([]*protocol.CombinerBotSubscription)
 	return ret0
 }
 
-// SubscribedBots indicates an expected call of SubscribedBots.
-func (mr *MockAlertFeedMockRecorder) SubscribedBots() *gomock.Call {
+// Subscriptions indicates an expected call of Subscriptions.
+func (mr *MockAlertFeedMockRecorder) Subscriptions() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribedBots", reflect.TypeOf((*MockAlertFeed)(nil).SubscribedBots))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscriptions", reflect.TypeOf((*MockAlertFeed)(nil).Subscriptions))
 }
 
 // MockLogFeed is a mock of LogFeed interface.
@@ -317,6 +305,18 @@ func NewMockLogFeed(ctrl *gomock.Controller) *MockLogFeed {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockLogFeed) EXPECT() *MockLogFeedMockRecorder {
 	return m.recorder
+}
+
+// AddAddress mocks base method.
+func (m *MockLogFeed) AddAddress(newAddr string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AddAddress", newAddr)
+}
+
+// AddAddress indicates an expected call of AddAddress.
+func (mr *MockLogFeedMockRecorder) AddAddress(newAddr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAddress", reflect.TypeOf((*MockLogFeed)(nil).AddAddress), newAddr)
 }
 
 // ForEachLog mocks base method.

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"strings"
+	"sync"
 
 	"github.com/forta-network/forta-core-go/domain"
 
@@ -23,16 +25,15 @@ type logFeed struct {
 	startBlock *big.Int
 	endBlock   *big.Int
 	topics     [][]string
-	addresses  []string
 	client     eth.Client
 	offset     int
+
+	addresses []common.Address
+	addrsMu   sync.RWMutex
 }
 
 func (l *logFeed) GetLogsForRange(startBlock *big.Int, endBlock *big.Int) ([]types.Log, error) {
-	addrs := make([]common.Address, 0, len(l.addresses))
-	for _, addr := range l.addresses {
-		addrs = append(addrs, common.HexToAddress(addr))
-	}
+	addrs := l.getAddrs()
 
 	var topics [][]common.Hash
 	for _, topicSet := range l.topics {
@@ -73,11 +74,6 @@ func (l *logFeed) GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error) {
 
 func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error {
 	eg, ctx := errgroup.WithContext(l.ctx)
-
-	addrs := make([]common.Address, 0, len(l.addresses))
-	for _, addr := range l.addresses {
-		addrs = append(addrs, common.HexToAddress(addr))
-	}
 
 	var topics [][]common.Hash
 	for _, topicSet := range l.topics {
@@ -130,6 +126,8 @@ func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log)
 				blk = pastBlock
 			}
 
+			addrs := l.getAddrs()
+
 			q := ethereum.FilterQuery{
 				FromBlock: blockToRetrieve,
 				ToBlock:   blockToRetrieve,
@@ -161,6 +159,25 @@ func (l *logFeed) ForEachLog(handler func(blk *domain.Block, logEntry types.Log)
 	return eg.Wait()
 }
 
+func (l *logFeed) getAddrs() []common.Address {
+	l.addrsMu.RLock()
+	defer l.addrsMu.RUnlock()
+
+	return l.addresses
+}
+
+func (l *logFeed) AddAddress(newAddr string) {
+	l.addrsMu.Lock()
+	defer l.addrsMu.Unlock()
+
+	for _, addr := range l.addresses {
+		if strings.EqualFold(addr.Hex(), newAddr) {
+			return
+		}
+	}
+	l.addresses = append(l.addresses, common.HexToAddress(newAddr))
+}
+
 type LogFeedConfig struct {
 	Topics     [][]string
 	Addresses  []string
@@ -173,11 +190,15 @@ func NewLogFeed(ctx context.Context, client eth.Client, cfg LogFeedConfig) (*log
 	if cfg.Offset < 0 {
 		return nil, fmt.Errorf("offset cannot be below zero: offset=%d", cfg.Offset)
 	}
+	addrs := make([]common.Address, 0, len(cfg.Addresses))
+	for _, addr := range cfg.Addresses {
+		addrs = append(addrs, common.HexToAddress(addr))
+	}
 	return &logFeed{
 		ctx:        ctx,
 		client:     client,
 		topics:     cfg.Topics,
-		addresses:  cfg.Addresses,
+		addresses:  addrs,
 		startBlock: cfg.StartBlock,
 		endBlock:   cfg.EndBlock,
 		offset:     cfg.Offset,

@@ -39,4 +39,5 @@ type LogFeed interface {
 	ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error
 	GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error)
 	GetLogsForRange(blockStart *big.Int, blockEnd *big.Int) ([]types.Log, error)
+	AddAddress(newAddr string)
 }

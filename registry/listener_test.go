@@ -7,16 +7,16 @@ import (
 	"os"
 	"testing"
 
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_0"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
 
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
-	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain/registry"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/sync/errgroup"
+	"github.com/stretchr/testify/require"
 )
 
 // This actually calls out to polygon to get some known blocks and parse the actions
@@ -53,7 +53,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "agent-enable",
 			listener: testListener(ctx, &ContractFilter{AgentRegistry: true},
-				contract_agent_registry.AgentEnabledTopic,
+				contract_agent_registry_0_1_4.AgentEnabledTopic,
 				Handlers{
 					AgentActionHandler: func(logger *log.Entry, msg *registry.AgentMessage) error {
 						assert.Equal(t, int64(26030393), msg.Source.BlockNumberDecimal)
@@ -67,7 +67,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "agent-disable",
 			listener: testListener(ctx, &ContractFilter{AgentRegistry: true},
-				contract_agent_registry.AgentEnabledTopic,
+				contract_agent_registry_0_1_4.AgentEnabledTopic,
 				Handlers{
 					AgentActionHandler: func(logger *log.Entry, msg *registry.AgentMessage) error {
 						assert.Equal(t, int64(26029118), msg.Source.BlockNumberDecimal)
@@ -81,7 +81,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "scanner-enable",
 			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry.ScannerEnabledTopic,
+				contract_scanner_registry_0_1_3.ScannerEnabledTopic,
 				Handlers{
 					ScannerActionHandler: func(logger *log.Entry, msg *registry.ScannerMessage) error {
 						assert.Equal(t, int64(27984372), msg.Source.BlockNumberDecimal)
@@ -95,7 +95,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "scanner-disable",
 			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry.ScannerEnabledTopic,
+				contract_scanner_registry_0_1_3.ScannerEnabledTopic,
 				Handlers{
 					ScannerActionHandler: func(logger *log.Entry, msg *registry.ScannerMessage) error {
 						assert.Equal(t, int64(28005870), msg.Source.BlockNumberDecimal)
@@ -109,7 +109,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "scanner-save",
 			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry.ScannerUpdatedTopic,
+				contract_scanner_registry_0_1_3.ScannerUpdatedTopic,
 				Handlers{
 					SaveScannerHandler: func(logger *log.Entry, msg *registry.ScannerSaveMessage) error {
 						assert.Equal(t, int64(25809030), msg.Source.BlockNumberDecimal)
@@ -123,7 +123,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "agent-save",
 			listener: testListener(ctx, &ContractFilter{AgentRegistry: true},
-				contract_agent_registry.AgentUpdatedTopic,
+				contract_agent_registry_0_1_4.AgentUpdatedTopic,
 				Handlers{
 					SaveAgentHandler: func(logger *log.Entry, msg *registry.AgentSaveMessage) error {
 						assert.Equal(t, int64(25730681), msg.Source.BlockNumberDecimal)
@@ -137,7 +137,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "dispatch-link",
 			listener: testListener(ctx, &ContractFilter{DispatchRegistry: true},
-				contract_dispatch.LinkTopic,
+				contract_dispatch_0_1_4.LinkTopic,
 				Handlers{
 					DispatchHandler: func(logger *log.Entry, msg *registry.DispatchMessage) error {
 						assert.Equal(t, int64(25730716), msg.Source.BlockNumberDecimal)
@@ -152,7 +152,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "dispatch-unlink",
 			listener: testListener(ctx, &ContractFilter{DispatchRegistry: true},
-				contract_dispatch.LinkTopic,
+				contract_dispatch_0_1_4.LinkTopic,
 				Handlers{
 					DispatchHandler: func(logger *log.Entry, msg *registry.DispatchMessage) error {
 						assert.Equal(t, int64(25772370), msg.Source.BlockNumberDecimal)
@@ -167,7 +167,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "scanner-stake-threshold",
 			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry.StakeThresholdChangedTopic,
+				contract_scanner_registry_0_1_3.StakeThresholdChangedTopic,
 				Handlers{
 					ScannerStakeThresholdHandler: func(logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error {
 						assert.Equal(t, int64(26465762), msg.Source.BlockNumberDecimal)
@@ -182,7 +182,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "scanner-stake",
 			listener: testListener(ctx, &ContractFilter{FortaStaking: true},
-				contract_forta_staking.StakeDepositedTopic,
+				contract_forta_staking_0_1_1.StakeDepositedTopic,
 				Handlers{
 					ScannerStakeHandler: func(logger *log.Entry, msg *registry.ScannerStakeMessage) error {
 						assert.Equal(t, int64(26498238), msg.Source.BlockNumberDecimal)
@@ -198,7 +198,7 @@ func TestListener_Listen(t *testing.T) {
 		{
 			name: "transfer-shares",
 			listener: testListener(ctx, &ContractFilter{FortaStaking: true},
-				contract_forta_staking.TransferSingleTopic,
+				contract_forta_staking_0_1_1.TransferSingleTopic,
 				Handlers{
 					TransferSharesHandler: func(logger *log.Entry, msg *registry.TransferSharesMessage) error {
 						assert.Equal(t, int64(26498238), msg.Source.BlockNumberDecimal)
@@ -212,7 +212,7 @@ func TestListener_Listen(t *testing.T) {
 		}, {
 			name: "scanner-version",
 			listener: testListener(ctx, &ContractFilter{ScannerVersion: true},
-				contract_scanner_node_version.ScannerNodeVersionUpdatedTopic,
+				contract_scanner_node_version_0_1_0.ScannerNodeVersionUpdatedTopic,
 				Handlers{
 					ScannerNodeVersionHandler: func(logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error {
 						assert.Equal(t, int64(31739343), msg.Source.BlockNumberDecimal)
@@ -226,15 +226,11 @@ func TestListener_Listen(t *testing.T) {
 		},
 	}
 
-	grp, _ := errgroup.WithContext(ctx)
-
-	for _, lt := range tests {
-		tst := lt
-		grp.Go(func() error {
-			err := tst.listener.ProcessBlockRange(big.NewInt(tst.block), big.NewInt(tst.block))
-			assert.Equal(t, found, err, tst.name)
-			return nil
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			r := require.New(t)
+			err := testCase.listener.ProcessBlockRange(big.NewInt(testCase.block), big.NewInt(testCase.block))
+			r.NoError(err)
 		})
 	}
-	assert.NoError(t, grp.Wait())
 }

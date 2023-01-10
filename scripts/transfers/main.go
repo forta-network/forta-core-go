@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
 	rd "github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
@@ -32,7 +32,7 @@ func main() {
 		ContractFilter: &registry.ContractFilter{
 			FortaStaking: true,
 		},
-		Topics: []string{contract_forta_staking.TransferSingleTopic, contract_forta_staking.TransferBatchTopic},
+		Topics: []string{contract_forta_staking_0_1_1.TransferSingleTopic, contract_forta_staking_0_1_1.TransferBatchTopic},
 	})
 	if err != nil {
 		panic(err)

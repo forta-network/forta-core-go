@@ -44,7 +44,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		contracts := c.RegistryContracts()
+		contracts := c.Contracts()
 		b, _ := json.MarshalIndent(contracts, "", "  ")
 		fmt.Println(string(b))
 	}
@@ -54,7 +54,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		contracts := c.RegistryContracts()
+		contracts := c.Contracts()
 		b, _ := json.MarshalIndent(contracts, "", "  ")
 		fmt.Println(string(b))
 	}
