@@ -559,6 +559,9 @@ func (c *client) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, er
 	aID := utils.AgentHexToBigInt(agentID)
 	sID := utils.ScannerIDHexToBigInt(scannerID)
 	length, err := c.dp.NumScannersFor(opts, aID)
+	if err != nil {
+		return nil, err
+	}
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
 		scn, err := c.dp.ScannerRefAt(opts, aID, idx)
