@@ -87,6 +87,9 @@ type Client interface {
 	// GetPoolScanner returns a scanner
 	GetPoolScanner(scannerID string) (*Scanner, error)
 
+	// TotalScannersRegistered returns the count of scanners registered in a pool
+	TotalScannersRegistered(poolID *big.Int) (*big.Int, error)
+
 	// RegisterScannerOld executes the pre-delegated-staking registration.
 	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
@@ -128,6 +131,12 @@ type Client interface {
 
 	// GetStakingThreshold returns the min/max/activated flag for a given address
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
+
+	// GetActiveScannerStake returns the active stake for a scanner
+	GetActiveScannerStake(scannerID string) (*big.Int, error)
+
+	// GetActivePoolStake returns the total active stake for a pool
+	GetActivePoolStake(poolID *big.Int) (*big.Int, error)
 
 	// EnableScanner enables a scanner.
 	EnableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
@@ -920,4 +929,29 @@ func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) 
 
 func (c *client) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
 	return c.scannerPoolReg.WillNewScannerShutdownPool(c.opts, poolID)
+}
+
+func (c *client) GetActivePoolStake(poolID *big.Int) (*big.Int, error) {
+	if c.scannerPoolReg == nil {
+		return nil, ErrContractNotReady
+	}
+
+	poolStake, err := c.fortaStaking.ActiveStakeFor(c.opts, SubjectTypeScannerPool, poolID)
+	if err != nil {
+		return nil, err
+	}
+	delegatorPoolStake, err := c.fortaStaking.ActiveStakeFor(c.opts, SubjectTypeDelegatorScannerPool, poolID)
+	if err != nil {
+		return nil, err
+	}
+
+	return poolStake.Add(poolStake, delegatorPoolStake), nil
+}
+
+func (c *client) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
+	if c.scannerPoolReg == nil {
+		return nil, ErrContractNotReady
+	}
+
+	return c.scannerPoolReg.TotalScannersRegistered(c.opts, poolID)
 }
