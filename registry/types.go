@@ -5,9 +5,10 @@ import (
 )
 
 const (
-	SubjectTypeScanner     = 0
-	SubjectTypeAgent       = 1
-	SubjectTypeScannerPool = 2
+	SubjectTypeScanner              = 0
+	SubjectTypeAgent                = 1
+	SubjectTypeScannerPool          = 2
+	SubjectTypeDelegatorScannerPool = 3
 )
 
 type Agent struct {
