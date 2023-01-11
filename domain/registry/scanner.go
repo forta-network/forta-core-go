@@ -73,7 +73,7 @@ func ParseUpdateScannerPoolMessage(msg string) (*UpdateScannerPoolMessage, error
 	return &m, nil
 }
 
-func NewScannerMessage(evt *contract_scanner_registry.ScannerEnabledEvent, blk *domain.Block) *ScannerMessage {
+func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnabled, blk *domain.Block) *ScannerMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	evtName := DisableScanner
 	if evt.Enabled {
@@ -86,7 +86,7 @@ func NewScannerMessage(evt *contract_scanner_registry.ScannerEnabledEvent, blk *
 	}
 }
 
-func NewScannerMessageFromPool(evt *contract_scanner_pool_registry.ScannerEnabledEvent, blk *domain.Block) *ScannerMessage {
+func NewScannerMessageFromPool(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerEnabled, blk *domain.Block) *ScannerMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	evtName := DisableScanner
 	if evt.Enabled {
@@ -99,7 +99,7 @@ func NewScannerMessageFromPool(evt *contract_scanner_pool_registry.ScannerEnable
 	}
 }
 
-func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerUpdatedEvent, enabled bool, blk *domain.Block) *ScannerSaveMessage {
+func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerRegistryScannerUpdated, enabled bool, blk *domain.Block) *ScannerSaveMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{
@@ -111,7 +111,7 @@ func NewScannerSaveMessage(evt *contract_scanner_registry.ScannerUpdatedEvent, e
 	}
 }
 
-func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerUpdatedEvent, enabled bool, blk *domain.Block) *ScannerSaveMessage {
+func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, enabled bool, blk *domain.Block) *ScannerSaveMessage {
 	scannerID := utils.HexAddr(evt.ScannerId)
 	return &ScannerSaveMessage{
 		ScannerMessage: ScannerMessage{
@@ -124,7 +124,7 @@ func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerUp
 	}
 }
 
-func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.TransferEvent, blk *domain.Block) *UpdateScannerPoolMessage {
+func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.ScannerPoolRegistryTransfer, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
 		PoolID:  utils.PoolIDToString(evt.TokenId),
@@ -132,7 +132,7 @@ func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.Trans
 	}
 }
 
-func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.ScannerPoolRegisteredEvent, owner string, blk *domain.Block) *UpdateScannerPoolMessage {
+func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.ScannerPoolRegistryScannerPoolRegistered, owner string, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
 		PoolID:  utils.PoolIDToString(evt.ScannerPoolId),
@@ -141,7 +141,7 @@ func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.S
 	}
 }
 
-func NewScannerPoolMessageFromEnablement(evt *contract_scanner_pool_registry.EnabledScannersChangedEvent, blk *domain.Block) *UpdateScannerPoolMessage {
+func NewScannerPoolMessageFromEnablement(evt *contract_scanner_pool_registry.ScannerPoolRegistryEnabledScannersChanged, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: MessageFrom(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
 		PoolID:  utils.PoolIDToString(evt.ScannerPoolId),

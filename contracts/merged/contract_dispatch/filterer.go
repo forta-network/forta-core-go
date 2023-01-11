@@ -183,8 +183,8 @@ func (merged *DispatchFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, 
 }
 
 
-// AccessManagerUpdatedEvent is a merged return type.
-type AccessManagerUpdatedEvent struct {
+// DispatchAccessManagerUpdated is a merged return type.
+type DispatchAccessManagerUpdated struct {
 
 	NewAddressManager common.Address
 
@@ -193,14 +193,14 @@ type AccessManagerUpdatedEvent struct {
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AccessManagerUpdatedEvent, err error) {
+func (merged *DispatchFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *DispatchAccessManagerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AccessManagerUpdatedEvent{}
+	retVal = &DispatchAccessManagerUpdated{}
 
 
 
@@ -344,8 +344,8 @@ func (merged *DispatchFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink cha
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// DispatchAdminChanged is a merged return type.
+type DispatchAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -356,14 +356,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *DispatchFilterer) ParseAdminChanged(log types.Log) (retVal *DispatchAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &DispatchAdminChanged{}
 
 
 
@@ -511,8 +511,8 @@ func (merged *DispatchFilterer) WatchAlreadyLinked(opts *bind.WatchOpts, sink ch
 }
 
 
-// AlreadyLinkedEvent is a merged return type.
-type AlreadyLinkedEvent struct {
+// DispatchAlreadyLinked is a merged return type.
+type DispatchAlreadyLinked struct {
 
 	AgentId *big.Int
 
@@ -525,14 +525,14 @@ type AlreadyLinkedEvent struct {
 }
 
 // ParseAlreadyLinked multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *AlreadyLinkedEvent, err error) {
+func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *DispatchAlreadyLinked, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AlreadyLinkedEvent{}
+	retVal = &DispatchAlreadyLinked{}
 
 
 
@@ -684,8 +684,8 @@ func (merged *DispatchFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink c
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// DispatchBeaconUpgraded is a merged return type.
+type DispatchBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -694,14 +694,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *DispatchFilterer) ParseBeaconUpgraded(log types.Log) (retVal *DispatchBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &DispatchBeaconUpgraded{}
 
 
 
@@ -845,8 +845,8 @@ func (merged *DispatchFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// DispatchInitialized is a merged return type.
+type DispatchInitialized struct {
 
 	Version uint8
 
@@ -855,14 +855,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *DispatchFilterer) ParseInitialized(log types.Log) (retVal *DispatchInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &DispatchInitialized{}
 
 
 
@@ -1006,8 +1006,8 @@ func (merged *DispatchFilterer) WatchLink(opts *bind.WatchOpts, sink chan<- *dis
 }
 
 
-// LinkEvent is a merged return type.
-type LinkEvent struct {
+// DispatchLink is a merged return type.
+type DispatchLink struct {
 
 	AgentId *big.Int
 
@@ -1020,14 +1020,14 @@ type LinkEvent struct {
 }
 
 // ParseLink multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *LinkEvent, err error) {
+func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *DispatchLink, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &LinkEvent{}
+	retVal = &DispatchLink{}
 
 
 
@@ -1179,8 +1179,8 @@ func (merged *DispatchFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink ch
 }
 
 
-// RouterUpdatedEvent is a merged return type.
-type RouterUpdatedEvent struct {
+// DispatchRouterUpdated is a merged return type.
+type DispatchRouterUpdated struct {
 
 	Router common.Address
 
@@ -1189,14 +1189,14 @@ type RouterUpdatedEvent struct {
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseRouterUpdated(log types.Log) (retVal *RouterUpdatedEvent, err error) {
+func (merged *DispatchFilterer) ParseRouterUpdated(log types.Log) (retVal *DispatchRouterUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RouterUpdatedEvent{}
+	retVal = &DispatchRouterUpdated{}
 
 
 
@@ -1340,8 +1340,8 @@ func (merged *DispatchFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- 
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// DispatchUpgraded is a merged return type.
+type DispatchUpgraded struct {
 
 	Implementation common.Address
 
@@ -1350,14 +1350,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *DispatchFilterer) ParseUpgraded(log types.Log) (retVal *DispatchUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &DispatchUpgraded{}
 
 
 
@@ -1461,8 +1461,8 @@ func (merged *DispatchFilterer) WatchSetAgentRegistry(opts *bind.WatchOpts, sink
 }
 
 
-// SetAgentRegistryEvent is a merged return type.
-type SetAgentRegistryEvent struct {
+// DispatchSetAgentRegistry is a merged return type.
+type DispatchSetAgentRegistry struct {
 
 	Registry common.Address
 
@@ -1471,14 +1471,14 @@ type SetAgentRegistryEvent struct {
 }
 
 // ParseSetAgentRegistry multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseSetAgentRegistry(log types.Log) (retVal *SetAgentRegistryEvent, err error) {
+func (merged *DispatchFilterer) ParseSetAgentRegistry(log types.Log) (retVal *DispatchSetAgentRegistry, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SetAgentRegistryEvent{}
+	retVal = &DispatchSetAgentRegistry{}
 
 
 
@@ -1565,8 +1565,8 @@ func (merged *DispatchFilterer) WatchSetScannerPoolRegistry(opts *bind.WatchOpts
 }
 
 
-// SetScannerPoolRegistryEvent is a merged return type.
-type SetScannerPoolRegistryEvent struct {
+// DispatchSetScannerPoolRegistry is a merged return type.
+type DispatchSetScannerPoolRegistry struct {
 
 	Registry common.Address
 
@@ -1575,14 +1575,14 @@ type SetScannerPoolRegistryEvent struct {
 }
 
 // ParseSetScannerPoolRegistry multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseSetScannerPoolRegistry(log types.Log) (retVal *SetScannerPoolRegistryEvent, err error) {
+func (merged *DispatchFilterer) ParseSetScannerPoolRegistry(log types.Log) (retVal *DispatchSetScannerPoolRegistry, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SetScannerPoolRegistryEvent{}
+	retVal = &DispatchSetScannerPoolRegistry{}
 
 
 
@@ -1669,8 +1669,8 @@ func (merged *DispatchFilterer) WatchSetScannerRegistry(opts *bind.WatchOpts, si
 }
 
 
-// SetScannerRegistryEvent is a merged return type.
-type SetScannerRegistryEvent struct {
+// DispatchSetScannerRegistry is a merged return type.
+type DispatchSetScannerRegistry struct {
 
 	Registry common.Address
 
@@ -1679,14 +1679,14 @@ type SetScannerRegistryEvent struct {
 }
 
 // ParseSetScannerRegistry multiplexes to different implementations of the method.
-func (merged *DispatchFilterer) ParseSetScannerRegistry(log types.Log) (retVal *SetScannerRegistryEvent, err error) {
+func (merged *DispatchFilterer) ParseSetScannerRegistry(log types.Log) (retVal *DispatchSetScannerRegistry, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SetScannerRegistryEvent{}
+	retVal = &DispatchSetScannerRegistry{}
 
 
 

@@ -20,7 +20,7 @@ type ScannerPoolAllocationMessage struct {
 	Increase     bool   `json:"increase"`
 }
 
-func NewScannerPoolAllocationMessage(l types.Log, blk *domain.Block, evt *contract_stake_allocator.AllocatedStakeEvent) *ScannerPoolAllocationMessage {
+func NewScannerPoolAllocationMessage(l types.Log, blk *domain.Block, evt *contract_stake_allocator.StakeAllocatorAllocatedStake) *ScannerPoolAllocationMessage {
 	return &ScannerPoolAllocationMessage{
 		Message:      MessageFrom(l.TxHash.Hex(), blk, ScannerPoolAllocatedStake),
 		PoolID:       utils.PoolIDToString(evt.Subject),

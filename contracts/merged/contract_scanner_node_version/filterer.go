@@ -181,8 +181,8 @@ func (merged *ScannerNodeVersionFilterer) WatchAccessManagerUpdated(opts *bind.W
 }
 
 
-// AccessManagerUpdatedEvent is a merged return type.
-type AccessManagerUpdatedEvent struct {
+// ScannerNodeVersionAccessManagerUpdated is a merged return type.
+type ScannerNodeVersionAccessManagerUpdated struct {
 
 	NewAddressManager common.Address
 
@@ -191,14 +191,14 @@ type AccessManagerUpdatedEvent struct {
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AccessManagerUpdatedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *ScannerNodeVersionAccessManagerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AccessManagerUpdatedEvent{}
+	retVal = &ScannerNodeVersionAccessManagerUpdated{}
 
 
 
@@ -342,8 +342,8 @@ func (merged *ScannerNodeVersionFilterer) WatchAdminChanged(opts *bind.WatchOpts
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// ScannerNodeVersionAdminChanged is a merged return type.
+type ScannerNodeVersionAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -354,14 +354,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retVal *ScannerNodeVersionAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &ScannerNodeVersionAdminChanged{}
 
 
 
@@ -509,8 +509,8 @@ func (merged *ScannerNodeVersionFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// ScannerNodeVersionBeaconUpgraded is a merged return type.
+type ScannerNodeVersionBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -519,14 +519,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (retVal *ScannerNodeVersionBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &ScannerNodeVersionBeaconUpgraded{}
 
 
 
@@ -670,8 +670,8 @@ func (merged *ScannerNodeVersionFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 }
 
 
-// RouterUpdatedEvent is a merged return type.
-type RouterUpdatedEvent struct {
+// ScannerNodeVersionRouterUpdated is a merged return type.
+type ScannerNodeVersionRouterUpdated struct {
 
 	Router common.Address
 
@@ -680,14 +680,14 @@ type RouterUpdatedEvent struct {
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (retVal *RouterUpdatedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (retVal *ScannerNodeVersionRouterUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RouterUpdatedEvent{}
+	retVal = &ScannerNodeVersionRouterUpdated{}
 
 
 
@@ -831,8 +831,8 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeVersionUpdated(opts *b
 }
 
 
-// ScannerNodeVersionUpdatedEvent is a merged return type.
-type ScannerNodeVersionUpdatedEvent struct {
+// ScannerNodeVersionScannerNodeVersionUpdated is a merged return type.
+type ScannerNodeVersionScannerNodeVersionUpdated struct {
 
 	NewVersion string
 
@@ -843,14 +843,14 @@ type ScannerNodeVersionUpdatedEvent struct {
 }
 
 // ParseScannerNodeVersionUpdated multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log types.Log) (retVal *ScannerNodeVersionUpdatedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log types.Log) (retVal *ScannerNodeVersionScannerNodeVersionUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ScannerNodeVersionUpdatedEvent{}
+	retVal = &ScannerNodeVersionScannerNodeVersionUpdated{}
 
 
 
@@ -998,8 +998,8 @@ func (merged *ScannerNodeVersionFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// ScannerNodeVersionUpgraded is a merged return type.
+type ScannerNodeVersionUpgraded struct {
 
 	Implementation common.Address
 
@@ -1008,14 +1008,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *ScannerNodeVersionUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &ScannerNodeVersionUpgraded{}
 
 
 
@@ -1119,8 +1119,8 @@ func (merged *ScannerNodeVersionFilterer) WatchInitialized(opts *bind.WatchOpts,
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// ScannerNodeVersionInitialized is a merged return type.
+type ScannerNodeVersionInitialized struct {
 
 	Version uint8
 
@@ -1129,14 +1129,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseInitialized(log types.Log) (retVal *ScannerNodeVersionInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &ScannerNodeVersionInitialized{}
 
 
 
@@ -1223,8 +1223,8 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeBetaVersionUpdated(opt
 }
 
 
-// ScannerNodeBetaVersionUpdatedEvent is a merged return type.
-type ScannerNodeBetaVersionUpdatedEvent struct {
+// ScannerNodeVersionScannerNodeBetaVersionUpdated is a merged return type.
+type ScannerNodeVersionScannerNodeBetaVersionUpdated struct {
 
 	NewVersion string
 
@@ -1235,14 +1235,14 @@ type ScannerNodeBetaVersionUpdatedEvent struct {
 }
 
 // ParseScannerNodeBetaVersionUpdated multiplexes to different implementations of the method.
-func (merged *ScannerNodeVersionFilterer) ParseScannerNodeBetaVersionUpdated(log types.Log) (retVal *ScannerNodeBetaVersionUpdatedEvent, err error) {
+func (merged *ScannerNodeVersionFilterer) ParseScannerNodeBetaVersionUpdated(log types.Log) (retVal *ScannerNodeVersionScannerNodeBetaVersionUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ScannerNodeBetaVersionUpdatedEvent{}
+	retVal = &ScannerNodeVersionScannerNodeBetaVersionUpdated{}
 
 
 

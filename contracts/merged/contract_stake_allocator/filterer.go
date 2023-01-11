@@ -134,8 +134,8 @@ func (merged *StakeAllocatorFilterer) WatchAccessManagerUpdated(opts *bind.Watch
 }
 
 
-// AccessManagerUpdatedEvent is a merged return type.
-type AccessManagerUpdatedEvent struct {
+// StakeAllocatorAccessManagerUpdated is a merged return type.
+type StakeAllocatorAccessManagerUpdated struct {
 
 	NewAddressManager common.Address
 
@@ -144,14 +144,14 @@ type AccessManagerUpdatedEvent struct {
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AccessManagerUpdatedEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *StakeAllocatorAccessManagerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AccessManagerUpdatedEvent{}
+	retVal = &StakeAllocatorAccessManagerUpdated{}
 
 
 
@@ -238,8 +238,8 @@ func (merged *StakeAllocatorFilterer) WatchAdminChanged(opts *bind.WatchOpts, si
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// StakeAllocatorAdminChanged is a merged return type.
+type StakeAllocatorAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -250,14 +250,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseAdminChanged(log types.Log) (retVal *StakeAllocatorAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &StakeAllocatorAdminChanged{}
 
 
 
@@ -346,8 +346,8 @@ func (merged *StakeAllocatorFilterer) WatchAllocatedStake(opts *bind.WatchOpts, 
 }
 
 
-// AllocatedStakeEvent is a merged return type.
-type AllocatedStakeEvent struct {
+// StakeAllocatorAllocatedStake is a merged return type.
+type StakeAllocatorAllocatedStake struct {
 
 	SubjectType uint8
 
@@ -364,14 +364,14 @@ type AllocatedStakeEvent struct {
 }
 
 // ParseAllocatedStake multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseAllocatedStake(log types.Log) (retVal *AllocatedStakeEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseAllocatedStake(log types.Log) (retVal *StakeAllocatorAllocatedStake, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AllocatedStakeEvent{}
+	retVal = &StakeAllocatorAllocatedStake{}
 
 
 
@@ -466,8 +466,8 @@ func (merged *StakeAllocatorFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, 
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// StakeAllocatorBeaconUpgraded is a merged return type.
+type StakeAllocatorBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -476,14 +476,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseBeaconUpgraded(log types.Log) (retVal *StakeAllocatorBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &StakeAllocatorBeaconUpgraded{}
 
 
 
@@ -570,8 +570,8 @@ func (merged *StakeAllocatorFilterer) WatchInitialized(opts *bind.WatchOpts, sin
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// StakeAllocatorInitialized is a merged return type.
+type StakeAllocatorInitialized struct {
 
 	Version uint8
 
@@ -580,14 +580,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseInitialized(log types.Log) (retVal *StakeAllocatorInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &StakeAllocatorInitialized{}
 
 
 
@@ -674,8 +674,8 @@ func (merged *StakeAllocatorFilterer) WatchRouterUpdated(opts *bind.WatchOpts, s
 }
 
 
-// RouterUpdatedEvent is a merged return type.
-type RouterUpdatedEvent struct {
+// StakeAllocatorRouterUpdated is a merged return type.
+type StakeAllocatorRouterUpdated struct {
 
 	Router common.Address
 
@@ -684,14 +684,14 @@ type RouterUpdatedEvent struct {
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseRouterUpdated(log types.Log) (retVal *RouterUpdatedEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseRouterUpdated(log types.Log) (retVal *StakeAllocatorRouterUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RouterUpdatedEvent{}
+	retVal = &StakeAllocatorRouterUpdated{}
 
 
 
@@ -778,8 +778,8 @@ func (merged *StakeAllocatorFilterer) WatchUnallocatedStake(opts *bind.WatchOpts
 }
 
 
-// UnallocatedStakeEvent is a merged return type.
-type UnallocatedStakeEvent struct {
+// StakeAllocatorUnallocatedStake is a merged return type.
+type StakeAllocatorUnallocatedStake struct {
 
 	SubjectType uint8
 
@@ -796,14 +796,14 @@ type UnallocatedStakeEvent struct {
 }
 
 // ParseUnallocatedStake multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseUnallocatedStake(log types.Log) (retVal *UnallocatedStakeEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseUnallocatedStake(log types.Log) (retVal *StakeAllocatorUnallocatedStake, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UnallocatedStakeEvent{}
+	retVal = &StakeAllocatorUnallocatedStake{}
 
 
 
@@ -898,8 +898,8 @@ func (merged *StakeAllocatorFilterer) WatchUpgraded(opts *bind.WatchOpts, sink c
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// StakeAllocatorUpgraded is a merged return type.
+type StakeAllocatorUpgraded struct {
 
 	Implementation common.Address
 
@@ -908,14 +908,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *StakeAllocatorFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *StakeAllocatorFilterer) ParseUpgraded(log types.Log) (retVal *StakeAllocatorUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &StakeAllocatorUpgraded{}
 
 
 

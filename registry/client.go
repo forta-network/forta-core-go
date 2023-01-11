@@ -116,16 +116,16 @@ type Client interface {
 	ForEachAgentID(handler func(agentID string) error) error
 
 	// ForEachAgentSinceBlock loops over all agents since a provided block number
-	ForEachAgentSinceBlock(block uint64, handler func(event *contract_agent_registry.AgentUpdatedEvent, a *Agent) error) error
+	ForEachAgentSinceBlock(block uint64, handler func(event *contract_agent_registry.AgentRegistryAgentUpdated, a *Agent) error) error
 
 	// ForEachScanner gets all scanners
 	ForEachScanner(handler func(s *Scanner) error) error
 
 	// ForEachScannerSinceBlock loops over all scanners since a provided block number
-	ForEachScannerSinceBlock(block uint64, handler func(event *contract_scanner_registry.ScannerUpdatedEvent, s *Scanner) error) error
+	ForEachScannerSinceBlock(block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error) error
 
 	// ForEachPoolScannerSinceBlock loops over all scanners since a provided block number
-	ForEachPoolScannerSinceBlock(block uint64, handler func(event *contract_scanner_pool_registry.ScannerUpdatedEvent, s *Scanner) error) error
+	ForEachPoolScannerSinceBlock(block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error) error
 
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
@@ -483,7 +483,7 @@ func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
 	return c.ForEachScannerSinceBlock(
 		scannerRegistryDeployBlock,
-		func(_ *contract_scanner_registry.ScannerUpdatedEvent, s *Scanner) error {
+		func(_ *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error {
 			return handler(s)
 		})
 }
@@ -495,7 +495,7 @@ type eventIterator interface {
 }
 
 func (c *client) ForEachScannerSinceBlock(
-	block uint64, handler func(event *contract_scanner_registry.ScannerUpdatedEvent, s *Scanner) error,
+	block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error,
 ) error {
 	opts, err := c.getOpts()
 	if err != nil {
@@ -520,12 +520,12 @@ func (c *client) ForEachScannerSinceBlock(
 
 	for it.Next() {
 		// find the event from any of the iterator implementations
-		var event *contract_scanner_registry.ScannerUpdatedEvent
+		var event *contract_scanner_registry.ScannerRegistryScannerUpdated
 		if iterators.Scannerregistry013Result != nil && iterators.Scannerregistry013Result.Event != nil {
-			event = (*contract_scanner_registry.ScannerUpdatedEvent)(iterators.Scannerregistry013Result.Event)
+			event = (*contract_scanner_registry.ScannerRegistryScannerUpdated)(iterators.Scannerregistry013Result.Event)
 		}
 		if iterators.Scannerregistry014Result != nil && iterators.Scannerregistry014Result.Event != nil {
-			event = (*contract_scanner_registry.ScannerUpdatedEvent)(iterators.Scannerregistry014Result.Event)
+			event = (*contract_scanner_registry.ScannerRegistryScannerUpdated)(iterators.Scannerregistry014Result.Event)
 		}
 
 		if event != nil {
@@ -549,7 +549,7 @@ func (c *client) ForEachScannerSinceBlock(
 }
 
 func (c *client) ForEachPoolScannerSinceBlock(
-	block uint64, handler func(event *contract_scanner_pool_registry.ScannerUpdatedEvent, s *Scanner) error,
+	block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error,
 ) error {
 	contracts := c.Contracts()
 	if contracts.ScannerPoolReg == nil || contracts.ScannerPoolRegFil == nil {
@@ -577,7 +577,7 @@ func (c *client) ForEachPoolScannerSinceBlock(
 			if err != nil {
 				return err
 			}
-			if err := handler((*contract_scanner_pool_registry.ScannerUpdatedEvent)(it.Event), &Scanner{
+			if err := handler((*contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated)(it.Event), &Scanner{
 				ScannerID: utils.ScannerIDBigIntToHex(it.Event.ScannerId),
 				ChainID:   scn.ChainId.Int64(),
 				Enabled:   scn.Operational,
@@ -679,7 +679,7 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 }
 
 func (c *client) ForEachAgentSinceBlock(
-	block uint64, handler func(event *contract_agent_registry.AgentUpdatedEvent, a *Agent) error,
+	block uint64, handler func(event *contract_agent_registry.AgentRegistryAgentUpdated, a *Agent) error,
 ) error {
 	opts, err := c.getOpts()
 	if err != nil {
@@ -703,12 +703,12 @@ func (c *client) ForEachAgentSinceBlock(
 	}
 
 	// find the event from any of the iterator implementations
-	var event *contract_agent_registry.AgentUpdatedEvent
+	var event *contract_agent_registry.AgentRegistryAgentUpdated
 	if iterators.Agentregistry014Result != nil && iterators.Agentregistry014Result.Event != nil {
-		event = (*contract_agent_registry.AgentUpdatedEvent)(iterators.Agentregistry014Result.Event)
+		event = (*contract_agent_registry.AgentRegistryAgentUpdated)(iterators.Agentregistry014Result.Event)
 	}
 	if iterators.Agentregistry016Result != nil && iterators.Agentregistry016Result.Event != nil {
-		event = (*contract_agent_registry.AgentUpdatedEvent)(iterators.Agentregistry016Result.Event)
+		event = (*contract_agent_registry.AgentRegistryAgentUpdated)(iterators.Agentregistry016Result.Event)
 	}
 
 	for it.Next() {

@@ -134,8 +134,8 @@ func (merged *FortaFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<-
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// FortaAdminChanged is a merged return type.
+type FortaAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -146,14 +146,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *FortaFilterer) ParseAdminChanged(log types.Log) (retVal *FortaAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &FortaAdminChanged{}
 
 
 
@@ -242,8 +242,8 @@ func (merged *FortaFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *fo
 }
 
 
-// ApprovalEvent is a merged return type.
-type ApprovalEvent struct {
+// FortaApproval is a merged return type.
+type FortaApproval struct {
 
 	Owner common.Address
 
@@ -256,14 +256,14 @@ type ApprovalEvent struct {
 }
 
 // ParseApproval multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseApproval(log types.Log) (retVal *ApprovalEvent, err error) {
+func (merged *FortaFilterer) ParseApproval(log types.Log) (retVal *FortaApproval, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ApprovalEvent{}
+	retVal = &FortaApproval{}
 
 
 
@@ -354,8 +354,8 @@ func (merged *FortaFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// FortaBeaconUpgraded is a merged return type.
+type FortaBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -364,14 +364,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *FortaFilterer) ParseBeaconUpgraded(log types.Log) (retVal *FortaBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &FortaBeaconUpgraded{}
 
 
 
@@ -458,8 +458,8 @@ func (merged *FortaFilterer) WatchDelegateChanged(opts *bind.WatchOpts, sink cha
 }
 
 
-// DelegateChangedEvent is a merged return type.
-type DelegateChangedEvent struct {
+// FortaDelegateChanged is a merged return type.
+type FortaDelegateChanged struct {
 
 	Delegator common.Address
 
@@ -472,14 +472,14 @@ type DelegateChangedEvent struct {
 }
 
 // ParseDelegateChanged multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseDelegateChanged(log types.Log) (retVal *DelegateChangedEvent, err error) {
+func (merged *FortaFilterer) ParseDelegateChanged(log types.Log) (retVal *FortaDelegateChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &DelegateChangedEvent{}
+	retVal = &FortaDelegateChanged{}
 
 
 
@@ -570,8 +570,8 @@ func (merged *FortaFilterer) WatchDelegateVotesChanged(opts *bind.WatchOpts, sin
 }
 
 
-// DelegateVotesChangedEvent is a merged return type.
-type DelegateVotesChangedEvent struct {
+// FortaDelegateVotesChanged is a merged return type.
+type FortaDelegateVotesChanged struct {
 
 	Delegate common.Address
 
@@ -584,14 +584,14 @@ type DelegateVotesChangedEvent struct {
 }
 
 // ParseDelegateVotesChanged multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseDelegateVotesChanged(log types.Log) (retVal *DelegateVotesChangedEvent, err error) {
+func (merged *FortaFilterer) ParseDelegateVotesChanged(log types.Log) (retVal *FortaDelegateVotesChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &DelegateVotesChangedEvent{}
+	retVal = &FortaDelegateVotesChanged{}
 
 
 
@@ -682,8 +682,8 @@ func (merged *FortaFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- 
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// FortaInitialized is a merged return type.
+type FortaInitialized struct {
 
 	Version uint8
 
@@ -692,14 +692,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *FortaFilterer) ParseInitialized(log types.Log) (retVal *FortaInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &FortaInitialized{}
 
 
 
@@ -786,8 +786,8 @@ func (merged *FortaFilterer) WatchRoleAdminChanged(opts *bind.WatchOpts, sink ch
 }
 
 
-// RoleAdminChangedEvent is a merged return type.
-type RoleAdminChangedEvent struct {
+// FortaRoleAdminChanged is a merged return type.
+type FortaRoleAdminChanged struct {
 
 	Role [32]byte
 
@@ -800,14 +800,14 @@ type RoleAdminChangedEvent struct {
 }
 
 // ParseRoleAdminChanged multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseRoleAdminChanged(log types.Log) (retVal *RoleAdminChangedEvent, err error) {
+func (merged *FortaFilterer) ParseRoleAdminChanged(log types.Log) (retVal *FortaRoleAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RoleAdminChangedEvent{}
+	retVal = &FortaRoleAdminChanged{}
 
 
 
@@ -898,8 +898,8 @@ func (merged *FortaFilterer) WatchRoleGranted(opts *bind.WatchOpts, sink chan<- 
 }
 
 
-// RoleGrantedEvent is a merged return type.
-type RoleGrantedEvent struct {
+// FortaRoleGranted is a merged return type.
+type FortaRoleGranted struct {
 
 	Role [32]byte
 
@@ -912,14 +912,14 @@ type RoleGrantedEvent struct {
 }
 
 // ParseRoleGranted multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseRoleGranted(log types.Log) (retVal *RoleGrantedEvent, err error) {
+func (merged *FortaFilterer) ParseRoleGranted(log types.Log) (retVal *FortaRoleGranted, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RoleGrantedEvent{}
+	retVal = &FortaRoleGranted{}
 
 
 
@@ -1010,8 +1010,8 @@ func (merged *FortaFilterer) WatchRoleRevoked(opts *bind.WatchOpts, sink chan<- 
 }
 
 
-// RoleRevokedEvent is a merged return type.
-type RoleRevokedEvent struct {
+// FortaRoleRevoked is a merged return type.
+type FortaRoleRevoked struct {
 
 	Role [32]byte
 
@@ -1024,14 +1024,14 @@ type RoleRevokedEvent struct {
 }
 
 // ParseRoleRevoked multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseRoleRevoked(log types.Log) (retVal *RoleRevokedEvent, err error) {
+func (merged *FortaFilterer) ParseRoleRevoked(log types.Log) (retVal *FortaRoleRevoked, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RoleRevokedEvent{}
+	retVal = &FortaRoleRevoked{}
 
 
 
@@ -1122,8 +1122,8 @@ func (merged *FortaFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *fo
 }
 
 
-// TransferEvent is a merged return type.
-type TransferEvent struct {
+// FortaTransfer is a merged return type.
+type FortaTransfer struct {
 
 	From common.Address
 
@@ -1136,14 +1136,14 @@ type TransferEvent struct {
 }
 
 // ParseTransfer multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseTransfer(log types.Log) (retVal *TransferEvent, err error) {
+func (merged *FortaFilterer) ParseTransfer(log types.Log) (retVal *FortaTransfer, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TransferEvent{}
+	retVal = &FortaTransfer{}
 
 
 
@@ -1234,8 +1234,8 @@ func (merged *FortaFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *fo
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// FortaUpgraded is a merged return type.
+type FortaUpgraded struct {
 
 	Implementation common.Address
 
@@ -1244,14 +1244,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *FortaFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *FortaFilterer) ParseUpgraded(log types.Log) (retVal *FortaUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &FortaUpgraded{}
 
 
 

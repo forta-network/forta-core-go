@@ -19,7 +19,7 @@ output:
   file: filterer.go
   rewrite:
   - match: ^Parse([a-zA-Z]+)Output$
-    transform: $Event
+    transform: ScannerRegistry$
 
 errors:
   hide: true

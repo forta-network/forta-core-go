@@ -134,8 +134,8 @@ func (merged *RewardsDistributorFilterer) WatchAccessManagerUpdated(opts *bind.W
 }
 
 
-// AccessManagerUpdatedEvent is a merged return type.
-type AccessManagerUpdatedEvent struct {
+// RewardsDistributorAccessManagerUpdated is a merged return type.
+type RewardsDistributorAccessManagerUpdated struct {
 
 	NewAddressManager common.Address
 
@@ -144,14 +144,14 @@ type AccessManagerUpdatedEvent struct {
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AccessManagerUpdatedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *RewardsDistributorAccessManagerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AccessManagerUpdatedEvent{}
+	retVal = &RewardsDistributorAccessManagerUpdated{}
 
 
 
@@ -238,8 +238,8 @@ func (merged *RewardsDistributorFilterer) WatchAdminChanged(opts *bind.WatchOpts
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// RewardsDistributorAdminChanged is a merged return type.
+type RewardsDistributorAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -250,14 +250,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseAdminChanged(log types.Log) (retVal *RewardsDistributorAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &RewardsDistributorAdminChanged{}
 
 
 
@@ -346,8 +346,8 @@ func (merged *RewardsDistributorFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// RewardsDistributorBeaconUpgraded is a merged return type.
+type RewardsDistributorBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -356,14 +356,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseBeaconUpgraded(log types.Log) (retVal *RewardsDistributorBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &RewardsDistributorBeaconUpgraded{}
 
 
 
@@ -450,8 +450,8 @@ func (merged *RewardsDistributorFilterer) WatchClaimedRewards(opts *bind.WatchOp
 }
 
 
-// ClaimedRewardsEvent is a merged return type.
-type ClaimedRewardsEvent struct {
+// RewardsDistributorClaimedRewards is a merged return type.
+type RewardsDistributorClaimedRewards struct {
 
 	SubjectType uint8
 
@@ -468,14 +468,14 @@ type ClaimedRewardsEvent struct {
 }
 
 // ParseClaimedRewards multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseClaimedRewards(log types.Log) (retVal *ClaimedRewardsEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseClaimedRewards(log types.Log) (retVal *RewardsDistributorClaimedRewards, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ClaimedRewardsEvent{}
+	retVal = &RewardsDistributorClaimedRewards{}
 
 
 
@@ -570,8 +570,8 @@ func (merged *RewardsDistributorFilterer) WatchDidAccumulateRate(opts *bind.Watc
 }
 
 
-// DidAccumulateRateEvent is a merged return type.
-type DidAccumulateRateEvent struct {
+// RewardsDistributorDidAccumulateRate is a merged return type.
+type RewardsDistributorDidAccumulateRate struct {
 
 	SubjectType uint8
 
@@ -588,14 +588,14 @@ type DidAccumulateRateEvent struct {
 }
 
 // ParseDidAccumulateRate multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseDidAccumulateRate(log types.Log) (retVal *DidAccumulateRateEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseDidAccumulateRate(log types.Log) (retVal *RewardsDistributorDidAccumulateRate, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &DidAccumulateRateEvent{}
+	retVal = &RewardsDistributorDidAccumulateRate{}
 
 
 
@@ -690,8 +690,8 @@ func (merged *RewardsDistributorFilterer) WatchDidReduceRate(opts *bind.WatchOpt
 }
 
 
-// DidReduceRateEvent is a merged return type.
-type DidReduceRateEvent struct {
+// RewardsDistributorDidReduceRate is a merged return type.
+type RewardsDistributorDidReduceRate struct {
 
 	SubjectType uint8
 
@@ -708,14 +708,14 @@ type DidReduceRateEvent struct {
 }
 
 // ParseDidReduceRate multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseDidReduceRate(log types.Log) (retVal *DidReduceRateEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseDidReduceRate(log types.Log) (retVal *RewardsDistributorDidReduceRate, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &DidReduceRateEvent{}
+	retVal = &RewardsDistributorDidReduceRate{}
 
 
 
@@ -810,8 +810,8 @@ func (merged *RewardsDistributorFilterer) WatchDidTransferRewardShares(opts *bin
 }
 
 
-// DidTransferRewardSharesEvent is a merged return type.
-type DidTransferRewardSharesEvent struct {
+// RewardsDistributorDidTransferRewardShares is a merged return type.
+type RewardsDistributorDidTransferRewardShares struct {
 
 	SharesId *big.Int
 
@@ -828,14 +828,14 @@ type DidTransferRewardSharesEvent struct {
 }
 
 // ParseDidTransferRewardShares multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseDidTransferRewardShares(log types.Log) (retVal *DidTransferRewardSharesEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseDidTransferRewardShares(log types.Log) (retVal *RewardsDistributorDidTransferRewardShares, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &DidTransferRewardSharesEvent{}
+	retVal = &RewardsDistributorDidTransferRewardShares{}
 
 
 
@@ -930,8 +930,8 @@ func (merged *RewardsDistributorFilterer) WatchInitialized(opts *bind.WatchOpts,
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// RewardsDistributorInitialized is a merged return type.
+type RewardsDistributorInitialized struct {
 
 	Version uint8
 
@@ -940,14 +940,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseInitialized(log types.Log) (retVal *RewardsDistributorInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &RewardsDistributorInitialized{}
 
 
 
@@ -1034,8 +1034,8 @@ func (merged *RewardsDistributorFilterer) WatchRewarded(opts *bind.WatchOpts, si
 }
 
 
-// RewardedEvent is a merged return type.
-type RewardedEvent struct {
+// RewardsDistributorRewarded is a merged return type.
+type RewardsDistributorRewarded struct {
 
 	SubjectType uint8
 
@@ -1050,14 +1050,14 @@ type RewardedEvent struct {
 }
 
 // ParseRewarded multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseRewarded(log types.Log) (retVal *RewardedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseRewarded(log types.Log) (retVal *RewardsDistributorRewarded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RewardedEvent{}
+	retVal = &RewardsDistributorRewarded{}
 
 
 
@@ -1150,8 +1150,8 @@ func (merged *RewardsDistributorFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 }
 
 
-// RouterUpdatedEvent is a merged return type.
-type RouterUpdatedEvent struct {
+// RewardsDistributorRouterUpdated is a merged return type.
+type RewardsDistributorRouterUpdated struct {
 
 	Router common.Address
 
@@ -1160,14 +1160,14 @@ type RouterUpdatedEvent struct {
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseRouterUpdated(log types.Log) (retVal *RouterUpdatedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseRouterUpdated(log types.Log) (retVal *RewardsDistributorRouterUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RouterUpdatedEvent{}
+	retVal = &RewardsDistributorRouterUpdated{}
 
 
 
@@ -1254,8 +1254,8 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationFee(opts *bind.Watch
 }
 
 
-// SetDelegationFeeEvent is a merged return type.
-type SetDelegationFeeEvent struct {
+// RewardsDistributorSetDelegationFee is a merged return type.
+type RewardsDistributorSetDelegationFee struct {
 
 	SubjectType uint8
 
@@ -1270,14 +1270,14 @@ type SetDelegationFeeEvent struct {
 }
 
 // ParseSetDelegationFee multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseSetDelegationFee(log types.Log) (retVal *SetDelegationFeeEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseSetDelegationFee(log types.Log) (retVal *RewardsDistributorSetDelegationFee, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SetDelegationFeeEvent{}
+	retVal = &RewardsDistributorSetDelegationFee{}
 
 
 
@@ -1370,8 +1370,8 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationParams(opts *bind.Wa
 }
 
 
-// SetDelegationParamsEvent is a merged return type.
-type SetDelegationParamsEvent struct {
+// RewardsDistributorSetDelegationParams is a merged return type.
+type RewardsDistributorSetDelegationParams struct {
 
 	EpochDelay *big.Int
 
@@ -1382,14 +1382,14 @@ type SetDelegationParamsEvent struct {
 }
 
 // ParseSetDelegationParams multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseSetDelegationParams(log types.Log) (retVal *SetDelegationParamsEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseSetDelegationParams(log types.Log) (retVal *RewardsDistributorSetDelegationParams, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SetDelegationParamsEvent{}
+	retVal = &RewardsDistributorSetDelegationParams{}
 
 
 
@@ -1478,8 +1478,8 @@ func (merged *RewardsDistributorFilterer) WatchTokensSwept(opts *bind.WatchOpts,
 }
 
 
-// TokensSweptEvent is a merged return type.
-type TokensSweptEvent struct {
+// RewardsDistributorTokensSwept is a merged return type.
+type RewardsDistributorTokensSwept struct {
 
 	Token common.Address
 
@@ -1492,14 +1492,14 @@ type TokensSweptEvent struct {
 }
 
 // ParseTokensSwept multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseTokensSwept(log types.Log) (retVal *TokensSweptEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseTokensSwept(log types.Log) (retVal *RewardsDistributorTokensSwept, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TokensSweptEvent{}
+	retVal = &RewardsDistributorTokensSwept{}
 
 
 
@@ -1590,8 +1590,8 @@ func (merged *RewardsDistributorFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// RewardsDistributorUpgraded is a merged return type.
+type RewardsDistributorUpgraded struct {
 
 	Implementation common.Address
 
@@ -1600,14 +1600,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *RewardsDistributorFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *RewardsDistributorFilterer) ParseUpgraded(log types.Log) (retVal *RewardsDistributorUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &RewardsDistributorUpgraded{}
 
 
 

@@ -13,7 +13,7 @@ output:
   file: filterer.go
   rewrite:
   - match: ^Parse([a-zA-Z]+)Output$
-    transform: $Event
+    transform: StakeAllocator$
 
 errors:
   hide: true

@@ -183,8 +183,8 @@ func (merged *AgentRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchO
 }
 
 
-// AccessManagerUpdatedEvent is a merged return type.
-type AccessManagerUpdatedEvent struct {
+// AgentRegistryAccessManagerUpdated is a merged return type.
+type AgentRegistryAccessManagerUpdated struct {
 
 	NewAddressManager common.Address
 
@@ -193,14 +193,14 @@ type AccessManagerUpdatedEvent struct {
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AccessManagerUpdatedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AgentRegistryAccessManagerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AccessManagerUpdatedEvent{}
+	retVal = &AgentRegistryAccessManagerUpdated{}
 
 
 
@@ -344,8 +344,8 @@ func (merged *AgentRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sin
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// AgentRegistryAdminChanged is a merged return type.
+type AgentRegistryAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -356,14 +356,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *AgentRegistryAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &AgentRegistryAdminChanged{}
 
 
 
@@ -511,8 +511,8 @@ func (merged *AgentRegistryFilterer) WatchAgentCommitted(opts *bind.WatchOpts, s
 }
 
 
-// AgentCommittedEvent is a merged return type.
-type AgentCommittedEvent struct {
+// AgentRegistryAgentCommitted is a merged return type.
+type AgentRegistryAgentCommitted struct {
 
 	Commit [32]byte
 
@@ -521,14 +521,14 @@ type AgentCommittedEvent struct {
 }
 
 // ParseAgentCommitted multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal *AgentCommittedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal *AgentRegistryAgentCommitted, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AgentCommittedEvent{}
+	retVal = &AgentRegistryAgentCommitted{}
 
 
 
@@ -672,8 +672,8 @@ func (merged *AgentRegistryFilterer) WatchAgentEnabled(opts *bind.WatchOpts, sin
 }
 
 
-// AgentEnabledEvent is a merged return type.
-type AgentEnabledEvent struct {
+// AgentRegistryAgentEnabled is a merged return type.
+type AgentRegistryAgentEnabled struct {
 
 	AgentId *big.Int
 
@@ -688,14 +688,14 @@ type AgentEnabledEvent struct {
 }
 
 // ParseAgentEnabled multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *AgentEnabledEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *AgentRegistryAgentEnabled, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AgentEnabledEvent{}
+	retVal = &AgentRegistryAgentEnabled{}
 
 
 
@@ -851,8 +851,8 @@ func (merged *AgentRegistryFilterer) WatchAgentUpdated(opts *bind.WatchOpts, sin
 }
 
 
-// AgentUpdatedEvent is a merged return type.
-type AgentUpdatedEvent struct {
+// AgentRegistryAgentUpdated is a merged return type.
+type AgentRegistryAgentUpdated struct {
 
 	AgentId *big.Int
 
@@ -867,14 +867,14 @@ type AgentUpdatedEvent struct {
 }
 
 // ParseAgentUpdated multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *AgentUpdatedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *AgentRegistryAgentUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AgentUpdatedEvent{}
+	retVal = &AgentRegistryAgentUpdated{}
 
 
 
@@ -1030,8 +1030,8 @@ func (merged *AgentRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink ch
 }
 
 
-// ApprovalEvent is a merged return type.
-type ApprovalEvent struct {
+// AgentRegistryApproval is a merged return type.
+type AgentRegistryApproval struct {
 
 	Owner common.Address
 
@@ -1044,14 +1044,14 @@ type ApprovalEvent struct {
 }
 
 // ParseApproval multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *ApprovalEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *AgentRegistryApproval, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ApprovalEvent{}
+	retVal = &AgentRegistryApproval{}
 
 
 
@@ -1203,8 +1203,8 @@ func (merged *AgentRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, s
 }
 
 
-// ApprovalForAllEvent is a merged return type.
-type ApprovalForAllEvent struct {
+// AgentRegistryApprovalForAll is a merged return type.
+type AgentRegistryApprovalForAll struct {
 
 	Owner common.Address
 
@@ -1217,14 +1217,14 @@ type ApprovalForAllEvent struct {
 }
 
 // ParseApprovalForAll multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal *ApprovalForAllEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal *AgentRegistryApprovalForAll, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ApprovalForAllEvent{}
+	retVal = &AgentRegistryApprovalForAll{}
 
 
 
@@ -1376,8 +1376,8 @@ func (merged *AgentRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, s
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// AgentRegistryBeaconUpgraded is a merged return type.
+type AgentRegistryBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -1386,14 +1386,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal *AgentRegistryBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &AgentRegistryBeaconUpgraded{}
 
 
 
@@ -1537,8 +1537,8 @@ func (merged *AgentRegistryFilterer) WatchFrontRunningDelaySet(opts *bind.WatchO
 }
 
 
-// FrontRunningDelaySetEvent is a merged return type.
-type FrontRunningDelaySetEvent struct {
+// AgentRegistryFrontRunningDelaySet is a merged return type.
+type AgentRegistryFrontRunningDelaySet struct {
 
 	Delay *big.Int
 
@@ -1547,14 +1547,14 @@ type FrontRunningDelaySetEvent struct {
 }
 
 // ParseFrontRunningDelaySet multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (retVal *FrontRunningDelaySetEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (retVal *AgentRegistryFrontRunningDelaySet, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &FrontRunningDelaySetEvent{}
+	retVal = &AgentRegistryFrontRunningDelaySet{}
 
 
 
@@ -1698,8 +1698,8 @@ func (merged *AgentRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// AgentRegistryInitialized is a merged return type.
+type AgentRegistryInitialized struct {
 
 	Version uint8
 
@@ -1708,14 +1708,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *AgentRegistryInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &AgentRegistryInitialized{}
 
 
 
@@ -1859,8 +1859,8 @@ func (merged *AgentRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, si
 }
 
 
-// RouterUpdatedEvent is a merged return type.
-type RouterUpdatedEvent struct {
+// AgentRegistryRouterUpdated is a merged return type.
+type AgentRegistryRouterUpdated struct {
 
 	Router common.Address
 
@@ -1869,14 +1869,14 @@ type RouterUpdatedEvent struct {
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *RouterUpdatedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *AgentRegistryRouterUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RouterUpdatedEvent{}
+	retVal = &AgentRegistryRouterUpdated{}
 
 
 
@@ -1980,8 +1980,8 @@ func (merged *AgentRegistryFilterer) WatchStakeControllerUpdated(opts *bind.Watc
 }
 
 
-// StakeControllerUpdatedEvent is a merged return type.
-type StakeControllerUpdatedEvent struct {
+// AgentRegistryStakeControllerUpdated is a merged return type.
+type AgentRegistryStakeControllerUpdated struct {
 
 	NewstakeController common.Address
 
@@ -1990,14 +1990,14 @@ type StakeControllerUpdatedEvent struct {
 }
 
 // ParseStakeControllerUpdated multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseStakeControllerUpdated(log types.Log) (retVal *StakeControllerUpdatedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseStakeControllerUpdated(log types.Log) (retVal *AgentRegistryStakeControllerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &StakeControllerUpdatedEvent{}
+	retVal = &AgentRegistryStakeControllerUpdated{}
 
 
 
@@ -2124,8 +2124,8 @@ func (merged *AgentRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Watch
 }
 
 
-// StakeThresholdChangedEvent is a merged return type.
-type StakeThresholdChangedEvent struct {
+// AgentRegistryStakeThresholdChanged is a merged return type.
+type AgentRegistryStakeThresholdChanged struct {
 
 	Min *big.Int
 
@@ -2138,14 +2138,14 @@ type StakeThresholdChangedEvent struct {
 }
 
 // ParseStakeThresholdChanged multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (retVal *StakeThresholdChangedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (retVal *AgentRegistryStakeThresholdChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &StakeThresholdChangedEvent{}
+	retVal = &AgentRegistryStakeThresholdChanged{}
 
 
 
@@ -2297,8 +2297,8 @@ func (merged *AgentRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink ch
 }
 
 
-// TransferEvent is a merged return type.
-type TransferEvent struct {
+// AgentRegistryTransfer is a merged return type.
+type AgentRegistryTransfer struct {
 
 	From common.Address
 
@@ -2311,14 +2311,14 @@ type TransferEvent struct {
 }
 
 // ParseTransfer multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *TransferEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *AgentRegistryTransfer, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TransferEvent{}
+	retVal = &AgentRegistryTransfer{}
 
 
 
@@ -2470,8 +2470,8 @@ func (merged *AgentRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink ch
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// AgentRegistryUpgraded is a merged return type.
+type AgentRegistryUpgraded struct {
 
 	Implementation common.Address
 
@@ -2480,14 +2480,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *AgentRegistryUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &AgentRegistryUpgraded{}
 
 
 
@@ -2591,8 +2591,8 @@ func (merged *AgentRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.Watch
 }
 
 
-// SubjectHandlerUpdatedEvent is a merged return type.
-type SubjectHandlerUpdatedEvent struct {
+// AgentRegistrySubjectHandlerUpdated is a merged return type.
+type AgentRegistrySubjectHandlerUpdated struct {
 
 	NewHandler common.Address
 
@@ -2601,14 +2601,14 @@ type SubjectHandlerUpdatedEvent struct {
 }
 
 // ParseSubjectHandlerUpdated multiplexes to different implementations of the method.
-func (merged *AgentRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log) (retVal *SubjectHandlerUpdatedEvent, err error) {
+func (merged *AgentRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log) (retVal *AgentRegistrySubjectHandlerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SubjectHandlerUpdatedEvent{}
+	retVal = &AgentRegistrySubjectHandlerUpdated{}
 
 
 

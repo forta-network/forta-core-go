@@ -183,8 +183,8 @@ func (merged *FortaStakingFilterer) WatchAccessManagerUpdated(opts *bind.WatchOp
 }
 
 
-// AccessManagerUpdatedEvent is a merged return type.
-type AccessManagerUpdatedEvent struct {
+// FortaStakingAccessManagerUpdated is a merged return type.
+type FortaStakingAccessManagerUpdated struct {
 
 	NewAddressManager common.Address
 
@@ -193,14 +193,14 @@ type AccessManagerUpdatedEvent struct {
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *AccessManagerUpdatedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (retVal *FortaStakingAccessManagerUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AccessManagerUpdatedEvent{}
+	retVal = &FortaStakingAccessManagerUpdated{}
 
 
 
@@ -344,8 +344,8 @@ func (merged *FortaStakingFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink
 }
 
 
-// AdminChangedEvent is a merged return type.
-type AdminChangedEvent struct {
+// FortaStakingAdminChanged is a merged return type.
+type FortaStakingAdminChanged struct {
 
 	PreviousAdmin common.Address
 
@@ -356,14 +356,14 @@ type AdminChangedEvent struct {
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *AdminChangedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *FortaStakingAdminChanged, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &AdminChangedEvent{}
+	retVal = &FortaStakingAdminChanged{}
 
 
 
@@ -511,8 +511,8 @@ func (merged *FortaStakingFilterer) WatchApprovalForAll(opts *bind.WatchOpts, si
 }
 
 
-// ApprovalForAllEvent is a merged return type.
-type ApprovalForAllEvent struct {
+// FortaStakingApprovalForAll is a merged return type.
+type FortaStakingApprovalForAll struct {
 
 	Account common.Address
 
@@ -525,14 +525,14 @@ type ApprovalForAllEvent struct {
 }
 
 // ParseApprovalForAll multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *ApprovalForAllEvent, err error) {
+func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *FortaStakingApprovalForAll, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ApprovalForAllEvent{}
+	retVal = &FortaStakingApprovalForAll{}
 
 
 
@@ -684,8 +684,8 @@ func (merged *FortaStakingFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, si
 }
 
 
-// BeaconUpgradedEvent is a merged return type.
-type BeaconUpgradedEvent struct {
+// FortaStakingBeaconUpgraded is a merged return type.
+type FortaStakingBeaconUpgraded struct {
 
 	Beacon common.Address
 
@@ -694,14 +694,14 @@ type BeaconUpgradedEvent struct {
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *BeaconUpgradedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *FortaStakingBeaconUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &BeaconUpgradedEvent{}
+	retVal = &FortaStakingBeaconUpgraded{}
 
 
 
@@ -845,8 +845,8 @@ func (merged *FortaStakingFilterer) WatchDelaySet(opts *bind.WatchOpts, sink cha
 }
 
 
-// DelaySetEvent is a merged return type.
-type DelaySetEvent struct {
+// FortaStakingDelaySet is a merged return type.
+type FortaStakingDelaySet struct {
 
 	NewWithdrawalDelay *big.Int
 
@@ -855,14 +855,14 @@ type DelaySetEvent struct {
 }
 
 // ParseDelaySet multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *DelaySetEvent, err error) {
+func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *FortaStakingDelaySet, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &DelaySetEvent{}
+	retVal = &FortaStakingDelaySet{}
 
 
 
@@ -1006,8 +1006,8 @@ func (merged *FortaStakingFilterer) WatchFroze(opts *bind.WatchOpts, sink chan<-
 }
 
 
-// FrozeEvent is a merged return type.
-type FrozeEvent struct {
+// FortaStakingFroze is a merged return type.
+type FortaStakingFroze struct {
 
 	SubjectType uint8
 
@@ -1022,14 +1022,14 @@ type FrozeEvent struct {
 }
 
 // ParseFroze multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FrozeEvent, err error) {
+func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStakingFroze, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &FrozeEvent{}
+	retVal = &FortaStakingFroze{}
 
 
 
@@ -1185,8 +1185,8 @@ func (merged *FortaStakingFilterer) WatchInitialized(opts *bind.WatchOpts, sink 
 }
 
 
-// InitializedEvent is a merged return type.
-type InitializedEvent struct {
+// FortaStakingInitialized is a merged return type.
+type FortaStakingInitialized struct {
 
 	Version uint8
 
@@ -1195,14 +1195,14 @@ type InitializedEvent struct {
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *InitializedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *FortaStakingInitialized, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &InitializedEvent{}
+	retVal = &FortaStakingInitialized{}
 
 
 
@@ -1346,8 +1346,8 @@ func (merged *FortaStakingFilterer) WatchMaxStakeReached(opts *bind.WatchOpts, s
 }
 
 
-// MaxStakeReachedEvent is a merged return type.
-type MaxStakeReachedEvent struct {
+// FortaStakingMaxStakeReached is a merged return type.
+type FortaStakingMaxStakeReached struct {
 
 	SubjectType uint8
 
@@ -1358,14 +1358,14 @@ type MaxStakeReachedEvent struct {
 }
 
 // ParseMaxStakeReached multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal *MaxStakeReachedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal *FortaStakingMaxStakeReached, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &MaxStakeReachedEvent{}
+	retVal = &FortaStakingMaxStakeReached{}
 
 
 
@@ -1473,8 +1473,8 @@ func (merged *FortaStakingFilterer) WatchReleased(opts *bind.WatchOpts, sink cha
 }
 
 
-// ReleasedEvent is a merged return type.
-type ReleasedEvent struct {
+// FortaStakingReleased is a merged return type.
+type FortaStakingReleased struct {
 
 	SubjectType uint8
 
@@ -1489,14 +1489,14 @@ type ReleasedEvent struct {
 }
 
 // ParseReleased multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseReleased(log types.Log) (retVal *ReleasedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseReleased(log types.Log) (retVal *FortaStakingReleased, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &ReleasedEvent{}
+	retVal = &FortaStakingReleased{}
 
 
 
@@ -1589,8 +1589,8 @@ func (merged *FortaStakingFilterer) WatchRewarded(opts *bind.WatchOpts, sink cha
 }
 
 
-// RewardedEvent is a merged return type.
-type RewardedEvent struct {
+// FortaStakingRewarded is a merged return type.
+type FortaStakingRewarded struct {
 
 	SubjectType uint8
 
@@ -1605,14 +1605,14 @@ type RewardedEvent struct {
 }
 
 // ParseRewarded multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseRewarded(log types.Log) (retVal *RewardedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseRewarded(log types.Log) (retVal *FortaStakingRewarded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RewardedEvent{}
+	retVal = &FortaStakingRewarded{}
 
 
 
@@ -1745,8 +1745,8 @@ func (merged *FortaStakingFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sin
 }
 
 
-// RouterUpdatedEvent is a merged return type.
-type RouterUpdatedEvent struct {
+// FortaStakingRouterUpdated is a merged return type.
+type FortaStakingRouterUpdated struct {
 
 	Router common.Address
 
@@ -1755,14 +1755,14 @@ type RouterUpdatedEvent struct {
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *RouterUpdatedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *FortaStakingRouterUpdated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &RouterUpdatedEvent{}
+	retVal = &FortaStakingRouterUpdated{}
 
 
 
@@ -1906,8 +1906,8 @@ func (merged *FortaStakingFilterer) WatchSlashed(opts *bind.WatchOpts, sink chan
 }
 
 
-// SlashedEvent is a merged return type.
-type SlashedEvent struct {
+// FortaStakingSlashed is a merged return type.
+type FortaStakingSlashed struct {
 
 	SubjectType uint8
 
@@ -1922,14 +1922,14 @@ type SlashedEvent struct {
 }
 
 // ParseSlashed multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *SlashedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaStakingSlashed, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SlashedEvent{}
+	retVal = &FortaStakingSlashed{}
 
 
 
@@ -2085,8 +2085,8 @@ func (merged *FortaStakingFilterer) WatchSlashedShareSent(opts *bind.WatchOpts, 
 }
 
 
-// SlashedShareSentEvent is a merged return type.
-type SlashedShareSentEvent struct {
+// FortaStakingSlashedShareSent is a merged return type.
+type FortaStakingSlashedShareSent struct {
 
 	SubjectType uint8
 
@@ -2101,14 +2101,14 @@ type SlashedShareSentEvent struct {
 }
 
 // ParseSlashedShareSent multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal *SlashedShareSentEvent, err error) {
+func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal *FortaStakingSlashedShareSent, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SlashedShareSentEvent{}
+	retVal = &FortaStakingSlashedShareSent{}
 
 
 
@@ -2264,8 +2264,8 @@ func (merged *FortaStakingFilterer) WatchStakeDeposited(opts *bind.WatchOpts, si
 }
 
 
-// StakeDepositedEvent is a merged return type.
-type StakeDepositedEvent struct {
+// FortaStakingStakeDeposited is a merged return type.
+type FortaStakingStakeDeposited struct {
 
 	SubjectType uint8
 
@@ -2280,14 +2280,14 @@ type StakeDepositedEvent struct {
 }
 
 // ParseStakeDeposited multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *StakeDepositedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *FortaStakingStakeDeposited, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &StakeDepositedEvent{}
+	retVal = &FortaStakingStakeDeposited{}
 
 
 
@@ -2403,8 +2403,8 @@ func (merged *FortaStakingFilterer) WatchStakeParamsManagerSet(opts *bind.WatchO
 }
 
 
-// StakeParamsManagerSetEvent is a merged return type.
-type StakeParamsManagerSetEvent struct {
+// FortaStakingStakeParamsManagerSet is a merged return type.
+type FortaStakingStakeParamsManagerSet struct {
 
 	NewManager common.Address
 
@@ -2413,14 +2413,14 @@ type StakeParamsManagerSetEvent struct {
 }
 
 // ParseStakeParamsManagerSet multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseStakeParamsManagerSet(log types.Log) (retVal *StakeParamsManagerSetEvent, err error) {
+func (merged *FortaStakingFilterer) ParseStakeParamsManagerSet(log types.Log) (retVal *FortaStakingStakeParamsManagerSet, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &StakeParamsManagerSetEvent{}
+	retVal = &FortaStakingStakeParamsManagerSet{}
 
 
 
@@ -2547,8 +2547,8 @@ func (merged *FortaStakingFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink 
 }
 
 
-// TokensSweptEvent is a merged return type.
-type TokensSweptEvent struct {
+// FortaStakingTokensSwept is a merged return type.
+type FortaStakingTokensSwept struct {
 
 	Token common.Address
 
@@ -2561,14 +2561,14 @@ type TokensSweptEvent struct {
 }
 
 // ParseTokensSwept multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *TokensSweptEvent, err error) {
+func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *FortaStakingTokensSwept, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TokensSweptEvent{}
+	retVal = &FortaStakingTokensSwept{}
 
 
 
@@ -2720,8 +2720,8 @@ func (merged *FortaStakingFilterer) WatchTransferBatch(opts *bind.WatchOpts, sin
 }
 
 
-// TransferBatchEvent is a merged return type.
-type TransferBatchEvent struct {
+// FortaStakingTransferBatch is a merged return type.
+type FortaStakingTransferBatch struct {
 
 	Operator common.Address
 
@@ -2738,14 +2738,14 @@ type TransferBatchEvent struct {
 }
 
 // ParseTransferBatch multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *TransferBatchEvent, err error) {
+func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *FortaStakingTransferBatch, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TransferBatchEvent{}
+	retVal = &FortaStakingTransferBatch{}
 
 
 
@@ -2905,8 +2905,8 @@ func (merged *FortaStakingFilterer) WatchTransferSingle(opts *bind.WatchOpts, si
 }
 
 
-// TransferSingleEvent is a merged return type.
-type TransferSingleEvent struct {
+// FortaStakingTransferSingle is a merged return type.
+type FortaStakingTransferSingle struct {
 
 	Operator common.Address
 
@@ -2923,14 +2923,14 @@ type TransferSingleEvent struct {
 }
 
 // ParseTransferSingle multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *TransferSingleEvent, err error) {
+func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *FortaStakingTransferSingle, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TransferSingleEvent{}
+	retVal = &FortaStakingTransferSingle{}
 
 
 
@@ -3090,8 +3090,8 @@ func (merged *FortaStakingFilterer) WatchTreasurySet(opts *bind.WatchOpts, sink 
 }
 
 
-// TreasurySetEvent is a merged return type.
-type TreasurySetEvent struct {
+// FortaStakingTreasurySet is a merged return type.
+type FortaStakingTreasurySet struct {
 
 	NewTreasury common.Address
 
@@ -3100,14 +3100,14 @@ type TreasurySetEvent struct {
 }
 
 // ParseTreasurySet multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *TreasurySetEvent, err error) {
+func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *FortaStakingTreasurySet, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &TreasurySetEvent{}
+	retVal = &FortaStakingTreasurySet{}
 
 
 
@@ -3251,8 +3251,8 @@ func (merged *FortaStakingFilterer) WatchURI(opts *bind.WatchOpts, sink chan<- *
 }
 
 
-// URIEvent is a merged return type.
-type URIEvent struct {
+// FortaStakingURI is a merged return type.
+type FortaStakingURI struct {
 
 	Value string
 
@@ -3263,14 +3263,14 @@ type URIEvent struct {
 }
 
 // ParseURI multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *URIEvent, err error) {
+func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *FortaStakingURI, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &URIEvent{}
+	retVal = &FortaStakingURI{}
 
 
 
@@ -3418,8 +3418,8 @@ func (merged *FortaStakingFilterer) WatchUpgraded(opts *bind.WatchOpts, sink cha
 }
 
 
-// UpgradedEvent is a merged return type.
-type UpgradedEvent struct {
+// FortaStakingUpgraded is a merged return type.
+type FortaStakingUpgraded struct {
 
 	Implementation common.Address
 
@@ -3428,14 +3428,14 @@ type UpgradedEvent struct {
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *UpgradedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *FortaStakingUpgraded, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &UpgradedEvent{}
+	retVal = &FortaStakingUpgraded{}
 
 
 
@@ -3579,8 +3579,8 @@ func (merged *FortaStakingFilterer) WatchWithdrawalExecuted(opts *bind.WatchOpts
 }
 
 
-// WithdrawalExecutedEvent is a merged return type.
-type WithdrawalExecutedEvent struct {
+// FortaStakingWithdrawalExecuted is a merged return type.
+type FortaStakingWithdrawalExecuted struct {
 
 	SubjectType uint8
 
@@ -3593,14 +3593,14 @@ type WithdrawalExecutedEvent struct {
 }
 
 // ParseWithdrawalExecuted multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retVal *WithdrawalExecutedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retVal *FortaStakingWithdrawalExecuted, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &WithdrawalExecutedEvent{}
+	retVal = &FortaStakingWithdrawalExecuted{}
 
 
 
@@ -3752,8 +3752,8 @@ func (merged *FortaStakingFilterer) WatchWithdrawalInitiated(opts *bind.WatchOpt
 }
 
 
-// WithdrawalInitiatedEvent is a merged return type.
-type WithdrawalInitiatedEvent struct {
+// FortaStakingWithdrawalInitiated is a merged return type.
+type FortaStakingWithdrawalInitiated struct {
 
 	SubjectType uint8
 
@@ -3768,14 +3768,14 @@ type WithdrawalInitiatedEvent struct {
 }
 
 // ParseWithdrawalInitiated multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (retVal *WithdrawalInitiatedEvent, err error) {
+func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (retVal *FortaStakingWithdrawalInitiated, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &WithdrawalInitiatedEvent{}
+	retVal = &FortaStakingWithdrawalInitiated{}
 
 
 
@@ -3891,8 +3891,8 @@ func (merged *FortaStakingFilterer) WatchSlashDelegatorsPercentSet(opts *bind.Wa
 }
 
 
-// SlashDelegatorsPercentSetEvent is a merged return type.
-type SlashDelegatorsPercentSetEvent struct {
+// FortaStakingSlashDelegatorsPercentSet is a merged return type.
+type FortaStakingSlashDelegatorsPercentSet struct {
 
 	Percent *big.Int
 
@@ -3901,14 +3901,14 @@ type SlashDelegatorsPercentSetEvent struct {
 }
 
 // ParseSlashDelegatorsPercentSet multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseSlashDelegatorsPercentSet(log types.Log) (retVal *SlashDelegatorsPercentSetEvent, err error) {
+func (merged *FortaStakingFilterer) ParseSlashDelegatorsPercentSet(log types.Log) (retVal *FortaStakingSlashDelegatorsPercentSet, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &SlashDelegatorsPercentSetEvent{}
+	retVal = &FortaStakingSlashDelegatorsPercentSet{}
 
 
 
@@ -3995,8 +3995,8 @@ func (merged *FortaStakingFilterer) WatchStakeHelpersConfigured(opts *bind.Watch
 }
 
 
-// StakeHelpersConfiguredEvent is a merged return type.
-type StakeHelpersConfiguredEvent struct {
+// FortaStakingStakeHelpersConfigured is a merged return type.
+type FortaStakingStakeHelpersConfigured struct {
 
 	SubjectGateway common.Address
 
@@ -4007,14 +4007,14 @@ type StakeHelpersConfiguredEvent struct {
 }
 
 // ParseStakeHelpersConfigured multiplexes to different implementations of the method.
-func (merged *FortaStakingFilterer) ParseStakeHelpersConfigured(log types.Log) (retVal *StakeHelpersConfiguredEvent, err error) {
+func (merged *FortaStakingFilterer) ParseStakeHelpersConfigured(log types.Log) (retVal *FortaStakingStakeHelpersConfigured, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
 
 
-	retVal = &StakeHelpersConfiguredEvent{}
+	retVal = &FortaStakingStakeHelpersConfigured{}
 
 
 

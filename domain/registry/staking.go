@@ -112,7 +112,7 @@ func isActive(id *big.Int) bool {
 	return 0 == big.NewInt(0).And(id, one.Lsh(one, 8)).Cmp(big.NewInt(256))
 }
 
-func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.TransferSingleEvent, blk *domain.Block) (*TransferSharesMessage, error) {
+func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.FortaStakingTransferSingle, blk *domain.Block) (*TransferSharesMessage, error) {
 	st, err := extractStakeType(evt.Id)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Tr
 	}, nil
 }
 
-func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.TransferBatchEvent, blk *domain.Block) ([]*TransferSharesMessage, error) {
+func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.FortaStakingTransferBatch, blk *domain.Block) ([]*TransferSharesMessage, error) {
 	var res []*TransferSharesMessage
 	for i, id := range evt.Ids {
 		st, err := extractStakeType(id)
@@ -192,7 +192,7 @@ func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.A
 	}
 }
 
-func NewAgentStakeThresholdMessage(evt *contract_agent_registry.StakeThresholdChangedEvent, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
+func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{
@@ -207,7 +207,7 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.StakeThresholdCh
 	}
 }
 
-func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.StakeThresholdChangedEvent, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{
@@ -223,7 +223,7 @@ func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.StakeThresho
 	}
 }
 
-func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ManagedStakeThresholdChangedEvent, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ScannerPoolRegistryManagedStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
 			Message: Message{
