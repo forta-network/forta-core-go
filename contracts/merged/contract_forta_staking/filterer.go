@@ -60,11 +60,29 @@ func NewFortaStakingFilterer(address common.Address, filterer bind.ContractFilte
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.1" {
+		return true
+	}
+
+	if tag == "0.1.2" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *FortaStakingFilterer) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.1"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -105,7 +123,7 @@ func (merged *FortaStakingFilterer) FilterAccessManagerUpdated(opts *bind.Filter
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -120,7 +138,7 @@ func (merged *FortaStakingFilterer) FilterAccessManagerUpdated(opts *bind.Filter
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ1.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -152,7 +170,7 @@ func (merged *FortaStakingFilterer) WatchAccessManagerUpdated(opts *bind.WatchOp
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
+		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -165,7 +183,7 @@ func (merged *FortaStakingFilterer) WatchAccessManagerUpdated(opts *bind.WatchOp
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchAccessManagerUpdated(opts, sinkAlt1, newAddressManager)
+		val, methodErr := merged.typ1.WatchAccessManagerUpdated(opts, sinkAlt1, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -205,7 +223,7 @@ func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (re
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -222,7 +240,7 @@ func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (re
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ1.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -266,7 +284,7 @@ func (merged *FortaStakingFilterer) FilterAdminChanged(opts *bind.FilterOpts) (r
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterAdminChanged(opts)
+		val, methodErr := merged.typ0.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -281,7 +299,7 @@ func (merged *FortaStakingFilterer) FilterAdminChanged(opts *bind.FilterOpts) (r
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterAdminChanged(opts)
+		val, methodErr := merged.typ1.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -313,7 +331,7 @@ func (merged *FortaStakingFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
+		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -326,7 +344,7 @@ func (merged *FortaStakingFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchAdminChanged(opts, sinkAlt2)
+		val, methodErr := merged.typ1.WatchAdminChanged(opts, sinkAlt2)
 
 		if err != nil {
 			err = methodErr
@@ -368,7 +386,7 @@ func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *Fo
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseAdminChanged(log)
+		val, methodErr := merged.typ0.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -387,7 +405,7 @@ func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *Fo
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseAdminChanged(log)
+		val, methodErr := merged.typ1.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -433,7 +451,7 @@ func (merged *FortaStakingFilterer) FilterApprovalForAll(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterApprovalForAll(opts, account, operator)
+		val, methodErr := merged.typ0.FilterApprovalForAll(opts, account, operator)
 
 		if err != nil {
 			err = methodErr
@@ -448,7 +466,7 @@ func (merged *FortaStakingFilterer) FilterApprovalForAll(opts *bind.FilterOpts, 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterApprovalForAll(opts, account, operator)
+		val, methodErr := merged.typ1.FilterApprovalForAll(opts, account, operator)
 
 		if err != nil {
 			err = methodErr
@@ -480,7 +498,7 @@ func (merged *FortaStakingFilterer) WatchApprovalForAll(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, account, operator)
+		val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, account, operator)
 
 		if err != nil {
 			err = methodErr
@@ -493,7 +511,7 @@ func (merged *FortaStakingFilterer) WatchApprovalForAll(opts *bind.WatchOpts, si
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchApprovalForAll(opts, sinkAlt3, account, operator)
+		val, methodErr := merged.typ1.WatchApprovalForAll(opts, sinkAlt3, account, operator)
 
 		if err != nil {
 			err = methodErr
@@ -537,7 +555,7 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseApprovalForAll(log)
+		val, methodErr := merged.typ0.ParseApprovalForAll(log)
 
 		if err != nil {
 			err = methodErr
@@ -558,7 +576,7 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseApprovalForAll(log)
+		val, methodErr := merged.typ1.ParseApprovalForAll(log)
 
 		if err != nil {
 			err = methodErr
@@ -606,7 +624,7 @@ func (merged *FortaStakingFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -621,7 +639,7 @@ func (merged *FortaStakingFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ1.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -653,7 +671,7 @@ func (merged *FortaStakingFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
+		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -666,7 +684,7 @@ func (merged *FortaStakingFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, si
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchBeaconUpgraded(opts, sinkAlt4, beacon)
+		val, methodErr := merged.typ1.WatchBeaconUpgraded(opts, sinkAlt4, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -706,7 +724,7 @@ func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -723,7 +741,7 @@ func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ1.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -767,7 +785,7 @@ func (merged *FortaStakingFilterer) FilterDelaySet(opts *bind.FilterOpts) (retVa
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterDelaySet(opts)
+		val, methodErr := merged.typ0.FilterDelaySet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -782,7 +800,7 @@ func (merged *FortaStakingFilterer) FilterDelaySet(opts *bind.FilterOpts) (retVa
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterDelaySet(opts)
+		val, methodErr := merged.typ1.FilterDelaySet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -814,7 +832,7 @@ func (merged *FortaStakingFilterer) WatchDelaySet(opts *bind.WatchOpts, sink cha
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchDelaySet(opts, sink)
+		val, methodErr := merged.typ0.WatchDelaySet(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -827,7 +845,7 @@ func (merged *FortaStakingFilterer) WatchDelaySet(opts *bind.WatchOpts, sink cha
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchDelaySet(opts, sinkAlt5)
+		val, methodErr := merged.typ1.WatchDelaySet(opts, sinkAlt5)
 
 		if err != nil {
 			err = methodErr
@@ -867,7 +885,7 @@ func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *FortaS
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseDelaySet(log)
+		val, methodErr := merged.typ0.ParseDelaySet(log)
 
 		if err != nil {
 			err = methodErr
@@ -884,7 +902,7 @@ func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *FortaS
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseDelaySet(log)
+		val, methodErr := merged.typ1.ParseDelaySet(log)
 
 		if err != nil {
 			err = methodErr
@@ -928,7 +946,7 @@ func (merged *FortaStakingFilterer) FilterFroze(opts *bind.FilterOpts, subjectTy
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterFroze(opts, subjectType, subject, by)
+		val, methodErr := merged.typ0.FilterFroze(opts, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -943,7 +961,7 @@ func (merged *FortaStakingFilterer) FilterFroze(opts *bind.FilterOpts, subjectTy
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterFroze(opts, subjectType, subject, by)
+		val, methodErr := merged.typ1.FilterFroze(opts, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -975,7 +993,7 @@ func (merged *FortaStakingFilterer) WatchFroze(opts *bind.WatchOpts, sink chan<-
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchFroze(opts, sink, subjectType, subject, by)
+		val, methodErr := merged.typ0.WatchFroze(opts, sink, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -988,7 +1006,7 @@ func (merged *FortaStakingFilterer) WatchFroze(opts *bind.WatchOpts, sink chan<-
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchFroze(opts, sinkAlt6, subjectType, subject, by)
+		val, methodErr := merged.typ1.WatchFroze(opts, sinkAlt6, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -1034,7 +1052,7 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseFroze(log)
+		val, methodErr := merged.typ0.ParseFroze(log)
 
 		if err != nil {
 			err = methodErr
@@ -1057,7 +1075,7 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseFroze(log)
+		val, methodErr := merged.typ1.ParseFroze(log)
 
 		if err != nil {
 			err = methodErr
@@ -1107,7 +1125,7 @@ func (merged *FortaStakingFilterer) FilterInitialized(opts *bind.FilterOpts) (re
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterInitialized(opts)
+		val, methodErr := merged.typ0.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1122,7 +1140,7 @@ func (merged *FortaStakingFilterer) FilterInitialized(opts *bind.FilterOpts) (re
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterInitialized(opts)
+		val, methodErr := merged.typ1.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1154,7 +1172,7 @@ func (merged *FortaStakingFilterer) WatchInitialized(opts *bind.WatchOpts, sink 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchInitialized(opts, sink)
+		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -1167,7 +1185,7 @@ func (merged *FortaStakingFilterer) WatchInitialized(opts *bind.WatchOpts, sink 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchInitialized(opts, sinkAlt7)
+		val, methodErr := merged.typ1.WatchInitialized(opts, sinkAlt7)
 
 		if err != nil {
 			err = methodErr
@@ -1207,7 +1225,7 @@ func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *For
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseInitialized(log)
+		val, methodErr := merged.typ0.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -1224,7 +1242,7 @@ func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *For
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseInitialized(log)
+		val, methodErr := merged.typ1.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -1268,7 +1286,7 @@ func (merged *FortaStakingFilterer) FilterMaxStakeReached(opts *bind.FilterOpts,
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterMaxStakeReached(opts, subjectType, subject)
+		val, methodErr := merged.typ0.FilterMaxStakeReached(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1283,7 +1301,7 @@ func (merged *FortaStakingFilterer) FilterMaxStakeReached(opts *bind.FilterOpts,
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterMaxStakeReached(opts, subjectType, subject)
+		val, methodErr := merged.typ1.FilterMaxStakeReached(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1315,7 +1333,7 @@ func (merged *FortaStakingFilterer) WatchMaxStakeReached(opts *bind.WatchOpts, s
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchMaxStakeReached(opts, sink, subjectType, subject)
+		val, methodErr := merged.typ0.WatchMaxStakeReached(opts, sink, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1328,7 +1346,7 @@ func (merged *FortaStakingFilterer) WatchMaxStakeReached(opts *bind.WatchOpts, s
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchMaxStakeReached(opts, sinkAlt8, subjectType, subject)
+		val, methodErr := merged.typ1.WatchMaxStakeReached(opts, sinkAlt8, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1370,7 +1388,7 @@ func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseMaxStakeReached(log)
+		val, methodErr := merged.typ0.ParseMaxStakeReached(log)
 
 		if err != nil {
 			err = methodErr
@@ -1389,7 +1407,7 @@ func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseMaxStakeReached(log)
+		val, methodErr := merged.typ1.ParseMaxStakeReached(log)
 
 		if err != nil {
 			err = methodErr
@@ -1425,7 +1443,7 @@ func (merged *FortaStakingFilterer) FilterReleased(opts *bind.FilterOpts, subjec
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterReleased(opts, subjectType, subject, to)
+		val, methodErr := merged.typ0.FilterReleased(opts, subjectType, subject, to)
 
 		if err != nil {
 			err = methodErr
@@ -1455,7 +1473,7 @@ func (merged *FortaStakingFilterer) WatchReleased(opts *bind.WatchOpts, sink cha
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchReleased(opts, sink, subjectType, subject, to)
+		val, methodErr := merged.typ0.WatchReleased(opts, sink, subjectType, subject, to)
 
 		if err != nil {
 			err = methodErr
@@ -1501,7 +1519,7 @@ func (merged *FortaStakingFilterer) ParseReleased(log types.Log) (retVal *FortaS
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseReleased(log)
+		val, methodErr := merged.typ0.ParseReleased(log)
 
 		if err != nil {
 			err = methodErr
@@ -1541,7 +1559,7 @@ func (merged *FortaStakingFilterer) FilterRewarded(opts *bind.FilterOpts, subjec
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterRewarded(opts, subjectType, subject, from)
+		val, methodErr := merged.typ0.FilterRewarded(opts, subjectType, subject, from)
 
 		if err != nil {
 			err = methodErr
@@ -1571,7 +1589,7 @@ func (merged *FortaStakingFilterer) WatchRewarded(opts *bind.WatchOpts, sink cha
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchRewarded(opts, sink, subjectType, subject, from)
+		val, methodErr := merged.typ0.WatchRewarded(opts, sink, subjectType, subject, from)
 
 		if err != nil {
 			err = methodErr
@@ -1617,7 +1635,7 @@ func (merged *FortaStakingFilterer) ParseRewarded(log types.Log) (retVal *FortaS
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseRewarded(log)
+		val, methodErr := merged.typ0.ParseRewarded(log)
 
 		if err != nil {
 			err = methodErr
@@ -1667,7 +1685,7 @@ func (merged *FortaStakingFilterer) FilterRouterUpdated(opts *bind.FilterOpts, r
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -1682,7 +1700,7 @@ func (merged *FortaStakingFilterer) FilterRouterUpdated(opts *bind.FilterOpts, r
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ1.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -1714,7 +1732,7 @@ func (merged *FortaStakingFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sin
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
+		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
 
 		if err != nil {
 			err = methodErr
@@ -1727,7 +1745,7 @@ func (merged *FortaStakingFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sin
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchRouterUpdated(opts, sinkAlt9, router)
+		val, methodErr := merged.typ1.WatchRouterUpdated(opts, sinkAlt9, router)
 
 		if err != nil {
 			err = methodErr
@@ -1767,7 +1785,7 @@ func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *F
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseRouterUpdated(log)
+		val, methodErr := merged.typ0.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -1784,7 +1802,7 @@ func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *F
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseRouterUpdated(log)
+		val, methodErr := merged.typ1.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -1828,7 +1846,7 @@ func (merged *FortaStakingFilterer) FilterSlashed(opts *bind.FilterOpts, subject
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterSlashed(opts, subjectType, subject, by)
+		val, methodErr := merged.typ0.FilterSlashed(opts, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -1843,7 +1861,7 @@ func (merged *FortaStakingFilterer) FilterSlashed(opts *bind.FilterOpts, subject
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterSlashed(opts, subjectType, subject, by)
+		val, methodErr := merged.typ1.FilterSlashed(opts, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -1875,7 +1893,7 @@ func (merged *FortaStakingFilterer) WatchSlashed(opts *bind.WatchOpts, sink chan
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchSlashed(opts, sink, subjectType, subject, by)
+		val, methodErr := merged.typ0.WatchSlashed(opts, sink, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -1888,7 +1906,7 @@ func (merged *FortaStakingFilterer) WatchSlashed(opts *bind.WatchOpts, sink chan
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchSlashed(opts, sinkAlt10, subjectType, subject, by)
+		val, methodErr := merged.typ1.WatchSlashed(opts, sinkAlt10, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -1934,7 +1952,7 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseSlashed(log)
+		val, methodErr := merged.typ0.ParseSlashed(log)
 
 		if err != nil {
 			err = methodErr
@@ -1957,7 +1975,7 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseSlashed(log)
+		val, methodErr := merged.typ1.ParseSlashed(log)
 
 		if err != nil {
 			err = methodErr
@@ -2007,7 +2025,7 @@ func (merged *FortaStakingFilterer) FilterSlashedShareSent(opts *bind.FilterOpts
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterSlashedShareSent(opts, subjectType, subject, by)
+		val, methodErr := merged.typ0.FilterSlashedShareSent(opts, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -2022,7 +2040,7 @@ func (merged *FortaStakingFilterer) FilterSlashedShareSent(opts *bind.FilterOpts
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterSlashedShareSent(opts, subjectType, subject, by)
+		val, methodErr := merged.typ1.FilterSlashedShareSent(opts, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -2054,7 +2072,7 @@ func (merged *FortaStakingFilterer) WatchSlashedShareSent(opts *bind.WatchOpts, 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchSlashedShareSent(opts, sink, subjectType, subject, by)
+		val, methodErr := merged.typ0.WatchSlashedShareSent(opts, sink, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -2067,7 +2085,7 @@ func (merged *FortaStakingFilterer) WatchSlashedShareSent(opts *bind.WatchOpts, 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchSlashedShareSent(opts, sinkAlt11, subjectType, subject, by)
+		val, methodErr := merged.typ1.WatchSlashedShareSent(opts, sinkAlt11, subjectType, subject, by)
 
 		if err != nil {
 			err = methodErr
@@ -2113,7 +2131,7 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseSlashedShareSent(log)
+		val, methodErr := merged.typ0.ParseSlashedShareSent(log)
 
 		if err != nil {
 			err = methodErr
@@ -2136,7 +2154,7 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseSlashedShareSent(log)
+		val, methodErr := merged.typ1.ParseSlashedShareSent(log)
 
 		if err != nil {
 			err = methodErr
@@ -2186,7 +2204,7 @@ func (merged *FortaStakingFilterer) FilterStakeDeposited(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterStakeDeposited(opts, subjectType, subject, account)
+		val, methodErr := merged.typ0.FilterStakeDeposited(opts, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -2201,7 +2219,7 @@ func (merged *FortaStakingFilterer) FilterStakeDeposited(opts *bind.FilterOpts, 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterStakeDeposited(opts, subjectType, subject, account)
+		val, methodErr := merged.typ1.FilterStakeDeposited(opts, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -2233,7 +2251,7 @@ func (merged *FortaStakingFilterer) WatchStakeDeposited(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchStakeDeposited(opts, sink, subjectType, subject, account)
+		val, methodErr := merged.typ0.WatchStakeDeposited(opts, sink, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -2246,7 +2264,7 @@ func (merged *FortaStakingFilterer) WatchStakeDeposited(opts *bind.WatchOpts, si
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchStakeDeposited(opts, sinkAlt12, subjectType, subject, account)
+		val, methodErr := merged.typ1.WatchStakeDeposited(opts, sinkAlt12, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -2292,7 +2310,7 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseStakeDeposited(log)
+		val, methodErr := merged.typ0.ParseStakeDeposited(log)
 
 		if err != nil {
 			err = methodErr
@@ -2315,7 +2333,7 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseStakeDeposited(log)
+		val, methodErr := merged.typ1.ParseStakeDeposited(log)
 
 		if err != nil {
 			err = methodErr
@@ -2355,7 +2373,7 @@ func (merged *FortaStakingFilterer) FilterStakeParamsManagerSet(opts *bind.Filte
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterStakeParamsManagerSet(opts, newManager)
+		val, methodErr := merged.typ0.FilterStakeParamsManagerSet(opts, newManager)
 
 		if err != nil {
 			err = methodErr
@@ -2385,7 +2403,7 @@ func (merged *FortaStakingFilterer) WatchStakeParamsManagerSet(opts *bind.WatchO
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchStakeParamsManagerSet(opts, sink, newManager)
+		val, methodErr := merged.typ0.WatchStakeParamsManagerSet(opts, sink, newManager)
 
 		if err != nil {
 			err = methodErr
@@ -2425,7 +2443,7 @@ func (merged *FortaStakingFilterer) ParseStakeParamsManagerSet(log types.Log) (r
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseStakeParamsManagerSet(log)
+		val, methodErr := merged.typ0.ParseStakeParamsManagerSet(log)
 
 		if err != nil {
 			err = methodErr
@@ -2469,7 +2487,7 @@ func (merged *FortaStakingFilterer) FilterTokensSwept(opts *bind.FilterOpts, tok
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterTokensSwept(opts, token)
+		val, methodErr := merged.typ0.FilterTokensSwept(opts, token)
 
 		if err != nil {
 			err = methodErr
@@ -2484,7 +2502,7 @@ func (merged *FortaStakingFilterer) FilterTokensSwept(opts *bind.FilterOpts, tok
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterTokensSwept(opts, token)
+		val, methodErr := merged.typ1.FilterTokensSwept(opts, token)
 
 		if err != nil {
 			err = methodErr
@@ -2516,7 +2534,7 @@ func (merged *FortaStakingFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchTokensSwept(opts, sink, token)
+		val, methodErr := merged.typ0.WatchTokensSwept(opts, sink, token)
 
 		if err != nil {
 			err = methodErr
@@ -2529,7 +2547,7 @@ func (merged *FortaStakingFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchTokensSwept(opts, sinkAlt13, token)
+		val, methodErr := merged.typ1.WatchTokensSwept(opts, sinkAlt13, token)
 
 		if err != nil {
 			err = methodErr
@@ -2573,7 +2591,7 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseTokensSwept(log)
+		val, methodErr := merged.typ0.ParseTokensSwept(log)
 
 		if err != nil {
 			err = methodErr
@@ -2594,7 +2612,7 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseTokensSwept(log)
+		val, methodErr := merged.typ1.ParseTokensSwept(log)
 
 		if err != nil {
 			err = methodErr
@@ -2642,7 +2660,7 @@ func (merged *FortaStakingFilterer) FilterTransferBatch(opts *bind.FilterOpts, o
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterTransferBatch(opts, operator, from, to)
+		val, methodErr := merged.typ0.FilterTransferBatch(opts, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2657,7 +2675,7 @@ func (merged *FortaStakingFilterer) FilterTransferBatch(opts *bind.FilterOpts, o
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterTransferBatch(opts, operator, from, to)
+		val, methodErr := merged.typ1.FilterTransferBatch(opts, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2689,7 +2707,7 @@ func (merged *FortaStakingFilterer) WatchTransferBatch(opts *bind.WatchOpts, sin
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchTransferBatch(opts, sink, operator, from, to)
+		val, methodErr := merged.typ0.WatchTransferBatch(opts, sink, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2702,7 +2720,7 @@ func (merged *FortaStakingFilterer) WatchTransferBatch(opts *bind.WatchOpts, sin
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchTransferBatch(opts, sinkAlt14, operator, from, to)
+		val, methodErr := merged.typ1.WatchTransferBatch(opts, sinkAlt14, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2750,7 +2768,7 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseTransferBatch(log)
+		val, methodErr := merged.typ0.ParseTransferBatch(log)
 
 		if err != nil {
 			err = methodErr
@@ -2775,7 +2793,7 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseTransferBatch(log)
+		val, methodErr := merged.typ1.ParseTransferBatch(log)
 
 		if err != nil {
 			err = methodErr
@@ -2827,7 +2845,7 @@ func (merged *FortaStakingFilterer) FilterTransferSingle(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterTransferSingle(opts, operator, from, to)
+		val, methodErr := merged.typ0.FilterTransferSingle(opts, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2842,7 +2860,7 @@ func (merged *FortaStakingFilterer) FilterTransferSingle(opts *bind.FilterOpts, 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterTransferSingle(opts, operator, from, to)
+		val, methodErr := merged.typ1.FilterTransferSingle(opts, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2874,7 +2892,7 @@ func (merged *FortaStakingFilterer) WatchTransferSingle(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchTransferSingle(opts, sink, operator, from, to)
+		val, methodErr := merged.typ0.WatchTransferSingle(opts, sink, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2887,7 +2905,7 @@ func (merged *FortaStakingFilterer) WatchTransferSingle(opts *bind.WatchOpts, si
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchTransferSingle(opts, sinkAlt15, operator, from, to)
+		val, methodErr := merged.typ1.WatchTransferSingle(opts, sinkAlt15, operator, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -2935,7 +2953,7 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseTransferSingle(log)
+		val, methodErr := merged.typ0.ParseTransferSingle(log)
 
 		if err != nil {
 			err = methodErr
@@ -2960,7 +2978,7 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseTransferSingle(log)
+		val, methodErr := merged.typ1.ParseTransferSingle(log)
 
 		if err != nil {
 			err = methodErr
@@ -3012,7 +3030,7 @@ func (merged *FortaStakingFilterer) FilterTreasurySet(opts *bind.FilterOpts) (re
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterTreasurySet(opts)
+		val, methodErr := merged.typ0.FilterTreasurySet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -3027,7 +3045,7 @@ func (merged *FortaStakingFilterer) FilterTreasurySet(opts *bind.FilterOpts) (re
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterTreasurySet(opts)
+		val, methodErr := merged.typ1.FilterTreasurySet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -3059,7 +3077,7 @@ func (merged *FortaStakingFilterer) WatchTreasurySet(opts *bind.WatchOpts, sink 
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchTreasurySet(opts, sink)
+		val, methodErr := merged.typ0.WatchTreasurySet(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -3072,7 +3090,7 @@ func (merged *FortaStakingFilterer) WatchTreasurySet(opts *bind.WatchOpts, sink 
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchTreasurySet(opts, sinkAlt16)
+		val, methodErr := merged.typ1.WatchTreasurySet(opts, sinkAlt16)
 
 		if err != nil {
 			err = methodErr
@@ -3112,7 +3130,7 @@ func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *For
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseTreasurySet(log)
+		val, methodErr := merged.typ0.ParseTreasurySet(log)
 
 		if err != nil {
 			err = methodErr
@@ -3129,7 +3147,7 @@ func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *For
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseTreasurySet(log)
+		val, methodErr := merged.typ1.ParseTreasurySet(log)
 
 		if err != nil {
 			err = methodErr
@@ -3173,7 +3191,7 @@ func (merged *FortaStakingFilterer) FilterURI(opts *bind.FilterOpts, id []*big.I
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterURI(opts, id)
+		val, methodErr := merged.typ0.FilterURI(opts, id)
 
 		if err != nil {
 			err = methodErr
@@ -3188,7 +3206,7 @@ func (merged *FortaStakingFilterer) FilterURI(opts *bind.FilterOpts, id []*big.I
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterURI(opts, id)
+		val, methodErr := merged.typ1.FilterURI(opts, id)
 
 		if err != nil {
 			err = methodErr
@@ -3220,7 +3238,7 @@ func (merged *FortaStakingFilterer) WatchURI(opts *bind.WatchOpts, sink chan<- *
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchURI(opts, sink, id)
+		val, methodErr := merged.typ0.WatchURI(opts, sink, id)
 
 		if err != nil {
 			err = methodErr
@@ -3233,7 +3251,7 @@ func (merged *FortaStakingFilterer) WatchURI(opts *bind.WatchOpts, sink chan<- *
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchURI(opts, sinkAlt17, id)
+		val, methodErr := merged.typ1.WatchURI(opts, sinkAlt17, id)
 
 		if err != nil {
 			err = methodErr
@@ -3275,7 +3293,7 @@ func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *FortaStakin
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseURI(log)
+		val, methodErr := merged.typ0.ParseURI(log)
 
 		if err != nil {
 			err = methodErr
@@ -3294,7 +3312,7 @@ func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *FortaStakin
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseURI(log)
+		val, methodErr := merged.typ1.ParseURI(log)
 
 		if err != nil {
 			err = methodErr
@@ -3340,7 +3358,7 @@ func (merged *FortaStakingFilterer) FilterUpgraded(opts *bind.FilterOpts, implem
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -3355,7 +3373,7 @@ func (merged *FortaStakingFilterer) FilterUpgraded(opts *bind.FilterOpts, implem
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ1.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -3387,7 +3405,7 @@ func (merged *FortaStakingFilterer) WatchUpgraded(opts *bind.WatchOpts, sink cha
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
+		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -3400,7 +3418,7 @@ func (merged *FortaStakingFilterer) WatchUpgraded(opts *bind.WatchOpts, sink cha
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchUpgraded(opts, sinkAlt18, implementation)
+		val, methodErr := merged.typ1.WatchUpgraded(opts, sinkAlt18, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -3440,7 +3458,7 @@ func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *FortaS
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseUpgraded(log)
+		val, methodErr := merged.typ0.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -3457,7 +3475,7 @@ func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *FortaS
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseUpgraded(log)
+		val, methodErr := merged.typ1.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -3501,7 +3519,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalExecuted(opts *bind.FilterOp
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterWithdrawalExecuted(opts, subjectType, subject, account)
+		val, methodErr := merged.typ0.FilterWithdrawalExecuted(opts, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3516,7 +3534,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalExecuted(opts *bind.FilterOp
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterWithdrawalExecuted(opts, subjectType, subject, account)
+		val, methodErr := merged.typ1.FilterWithdrawalExecuted(opts, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3548,7 +3566,7 @@ func (merged *FortaStakingFilterer) WatchWithdrawalExecuted(opts *bind.WatchOpts
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchWithdrawalExecuted(opts, sink, subjectType, subject, account)
+		val, methodErr := merged.typ0.WatchWithdrawalExecuted(opts, sink, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3561,7 +3579,7 @@ func (merged *FortaStakingFilterer) WatchWithdrawalExecuted(opts *bind.WatchOpts
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchWithdrawalExecuted(opts, sinkAlt19, subjectType, subject, account)
+		val, methodErr := merged.typ1.WatchWithdrawalExecuted(opts, sinkAlt19, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3605,7 +3623,7 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseWithdrawalExecuted(log)
+		val, methodErr := merged.typ0.ParseWithdrawalExecuted(log)
 
 		if err != nil {
 			err = methodErr
@@ -3626,7 +3644,7 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseWithdrawalExecuted(log)
+		val, methodErr := merged.typ1.ParseWithdrawalExecuted(log)
 
 		if err != nil {
 			err = methodErr
@@ -3674,7 +3692,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalInitiated(opts *bind.FilterO
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.FilterWithdrawalInitiated(opts, subjectType, subject, account)
+		val, methodErr := merged.typ0.FilterWithdrawalInitiated(opts, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3689,7 +3707,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalInitiated(opts *bind.FilterO
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterWithdrawalInitiated(opts, subjectType, subject, account)
+		val, methodErr := merged.typ1.FilterWithdrawalInitiated(opts, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3721,7 +3739,7 @@ func (merged *FortaStakingFilterer) WatchWithdrawalInitiated(opts *bind.WatchOpt
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.WatchWithdrawalInitiated(opts, sink, subjectType, subject, account)
+		val, methodErr := merged.typ0.WatchWithdrawalInitiated(opts, sink, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3734,7 +3752,7 @@ func (merged *FortaStakingFilterer) WatchWithdrawalInitiated(opts *bind.WatchOpt
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchWithdrawalInitiated(opts, sinkAlt20, subjectType, subject, account)
+		val, methodErr := merged.typ1.WatchWithdrawalInitiated(opts, sinkAlt20, subjectType, subject, account)
 
 		if err != nil {
 			err = methodErr
@@ -3780,7 +3798,7 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ0.ParseWithdrawalInitiated(log)
+		val, methodErr := merged.typ0.ParseWithdrawalInitiated(log)
 
 		if err != nil {
 			err = methodErr
@@ -3803,7 +3821,7 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 	}
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseWithdrawalInitiated(log)
+		val, methodErr := merged.typ1.ParseWithdrawalInitiated(log)
 
 		if err != nil {
 			err = methodErr
@@ -3843,7 +3861,7 @@ func (merged *FortaStakingFilterer) FilterSlashDelegatorsPercentSet(opts *bind.F
 
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterSlashDelegatorsPercentSet(opts)
+		val, methodErr := merged.typ1.FilterSlashDelegatorsPercentSet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -3873,7 +3891,7 @@ func (merged *FortaStakingFilterer) WatchSlashDelegatorsPercentSet(opts *bind.Wa
 
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchSlashDelegatorsPercentSet(opts, sink)
+		val, methodErr := merged.typ1.WatchSlashDelegatorsPercentSet(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -3913,7 +3931,7 @@ func (merged *FortaStakingFilterer) ParseSlashDelegatorsPercentSet(log types.Log
 
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseSlashDelegatorsPercentSet(log)
+		val, methodErr := merged.typ1.ParseSlashDelegatorsPercentSet(log)
 
 		if err != nil {
 			err = methodErr
@@ -3947,7 +3965,7 @@ func (merged *FortaStakingFilterer) FilterStakeHelpersConfigured(opts *bind.Filt
 
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.FilterStakeHelpersConfigured(opts, subjectGateway, allocator)
+		val, methodErr := merged.typ1.FilterStakeHelpersConfigured(opts, subjectGateway, allocator)
 
 		if err != nil {
 			err = methodErr
@@ -3977,7 +3995,7 @@ func (merged *FortaStakingFilterer) WatchStakeHelpersConfigured(opts *bind.Watch
 
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.WatchStakeHelpersConfigured(opts, sink, subjectGateway, allocator)
+		val, methodErr := merged.typ1.WatchStakeHelpersConfigured(opts, sink, subjectGateway, allocator)
 
 		if err != nil {
 			err = methodErr
@@ -4019,7 +4037,7 @@ func (merged *FortaStakingFilterer) ParseStakeHelpersConfigured(log types.Log) (
 
 
 	if merged.currTag == "0.1.2" {
-	val, methodErr := merged.typ1.ParseStakeHelpersConfigured(log)
+		val, methodErr := merged.typ1.ParseStakeHelpersConfigured(log)
 
 		if err != nil {
 			err = methodErr

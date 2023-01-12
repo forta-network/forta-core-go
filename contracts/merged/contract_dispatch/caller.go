@@ -56,11 +56,29 @@ func NewDispatchCaller(address common.Address, caller bind.ContractCaller) (*Dis
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.4" {
+		return true
+	}
+
+	if tag == "0.1.5" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *DispatchCaller) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.4"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -91,7 +109,7 @@ func (merged *DispatchCaller) AgentAt(opts *bind.CallOpts, scannerId *big.Int, p
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.AgentAt(opts, scannerId, pos)
+		val, methodErr := merged.typ0.AgentAt(opts, scannerId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -104,7 +122,7 @@ func (merged *DispatchCaller) AgentAt(opts *bind.CallOpts, scannerId *big.Int, p
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.AgentAt(opts, scannerId, pos)
+		val, methodErr := merged.typ1.AgentAt(opts, scannerId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -144,7 +162,7 @@ func (merged *DispatchCaller) AgentHash(opts *bind.CallOpts, agentId *big.Int) (
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.AgentHash(opts, agentId)
+		val, methodErr := merged.typ0.AgentHash(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -161,7 +179,7 @@ func (merged *DispatchCaller) AgentHash(opts *bind.CallOpts, agentId *big.Int) (
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.AgentHash(opts, agentId)
+		val, methodErr := merged.typ1.AgentHash(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -217,7 +235,7 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.AgentRefAt(opts, scannerId, pos)
+		val, methodErr := merged.typ0.AgentRefAt(opts, scannerId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -246,7 +264,7 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.AgentRefAt(opts, scannerId, pos)
+		val, methodErr := merged.typ1.AgentRefAt(opts, scannerId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -292,7 +310,7 @@ func (merged *DispatchCaller) AgentRegistry(opts *bind.CallOpts) (retVal common.
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.AgentRegistry(opts)
+		val, methodErr := merged.typ0.AgentRegistry(opts)
 
 		if err != nil {
 			err = methodErr
@@ -305,7 +323,7 @@ func (merged *DispatchCaller) AgentRegistry(opts *bind.CallOpts) (retVal common.
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.AgentRegistry(opts)
+		val, methodErr := merged.typ1.AgentRegistry(opts)
 
 		if err != nil {
 			err = methodErr
@@ -335,7 +353,7 @@ func (merged *DispatchCaller) AreTheyLinked(opts *bind.CallOpts, agentId *big.In
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.AreTheyLinked(opts, agentId, scannerId)
+		val, methodErr := merged.typ0.AreTheyLinked(opts, agentId, scannerId)
 
 		if err != nil {
 			err = methodErr
@@ -348,7 +366,7 @@ func (merged *DispatchCaller) AreTheyLinked(opts *bind.CallOpts, agentId *big.In
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.AreTheyLinked(opts, agentId, scannerId)
+		val, methodErr := merged.typ1.AreTheyLinked(opts, agentId, scannerId)
 
 		if err != nil {
 			err = methodErr
@@ -378,7 +396,7 @@ func (merged *DispatchCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -391,7 +409,7 @@ func (merged *DispatchCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder 
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -421,7 +439,7 @@ func (merged *DispatchCaller) NumAgentsFor(opts *bind.CallOpts, scannerId *big.I
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.NumAgentsFor(opts, scannerId)
+		val, methodErr := merged.typ0.NumAgentsFor(opts, scannerId)
 
 		if err != nil {
 			err = methodErr
@@ -434,7 +452,7 @@ func (merged *DispatchCaller) NumAgentsFor(opts *bind.CallOpts, scannerId *big.I
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.NumAgentsFor(opts, scannerId)
+		val, methodErr := merged.typ1.NumAgentsFor(opts, scannerId)
 
 		if err != nil {
 			err = methodErr
@@ -464,7 +482,7 @@ func (merged *DispatchCaller) NumScannersFor(opts *bind.CallOpts, agentId *big.I
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.NumScannersFor(opts, agentId)
+		val, methodErr := merged.typ0.NumScannersFor(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -477,7 +495,7 @@ func (merged *DispatchCaller) NumScannersFor(opts *bind.CallOpts, agentId *big.I
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.NumScannersFor(opts, agentId)
+		val, methodErr := merged.typ1.NumScannersFor(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -507,7 +525,7 @@ func (merged *DispatchCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byt
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ProxiableUUID(opts)
+		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
 		if err != nil {
 			err = methodErr
@@ -520,7 +538,7 @@ func (merged *DispatchCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byt
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.ProxiableUUID(opts)
+		val, methodErr := merged.typ1.ProxiableUUID(opts)
 
 		if err != nil {
 			err = methodErr
@@ -550,7 +568,7 @@ func (merged *DispatchCaller) ScannerAt(opts *bind.CallOpts, agentId *big.Int, p
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ScannerAt(opts, agentId, pos)
+		val, methodErr := merged.typ0.ScannerAt(opts, agentId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -563,7 +581,7 @@ func (merged *DispatchCaller) ScannerAt(opts *bind.CallOpts, agentId *big.Int, p
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.ScannerAt(opts, agentId, pos)
+		val, methodErr := merged.typ1.ScannerAt(opts, agentId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -603,7 +621,7 @@ func (merged *DispatchCaller) ScannerHash(opts *bind.CallOpts, scannerId *big.In
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ScannerHash(opts, scannerId)
+		val, methodErr := merged.typ0.ScannerHash(opts, scannerId)
 
 		if err != nil {
 			err = methodErr
@@ -620,7 +638,7 @@ func (merged *DispatchCaller) ScannerHash(opts *bind.CallOpts, scannerId *big.In
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.ScannerHash(opts, scannerId)
+		val, methodErr := merged.typ1.ScannerHash(opts, scannerId)
 
 		if err != nil {
 			err = methodErr
@@ -678,7 +696,7 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ScannerRefAt(opts, agentId, pos)
+		val, methodErr := merged.typ0.ScannerRefAt(opts, agentId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -705,7 +723,7 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.ScannerRefAt(opts, agentId, pos)
+		val, methodErr := merged.typ1.ScannerRefAt(opts, agentId, pos)
 
 		if err != nil {
 			err = methodErr
@@ -749,7 +767,7 @@ func (merged *DispatchCaller) ScannerRegistry(opts *bind.CallOpts) (retVal commo
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ScannerRegistry(opts)
+		val, methodErr := merged.typ0.ScannerRegistry(opts)
 
 		if err != nil {
 			err = methodErr
@@ -762,7 +780,7 @@ func (merged *DispatchCaller) ScannerRegistry(opts *bind.CallOpts) (retVal commo
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.ScannerRegistry(opts)
+		val, methodErr := merged.typ1.ScannerRegistry(opts)
 
 		if err != nil {
 			err = methodErr
@@ -792,7 +810,7 @@ func (merged *DispatchCaller) Version(opts *bind.CallOpts) (retVal string, err e
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.Version(opts)
+		val, methodErr := merged.typ0.Version(opts)
 
 		if err != nil {
 			err = methodErr
@@ -805,7 +823,7 @@ func (merged *DispatchCaller) Version(opts *bind.CallOpts) (retVal string, err e
 	}
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.Version(opts)
+		val, methodErr := merged.typ1.Version(opts)
 
 		if err != nil {
 			err = methodErr
@@ -835,7 +853,7 @@ func (merged *DispatchCaller) ScannerPoolRegistry(opts *bind.CallOpts) (retVal c
 
 
 	if merged.currTag == "0.1.5" {
-	val, methodErr := merged.typ1.ScannerPoolRegistry(opts)
+		val, methodErr := merged.typ1.ScannerPoolRegistry(opts)
 
 		if err != nil {
 			err = methodErr

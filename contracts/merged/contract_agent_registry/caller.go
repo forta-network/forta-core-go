@@ -56,11 +56,29 @@ func NewAgentRegistryCaller(address common.Address, caller bind.ContractCaller) 
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.4" {
+		return true
+	}
+
+	if tag == "0.1.6" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *AgentRegistryCaller) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.4"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -91,7 +109,7 @@ func (merged *AgentRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common.A
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.BalanceOf(opts, owner)
+		val, methodErr := merged.typ0.BalanceOf(opts, owner)
 
 		if err != nil {
 			err = methodErr
@@ -104,7 +122,7 @@ func (merged *AgentRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common.A
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.BalanceOf(opts, owner)
+		val, methodErr := merged.typ1.BalanceOf(opts, owner)
 
 		if err != nil {
 			err = methodErr
@@ -134,7 +152,7 @@ func (merged *AgentRegistryCaller) FrontRunningDelay(opts *bind.CallOpts) (retVa
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FrontRunningDelay(opts)
+		val, methodErr := merged.typ0.FrontRunningDelay(opts)
 
 		if err != nil {
 			err = methodErr
@@ -147,7 +165,7 @@ func (merged *AgentRegistryCaller) FrontRunningDelay(opts *bind.CallOpts) (retVa
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FrontRunningDelay(opts)
+		val, methodErr := merged.typ1.FrontRunningDelay(opts)
 
 		if err != nil {
 			err = methodErr
@@ -193,7 +211,7 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetAgent(opts, agentId)
+		val, methodErr := merged.typ0.GetAgent(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -216,7 +234,7 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetAgent(opts, agentId)
+		val, methodErr := merged.typ1.GetAgent(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -256,7 +274,7 @@ func (merged *AgentRegistryCaller) GetAgentByChainAndIndex(opts *bind.CallOpts, 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetAgentByChainAndIndex(opts, chainId, index)
+		val, methodErr := merged.typ0.GetAgentByChainAndIndex(opts, chainId, index)
 
 		if err != nil {
 			err = methodErr
@@ -269,7 +287,7 @@ func (merged *AgentRegistryCaller) GetAgentByChainAndIndex(opts *bind.CallOpts, 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetAgentByChainAndIndex(opts, chainId, index)
+		val, methodErr := merged.typ1.GetAgentByChainAndIndex(opts, chainId, index)
 
 		if err != nil {
 			err = methodErr
@@ -299,7 +317,7 @@ func (merged *AgentRegistryCaller) GetAgentByIndex(opts *bind.CallOpts, index *b
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetAgentByIndex(opts, index)
+		val, methodErr := merged.typ0.GetAgentByIndex(opts, index)
 
 		if err != nil {
 			err = methodErr
@@ -312,7 +330,7 @@ func (merged *AgentRegistryCaller) GetAgentByIndex(opts *bind.CallOpts, index *b
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetAgentByIndex(opts, index)
+		val, methodErr := merged.typ1.GetAgentByIndex(opts, index)
 
 		if err != nil {
 			err = methodErr
@@ -342,7 +360,7 @@ func (merged *AgentRegistryCaller) GetAgentCount(opts *bind.CallOpts) (retVal *b
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetAgentCount(opts)
+		val, methodErr := merged.typ0.GetAgentCount(opts)
 
 		if err != nil {
 			err = methodErr
@@ -355,7 +373,7 @@ func (merged *AgentRegistryCaller) GetAgentCount(opts *bind.CallOpts) (retVal *b
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetAgentCount(opts)
+		val, methodErr := merged.typ1.GetAgentCount(opts)
 
 		if err != nil {
 			err = methodErr
@@ -385,7 +403,7 @@ func (merged *AgentRegistryCaller) GetAgentCountByChain(opts *bind.CallOpts, cha
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetAgentCountByChain(opts, chainId)
+		val, methodErr := merged.typ0.GetAgentCountByChain(opts, chainId)
 
 		if err != nil {
 			err = methodErr
@@ -398,7 +416,7 @@ func (merged *AgentRegistryCaller) GetAgentCountByChain(opts *bind.CallOpts, cha
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetAgentCountByChain(opts, chainId)
+		val, methodErr := merged.typ1.GetAgentCountByChain(opts, chainId)
 
 		if err != nil {
 			err = methodErr
@@ -448,7 +466,7 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetAgentState(opts, agentId)
+		val, methodErr := merged.typ0.GetAgentState(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -475,7 +493,7 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetAgentState(opts, agentId)
+		val, methodErr := merged.typ1.GetAgentState(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -519,7 +537,7 @@ func (merged *AgentRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *big
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetApproved(opts, tokenId)
+		val, methodErr := merged.typ0.GetApproved(opts, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -532,7 +550,7 @@ func (merged *AgentRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *big
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetApproved(opts, tokenId)
+		val, methodErr := merged.typ1.GetApproved(opts, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -562,7 +580,7 @@ func (merged *AgentRegistryCaller) GetCommitTimestamp(opts *bind.CallOpts, commi
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetCommitTimestamp(opts, commit)
+		val, methodErr := merged.typ0.GetCommitTimestamp(opts, commit)
 
 		if err != nil {
 			err = methodErr
@@ -575,7 +593,7 @@ func (merged *AgentRegistryCaller) GetCommitTimestamp(opts *bind.CallOpts, commi
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetCommitTimestamp(opts, commit)
+		val, methodErr := merged.typ1.GetCommitTimestamp(opts, commit)
 
 		if err != nil {
 			err = methodErr
@@ -605,7 +623,7 @@ func (merged *AgentRegistryCaller) GetDisableFlags(opts *bind.CallOpts, agentId 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetDisableFlags(opts, agentId)
+		val, methodErr := merged.typ0.GetDisableFlags(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -618,7 +636,7 @@ func (merged *AgentRegistryCaller) GetDisableFlags(opts *bind.CallOpts, agentId 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetDisableFlags(opts, agentId)
+		val, methodErr := merged.typ1.GetDisableFlags(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -648,7 +666,7 @@ func (merged *AgentRegistryCaller) GetStakeController(opts *bind.CallOpts) (retV
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetStakeController(opts)
+		val, methodErr := merged.typ0.GetStakeController(opts)
 
 		if err != nil {
 			err = methodErr
@@ -690,7 +708,7 @@ func (merged *AgentRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, arg0 *
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.GetStakeThreshold(opts, arg0)
+		val, methodErr := merged.typ0.GetStakeThreshold(opts, arg0)
 
 		if err != nil {
 			err = methodErr
@@ -709,7 +727,7 @@ func (merged *AgentRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, arg0 *
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetStakeThreshold(opts, arg0)
+		val, methodErr := merged.typ1.GetStakeThreshold(opts, arg0)
 
 		if err != nil {
 			err = methodErr
@@ -745,7 +763,7 @@ func (merged *AgentRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner c
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.IsApprovedForAll(opts, owner, operator)
+		val, methodErr := merged.typ0.IsApprovedForAll(opts, owner, operator)
 
 		if err != nil {
 			err = methodErr
@@ -758,7 +776,7 @@ func (merged *AgentRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner c
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.IsApprovedForAll(opts, owner, operator)
+		val, methodErr := merged.typ1.IsApprovedForAll(opts, owner, operator)
 
 		if err != nil {
 			err = methodErr
@@ -788,7 +806,7 @@ func (merged *AgentRegistryCaller) IsEnabled(opts *bind.CallOpts, agentId *big.I
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.IsEnabled(opts, agentId)
+		val, methodErr := merged.typ0.IsEnabled(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -801,7 +819,7 @@ func (merged *AgentRegistryCaller) IsEnabled(opts *bind.CallOpts, agentId *big.I
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.IsEnabled(opts, agentId)
+		val, methodErr := merged.typ1.IsEnabled(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -831,7 +849,7 @@ func (merged *AgentRegistryCaller) IsRegistered(opts *bind.CallOpts, agentId *bi
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.IsRegistered(opts, agentId)
+		val, methodErr := merged.typ0.IsRegistered(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -844,7 +862,7 @@ func (merged *AgentRegistryCaller) IsRegistered(opts *bind.CallOpts, agentId *bi
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.IsRegistered(opts, agentId)
+		val, methodErr := merged.typ1.IsRegistered(opts, agentId)
 
 		if err != nil {
 			err = methodErr
@@ -874,7 +892,7 @@ func (merged *AgentRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subject 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.IsStakedOverMin(opts, subject)
+		val, methodErr := merged.typ0.IsStakedOverMin(opts, subject)
 
 		if err != nil {
 			err = methodErr
@@ -887,7 +905,7 @@ func (merged *AgentRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subject 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.IsStakedOverMin(opts, subject)
+		val, methodErr := merged.typ1.IsStakedOverMin(opts, subject)
 
 		if err != nil {
 			err = methodErr
@@ -917,7 +935,7 @@ func (merged *AgentRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, forwa
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -930,7 +948,7 @@ func (merged *AgentRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, forwa
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -960,7 +978,7 @@ func (merged *AgentRegistryCaller) Name(opts *bind.CallOpts) (retVal string, err
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.Name(opts)
+		val, methodErr := merged.typ0.Name(opts)
 
 		if err != nil {
 			err = methodErr
@@ -973,7 +991,7 @@ func (merged *AgentRegistryCaller) Name(opts *bind.CallOpts) (retVal string, err
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.Name(opts)
+		val, methodErr := merged.typ1.Name(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1003,7 +1021,7 @@ func (merged *AgentRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.Int
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.OwnerOf(opts, tokenId)
+		val, methodErr := merged.typ0.OwnerOf(opts, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -1016,7 +1034,7 @@ func (merged *AgentRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.Int
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.OwnerOf(opts, subject)
+		val, methodErr := merged.typ1.OwnerOf(opts, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1046,7 +1064,7 @@ func (merged *AgentRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [3
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ProxiableUUID(opts)
+		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1059,7 +1077,7 @@ func (merged *AgentRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [3
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ProxiableUUID(opts)
+		val, methodErr := merged.typ1.ProxiableUUID(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1089,7 +1107,7 @@ func (merged *AgentRegistryCaller) SupportsInterface(opts *bind.CallOpts, interf
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
+		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
 
 		if err != nil {
 			err = methodErr
@@ -1102,7 +1120,7 @@ func (merged *AgentRegistryCaller) SupportsInterface(opts *bind.CallOpts, interf
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.SupportsInterface(opts, interfaceId)
+		val, methodErr := merged.typ1.SupportsInterface(opts, interfaceId)
 
 		if err != nil {
 			err = methodErr
@@ -1132,7 +1150,7 @@ func (merged *AgentRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string, e
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.Symbol(opts)
+		val, methodErr := merged.typ0.Symbol(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1145,7 +1163,7 @@ func (merged *AgentRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string, e
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.Symbol(opts)
+		val, methodErr := merged.typ1.Symbol(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1175,7 +1193,7 @@ func (merged *AgentRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.In
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.TokenURI(opts, tokenId)
+		val, methodErr := merged.typ0.TokenURI(opts, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -1188,7 +1206,7 @@ func (merged *AgentRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.In
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.TokenURI(opts, tokenId)
+		val, methodErr := merged.typ1.TokenURI(opts, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -1218,7 +1236,7 @@ func (merged *AgentRegistryCaller) Version(opts *bind.CallOpts) (retVal string, 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.Version(opts)
+		val, methodErr := merged.typ0.Version(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1231,7 +1249,7 @@ func (merged *AgentRegistryCaller) Version(opts *bind.CallOpts) (retVal string, 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.Version(opts)
+		val, methodErr := merged.typ1.Version(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1261,7 +1279,7 @@ func (merged *AgentRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) (retVa
 
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.GetSubjectHandler(opts)
+		val, methodErr := merged.typ1.GetSubjectHandler(opts)
 
 		if err != nil {
 			err = methodErr

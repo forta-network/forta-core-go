@@ -54,11 +54,29 @@ func NewScannerNodeVersionCaller(address common.Address, caller bind.ContractCal
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.0" {
+		return true
+	}
+
+	if tag == "0.1.1" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *ScannerNodeVersionCaller) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -89,7 +107,7 @@ func (merged *ScannerNodeVersionCaller) IsTrustedForwarder(opts *bind.CallOpts, 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -102,7 +120,7 @@ func (merged *ScannerNodeVersionCaller) IsTrustedForwarder(opts *bind.CallOpts, 
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -132,7 +150,7 @@ func (merged *ScannerNodeVersionCaller) ScannerNodeVersion(opts *bind.CallOpts) 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ScannerNodeVersion(opts)
+		val, methodErr := merged.typ0.ScannerNodeVersion(opts)
 
 		if err != nil {
 			err = methodErr
@@ -145,7 +163,7 @@ func (merged *ScannerNodeVersionCaller) ScannerNodeVersion(opts *bind.CallOpts) 
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ScannerNodeVersion(opts)
+		val, methodErr := merged.typ1.ScannerNodeVersion(opts)
 
 		if err != nil {
 			err = methodErr
@@ -175,7 +193,7 @@ func (merged *ScannerNodeVersionCaller) Version(opts *bind.CallOpts) (retVal str
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.Version(opts)
+		val, methodErr := merged.typ0.Version(opts)
 
 		if err != nil {
 			err = methodErr
@@ -188,7 +206,7 @@ func (merged *ScannerNodeVersionCaller) Version(opts *bind.CallOpts) (retVal str
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.Version(opts)
+		val, methodErr := merged.typ1.Version(opts)
 
 		if err != nil {
 			err = methodErr
@@ -218,7 +236,7 @@ func (merged *ScannerNodeVersionCaller) ProxiableUUID(opts *bind.CallOpts) (retV
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ProxiableUUID(opts)
+		val, methodErr := merged.typ1.ProxiableUUID(opts)
 
 		if err != nil {
 			err = methodErr
@@ -248,7 +266,7 @@ func (merged *ScannerNodeVersionCaller) ScannerNodeBetaVersion(opts *bind.CallOp
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ScannerNodeBetaVersion(opts)
+		val, methodErr := merged.typ1.ScannerNodeBetaVersion(opts)
 
 		if err != nil {
 			err = methodErr

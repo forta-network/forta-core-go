@@ -60,11 +60,29 @@ func NewAgentRegistryFilterer(address common.Address, filterer bind.ContractFilt
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.4" {
+		return true
+	}
+
+	if tag == "0.1.6" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *AgentRegistryFilterer) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.4"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -105,7 +123,7 @@ func (merged *AgentRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Filte
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -120,7 +138,7 @@ func (merged *AgentRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Filte
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ1.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -152,7 +170,7 @@ func (merged *AgentRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchO
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
+		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -165,7 +183,7 @@ func (merged *AgentRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchO
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchAccessManagerUpdated(opts, sinkAlt1, newAddressManager)
+		val, methodErr := merged.typ1.WatchAccessManagerUpdated(opts, sinkAlt1, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -205,7 +223,7 @@ func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (r
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -222,7 +240,7 @@ func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (r
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ1.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -266,7 +284,7 @@ func (merged *AgentRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts) (
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterAdminChanged(opts)
+		val, methodErr := merged.typ0.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -281,7 +299,7 @@ func (merged *AgentRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts) (
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterAdminChanged(opts)
+		val, methodErr := merged.typ1.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -313,7 +331,7 @@ func (merged *AgentRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sin
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
+		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -326,7 +344,7 @@ func (merged *AgentRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sin
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchAdminChanged(opts, sinkAlt2)
+		val, methodErr := merged.typ1.WatchAdminChanged(opts, sinkAlt2)
 
 		if err != nil {
 			err = methodErr
@@ -368,7 +386,7 @@ func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *A
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseAdminChanged(log)
+		val, methodErr := merged.typ0.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -387,7 +405,7 @@ func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *A
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseAdminChanged(log)
+		val, methodErr := merged.typ1.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -433,7 +451,7 @@ func (merged *AgentRegistryFilterer) FilterAgentCommitted(opts *bind.FilterOpts,
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterAgentCommitted(opts, commit)
+		val, methodErr := merged.typ0.FilterAgentCommitted(opts, commit)
 
 		if err != nil {
 			err = methodErr
@@ -448,7 +466,7 @@ func (merged *AgentRegistryFilterer) FilterAgentCommitted(opts *bind.FilterOpts,
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterAgentCommitted(opts, commit)
+		val, methodErr := merged.typ1.FilterAgentCommitted(opts, commit)
 
 		if err != nil {
 			err = methodErr
@@ -480,7 +498,7 @@ func (merged *AgentRegistryFilterer) WatchAgentCommitted(opts *bind.WatchOpts, s
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchAgentCommitted(opts, sink, commit)
+		val, methodErr := merged.typ0.WatchAgentCommitted(opts, sink, commit)
 
 		if err != nil {
 			err = methodErr
@@ -493,7 +511,7 @@ func (merged *AgentRegistryFilterer) WatchAgentCommitted(opts *bind.WatchOpts, s
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchAgentCommitted(opts, sinkAlt3, commit)
+		val, methodErr := merged.typ1.WatchAgentCommitted(opts, sinkAlt3, commit)
 
 		if err != nil {
 			err = methodErr
@@ -533,7 +551,7 @@ func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseAgentCommitted(log)
+		val, methodErr := merged.typ0.ParseAgentCommitted(log)
 
 		if err != nil {
 			err = methodErr
@@ -550,7 +568,7 @@ func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseAgentCommitted(log)
+		val, methodErr := merged.typ1.ParseAgentCommitted(log)
 
 		if err != nil {
 			err = methodErr
@@ -594,7 +612,7 @@ func (merged *AgentRegistryFilterer) FilterAgentEnabled(opts *bind.FilterOpts, a
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterAgentEnabled(opts, agentId, enabled)
+		val, methodErr := merged.typ0.FilterAgentEnabled(opts, agentId, enabled)
 
 		if err != nil {
 			err = methodErr
@@ -609,7 +627,7 @@ func (merged *AgentRegistryFilterer) FilterAgentEnabled(opts *bind.FilterOpts, a
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterAgentEnabled(opts, agentId, enabled)
+		val, methodErr := merged.typ1.FilterAgentEnabled(opts, agentId, enabled)
 
 		if err != nil {
 			err = methodErr
@@ -641,7 +659,7 @@ func (merged *AgentRegistryFilterer) WatchAgentEnabled(opts *bind.WatchOpts, sin
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchAgentEnabled(opts, sink, agentId, enabled)
+		val, methodErr := merged.typ0.WatchAgentEnabled(opts, sink, agentId, enabled)
 
 		if err != nil {
 			err = methodErr
@@ -654,7 +672,7 @@ func (merged *AgentRegistryFilterer) WatchAgentEnabled(opts *bind.WatchOpts, sin
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchAgentEnabled(opts, sinkAlt4, agentId, enabled)
+		val, methodErr := merged.typ1.WatchAgentEnabled(opts, sinkAlt4, agentId, enabled)
 
 		if err != nil {
 			err = methodErr
@@ -700,7 +718,7 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseAgentEnabled(log)
+		val, methodErr := merged.typ0.ParseAgentEnabled(log)
 
 		if err != nil {
 			err = methodErr
@@ -723,7 +741,7 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseAgentEnabled(log)
+		val, methodErr := merged.typ1.ParseAgentEnabled(log)
 
 		if err != nil {
 			err = methodErr
@@ -773,7 +791,7 @@ func (merged *AgentRegistryFilterer) FilterAgentUpdated(opts *bind.FilterOpts, a
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterAgentUpdated(opts, agentId, by)
+		val, methodErr := merged.typ0.FilterAgentUpdated(opts, agentId, by)
 
 		if err != nil {
 			err = methodErr
@@ -788,7 +806,7 @@ func (merged *AgentRegistryFilterer) FilterAgentUpdated(opts *bind.FilterOpts, a
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterAgentUpdated(opts, agentId, by)
+		val, methodErr := merged.typ1.FilterAgentUpdated(opts, agentId, by)
 
 		if err != nil {
 			err = methodErr
@@ -820,7 +838,7 @@ func (merged *AgentRegistryFilterer) WatchAgentUpdated(opts *bind.WatchOpts, sin
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchAgentUpdated(opts, sink, agentId, by)
+		val, methodErr := merged.typ0.WatchAgentUpdated(opts, sink, agentId, by)
 
 		if err != nil {
 			err = methodErr
@@ -833,7 +851,7 @@ func (merged *AgentRegistryFilterer) WatchAgentUpdated(opts *bind.WatchOpts, sin
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchAgentUpdated(opts, sinkAlt5, agentId, by)
+		val, methodErr := merged.typ1.WatchAgentUpdated(opts, sinkAlt5, agentId, by)
 
 		if err != nil {
 			err = methodErr
@@ -879,7 +897,7 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseAgentUpdated(log)
+		val, methodErr := merged.typ0.ParseAgentUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -902,7 +920,7 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseAgentUpdated(log)
+		val, methodErr := merged.typ1.ParseAgentUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -952,7 +970,7 @@ func (merged *AgentRegistryFilterer) FilterApproval(opts *bind.FilterOpts, owner
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterApproval(opts, owner, approved, tokenId)
+		val, methodErr := merged.typ0.FilterApproval(opts, owner, approved, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -967,7 +985,7 @@ func (merged *AgentRegistryFilterer) FilterApproval(opts *bind.FilterOpts, owner
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterApproval(opts, owner, approved, tokenId)
+		val, methodErr := merged.typ1.FilterApproval(opts, owner, approved, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -999,7 +1017,7 @@ func (merged *AgentRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink ch
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchApproval(opts, sink, owner, approved, tokenId)
+		val, methodErr := merged.typ0.WatchApproval(opts, sink, owner, approved, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -1012,7 +1030,7 @@ func (merged *AgentRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink ch
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchApproval(opts, sinkAlt6, owner, approved, tokenId)
+		val, methodErr := merged.typ1.WatchApproval(opts, sinkAlt6, owner, approved, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -1056,7 +1074,7 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseApproval(log)
+		val, methodErr := merged.typ0.ParseApproval(log)
 
 		if err != nil {
 			err = methodErr
@@ -1077,7 +1095,7 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseApproval(log)
+		val, methodErr := merged.typ1.ParseApproval(log)
 
 		if err != nil {
 			err = methodErr
@@ -1125,7 +1143,7 @@ func (merged *AgentRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpts,
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterApprovalForAll(opts, owner, operator)
+		val, methodErr := merged.typ0.FilterApprovalForAll(opts, owner, operator)
 
 		if err != nil {
 			err = methodErr
@@ -1140,7 +1158,7 @@ func (merged *AgentRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpts,
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterApprovalForAll(opts, owner, operator)
+		val, methodErr := merged.typ1.FilterApprovalForAll(opts, owner, operator)
 
 		if err != nil {
 			err = methodErr
@@ -1172,7 +1190,7 @@ func (merged *AgentRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, s
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, owner, operator)
+		val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, owner, operator)
 
 		if err != nil {
 			err = methodErr
@@ -1185,7 +1203,7 @@ func (merged *AgentRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, s
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchApprovalForAll(opts, sinkAlt7, owner, operator)
+		val, methodErr := merged.typ1.WatchApprovalForAll(opts, sinkAlt7, owner, operator)
 
 		if err != nil {
 			err = methodErr
@@ -1229,7 +1247,7 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseApprovalForAll(log)
+		val, methodErr := merged.typ0.ParseApprovalForAll(log)
 
 		if err != nil {
 			err = methodErr
@@ -1250,7 +1268,7 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseApprovalForAll(log)
+		val, methodErr := merged.typ1.ParseApprovalForAll(log)
 
 		if err != nil {
 			err = methodErr
@@ -1298,7 +1316,7 @@ func (merged *AgentRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts,
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -1313,7 +1331,7 @@ func (merged *AgentRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts,
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ1.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -1345,7 +1363,7 @@ func (merged *AgentRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, s
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
+		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -1358,7 +1376,7 @@ func (merged *AgentRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, s
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchBeaconUpgraded(opts, sinkAlt8, beacon)
+		val, methodErr := merged.typ1.WatchBeaconUpgraded(opts, sinkAlt8, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -1398,7 +1416,7 @@ func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -1415,7 +1433,7 @@ func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ1.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -1459,7 +1477,7 @@ func (merged *AgentRegistryFilterer) FilterFrontRunningDelaySet(opts *bind.Filte
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterFrontRunningDelaySet(opts)
+		val, methodErr := merged.typ0.FilterFrontRunningDelaySet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1474,7 +1492,7 @@ func (merged *AgentRegistryFilterer) FilterFrontRunningDelaySet(opts *bind.Filte
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterFrontRunningDelaySet(opts)
+		val, methodErr := merged.typ1.FilterFrontRunningDelaySet(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1506,7 +1524,7 @@ func (merged *AgentRegistryFilterer) WatchFrontRunningDelaySet(opts *bind.WatchO
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchFrontRunningDelaySet(opts, sink)
+		val, methodErr := merged.typ0.WatchFrontRunningDelaySet(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -1519,7 +1537,7 @@ func (merged *AgentRegistryFilterer) WatchFrontRunningDelaySet(opts *bind.WatchO
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchFrontRunningDelaySet(opts, sinkAlt9)
+		val, methodErr := merged.typ1.WatchFrontRunningDelaySet(opts, sinkAlt9)
 
 		if err != nil {
 			err = methodErr
@@ -1559,7 +1577,7 @@ func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (r
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseFrontRunningDelaySet(log)
+		val, methodErr := merged.typ0.ParseFrontRunningDelaySet(log)
 
 		if err != nil {
 			err = methodErr
@@ -1576,7 +1594,7 @@ func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (r
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseFrontRunningDelaySet(log)
+		val, methodErr := merged.typ1.ParseFrontRunningDelaySet(log)
 
 		if err != nil {
 			err = methodErr
@@ -1620,7 +1638,7 @@ func (merged *AgentRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) (r
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterInitialized(opts)
+		val, methodErr := merged.typ0.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1635,7 +1653,7 @@ func (merged *AgentRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) (r
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterInitialized(opts)
+		val, methodErr := merged.typ1.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1667,7 +1685,7 @@ func (merged *AgentRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchInitialized(opts, sink)
+		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -1680,7 +1698,7 @@ func (merged *AgentRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchInitialized(opts, sinkAlt10)
+		val, methodErr := merged.typ1.WatchInitialized(opts, sinkAlt10)
 
 		if err != nil {
 			err = methodErr
@@ -1720,7 +1738,7 @@ func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *Ag
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseInitialized(log)
+		val, methodErr := merged.typ0.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -1737,7 +1755,7 @@ func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *Ag
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseInitialized(log)
+		val, methodErr := merged.typ1.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -1781,7 +1799,7 @@ func (merged *AgentRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -1796,7 +1814,7 @@ func (merged *AgentRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts, 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ1.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -1828,7 +1846,7 @@ func (merged *AgentRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
+		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
 
 		if err != nil {
 			err = methodErr
@@ -1841,7 +1859,7 @@ func (merged *AgentRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, si
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchRouterUpdated(opts, sinkAlt11, router)
+		val, methodErr := merged.typ1.WatchRouterUpdated(opts, sinkAlt11, router)
 
 		if err != nil {
 			err = methodErr
@@ -1881,7 +1899,7 @@ func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseRouterUpdated(log)
+		val, methodErr := merged.typ0.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -1898,7 +1916,7 @@ func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseRouterUpdated(log)
+		val, methodErr := merged.typ1.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -1932,7 +1950,7 @@ func (merged *AgentRegistryFilterer) FilterStakeControllerUpdated(opts *bind.Fil
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterStakeControllerUpdated(opts, newstakeController)
+		val, methodErr := merged.typ0.FilterStakeControllerUpdated(opts, newstakeController)
 
 		if err != nil {
 			err = methodErr
@@ -1962,7 +1980,7 @@ func (merged *AgentRegistryFilterer) WatchStakeControllerUpdated(opts *bind.Watc
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchStakeControllerUpdated(opts, sink, newstakeController)
+		val, methodErr := merged.typ0.WatchStakeControllerUpdated(opts, sink, newstakeController)
 
 		if err != nil {
 			err = methodErr
@@ -2002,7 +2020,7 @@ func (merged *AgentRegistryFilterer) ParseStakeControllerUpdated(log types.Log) 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseStakeControllerUpdated(log)
+		val, methodErr := merged.typ0.ParseStakeControllerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -2046,7 +2064,7 @@ func (merged *AgentRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Filt
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterStakeThresholdChanged(opts)
+		val, methodErr := merged.typ0.FilterStakeThresholdChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -2061,7 +2079,7 @@ func (merged *AgentRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Filt
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterStakeThresholdChanged(opts)
+		val, methodErr := merged.typ1.FilterStakeThresholdChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -2093,7 +2111,7 @@ func (merged *AgentRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Watch
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchStakeThresholdChanged(opts, sink)
+		val, methodErr := merged.typ0.WatchStakeThresholdChanged(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -2106,7 +2124,7 @@ func (merged *AgentRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Watch
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchStakeThresholdChanged(opts, sinkAlt12)
+		val, methodErr := merged.typ1.WatchStakeThresholdChanged(opts, sinkAlt12)
 
 		if err != nil {
 			err = methodErr
@@ -2150,7 +2168,7 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseStakeThresholdChanged(log)
+		val, methodErr := merged.typ0.ParseStakeThresholdChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -2171,7 +2189,7 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseStakeThresholdChanged(log)
+		val, methodErr := merged.typ1.ParseStakeThresholdChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -2219,7 +2237,7 @@ func (merged *AgentRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, from 
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterTransfer(opts, from, to, tokenId)
+		val, methodErr := merged.typ0.FilterTransfer(opts, from, to, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -2234,7 +2252,7 @@ func (merged *AgentRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, from 
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterTransfer(opts, from, to, tokenId)
+		val, methodErr := merged.typ1.FilterTransfer(opts, from, to, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -2266,7 +2284,7 @@ func (merged *AgentRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink ch
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchTransfer(opts, sink, from, to, tokenId)
+		val, methodErr := merged.typ0.WatchTransfer(opts, sink, from, to, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -2279,7 +2297,7 @@ func (merged *AgentRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink ch
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchTransfer(opts, sinkAlt13, from, to, tokenId)
+		val, methodErr := merged.typ1.WatchTransfer(opts, sinkAlt13, from, to, tokenId)
 
 		if err != nil {
 			err = methodErr
@@ -2323,7 +2341,7 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseTransfer(log)
+		val, methodErr := merged.typ0.ParseTransfer(log)
 
 		if err != nil {
 			err = methodErr
@@ -2344,7 +2362,7 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseTransfer(log)
+		val, methodErr := merged.typ1.ParseTransfer(log)
 
 		if err != nil {
 			err = methodErr
@@ -2392,7 +2410,7 @@ func (merged *AgentRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imple
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -2407,7 +2425,7 @@ func (merged *AgentRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imple
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ1.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -2439,7 +2457,7 @@ func (merged *AgentRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink ch
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
+		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -2452,7 +2470,7 @@ func (merged *AgentRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink ch
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchUpgraded(opts, sinkAlt14, implementation)
+		val, methodErr := merged.typ1.WatchUpgraded(opts, sinkAlt14, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -2492,7 +2510,7 @@ func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Agent
 
 
 	if merged.currTag == "0.1.4" {
-	val, methodErr := merged.typ0.ParseUpgraded(log)
+		val, methodErr := merged.typ0.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -2509,7 +2527,7 @@ func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Agent
 	}
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseUpgraded(log)
+		val, methodErr := merged.typ1.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -2543,7 +2561,7 @@ func (merged *AgentRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.Filt
 
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.FilterSubjectHandlerUpdated(opts, newHandler)
+		val, methodErr := merged.typ1.FilterSubjectHandlerUpdated(opts, newHandler)
 
 		if err != nil {
 			err = methodErr
@@ -2573,7 +2591,7 @@ func (merged *AgentRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.Watch
 
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.WatchSubjectHandlerUpdated(opts, sink, newHandler)
+		val, methodErr := merged.typ1.WatchSubjectHandlerUpdated(opts, sink, newHandler)
 
 		if err != nil {
 			err = methodErr
@@ -2613,7 +2631,7 @@ func (merged *AgentRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log) (
 
 
 	if merged.currTag == "0.1.6" {
-	val, methodErr := merged.typ1.ParseSubjectHandlerUpdated(log)
+		val, methodErr := merged.typ1.ParseSubjectHandlerUpdated(log)
 
 		if err != nil {
 			err = methodErr

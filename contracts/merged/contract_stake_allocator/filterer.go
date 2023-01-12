@@ -51,11 +51,25 @@ func NewStakeAllocatorFilterer(address common.Address, filterer bind.ContractFil
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.0" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *StakeAllocatorFilterer) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -86,7 +100,7 @@ func (merged *StakeAllocatorFilterer) FilterAccessManagerUpdated(opts *bind.Filt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -116,7 +130,7 @@ func (merged *StakeAllocatorFilterer) WatchAccessManagerUpdated(opts *bind.Watch
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
+		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -156,7 +170,7 @@ func (merged *StakeAllocatorFilterer) ParseAccessManagerUpdated(log types.Log) (
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -190,7 +204,7 @@ func (merged *StakeAllocatorFilterer) FilterAdminChanged(opts *bind.FilterOpts) 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAdminChanged(opts)
+		val, methodErr := merged.typ0.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -220,7 +234,7 @@ func (merged *StakeAllocatorFilterer) WatchAdminChanged(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
+		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -262,7 +276,7 @@ func (merged *StakeAllocatorFilterer) ParseAdminChanged(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAdminChanged(log)
+		val, methodErr := merged.typ0.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -298,7 +312,7 @@ func (merged *StakeAllocatorFilterer) FilterAllocatedStake(opts *bind.FilterOpts
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAllocatedStake(opts, subjectType, subject)
+		val, methodErr := merged.typ0.FilterAllocatedStake(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -328,7 +342,7 @@ func (merged *StakeAllocatorFilterer) WatchAllocatedStake(opts *bind.WatchOpts, 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAllocatedStake(opts, sink, subjectType, subject)
+		val, methodErr := merged.typ0.WatchAllocatedStake(opts, sink, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -376,7 +390,7 @@ func (merged *StakeAllocatorFilterer) ParseAllocatedStake(log types.Log) (retVal
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAllocatedStake(log)
+		val, methodErr := merged.typ0.ParseAllocatedStake(log)
 
 		if err != nil {
 			err = methodErr
@@ -418,7 +432,7 @@ func (merged *StakeAllocatorFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -448,7 +462,7 @@ func (merged *StakeAllocatorFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
+		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -488,7 +502,7 @@ func (merged *StakeAllocatorFilterer) ParseBeaconUpgraded(log types.Log) (retVal
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -522,7 +536,7 @@ func (merged *StakeAllocatorFilterer) FilterInitialized(opts *bind.FilterOpts) (
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterInitialized(opts)
+		val, methodErr := merged.typ0.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -552,7 +566,7 @@ func (merged *StakeAllocatorFilterer) WatchInitialized(opts *bind.WatchOpts, sin
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchInitialized(opts, sink)
+		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -592,7 +606,7 @@ func (merged *StakeAllocatorFilterer) ParseInitialized(log types.Log) (retVal *S
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseInitialized(log)
+		val, methodErr := merged.typ0.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -626,7 +640,7 @@ func (merged *StakeAllocatorFilterer) FilterRouterUpdated(opts *bind.FilterOpts,
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -656,7 +670,7 @@ func (merged *StakeAllocatorFilterer) WatchRouterUpdated(opts *bind.WatchOpts, s
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
+		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
 
 		if err != nil {
 			err = methodErr
@@ -696,7 +710,7 @@ func (merged *StakeAllocatorFilterer) ParseRouterUpdated(log types.Log) (retVal 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseRouterUpdated(log)
+		val, methodErr := merged.typ0.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -730,7 +744,7 @@ func (merged *StakeAllocatorFilterer) FilterUnallocatedStake(opts *bind.FilterOp
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterUnallocatedStake(opts, subjectType, subject)
+		val, methodErr := merged.typ0.FilterUnallocatedStake(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -760,7 +774,7 @@ func (merged *StakeAllocatorFilterer) WatchUnallocatedStake(opts *bind.WatchOpts
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchUnallocatedStake(opts, sink, subjectType, subject)
+		val, methodErr := merged.typ0.WatchUnallocatedStake(opts, sink, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -808,7 +822,7 @@ func (merged *StakeAllocatorFilterer) ParseUnallocatedStake(log types.Log) (retV
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseUnallocatedStake(log)
+		val, methodErr := merged.typ0.ParseUnallocatedStake(log)
 
 		if err != nil {
 			err = methodErr
@@ -850,7 +864,7 @@ func (merged *StakeAllocatorFilterer) FilterUpgraded(opts *bind.FilterOpts, impl
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -880,7 +894,7 @@ func (merged *StakeAllocatorFilterer) WatchUpgraded(opts *bind.WatchOpts, sink c
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
+		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -920,7 +934,7 @@ func (merged *StakeAllocatorFilterer) ParseUpgraded(log types.Log) (retVal *Stak
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseUpgraded(log)
+		val, methodErr := merged.typ0.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr

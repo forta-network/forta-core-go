@@ -58,11 +58,29 @@ func NewScannerNodeVersionFilterer(address common.Address, filterer bind.Contrac
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.0" {
+		return true
+	}
+
+	if tag == "0.1.1" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *ScannerNodeVersionFilterer) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -103,7 +121,7 @@ func (merged *ScannerNodeVersionFilterer) FilterAccessManagerUpdated(opts *bind.
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -118,7 +136,7 @@ func (merged *ScannerNodeVersionFilterer) FilterAccessManagerUpdated(opts *bind.
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ1.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -150,7 +168,7 @@ func (merged *ScannerNodeVersionFilterer) WatchAccessManagerUpdated(opts *bind.W
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
+		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -163,7 +181,7 @@ func (merged *ScannerNodeVersionFilterer) WatchAccessManagerUpdated(opts *bind.W
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchAccessManagerUpdated(opts, sinkAlt1, newAddressManager)
+		val, methodErr := merged.typ1.WatchAccessManagerUpdated(opts, sinkAlt1, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -203,7 +221,7 @@ func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Lo
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -220,7 +238,7 @@ func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Lo
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ1.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -264,7 +282,7 @@ func (merged *ScannerNodeVersionFilterer) FilterAdminChanged(opts *bind.FilterOp
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAdminChanged(opts)
+		val, methodErr := merged.typ0.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -279,7 +297,7 @@ func (merged *ScannerNodeVersionFilterer) FilterAdminChanged(opts *bind.FilterOp
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterAdminChanged(opts)
+		val, methodErr := merged.typ1.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -311,7 +329,7 @@ func (merged *ScannerNodeVersionFilterer) WatchAdminChanged(opts *bind.WatchOpts
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
+		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -324,7 +342,7 @@ func (merged *ScannerNodeVersionFilterer) WatchAdminChanged(opts *bind.WatchOpts
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchAdminChanged(opts, sinkAlt2)
+		val, methodErr := merged.typ1.WatchAdminChanged(opts, sinkAlt2)
 
 		if err != nil {
 			err = methodErr
@@ -366,7 +384,7 @@ func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retV
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAdminChanged(log)
+		val, methodErr := merged.typ0.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -385,7 +403,7 @@ func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retV
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseAdminChanged(log)
+		val, methodErr := merged.typ1.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -431,7 +449,7 @@ func (merged *ScannerNodeVersionFilterer) FilterBeaconUpgraded(opts *bind.Filter
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -446,7 +464,7 @@ func (merged *ScannerNodeVersionFilterer) FilterBeaconUpgraded(opts *bind.Filter
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ1.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -478,7 +496,7 @@ func (merged *ScannerNodeVersionFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
+		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -491,7 +509,7 @@ func (merged *ScannerNodeVersionFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchBeaconUpgraded(opts, sinkAlt3, beacon)
+		val, methodErr := merged.typ1.WatchBeaconUpgraded(opts, sinkAlt3, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -531,7 +549,7 @@ func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (re
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -548,7 +566,7 @@ func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (re
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ1.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -592,7 +610,7 @@ func (merged *ScannerNodeVersionFilterer) FilterRouterUpdated(opts *bind.FilterO
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -607,7 +625,7 @@ func (merged *ScannerNodeVersionFilterer) FilterRouterUpdated(opts *bind.FilterO
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ1.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -639,7 +657,7 @@ func (merged *ScannerNodeVersionFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
+		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
 
 		if err != nil {
 			err = methodErr
@@ -652,7 +670,7 @@ func (merged *ScannerNodeVersionFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchRouterUpdated(opts, sinkAlt4, router)
+		val, methodErr := merged.typ1.WatchRouterUpdated(opts, sinkAlt4, router)
 
 		if err != nil {
 			err = methodErr
@@ -692,7 +710,7 @@ func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (ret
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseRouterUpdated(log)
+		val, methodErr := merged.typ0.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -709,7 +727,7 @@ func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (ret
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseRouterUpdated(log)
+		val, methodErr := merged.typ1.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -753,7 +771,7 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeVersionUpdated(opts *
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterScannerNodeVersionUpdated(opts)
+		val, methodErr := merged.typ0.FilterScannerNodeVersionUpdated(opts)
 
 		if err != nil {
 			err = methodErr
@@ -768,7 +786,7 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeVersionUpdated(opts *
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterScannerNodeVersionUpdated(opts)
+		val, methodErr := merged.typ1.FilterScannerNodeVersionUpdated(opts)
 
 		if err != nil {
 			err = methodErr
@@ -800,7 +818,7 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeVersionUpdated(opts *b
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchScannerNodeVersionUpdated(opts, sink)
+		val, methodErr := merged.typ0.WatchScannerNodeVersionUpdated(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -813,7 +831,7 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeVersionUpdated(opts *b
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchScannerNodeVersionUpdated(opts, sinkAlt5)
+		val, methodErr := merged.typ1.WatchScannerNodeVersionUpdated(opts, sinkAlt5)
 
 		if err != nil {
 			err = methodErr
@@ -855,7 +873,7 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log typ
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseScannerNodeVersionUpdated(log)
+		val, methodErr := merged.typ0.ParseScannerNodeVersionUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -874,7 +892,7 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log typ
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseScannerNodeVersionUpdated(log)
+		val, methodErr := merged.typ1.ParseScannerNodeVersionUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -920,7 +938,7 @@ func (merged *ScannerNodeVersionFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -935,7 +953,7 @@ func (merged *ScannerNodeVersionFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ1.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -967,7 +985,7 @@ func (merged *ScannerNodeVersionFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
+		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -980,7 +998,7 @@ func (merged *ScannerNodeVersionFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchUpgraded(opts, sinkAlt6, implementation)
+		val, methodErr := merged.typ1.WatchUpgraded(opts, sinkAlt6, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -1020,7 +1038,7 @@ func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseUpgraded(log)
+		val, methodErr := merged.typ0.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -1037,7 +1055,7 @@ func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *
 	}
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseUpgraded(log)
+		val, methodErr := merged.typ1.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -1071,7 +1089,7 @@ func (merged *ScannerNodeVersionFilterer) FilterInitialized(opts *bind.FilterOpt
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterInitialized(opts)
+		val, methodErr := merged.typ1.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1101,7 +1119,7 @@ func (merged *ScannerNodeVersionFilterer) WatchInitialized(opts *bind.WatchOpts,
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchInitialized(opts, sink)
+		val, methodErr := merged.typ1.WatchInitialized(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -1141,7 +1159,7 @@ func (merged *ScannerNodeVersionFilterer) ParseInitialized(log types.Log) (retVa
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseInitialized(log)
+		val, methodErr := merged.typ1.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -1175,7 +1193,7 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeBetaVersionUpdated(op
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.FilterScannerNodeBetaVersionUpdated(opts)
+		val, methodErr := merged.typ1.FilterScannerNodeBetaVersionUpdated(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1205,7 +1223,7 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeBetaVersionUpdated(opt
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.WatchScannerNodeBetaVersionUpdated(opts, sink)
+		val, methodErr := merged.typ1.WatchScannerNodeBetaVersionUpdated(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -1247,7 +1265,7 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeBetaVersionUpdated(log
 
 
 	if merged.currTag == "0.1.1" {
-	val, methodErr := merged.typ1.ParseScannerNodeBetaVersionUpdated(log)
+		val, methodErr := merged.typ1.ParseScannerNodeBetaVersionUpdated(log)
 
 		if err != nil {
 			err = methodErr

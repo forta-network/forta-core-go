@@ -47,11 +47,25 @@ func NewStakeAllocatorCaller(address common.Address, caller bind.ContractCaller)
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.0" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *StakeAllocatorCaller) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -82,7 +96,7 @@ func (merged *StakeAllocatorCaller) AllocatedDelegatorsStakePerManaged(opts *bin
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.AllocatedDelegatorsStakePerManaged(opts, subjectType, subject)
+		val, methodErr := merged.typ0.AllocatedDelegatorsStakePerManaged(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -112,7 +126,7 @@ func (merged *StakeAllocatorCaller) AllocatedManagedStake(opts *bind.CallOpts, s
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.AllocatedManagedStake(opts, subjectType, subject)
+		val, methodErr := merged.typ0.AllocatedManagedStake(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -142,7 +156,7 @@ func (merged *StakeAllocatorCaller) AllocatedOwnStakePerManaged(opts *bind.CallO
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.AllocatedOwnStakePerManaged(opts, subjectType, subject)
+		val, methodErr := merged.typ0.AllocatedOwnStakePerManaged(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -172,7 +186,7 @@ func (merged *StakeAllocatorCaller) AllocatedStakeFor(opts *bind.CallOpts, subje
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.AllocatedStakeFor(opts, subjectType, subject)
+		val, methodErr := merged.typ0.AllocatedStakeFor(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -202,7 +216,7 @@ func (merged *StakeAllocatorCaller) AllocatedStakePerManaged(opts *bind.CallOpts
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.AllocatedStakePerManaged(opts, subjectType, subject)
+		val, methodErr := merged.typ0.AllocatedStakePerManaged(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -232,7 +246,7 @@ func (merged *StakeAllocatorCaller) GetDelegatedSubjectType(opts *bind.CallOpts,
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.GetDelegatedSubjectType(opts, subjectType)
+		val, methodErr := merged.typ0.GetDelegatedSubjectType(opts, subjectType)
 
 		if err != nil {
 			err = methodErr
@@ -262,7 +276,7 @@ func (merged *StakeAllocatorCaller) GetDelegatorSubjectType(opts *bind.CallOpts,
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.GetDelegatorSubjectType(opts, subjectType)
+		val, methodErr := merged.typ0.GetDelegatorSubjectType(opts, subjectType)
 
 		if err != nil {
 			err = methodErr
@@ -292,7 +306,7 @@ func (merged *StakeAllocatorCaller) GetSubjectTypeAgency(opts *bind.CallOpts, su
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.GetSubjectTypeAgency(opts, subjectType)
+		val, methodErr := merged.typ0.GetSubjectTypeAgency(opts, subjectType)
 
 		if err != nil {
 			err = methodErr
@@ -322,7 +336,7 @@ func (merged *StakeAllocatorCaller) IsTrustedForwarder(opts *bind.CallOpts, forw
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
+		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
 		if err != nil {
 			err = methodErr
@@ -352,7 +366,7 @@ func (merged *StakeAllocatorCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ProxiableUUID(opts)
+		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
 		if err != nil {
 			err = methodErr
@@ -382,7 +396,7 @@ func (merged *StakeAllocatorCaller) RewardsDistributor(opts *bind.CallOpts) (ret
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.RewardsDistributor(opts)
+		val, methodErr := merged.typ0.RewardsDistributor(opts)
 
 		if err != nil {
 			err = methodErr
@@ -412,7 +426,7 @@ func (merged *StakeAllocatorCaller) UnallocatedStakeFor(opts *bind.CallOpts, sub
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.UnallocatedStakeFor(opts, subjectType, subject)
+		val, methodErr := merged.typ0.UnallocatedStakeFor(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -442,7 +456,7 @@ func (merged *StakeAllocatorCaller) Version(opts *bind.CallOpts) (retVal string,
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.Version(opts)
+		val, methodErr := merged.typ0.Version(opts)
 
 		if err != nil {
 			err = methodErr

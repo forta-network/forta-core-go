@@ -51,11 +51,25 @@ func NewRewardsDistributorFilterer(address common.Address, filterer bind.Contrac
 	return &mergedType, nil
 }
 
+// IsKnownTag tells if given tag is a known tag.
+func IsKnownTag(tag string) bool {
+
+	if tag == "0.1.0" {
+		return true
+	}
+
+	return false
+}
+
 // Use sets the used implementation to given tag.
 func (merged *RewardsDistributorFilterer) Use(tag string) (changed bool) {
 	if !merged.unsafe {
 		merged.mu.Lock()
 		defer merged.mu.Unlock()
+	}
+	// use the default tag if the provided tag is unknown
+	if !IsKnownTag(tag) {
+		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -86,7 +100,7 @@ func (merged *RewardsDistributorFilterer) FilterAccessManagerUpdated(opts *bind.
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
+		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -116,7 +130,7 @@ func (merged *RewardsDistributorFilterer) WatchAccessManagerUpdated(opts *bind.W
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
+		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
 
 		if err != nil {
 			err = methodErr
@@ -156,7 +170,7 @@ func (merged *RewardsDistributorFilterer) ParseAccessManagerUpdated(log types.Lo
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
+		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -190,7 +204,7 @@ func (merged *RewardsDistributorFilterer) FilterAdminChanged(opts *bind.FilterOp
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterAdminChanged(opts)
+		val, methodErr := merged.typ0.FilterAdminChanged(opts)
 
 		if err != nil {
 			err = methodErr
@@ -220,7 +234,7 @@ func (merged *RewardsDistributorFilterer) WatchAdminChanged(opts *bind.WatchOpts
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
+		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -262,7 +276,7 @@ func (merged *RewardsDistributorFilterer) ParseAdminChanged(log types.Log) (retV
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseAdminChanged(log)
+		val, methodErr := merged.typ0.ParseAdminChanged(log)
 
 		if err != nil {
 			err = methodErr
@@ -298,7 +312,7 @@ func (merged *RewardsDistributorFilterer) FilterBeaconUpgraded(opts *bind.Filter
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
+		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -328,7 +342,7 @@ func (merged *RewardsDistributorFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
+		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
 
 		if err != nil {
 			err = methodErr
@@ -368,7 +382,7 @@ func (merged *RewardsDistributorFilterer) ParseBeaconUpgraded(log types.Log) (re
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
+		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
 
 		if err != nil {
 			err = methodErr
@@ -402,7 +416,7 @@ func (merged *RewardsDistributorFilterer) FilterClaimedRewards(opts *bind.Filter
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterClaimedRewards(opts, subjectType, subject, to)
+		val, methodErr := merged.typ0.FilterClaimedRewards(opts, subjectType, subject, to)
 
 		if err != nil {
 			err = methodErr
@@ -432,7 +446,7 @@ func (merged *RewardsDistributorFilterer) WatchClaimedRewards(opts *bind.WatchOp
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchClaimedRewards(opts, sink, subjectType, subject, to)
+		val, methodErr := merged.typ0.WatchClaimedRewards(opts, sink, subjectType, subject, to)
 
 		if err != nil {
 			err = methodErr
@@ -480,7 +494,7 @@ func (merged *RewardsDistributorFilterer) ParseClaimedRewards(log types.Log) (re
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseClaimedRewards(log)
+		val, methodErr := merged.typ0.ParseClaimedRewards(log)
 
 		if err != nil {
 			err = methodErr
@@ -522,7 +536,7 @@ func (merged *RewardsDistributorFilterer) FilterDidAccumulateRate(opts *bind.Fil
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterDidAccumulateRate(opts, subjectType, subject, staker)
+		val, methodErr := merged.typ0.FilterDidAccumulateRate(opts, subjectType, subject, staker)
 
 		if err != nil {
 			err = methodErr
@@ -552,7 +566,7 @@ func (merged *RewardsDistributorFilterer) WatchDidAccumulateRate(opts *bind.Watc
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchDidAccumulateRate(opts, sink, subjectType, subject, staker)
+		val, methodErr := merged.typ0.WatchDidAccumulateRate(opts, sink, subjectType, subject, staker)
 
 		if err != nil {
 			err = methodErr
@@ -600,7 +614,7 @@ func (merged *RewardsDistributorFilterer) ParseDidAccumulateRate(log types.Log) 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseDidAccumulateRate(log)
+		val, methodErr := merged.typ0.ParseDidAccumulateRate(log)
 
 		if err != nil {
 			err = methodErr
@@ -642,7 +656,7 @@ func (merged *RewardsDistributorFilterer) FilterDidReduceRate(opts *bind.FilterO
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterDidReduceRate(opts, subjectType, subject, staker)
+		val, methodErr := merged.typ0.FilterDidReduceRate(opts, subjectType, subject, staker)
 
 		if err != nil {
 			err = methodErr
@@ -672,7 +686,7 @@ func (merged *RewardsDistributorFilterer) WatchDidReduceRate(opts *bind.WatchOpt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchDidReduceRate(opts, sink, subjectType, subject, staker)
+		val, methodErr := merged.typ0.WatchDidReduceRate(opts, sink, subjectType, subject, staker)
 
 		if err != nil {
 			err = methodErr
@@ -720,7 +734,7 @@ func (merged *RewardsDistributorFilterer) ParseDidReduceRate(log types.Log) (ret
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseDidReduceRate(log)
+		val, methodErr := merged.typ0.ParseDidReduceRate(log)
 
 		if err != nil {
 			err = methodErr
@@ -762,7 +776,7 @@ func (merged *RewardsDistributorFilterer) FilterDidTransferRewardShares(opts *bi
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterDidTransferRewardShares(opts, sharesId, from, to)
+		val, methodErr := merged.typ0.FilterDidTransferRewardShares(opts, sharesId, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -792,7 +806,7 @@ func (merged *RewardsDistributorFilterer) WatchDidTransferRewardShares(opts *bin
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchDidTransferRewardShares(opts, sink, sharesId, from, to)
+		val, methodErr := merged.typ0.WatchDidTransferRewardShares(opts, sink, sharesId, from, to)
 
 		if err != nil {
 			err = methodErr
@@ -840,7 +854,7 @@ func (merged *RewardsDistributorFilterer) ParseDidTransferRewardShares(log types
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseDidTransferRewardShares(log)
+		val, methodErr := merged.typ0.ParseDidTransferRewardShares(log)
 
 		if err != nil {
 			err = methodErr
@@ -882,7 +896,7 @@ func (merged *RewardsDistributorFilterer) FilterInitialized(opts *bind.FilterOpt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterInitialized(opts)
+		val, methodErr := merged.typ0.FilterInitialized(opts)
 
 		if err != nil {
 			err = methodErr
@@ -912,7 +926,7 @@ func (merged *RewardsDistributorFilterer) WatchInitialized(opts *bind.WatchOpts,
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchInitialized(opts, sink)
+		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -952,7 +966,7 @@ func (merged *RewardsDistributorFilterer) ParseInitialized(log types.Log) (retVa
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseInitialized(log)
+		val, methodErr := merged.typ0.ParseInitialized(log)
 
 		if err != nil {
 			err = methodErr
@@ -986,7 +1000,7 @@ func (merged *RewardsDistributorFilterer) FilterRewarded(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterRewarded(opts, subjectType, subject)
+		val, methodErr := merged.typ0.FilterRewarded(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1016,7 +1030,7 @@ func (merged *RewardsDistributorFilterer) WatchRewarded(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchRewarded(opts, sink, subjectType, subject)
+		val, methodErr := merged.typ0.WatchRewarded(opts, sink, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1062,7 +1076,7 @@ func (merged *RewardsDistributorFilterer) ParseRewarded(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseRewarded(log)
+		val, methodErr := merged.typ0.ParseRewarded(log)
 
 		if err != nil {
 			err = methodErr
@@ -1102,7 +1116,7 @@ func (merged *RewardsDistributorFilterer) FilterRouterUpdated(opts *bind.FilterO
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
+		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
 
 		if err != nil {
 			err = methodErr
@@ -1132,7 +1146,7 @@ func (merged *RewardsDistributorFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
+		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
 
 		if err != nil {
 			err = methodErr
@@ -1172,7 +1186,7 @@ func (merged *RewardsDistributorFilterer) ParseRouterUpdated(log types.Log) (ret
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseRouterUpdated(log)
+		val, methodErr := merged.typ0.ParseRouterUpdated(log)
 
 		if err != nil {
 			err = methodErr
@@ -1206,7 +1220,7 @@ func (merged *RewardsDistributorFilterer) FilterSetDelegationFee(opts *bind.Filt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterSetDelegationFee(opts, subjectType, subject)
+		val, methodErr := merged.typ0.FilterSetDelegationFee(opts, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1236,7 +1250,7 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationFee(opts *bind.Watch
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchSetDelegationFee(opts, sink, subjectType, subject)
+		val, methodErr := merged.typ0.WatchSetDelegationFee(opts, sink, subjectType, subject)
 
 		if err != nil {
 			err = methodErr
@@ -1282,7 +1296,7 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationFee(log types.Log) (
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseSetDelegationFee(log)
+		val, methodErr := merged.typ0.ParseSetDelegationFee(log)
 
 		if err != nil {
 			err = methodErr
@@ -1322,7 +1336,7 @@ func (merged *RewardsDistributorFilterer) FilterSetDelegationParams(opts *bind.F
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterSetDelegationParams(opts)
+		val, methodErr := merged.typ0.FilterSetDelegationParams(opts)
 
 		if err != nil {
 			err = methodErr
@@ -1352,7 +1366,7 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationParams(opts *bind.Wa
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchSetDelegationParams(opts, sink)
+		val, methodErr := merged.typ0.WatchSetDelegationParams(opts, sink)
 
 		if err != nil {
 			err = methodErr
@@ -1394,7 +1408,7 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationParams(log types.Log
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseSetDelegationParams(log)
+		val, methodErr := merged.typ0.ParseSetDelegationParams(log)
 
 		if err != nil {
 			err = methodErr
@@ -1430,7 +1444,7 @@ func (merged *RewardsDistributorFilterer) FilterTokensSwept(opts *bind.FilterOpt
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterTokensSwept(opts, token)
+		val, methodErr := merged.typ0.FilterTokensSwept(opts, token)
 
 		if err != nil {
 			err = methodErr
@@ -1460,7 +1474,7 @@ func (merged *RewardsDistributorFilterer) WatchTokensSwept(opts *bind.WatchOpts,
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchTokensSwept(opts, sink, token)
+		val, methodErr := merged.typ0.WatchTokensSwept(opts, sink, token)
 
 		if err != nil {
 			err = methodErr
@@ -1504,7 +1518,7 @@ func (merged *RewardsDistributorFilterer) ParseTokensSwept(log types.Log) (retVa
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseTokensSwept(log)
+		val, methodErr := merged.typ0.ParseTokensSwept(log)
 
 		if err != nil {
 			err = methodErr
@@ -1542,7 +1556,7 @@ func (merged *RewardsDistributorFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
+		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -1572,7 +1586,7 @@ func (merged *RewardsDistributorFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
+		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
 
 		if err != nil {
 			err = methodErr
@@ -1612,7 +1626,7 @@ func (merged *RewardsDistributorFilterer) ParseUpgraded(log types.Log) (retVal *
 
 
 	if merged.currTag == "0.1.0" {
-	val, methodErr := merged.typ0.ParseUpgraded(log)
+		val, methodErr := merged.typ0.ParseUpgraded(log)
 
 		if err != nil {
 			err = methodErr
