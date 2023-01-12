@@ -10,7 +10,7 @@ import (
 )
 
 var testTraceEnv struct {
-	TraceAPI string `envconfig:"trace_api" default:"https://rpcapi-tracing.fantom.network/"`
+	TraceAPI string `envconfig:"trace_api" default:"https://rpcapi-tracing.testnet.fantom.network/"`
 }
 
 func init() {
@@ -36,7 +36,7 @@ func TestTraceAPIInspection(t *testing.T) {
 		map[string]float64{
 			IndicatorTraceAccessible: ResultSuccess,
 			IndicatorTraceSupported:  ResultSuccess,
-			IndicatorTraceAPIChainID: 250,
+			IndicatorTraceAPIChainID: 4002,
 			IndicatorTraceAPIIsETH2:  ResultFailure,
 		}, results.Indicators,
 	)
@@ -50,5 +50,5 @@ func testGetRecentBlockNumber(r *require.Assertions, apiURL string) uint64 {
 	r.NoError(err)
 	block, err := client.BlockByNumber(context.Background(), nil)
 	r.NoError(err)
-	return block.NumberU64() - 20
+	return block.NumberU64() - 100
 }
