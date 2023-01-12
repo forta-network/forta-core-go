@@ -43,7 +43,7 @@ type Handlers struct {
 
 type HandlerRegistry struct {
 	afterBlockHandler func(blk *domain.Block) error
-	all               slicemap.SliceMap[string, []any]
+	all               slicemap.SliceMap[string, []reflect.Value]
 }
 
 // Handle finds the right handler for the message and calls it.
@@ -53,9 +53,7 @@ func (reg *HandlerRegistry) Handle(logger *log.Entry, msg registry.MessageInterf
 		logger.WithField("action", msg.ActionName()).Warn("no handlers found")
 		return nil
 	}
-	handlerArr := reflect.ValueOf(h)
-	for i := 0; i < handlerArr.Len(); i++ {
-		f := handlerArr.Index(i)
+	for _, f := range h {
 		ret := f.Call([]reflect.Value{reflect.ValueOf(logger), reflect.ValueOf(msg)})
 		retErr := ret[0]
 		// return when any of the handlers return an error
@@ -76,7 +74,7 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 	for i := 0; i < handlers.NumField(); i++ {
 		field := handlers.Field(i)
 		// must be an array
-		if field.Kind() != reflect.Array {
+		if field.Kind() != reflect.Slice {
 			continue
 		}
 		// array elements must be a func
@@ -85,7 +83,7 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 		}
 		// for each func in array, validate and collect
 		var (
-			methods []any
+			methods []reflect.Value
 			msgType registry.MessageInterface
 		)
 		for j := 0; j < field.Len(); j++ {
@@ -93,17 +91,19 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 			// for each arg type in func
 			for k := 0; k < f.Type().NumIn(); k++ {
 				in := f.Type().In(k)
-				inVal := reflect.New(in).Interface()
+				inVal := reflect.New(in.Elem()).Interface()
 				// register handler if one of the args is a message
 				v, ok := inVal.(registry.MessageInterface)
 				if ok {
-					methods = append(methods, f.Interface())
+					methods = append(methods, f)
 					msgType = v
 				}
 			}
 		}
 		// set handlers
-		reg.all.Set(msgKey(msgType), methods)
+		if methods != nil {
+			reg.all.Set(msgKey(msgType), methods)
+		}
 	}
 
 	return reg

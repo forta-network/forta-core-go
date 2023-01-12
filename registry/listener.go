@@ -67,6 +67,7 @@ type ListenerConfig struct {
 	ContractFilter *ContractFilter
 	Topics         []string
 	Proxy          MessageProxy
+	NoRefresh      bool
 }
 
 type Listener interface {
@@ -489,6 +490,7 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		JsonRpcUrl: jsonRpc,
 		ENSAddress: ensAddr,
 		Name:       "registry-listener",
+		NoRefresh:  cfg.NoRefresh,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create registry client: %v", err)

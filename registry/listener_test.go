@@ -33,6 +33,7 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
+		NoRefresh:      true,
 	})
 	if err != nil {
 		panic(err)
@@ -242,7 +243,7 @@ func TestListener_Listen(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			r := require.New(t)
 			err := testCase.listener.ProcessBlockRange(big.NewInt(testCase.block), big.NewInt(testCase.block))
-			r.NoError(err)
+			r.Equal(found, err)
 		})
 	}
 }
