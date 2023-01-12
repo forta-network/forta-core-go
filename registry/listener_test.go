@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/big"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
@@ -51,6 +52,22 @@ func TestListener_Listen(t *testing.T) {
 	ctx := context.Background()
 	found := errors.New("found")
 	tests := []listenerTest{
+		{
+			name: "upgrade",
+			listener: testListener(ctx, &ContractFilter{ScannerVersion: true},
+				UpgradedTopic,
+				Handlers{
+					UpgradeHandlers: MessageHandlers[*registry.UpgradeMessage]{
+						func(logger *log.Entry, msg *registry.UpgradeMessage) error {
+							assert.Equal(t, int64(27061991), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.Upgrade, msg.Action)
+							assert.Equal(t, strings.ToLower("0x4720c872425876B6f4b4E9130CDef667aDE553b2"), msg.Proxy)
+							assert.Equal(t, strings.ToLower("0x68608f260ba3be8808b83fd686eccfe6a9f468f7"), msg.NewImplementation)
+							return found
+						},
+					}}),
+			block: 27061991,
+		},
 		{
 			name: "agent-enable",
 			listener: testListener(ctx, &ContractFilter{AgentRegistry: true},

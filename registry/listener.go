@@ -331,13 +331,43 @@ func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *
 	return nil
 }
 
-func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
-	contracts := l.client.Contracts()
+func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	// use any contract's upgraded topic to check - they are all the same
+	if getTopic(le) != UpgradedTopic {
+		return nil
+	}
 
+	// refresh contracts and log filter addresses
+	if err := l.client.RefreshContracts(); err != nil {
+		return err
+	}
+	l.setLogFilterAddrs()
+
+	// use any contract's filterer to unpack the event - pick dispatch
+	upgraded, err := contracts.DispatchFil.ParseUpgraded(le)
+	if err != nil {
+		return err
+	}
+
+	return l.handler(logger, registry.NewUpgradeMessage(upgraded, le, blk))
+}
+
+func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	if l.ctx.Err() != nil {
 		return l.ctx.Err()
 	}
+
 	logger := getLoggerForLog(le)
+	contracts := l.client.Contracts()
+
+	// always try to handle the upgrade event first because we don't enforce address checks
+	// the addresses are limited by the filtered addresses
+	// this is no-op if the topic is irrelevant
+	// we refresh all contracts if it's relevant to any of the contracts
+	if err := l.handleUpgradeEvent(contracts, le, blk, logger); err != nil {
+		return err
+	}
+
 	if equalsAddress(le.Address, contracts.Addresses.ScannerRegistry.Hex()) {
 		return l.handleScannerRegistryEvent(contracts, le, blk, logger)
 	}
@@ -542,6 +572,10 @@ func (l *listener) setLogFilterAddrs() {
 		if regContracts.StakeAllocator != nil {
 			addrs = append(addrs, regContracts.StakeAllocator.Hex())
 		}
+	}
+
+	if len(addrs) == 0 {
+		panic("empty filter")
 	}
 
 	for _, addr := range addrs {

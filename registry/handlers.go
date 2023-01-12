@@ -16,6 +16,9 @@ type MessageHandlers[K registry.MessageInterface] []MessageHandler[K]
 type Handlers struct {
 	AfterBlockHandler func(blk *domain.Block) error
 
+	// implementation upgrades
+	UpgradeHandlers MessageHandlers[*registry.UpgradeMessage]
+
 	// registration
 	SaveAgentHandlers         MessageHandlers[*registry.AgentSaveMessage]
 	AgentActionHandlers       MessageHandlers[*registry.AgentMessage]
