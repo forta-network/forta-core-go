@@ -51,8 +51,8 @@ func NewStakeAllocatorFilterer(address common.Address, filterer bind.ContractFil
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForStakeAllocatorFilterer tells if given tag is a known tag.
+func IsKnownTagForStakeAllocatorFilterer(tag string) bool {
 
 	if tag == "0.1.0" {
 		return true
@@ -68,7 +68,7 @@ func (merged *StakeAllocatorFilterer) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForStakeAllocatorFilterer(tag) {
 		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag

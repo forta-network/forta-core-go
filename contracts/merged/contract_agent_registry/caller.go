@@ -56,8 +56,8 @@ func NewAgentRegistryCaller(address common.Address, caller bind.ContractCaller) 
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForAgentRegistryCaller tells if given tag is a known tag.
+func IsKnownTagForAgentRegistryCaller(tag string) bool {
 
 	if tag == "0.1.4" {
 		return true
@@ -77,7 +77,7 @@ func (merged *AgentRegistryCaller) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForAgentRegistryCaller(tag) {
 		tag = "0.1.4"
 	}
 	changed = merged.currTag != tag

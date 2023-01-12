@@ -56,8 +56,8 @@ func NewScannerRegistryCaller(address common.Address, caller bind.ContractCaller
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForScannerRegistryCaller tells if given tag is a known tag.
+func IsKnownTagForScannerRegistryCaller(tag string) bool {
 
 	if tag == "0.1.3" {
 		return true
@@ -77,7 +77,7 @@ func (merged *ScannerRegistryCaller) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForScannerRegistryCaller(tag) {
 		tag = "0.1.3"
 	}
 	changed = merged.currTag != tag

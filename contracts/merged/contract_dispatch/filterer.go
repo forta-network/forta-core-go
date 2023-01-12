@@ -60,8 +60,8 @@ func NewDispatchFilterer(address common.Address, filterer bind.ContractFilterer)
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForDispatchFilterer tells if given tag is a known tag.
+func IsKnownTagForDispatchFilterer(tag string) bool {
 
 	if tag == "0.1.4" {
 		return true
@@ -81,7 +81,7 @@ func (merged *DispatchFilterer) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForDispatchFilterer(tag) {
 		tag = "0.1.4"
 	}
 	changed = merged.currTag != tag

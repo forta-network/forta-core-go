@@ -47,8 +47,8 @@ func NewRewardsDistributorCaller(address common.Address, caller bind.ContractCal
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForRewardsDistributorCaller tells if given tag is a known tag.
+func IsKnownTagForRewardsDistributorCaller(tag string) bool {
 
 	if tag == "0.1.0" {
 		return true
@@ -64,7 +64,7 @@ func (merged *RewardsDistributorCaller) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForRewardsDistributorCaller(tag) {
 		tag = "0.1.0"
 	}
 	changed = merged.currTag != tag

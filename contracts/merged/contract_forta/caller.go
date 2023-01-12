@@ -47,8 +47,8 @@ func NewFortaCaller(address common.Address, caller bind.ContractCaller) (*FortaC
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForFortaCaller tells if given tag is a known tag.
+func IsKnownTagForFortaCaller(tag string) bool {
 
 	if tag == "0.2.0" {
 		return true
@@ -64,7 +64,7 @@ func (merged *FortaCaller) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForFortaCaller(tag) {
 		tag = "0.2.0"
 	}
 	changed = merged.currTag != tag

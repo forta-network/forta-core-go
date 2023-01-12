@@ -51,8 +51,8 @@ func NewFortaFilterer(address common.Address, filterer bind.ContractFilterer) (*
 	return &mergedType, nil
 }
 
-// IsKnownTag tells if given tag is a known tag.
-func IsKnownTag(tag string) bool {
+// IsKnownTagForFortaFilterer tells if given tag is a known tag.
+func IsKnownTagForFortaFilterer(tag string) bool {
 
 	if tag == "0.2.0" {
 		return true
@@ -68,7 +68,7 @@ func (merged *FortaFilterer) Use(tag string) (changed bool) {
 		defer merged.mu.Unlock()
 	}
 	// use the default tag if the provided tag is unknown
-	if !IsKnownTag(tag) {
+	if !IsKnownTagForFortaFilterer(tag) {
 		tag = "0.2.0"
 	}
 	changed = merged.currTag != tag
