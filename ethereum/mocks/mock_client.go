@@ -186,6 +186,51 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockClient)(nil).Close))
 }
 
+// GetClosestBlock mocks base method.
+func (m *MockClient) GetClosestBlock(ctx context.Context, activeTime time.Time) (*domain.Block, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClosestBlock", ctx, activeTime)
+	ret0, _ := ret[0].(*domain.Block)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClosestBlock indicates an expected call of GetClosestBlock.
+func (mr *MockClientMockRecorder) GetClosestBlock(ctx, activeTime interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClosestBlock", reflect.TypeOf((*MockClient)(nil).GetClosestBlock), ctx, activeTime)
+}
+
+// GetClosestBlockAfter mocks base method.
+func (m *MockClient) GetClosestBlockAfter(ctx context.Context, activeTime time.Time) (*domain.Block, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClosestBlockAfter", ctx, activeTime)
+	ret0, _ := ret[0].(*domain.Block)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClosestBlockAfter indicates an expected call of GetClosestBlockAfter.
+func (mr *MockClientMockRecorder) GetClosestBlockAfter(ctx, activeTime interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClosestBlockAfter", reflect.TypeOf((*MockClient)(nil).GetClosestBlockAfter), ctx, activeTime)
+}
+
+// GetClosestBlockBefore mocks base method.
+func (m *MockClient) GetClosestBlockBefore(ctx context.Context, activeTime time.Time) (*domain.Block, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClosestBlockBefore", ctx, activeTime)
+	ret0, _ := ret[0].(*domain.Block)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClosestBlockBefore indicates an expected call of GetClosestBlockBefore.
+func (mr *MockClientMockRecorder) GetClosestBlockBefore(ctx, activeTime interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClosestBlockBefore", reflect.TypeOf((*MockClient)(nil).GetClosestBlockBefore), ctx, activeTime)
+}
+
 // GetLogs mocks base method.
 func (m *MockClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	m.ctrl.T.Helper()
