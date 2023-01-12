@@ -57,4 +57,13 @@ func TestVersionManager(t *testing.T) {
 	// when version manager is refreshed
 	err = vm.Refresh()
 	r.NoError(err)
+
+	// given that there are two rules
+	// then the first getter must be called to get the versions
+	getter1.EXPECT().Version(gomock.Any()).Return(versionTag1, nil)
+	// and the first setter must be called to set the versions
+	setter1.EXPECT().Use(versionTag1)
+	// when version manager is refreshes use single rule
+	err = vm.RefreshSingle(ruleName1)
+	r.NoError(err)
 }

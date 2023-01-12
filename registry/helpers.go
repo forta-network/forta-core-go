@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/forta-network/forta-core-go/domain/registry"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,4 +27,30 @@ func getLoggerForLog(le types.Log) *log.Entry {
 		"blockNumber": le.BlockNumber,
 		"blockHash":   le.BlockHash.Hex(),
 	})
+}
+
+func getAllContractAddrs(regContracts registry.RegistryContracts) []string {
+	addrs := []string{
+		regContracts.AgentRegistry.Hex(),
+		regContracts.ScannerRegistry.Hex(),
+		regContracts.Dispatch.Hex(),
+		regContracts.FortaStaking.Hex(),
+		regContracts.ScannerNodeVersion.Hex(),
+	}
+	if regContracts.ScannerPoolRegistry != nil {
+		addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
+	}
+	if regContracts.StakeAllocator != nil {
+		addrs = append(addrs, regContracts.StakeAllocator.Hex())
+	}
+	return addrs
+}
+
+func isAddrIn(addrs []string, ethAddr common.Address) bool {
+	for _, addr := range addrs {
+		if equalsAddress(ethAddr, addr) {
+			return true
+		}
+	}
+	return false
 }

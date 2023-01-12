@@ -559,19 +559,7 @@ func (l *listener) setLogFilterAddrs() {
 		}
 	} else {
 		// include all contracts
-		addrs = []string{
-			regContracts.AgentRegistry.Hex(),
-			regContracts.ScannerRegistry.Hex(),
-			regContracts.Dispatch.Hex(),
-			regContracts.FortaStaking.Hex(),
-			regContracts.ScannerNodeVersion.Hex(),
-		}
-		if regContracts.ScannerPoolRegistry != nil {
-			addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
-		}
-		if regContracts.StakeAllocator != nil {
-			addrs = append(addrs, regContracts.StakeAllocator.Hex())
-		}
+		addrs = getAllContractAddrs(regContracts)
 	}
 
 	if len(addrs) == 0 {
@@ -618,4 +606,23 @@ func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient e
 	li.setLogFilterAddrs()
 
 	return li, nil
+}
+
+// ListenToUpgrades listens for contract upgrades and refreshes the contracts.
+func ListenToUpgrades(ctx context.Context, client Client, blockFeed feeds.BlockFeed) <-chan error {
+	return blockFeed.Subscribe(func(evt *domain.BlockEvent) error {
+		regContracts := client.Contracts().Addresses
+		addrs := getAllContractAddrs(regContracts)
+		for _, log := range evt.Logs {
+			ethLog := log.ToTypesLog()
+			if !isAddrIn(addrs, ethLog.Address) {
+				continue
+			}
+			if getTopic(ethLog) != UpgradedTopic {
+				continue
+			}
+			return client.RefreshContracts()
+		}
+		return nil
+	})
 }

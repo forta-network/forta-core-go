@@ -48,24 +48,45 @@ func (vm *VersionManager) SetUpdateRule(contractName string, getter VersionGette
 // Refresh executes all of the update rules.
 func (vm *VersionManager) Refresh() error {
 	for _, rule := range vm.rules {
-		version, err := rule.Getter.Version(nil)
-		if err != nil {
-			return fmt.Errorf("refresh: failed to get version of %s: %w", rule.ContractName, err)
+		if err := vm.refreshRule(rule); err != nil {
+			return err
 		}
-		var anyChange bool
-		for _, setter := range rule.Setters {
-			changed := setter.Use(version)
-			anyChange = anyChange || changed
+	}
+	return nil
+}
+
+// RefreshSingle refreshes using only a specific update rule.
+func (vm *VersionManager) RefreshSingle(contractName string) error {
+	for _, rule := range vm.rules {
+		if rule.ContractName != contractName {
+			continue
 		}
-		logger := log.WithFields(log.Fields{
-			"name":    rule.ContractName,
-			"version": version,
-		})
-		if anyChange {
-			logger.Info("contract was successfully set to use new version")
-		} else {
-			logger.Debug("contract is already up-to-date")
+		if err := vm.refreshRule(rule); err != nil {
+			return err
 		}
+		break
+	}
+	return nil
+}
+
+func (vm *VersionManager) refreshRule(rule *UpdateRule) error {
+	version, err := rule.Getter.Version(nil)
+	if err != nil {
+		return fmt.Errorf("refresh: failed to get version of %s: %w", rule.ContractName, err)
+	}
+	var anyChange bool
+	for _, setter := range rule.Setters {
+		changed := setter.Use(version)
+		anyChange = anyChange || changed
+	}
+	logger := log.WithFields(log.Fields{
+		"name":    rule.ContractName,
+		"version": version,
+	})
+	if anyChange {
+		logger.Info("contract was successfully set to use new version")
+	} else {
+		logger.Debug("contract is already up-to-date")
 	}
 	return nil
 }

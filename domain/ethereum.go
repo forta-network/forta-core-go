@@ -4,6 +4,8 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/utils"
 )
@@ -80,6 +82,41 @@ type LogEntry struct {
 	Topics           []*string `json:"topics"`
 	TransactionHash  *string   `json:"transactionHash"`
 	TransactionIndex *string   `json:"transactionIndex"`
+}
+
+// ToTypesLog converts our type to go-ethereum type.
+func (le LogEntry) ToTypesLog() (log types.Log) {
+	if le.Address != nil {
+		log.Address = common.HexToAddress(*le.Address)
+	}
+	if le.BlockHash != nil {
+		log.BlockHash = common.HexToHash(*le.BlockHash)
+	}
+	if le.BlockNumber != nil {
+		num, _ := hexutil.DecodeBig(*le.BlockNumber)
+		log.BlockNumber = num.Uint64()
+	}
+	if le.Data != nil {
+		log.Data = []byte(*le.Data)
+	}
+	if le.LogIndex != nil {
+		num, _ := hexutil.DecodeBig(*le.LogIndex)
+		log.Index = uint(num.Uint64())
+	}
+	if le.Removed != nil {
+		log.Removed = *le.Removed
+	}
+	for _, topic := range le.Topics {
+		log.Topics = append(log.Topics, common.HexToHash(*topic))
+	}
+	if le.TransactionHash != nil {
+		log.TxHash = common.HexToHash(*le.TransactionHash)
+	}
+	if le.TransactionIndex != nil {
+		num, _ := hexutil.DecodeBig(*le.TransactionIndex)
+		log.TxIndex = uint(num.Uint64())
+	}
+	return
 }
 
 // TransactionReceipt is a result of a eth_getTransactionReceipt call
