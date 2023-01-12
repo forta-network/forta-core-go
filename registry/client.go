@@ -210,6 +210,9 @@ type ClientConfig struct {
 
 	// PrivateKey is used for sending transactions
 	PrivateKey *ecdsa.PrivateKey
+
+	// NoRefresh tells if the contracts should not be refreshed and multiplexed to different versions.
+	NoRefresh bool
 }
 
 var defaultConfig = ClientConfig{
@@ -310,6 +313,10 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 	cl.versionManager.AddUpdateRule("FortaStaking", cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStakingFil)
+
+	if cfg.NoRefresh {
+		return cl, nil
+	}
 
 	if err := cl.RefreshContracts(); err != nil {
 		return nil, err

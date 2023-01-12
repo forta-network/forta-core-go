@@ -49,6 +49,16 @@ type Message struct {
 	Source    Source    `json:"source"`
 }
 
+// MessageInterface implements a message interface.
+type MessageInterface interface {
+	ActionName() string
+}
+
+// ActionName implements the message interface.
+func (m Message) ActionName() string {
+	return m.Action
+}
+
 func ParseMessage(msg string) (*Message, error) {
 	var r Message
 	err := json.Unmarshal([]byte(msg), &r)
