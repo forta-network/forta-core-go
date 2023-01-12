@@ -17,18 +17,19 @@ func main() {
 	l, err := registry.NewListener(ctx, registry.ListenerConfig{
 		JsonRpcURL: os.Getenv("POLYGON_JSON_RPC"),
 		Handlers: registry.Handlers{
-			TransferSharesHandler: func(logger *log.Entry, msg *rd.TransferSharesMessage) error {
-				log.WithFields(log.Fields{
-					"to":     msg.To,
-					"from":   msg.From,
-					"amount": msg.Amount,
-					"type":   msg.StakeType,
-					"burn":   msg.IsBurn(),
-					"mint":   msg.IsMint(),
-				}).Info("event")
-				return nil
-			},
-		},
+			TransferSharesHandlers: registry.MessageHandlers[*rd.TransferSharesMessage]{
+				func(logger *log.Entry, msg *rd.TransferSharesMessage) error {
+					log.WithFields(log.Fields{
+						"to":     msg.To,
+						"from":   msg.From,
+						"amount": msg.Amount,
+						"type":   msg.StakeType,
+						"burn":   msg.IsBurn(),
+						"mint":   msg.IsMint(),
+					}).Info("event")
+					return nil
+				},
+			}},
 		ContractFilter: &registry.ContractFilter{
 			FortaStaking: true,
 		},
