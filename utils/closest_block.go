@@ -5,14 +5,11 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"math/big"
-	"strconv"
 	"time"
 )
 
 // GetClosestBlock Obtains the block closest to the time given
 func GetClosestBlock(ctx context.Context, eth ethereum.Client, activeTime time.Time) (*domain.Block, error) {
-
-	activeTimestamp := activeTime.UnixMilli()
 
 	minBlockNumber := big.NewInt(0)
 	maxBlockNumber, err := eth.BlockNumber(ctx)
@@ -27,14 +24,14 @@ func GetClosestBlock(ctx context.Context, eth ethereum.Client, activeTime time.T
 	}
 
 	for minBlockNumber.Cmp(maxBlockNumber) <= 0 {
-		closestBlockTimestamp64, err := strconv.ParseInt(closestBlock.Timestamp[2:], 16, 64)
+		closestBlockTime, err := closestBlock.GetTimestamp()
 		if err != nil {
 			return nil, err
 		}
 
-		if closestBlockTimestamp64 == activeTimestamp {
+		if closestBlockTime.Equal(activeTime) {
 			break
-		} else if closestBlockTimestamp64 > activeTimestamp {
+		} else if closestBlockTime.After(activeTime) {
 			maxBlockNumber = maxBlockNumber.Sub(closestBlockNumber, big.NewInt(1))
 		} else {
 			minBlockNumber = minBlockNumber.Add(closestBlockNumber, big.NewInt(1))
@@ -58,12 +55,12 @@ func GetClosestBlockBefore(ctx context.Context, eth ethereum.Client, activeTime 
 		return nil, err
 	}
 
-	closestBlockTimestamp64, err := strconv.ParseInt(closestBlock.Timestamp[2:], 16, 64)
+	closestBlockTime, err := closestBlock.GetTimestamp()
 	if err != nil {
 		return nil, err
 	}
 
-	if closestBlockTimestamp64 <= activeTime.UnixMilli() {
+	if closestBlockTime.Equal(activeTime) || closestBlockTime.Before(activeTime) {
 		return closestBlock, nil
 	}
 	closestBlockNumber, err := HexToBigInt(closestBlock.Number)
@@ -81,12 +78,12 @@ func GetClosestBlockAfter(ctx context.Context, eth ethereum.Client, activeTime t
 		return nil, err
 	}
 
-	closestBlockTimestamp64, err := strconv.ParseInt(closestBlock.Timestamp[2:], 16, 64)
+	closestBlockTime, err := closestBlock.GetTimestamp()
 	if err != nil {
 		return nil, err
 	}
 
-	if closestBlockTimestamp64 >= activeTime.UnixMilli() {
+	if closestBlockTime.Equal(activeTime) || closestBlockTime.After(activeTime) {
 		return closestBlock, nil
 	}
 	closestBlockNumber, err := HexToBigInt(closestBlock.Number)
