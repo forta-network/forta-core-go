@@ -1,15 +1,15 @@
-package utils
+package ethereum
 
 import (
 	"context"
 	"github.com/forta-network/forta-core-go/domain"
-	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/utils"
 	"math/big"
 	"time"
 )
 
 // GetClosestBlock Obtains the block closest to the time given
-func GetClosestBlock(ctx context.Context, eth ethereum.Client, activeTime time.Time) (*domain.Block, error) {
+func GetClosestBlock(ctx context.Context, eth Client, activeTime time.Time) (*domain.Block, error) {
 
 	minBlockNumber := big.NewInt(0)
 	maxBlockNumber, err := eth.BlockNumber(ctx)
@@ -49,7 +49,7 @@ func GetClosestBlock(ctx context.Context, eth ethereum.Client, activeTime time.T
 }
 
 // GetClosestBlockBefore Obtains the closest block only before the current active time
-func GetClosestBlockBefore(ctx context.Context, eth ethereum.Client, activeTime time.Time) (*domain.Block, error) {
+func GetClosestBlockBefore(ctx context.Context, eth Client, activeTime time.Time) (*domain.Block, error) {
 	closestBlock, err := GetClosestBlock(ctx, eth, activeTime)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func GetClosestBlockBefore(ctx context.Context, eth ethereum.Client, activeTime 
 	if closestBlockTime.Equal(activeTime) || closestBlockTime.Before(activeTime) {
 		return closestBlock, nil
 	}
-	closestBlockNumber, err := HexToBigInt(closestBlock.Number)
+	closestBlockNumber, err := utils.HexToBigInt(closestBlock.Number)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func GetClosestBlockBefore(ctx context.Context, eth ethereum.Client, activeTime 
 }
 
 // GetClosestBlockAfter Obtains the closest block only after the current active time
-func GetClosestBlockAfter(ctx context.Context, eth ethereum.Client, activeTime time.Time) (*domain.Block, error) {
+func GetClosestBlockAfter(ctx context.Context, eth Client, activeTime time.Time) (*domain.Block, error) {
 	closestBlock, err := GetClosestBlock(ctx, eth, activeTime)
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func GetClosestBlockAfter(ctx context.Context, eth ethereum.Client, activeTime t
 	if closestBlockTime.Equal(activeTime) || closestBlockTime.After(activeTime) {
 		return closestBlock, nil
 	}
-	closestBlockNumber, err := HexToBigInt(closestBlock.Number)
+	closestBlockNumber, err := utils.HexToBigInt(closestBlock.Number)
 	if err != nil {
 		return nil, err
 	}
