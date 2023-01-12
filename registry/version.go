@@ -29,10 +29,12 @@ type VersionManager struct {
 	rules []*UpdateRule
 }
 
-// AddUpdateRule adds an update rule to the version manager.
-func (vm *VersionManager) AddUpdateRule(contractName string, getter VersionGetter, setters ...VersionSetter) {
+// SetUpdateRule adds or updates an update rule to the version manager.
+func (vm *VersionManager) SetUpdateRule(contractName string, getter VersionGetter, setters ...VersionSetter) {
 	for _, rule := range vm.rules {
 		if rule.ContractName == contractName {
+			rule.Getter = getter
+			rule.Setters = setters
 			return
 		}
 	}

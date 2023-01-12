@@ -272,7 +272,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.AddUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil)
+	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil)
 
 	cl.contractsUnsafe.ScannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
@@ -282,7 +282,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.AddUpdateRule("ScannerRegistry", cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerRegFil)
+	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerRegFil)
 
 	cl.contractsUnsafe.Dispatch, err = contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
@@ -292,7 +292,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.AddUpdateRule("Dispatch", cl.contractsUnsafe.Dispatch, cl.contractsUnsafe.Dispatch, cl.contractsUnsafe.DispatchFil)
+	cl.versionManager.SetUpdateRule("Dispatch", cl.contractsUnsafe.Dispatch, cl.contractsUnsafe.Dispatch, cl.contractsUnsafe.DispatchFil)
 
 	cl.contractsUnsafe.ScannerVersion, err = contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
 	if err != nil {
@@ -302,7 +302,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.AddUpdateRule("ScannerNodeVersion", cl.contractsUnsafe.ScannerVersion, cl.contractsUnsafe.ScannerVersion, cl.contractsUnsafe.ScannerVersionFil)
+	cl.versionManager.SetUpdateRule("ScannerNodeVersion", cl.contractsUnsafe.ScannerVersion, cl.contractsUnsafe.ScannerVersion, cl.contractsUnsafe.ScannerVersionFil)
 
 	cl.contractsUnsafe.FortaStaking, err = contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
 	if err != nil {
@@ -312,7 +312,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.AddUpdateRule("FortaStaking", cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStakingFil)
+	cl.versionManager.SetUpdateRule("FortaStaking", cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStakingFil)
 
 	if cfg.NoRefresh {
 		return cl, nil
@@ -340,11 +340,20 @@ func (c *client) RefreshContracts() error {
 	scannerPoolRegAddr, err := c.contractsUnsafe.ScannerReg.ScannerPoolRegistry(c.opts)
 	if err == nil && scannerPoolRegAddr.Hex() != utils.ZeroAddress {
 		c.contractsUnsafe.Addresses.ScannerPoolRegistry = &scannerPoolRegAddr
-		c.contractsUnsafe.ScannerPoolReg, _ = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, c.ec)
-		c.contractsUnsafe.ScannerPoolRegFil, _ = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(scannerPoolRegAddr, c.ec)
-		c.versionManager.AddUpdateRule("ScannerPoolRegistry", c.contractsUnsafe.ScannerPoolReg, c.contractsUnsafe.ScannerPoolReg, c.contractsUnsafe.ScannerPoolRegFil)
+		c.contractsUnsafe.ScannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, c.ec)
+		if err != nil {
+			return err
+		}
+		c.contractsUnsafe.ScannerPoolRegFil, err = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(scannerPoolRegAddr, c.ec)
+		if err != nil {
+			return err
+		}
+		c.versionManager.SetUpdateRule("ScannerPoolRegistry", c.contractsUnsafe.ScannerPoolReg, c.contractsUnsafe.ScannerPoolReg, c.contractsUnsafe.ScannerPoolRegFil)
 		detectedNew = true
-		version, _ := c.contractsUnsafe.ScannerPoolReg.Version(c.opts)
+		version, err := c.contractsUnsafe.ScannerPoolReg.Version(c.opts)
+		if err != nil {
+			return err
+		}
 		log.WithFields(log.Fields{
 			"name":    "ScannerPoolRegistry",
 			"version": version,
@@ -354,11 +363,20 @@ func (c *client) RefreshContracts() error {
 	stakeAllocatorAddr, err := c.contractsUnsafe.FortaStaking.Allocator(c.opts)
 	if err == nil && stakeAllocatorAddr.Hex() != utils.ZeroAddress {
 		c.contractsUnsafe.Addresses.StakeAllocator = &stakeAllocatorAddr
-		c.contractsUnsafe.StakeAllocator, _ = contract_stake_allocator.NewStakeAllocatorCaller(stakeAllocatorAddr, c.ec)
-		c.contractsUnsafe.StakeAllocatorFil, _ = contract_stake_allocator.NewStakeAllocatorFilterer(stakeAllocatorAddr, c.ec)
-		c.versionManager.AddUpdateRule("StakeAllocator", c.contractsUnsafe.StakeAllocator, c.contractsUnsafe.StakeAllocator, c.contractsUnsafe.StakeAllocatorFil)
-		version, _ := c.contractsUnsafe.StakeAllocator.Version(c.opts)
+		c.contractsUnsafe.StakeAllocator, err = contract_stake_allocator.NewStakeAllocatorCaller(stakeAllocatorAddr, c.ec)
+		if err != nil {
+			return err
+		}
+		c.contractsUnsafe.StakeAllocatorFil, err = contract_stake_allocator.NewStakeAllocatorFilterer(stakeAllocatorAddr, c.ec)
+		if err != nil {
+			return err
+		}
+		c.versionManager.SetUpdateRule("StakeAllocator", c.contractsUnsafe.StakeAllocator, c.contractsUnsafe.StakeAllocator, c.contractsUnsafe.StakeAllocatorFil)
 		detectedNew = true
+		version, err := c.contractsUnsafe.StakeAllocator.Version(c.opts)
+		if err != nil {
+			return err
+		}
 		log.WithFields(log.Fields{
 			"name":    "StakeAllocator",
 			"version": version,
