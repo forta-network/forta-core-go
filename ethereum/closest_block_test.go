@@ -77,7 +77,9 @@ func TestGetClosestBlock(t *testing.T) {
 				return
 			}
 			result, err := utils.HexToBigInt(got.Number)
-
+			if !tt.wantErr(t, err, fmt.Sprintf("HexToBigInt( %v)", got.Number)) {
+				return
+			}
 			assert.Equalf(t, big.NewInt(tt.want), result, "GetClosestBlock( @ %v)", tt.activeTime)
 		})
 	}
@@ -120,7 +122,9 @@ func TestGetClosestBlockAfter(t *testing.T) {
 				return
 			}
 			result, err := utils.HexToBigInt(got.Number)
-
+			if !tt.wantErr(t, err, fmt.Sprintf("HexToBigInt( %v)", got.Number)) {
+				return
+			}
 			assert.Equalf(t, big.NewInt(tt.want), result, "GetClosestBlockAfter(@  %v)", tt.activeTime)
 		})
 	}
@@ -157,6 +161,9 @@ func TestGetClosestBlockBefore(t *testing.T) {
 			}
 
 			result, err := utils.HexToBigInt(got.Number)
+			if !tt.wantErr(t, err, fmt.Sprintf("HexToBigInt( %v)", got.Number)) {
+				return
+			}
 
 			assert.Equalf(t, big.NewInt(tt.want), result, "GetClosestBlockBefore( @ %v)", tt.activeTime)
 		})
