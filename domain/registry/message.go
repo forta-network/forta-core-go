@@ -1,12 +1,10 @@
 package registry
 
 import (
-	"errors"
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
-	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -49,27 +47,13 @@ type Message struct {
 	Source    Source    `json:"source"`
 }
 
-// MessageInterface implements a message interface.
-type MessageInterface interface {
-	ActionName() string
-}
-
 // ActionName implements the message interface.
 func (m Message) ActionName() string {
 	return m.Action
 }
 
-func ParseMessage(msg string) (*Message, error) {
-	var r Message
-	err := json.Unmarshal([]byte(msg), &r)
-	if err != nil {
-		return nil, err
-	}
-	if r.Action == "" {
-		log.WithFields(log.Fields{
-			"body": msg,
-		}).Error("action is not populated")
-		return nil, errors.New("action is not populated")
-	}
-	return &r, nil
+// MessageInterface implements a message interface.
+type MessageInterface interface {
+	ActionName() string
+	LogFields() log.Fields
 }

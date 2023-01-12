@@ -7,6 +7,7 @@ import (
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_node_version"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/sirupsen/logrus"
 )
 
 const ScannerNodeVersionUpdated = "ScannerNodeVersionUpdated"
@@ -15,6 +16,10 @@ type ScannerNodeVersionMessage struct {
 	Message
 	NewVersion string `json:"newVersion"`
 	OldVersion string `json:"oldVersion"`
+}
+
+func (snvm *ScannerNodeVersionMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
 }
 
 func ParseScannerNodeVersionUpdated(msg string) (*ScannerNodeVersionMessage, error) {

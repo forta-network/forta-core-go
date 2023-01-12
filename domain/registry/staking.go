@@ -1,13 +1,13 @@
 package registry
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/big"
 	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
@@ -40,6 +40,10 @@ type AgentStakeThresholdMessage struct {
 	ThresholdMessage
 }
 
+func (astm *AgentStakeThresholdMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
+}
+
 type TransferSharesMessage struct {
 	Message
 	ShareID   string `json:"shareId"`
@@ -48,6 +52,10 @@ type TransferSharesMessage struct {
 	To        string `json:"to"`
 	From      string `json:"from"`
 	Amount    string `json:"amount"`
+}
+
+func (tsm *TransferSharesMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
 }
 
 func (t TransferSharesMessage) IsBurn() bool {
@@ -63,6 +71,10 @@ type ScannerStakeThresholdMessage struct {
 	ChainID int64 `json:"chainId"`
 }
 
+func (sstm *ScannerStakeThresholdMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
+}
+
 type StakeMessage struct {
 	Message
 	ChangeType string `json:"changeType"`
@@ -75,14 +87,35 @@ type AgentStakeMessage struct {
 	AgentID string `json:"agentId"`
 }
 
+func (asm *AgentStakeMessage) LogFields() logrus.Fields {
+	return logrus.Fields{
+		"agentId":    asm.AgentID,
+		"changeType": asm.ChangeType,
+	}
+}
+
 type ScannerStakeMessage struct {
 	StakeMessage
 	ScannerID string `json:"scannerId"`
 }
 
+func (ssm *ScannerStakeMessage) LogFields() logrus.Fields {
+	return logrus.Fields{
+		"scannerId":  ssm.ScannerID,
+		"changeType": ssm.ChangeType,
+	}
+}
+
 type ScannerPoolStakeMessage struct {
 	StakeMessage
 	PoolID string `json:"poolId"`
+}
+
+func (spsm *ScannerPoolStakeMessage) LogFields() logrus.Fields {
+	return logrus.Fields{
+		"poolId":     spsm.PoolID,
+		"changeType": spsm.ChangeType,
+	}
 }
 
 func valueString(v *big.Int) string {
@@ -237,49 +270,4 @@ func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.
 		},
 		ChainID: evt.ChainId.Int64(),
 	}
-}
-
-func ParseAgentStakeThresholdMessage(msg string) (*AgentStakeThresholdMessage, error) {
-	var m AgentStakeThresholdMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseScannerStakeThresholdMessage(msg string) (*ScannerStakeThresholdMessage, error) {
-	var m ScannerStakeThresholdMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseAgentStakeMessage(msg string) (*AgentStakeMessage, error) {
-	var m AgentStakeMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseScannerStakeMessage(msg string) (*ScannerStakeMessage, error) {
-	var m ScannerStakeMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseTransferSharesMessage(msg string) (*TransferSharesMessage, error) {
-	var m TransferSharesMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
 }

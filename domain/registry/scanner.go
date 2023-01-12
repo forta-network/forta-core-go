@@ -1,15 +1,14 @@
 package registry
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/utils"
-	"github.com/goccy/go-json"
 )
 
 const SaveScanner = "SaveScanner"
@@ -29,6 +28,10 @@ type ScannerMessage struct {
 	Sender     string `json:"sender"`
 }
 
+func (sm *ScannerMessage) LogFields() logrus.Fields {
+	return logrus.Fields{"scannerId": sm.ScannerID}
+}
+
 type ScannerSaveMessage struct {
 	ScannerMessage
 	ChainID int64  `json:"chainId"`
@@ -43,34 +46,8 @@ type UpdateScannerPoolMessage struct {
 	Owner   *string `json:"owner,omitempty"`
 }
 
-func ParseScannerSave(msg string) (*ScannerSaveMessage, error) {
-	var save ScannerSaveMessage
-	err := json.Unmarshal([]byte(msg), &save)
-	if err != nil {
-		return nil, err
-	}
-	if save.Action != SaveScanner {
-		return nil, fmt.Errorf("invalid action for ScannerSave: %s", save.Action)
-	}
-	return &save, nil
-}
-
-func ParseScannerMessage(msg string) (*ScannerMessage, error) {
-	var m ScannerMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseUpdateScannerPoolMessage(msg string) (*UpdateScannerPoolMessage, error) {
-	var m UpdateScannerPoolMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
+func (uspm *UpdateScannerPoolMessage) LogFields() logrus.Fields {
+	return logrus.Fields{"poolId": uspm.PoolID}
 }
 
 func NewScannerMessage(evt *contract_scanner_registry.ScannerRegistryScannerEnabled, blk *domain.Block) *ScannerMessage {
