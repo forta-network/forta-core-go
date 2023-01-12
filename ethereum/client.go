@@ -48,6 +48,10 @@ type Client interface {
 	SubscribeToHead(ctx context.Context) (domain.HeaderCh, error)
 
 	health.Reporter
+
+	GetClosestBlock(ctx context.Context, activeTime time.Time) (*domain.Block, error)
+	GetClosestBlockBefore(ctx context.Context, activeTime time.Time) (*domain.Block, error)
+	GetClosestBlockAfter(ctx context.Context, activeTime time.Time) (*domain.Block, error)
 }
 
 const blocksByNumber = "eth_getBlockByNumber"

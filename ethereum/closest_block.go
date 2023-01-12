@@ -9,16 +9,16 @@ import (
 )
 
 // GetClosestBlock Obtains the block closest to the time given
-func GetClosestBlock(ctx context.Context, eth Client, activeTime time.Time) (*domain.Block, error) {
+func (e *streamEthClient) GetClosestBlock(ctx context.Context, activeTime time.Time) (*domain.Block, error) {
 
 	minBlockNumber := big.NewInt(0)
-	maxBlockNumber, err := eth.BlockNumber(ctx)
+	maxBlockNumber, err := e.BlockNumber(ctx)
 	if err != nil {
 		return nil, err
 	}
 	closestBlockNumber := new(big.Int).Add(maxBlockNumber, minBlockNumber)
 	closestBlockNumber = closestBlockNumber.Div(closestBlockNumber, big.NewInt(2))
-	closestBlock, err := eth.BlockByNumber(ctx, closestBlockNumber)
+	closestBlock, err := e.BlockByNumber(ctx, closestBlockNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func GetClosestBlock(ctx context.Context, eth Client, activeTime time.Time) (*do
 
 		closestBlockNumber = new(big.Int).Add(maxBlockNumber, minBlockNumber)
 		closestBlockNumber = closestBlockNumber.Div(closestBlockNumber, big.NewInt(2))
-		closestBlock, err = eth.BlockByNumber(ctx, closestBlockNumber)
+		closestBlock, err = e.BlockByNumber(ctx, closestBlockNumber)
 		if err != nil {
 			return nil, err
 		}
@@ -49,8 +49,8 @@ func GetClosestBlock(ctx context.Context, eth Client, activeTime time.Time) (*do
 }
 
 // GetClosestBlockBefore Obtains the closest block only before the current active time
-func GetClosestBlockBefore(ctx context.Context, eth Client, activeTime time.Time) (*domain.Block, error) {
-	closestBlock, err := GetClosestBlock(ctx, eth, activeTime)
+func (e *streamEthClient) GetClosestBlockBefore(ctx context.Context, activeTime time.Time) (*domain.Block, error) {
+	closestBlock, err := e.GetClosestBlock(ctx, activeTime)
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +68,12 @@ func GetClosestBlockBefore(ctx context.Context, eth Client, activeTime time.Time
 		return nil, err
 	}
 	closestBlockNumberBefore := big.NewInt(0).Sub(closestBlockNumber, big.NewInt(1))
-	return eth.BlockByNumber(ctx, closestBlockNumberBefore)
+	return e.BlockByNumber(ctx, closestBlockNumberBefore)
 }
 
 // GetClosestBlockAfter Obtains the closest block only after the current active time
-func GetClosestBlockAfter(ctx context.Context, eth Client, activeTime time.Time) (*domain.Block, error) {
-	closestBlock, err := GetClosestBlock(ctx, eth, activeTime)
+func (e *streamEthClient) GetClosestBlockAfter(ctx context.Context, activeTime time.Time) (*domain.Block, error) {
+	closestBlock, err := e.GetClosestBlock(ctx, activeTime)
 	if err != nil {
 		return nil, err
 	}
@@ -91,5 +91,5 @@ func GetClosestBlockAfter(ctx context.Context, eth Client, activeTime time.Time)
 		return nil, err
 	}
 	closestBlockNumberBefore := big.NewInt(0).Add(closestBlockNumber, big.NewInt(1))
-	return eth.BlockByNumber(ctx, closestBlockNumberBefore)
+	return e.BlockByNumber(ctx, closestBlockNumberBefore)
 }
