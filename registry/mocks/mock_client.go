@@ -8,10 +8,11 @@ import (
 	big "math/big"
 	reflect "reflect"
 
-	contract_agent_registry "github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
-	contract_scanner_registry "github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
-	registry "github.com/forta-network/forta-core-go/domain/registry"
-	registry0 "github.com/forta-network/forta-core-go/registry"
+	contract_agent_registry "github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
+	contract_scanner_pool_registry "github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
+	contract_scanner_registry "github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
+	registry "github.com/forta-network/forta-core-go/registry"
+	eip712 "github.com/forta-network/forta-core-go/security/eip712"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -38,8 +39,22 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
+// Contracts mocks base method.
+func (m *MockClient) Contracts() *registry.Contracts {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Contracts")
+	ret0, _ := ret[0].(*registry.Contracts)
+	return ret0
+}
+
+// Contracts indicates an expected call of Contracts.
+func (mr *MockClientMockRecorder) Contracts() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Contracts", reflect.TypeOf((*MockClient)(nil).Contracts))
+}
+
 // DisableScanner mocks base method.
-func (m *MockClient) DisableScanner(ScannerPermission registry0.ScannerPermission, scannerAddress string) (string, error) {
+func (m *MockClient) DisableScanner(ScannerPermission registry.ScannerPermission, scannerAddress string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DisableScanner", ScannerPermission, scannerAddress)
 	ret0, _ := ret[0].(string)
@@ -54,7 +69,7 @@ func (mr *MockClientMockRecorder) DisableScanner(ScannerPermission, scannerAddre
 }
 
 // EnableScanner mocks base method.
-func (m *MockClient) EnableScanner(ScannerPermission registry0.ScannerPermission, scannerAddress string) (string, error) {
+func (m *MockClient) EnableScanner(ScannerPermission registry.ScannerPermission, scannerAddress string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "EnableScanner", ScannerPermission, scannerAddress)
 	ret0, _ := ret[0].(string)
@@ -69,7 +84,7 @@ func (mr *MockClientMockRecorder) EnableScanner(ScannerPermission, scannerAddres
 }
 
 // ForEachAgent mocks base method.
-func (m *MockClient) ForEachAgent(handler func(*registry0.Agent) error) error {
+func (m *MockClient) ForEachAgent(handler func(*registry.Agent) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachAgent", handler)
 	ret0, _ := ret[0].(error)
@@ -97,7 +112,7 @@ func (mr *MockClientMockRecorder) ForEachAgentID(handler interface{}) *gomock.Ca
 }
 
 // ForEachAgentSinceBlock mocks base method.
-func (m *MockClient) ForEachAgentSinceBlock(block uint64, handler func(*contract_agent_registry.AgentRegistryAgentUpdated, *registry0.Agent) error) error {
+func (m *MockClient) ForEachAgentSinceBlock(block uint64, handler func(*contract_agent_registry.AgentRegistryAgentUpdated, *registry.Agent) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachAgentSinceBlock", block, handler)
 	ret0, _ := ret[0].(error)
@@ -111,7 +126,7 @@ func (mr *MockClientMockRecorder) ForEachAgentSinceBlock(block, handler interfac
 }
 
 // ForEachAssignedAgent mocks base method.
-func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry0.Agent) error) error {
+func (m *MockClient) ForEachAssignedAgent(scannerID string, handler func(*registry.Agent) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachAssignedAgent", scannerID, handler)
 	ret0, _ := ret[0].(error)
@@ -125,7 +140,7 @@ func (mr *MockClientMockRecorder) ForEachAssignedAgent(scannerID, handler interf
 }
 
 // ForEachAssignedScanner mocks base method.
-func (m *MockClient) ForEachAssignedScanner(agentID string, handler func(*registry0.Scanner) error) error {
+func (m *MockClient) ForEachAssignedScanner(agentID string, handler func(*registry.Scanner) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachAssignedScanner", agentID, handler)
 	ret0, _ := ret[0].(error)
@@ -139,7 +154,7 @@ func (mr *MockClientMockRecorder) ForEachAssignedScanner(agentID, handler interf
 }
 
 // ForEachChainAgent mocks base method.
-func (m *MockClient) ForEachChainAgent(chainID int64, handler func(*registry0.Agent) error) error {
+func (m *MockClient) ForEachChainAgent(chainID int64, handler func(*registry.Agent) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachChainAgent", chainID, handler)
 	ret0, _ := ret[0].(error)
@@ -152,8 +167,22 @@ func (mr *MockClientMockRecorder) ForEachChainAgent(chainID, handler interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachChainAgent", reflect.TypeOf((*MockClient)(nil).ForEachChainAgent), chainID, handler)
 }
 
+// ForEachPoolScannerSinceBlock mocks base method.
+func (m *MockClient) ForEachPoolScannerSinceBlock(block uint64, handler func(*contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, *registry.Scanner) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ForEachPoolScannerSinceBlock", block, handler)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ForEachPoolScannerSinceBlock indicates an expected call of ForEachPoolScannerSinceBlock.
+func (mr *MockClientMockRecorder) ForEachPoolScannerSinceBlock(block, handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachPoolScannerSinceBlock", reflect.TypeOf((*MockClient)(nil).ForEachPoolScannerSinceBlock), block, handler)
+}
+
 // ForEachScanner mocks base method.
-func (m *MockClient) ForEachScanner(handler func(*registry0.Scanner) error) error {
+func (m *MockClient) ForEachScanner(handler func(*registry.Scanner) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachScanner", handler)
 	ret0, _ := ret[0].(error)
@@ -167,7 +196,7 @@ func (mr *MockClientMockRecorder) ForEachScanner(handler interface{}) *gomock.Ca
 }
 
 // ForEachScannerSinceBlock mocks base method.
-func (m *MockClient) ForEachScannerSinceBlock(block uint64, handler func(*contract_scanner_registry.ScannerRegistryScannerUpdated, *registry0.Scanner) error) error {
+func (m *MockClient) ForEachScannerSinceBlock(block uint64, handler func(*contract_scanner_registry.ScannerRegistryScannerUpdated, *registry.Scanner) error) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ForEachScannerSinceBlock", block, handler)
 	ret0, _ := ret[0].(error)
@@ -180,11 +209,57 @@ func (mr *MockClientMockRecorder) ForEachScannerSinceBlock(block, handler interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachScannerSinceBlock", reflect.TypeOf((*MockClient)(nil).ForEachScannerSinceBlock), block, handler)
 }
 
+// GenerateScannerRegistrationSignature mocks base method.
+func (m *MockClient) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateScannerRegistrationSignature", reg)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].([]byte)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GenerateScannerRegistrationSignature indicates an expected call of GenerateScannerRegistrationSignature.
+func (mr *MockClientMockRecorder) GenerateScannerRegistrationSignature(reg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateScannerRegistrationSignature", reflect.TypeOf((*MockClient)(nil).GenerateScannerRegistrationSignature), reg)
+}
+
+// GetActivePoolStake mocks base method.
+func (m *MockClient) GetActivePoolStake(poolID *big.Int) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActivePoolStake", poolID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetActivePoolStake indicates an expected call of GetActivePoolStake.
+func (mr *MockClientMockRecorder) GetActivePoolStake(poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActivePoolStake", reflect.TypeOf((*MockClient)(nil).GetActivePoolStake), poolID)
+}
+
+// GetActiveScannerStake mocks base method.
+func (m *MockClient) GetActiveScannerStake(scannerID string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActiveScannerStake", scannerID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetActiveScannerStake indicates an expected call of GetActiveScannerStake.
+func (mr *MockClientMockRecorder) GetActiveScannerStake(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveScannerStake", reflect.TypeOf((*MockClient)(nil).GetActiveScannerStake), scannerID)
+}
+
 // GetAgent mocks base method.
-func (m *MockClient) GetAgent(agentID string) (*registry0.Agent, error) {
+func (m *MockClient) GetAgent(agentID string) (*registry.Agent, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAgent", agentID)
-	ret0, _ := ret[0].(*registry0.Agent)
+	ret0, _ := ret[0].(*registry.Agent)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -196,10 +271,10 @@ func (mr *MockClientMockRecorder) GetAgent(agentID interface{}) *gomock.Call {
 }
 
 // GetAssignmentHash mocks base method.
-func (m *MockClient) GetAssignmentHash(scannerID string) (*registry0.AssignmentHash, error) {
+func (m *MockClient) GetAssignmentHash(scannerID string) (*registry.AssignmentHash, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAssignmentHash", scannerID)
-	ret0, _ := ret[0].(*registry0.AssignmentHash)
+	ret0, _ := ret[0].(*registry.AssignmentHash)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -210,11 +285,26 @@ func (mr *MockClientMockRecorder) GetAssignmentHash(scannerID interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignmentHash", reflect.TypeOf((*MockClient)(nil).GetAssignmentHash), scannerID)
 }
 
+// GetPoolScanner mocks base method.
+func (m *MockClient) GetPoolScanner(scannerID string) (*registry.Scanner, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPoolScanner", scannerID)
+	ret0, _ := ret[0].(*registry.Scanner)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPoolScanner indicates an expected call of GetPoolScanner.
+func (mr *MockClientMockRecorder) GetPoolScanner(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPoolScanner", reflect.TypeOf((*MockClient)(nil).GetPoolScanner), scannerID)
+}
+
 // GetScanner mocks base method.
-func (m *MockClient) GetScanner(scannerID string) (*registry0.Scanner, error) {
+func (m *MockClient) GetScanner(scannerID string) (*registry.Scanner, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetScanner", scannerID)
-	ret0, _ := ret[0].(*registry0.Scanner)
+	ret0, _ := ret[0].(*registry.Scanner)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -255,11 +345,26 @@ func (mr *MockClientMockRecorder) GetScannerNodeVersion() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerNodeVersion", reflect.TypeOf((*MockClient)(nil).GetScannerNodeVersion))
 }
 
+// GetScannerPoolOwner mocks base method.
+func (m *MockClient) GetScannerPoolOwner(poolID *big.Int) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetScannerPoolOwner", poolID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetScannerPoolOwner indicates an expected call of GetScannerPoolOwner.
+func (mr *MockClientMockRecorder) GetScannerPoolOwner(poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetScannerPoolOwner", reflect.TypeOf((*MockClient)(nil).GetScannerPoolOwner), poolID)
+}
+
 // GetStakingThreshold mocks base method.
-func (m *MockClient) GetStakingThreshold(scannerID string) (*registry0.StakingThreshold, error) {
+func (m *MockClient) GetStakingThreshold(scannerID string) (*registry.StakingThreshold, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStakingThreshold", scannerID)
-	ret0, _ := ret[0].(*registry0.StakingThreshold)
+	ret0, _ := ret[0].(*registry.StakingThreshold)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -300,6 +405,21 @@ func (mr *MockClientMockRecorder) IsEnabledScanner(scannerID interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEnabledScanner", reflect.TypeOf((*MockClient)(nil).IsEnabledScanner), scannerID)
 }
 
+// IsOperationalScanner mocks base method.
+func (m *MockClient) IsOperationalScanner(scannerID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsOperationalScanner", scannerID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsOperationalScanner indicates an expected call of IsOperationalScanner.
+func (mr *MockClientMockRecorder) IsOperationalScanner(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsOperationalScanner", reflect.TypeOf((*MockClient)(nil).IsOperationalScanner), scannerID)
+}
+
 // PegBlock mocks base method.
 func (m *MockClient) PegBlock(blockNum *big.Int) {
 	m.ctrl.T.Helper()
@@ -326,33 +446,33 @@ func (mr *MockClientMockRecorder) PegLatestBlock() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PegLatestBlock", reflect.TypeOf((*MockClient)(nil).PegLatestBlock))
 }
 
-// RegisterScanner mocks base method.
-func (m *MockClient) RegisterScanner(ownerAddress string, chainID int64, metadata string) (string, error) {
+// RefreshContracts mocks base method.
+func (m *MockClient) RefreshContracts() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterScanner", ownerAddress, chainID, metadata)
+	ret := m.ctrl.Call(m, "RefreshContracts")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RefreshContracts indicates an expected call of RefreshContracts.
+func (mr *MockClientMockRecorder) RefreshContracts() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshContracts", reflect.TypeOf((*MockClient)(nil).RefreshContracts))
+}
+
+// RegisterScannerOld mocks base method.
+func (m *MockClient) RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegisterScannerOld", ownerAddress, chainID, metadata)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// RegisterScanner indicates an expected call of RegisterScanner.
-func (mr *MockClientMockRecorder) RegisterScanner(ownerAddress, chainID, metadata interface{}) *gomock.Call {
+// RegisterScannerOld indicates an expected call of RegisterScannerOld.
+func (mr *MockClientMockRecorder) RegisterScannerOld(ownerAddress, chainID, metadata interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScanner", reflect.TypeOf((*MockClient)(nil).RegisterScanner), ownerAddress, chainID, metadata)
-}
-
-// RegistryContracts mocks base method.
-func (m *MockClient) RegistryContracts() *registry.RegistryContracts {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegistryContracts")
-	ret0, _ := ret[0].(*registry.RegistryContracts)
-	return ret0
-}
-
-// RegistryContracts indicates an expected call of RegistryContracts.
-func (mr *MockClientMockRecorder) RegistryContracts() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegistryContracts", reflect.TypeOf((*MockClient)(nil).RegistryContracts))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterScannerOld", reflect.TypeOf((*MockClient)(nil).RegisterScannerOld), ownerAddress, chainID, metadata)
 }
 
 // ResetOpts mocks base method.
@@ -365,4 +485,99 @@ func (m *MockClient) ResetOpts() {
 func (mr *MockClientMockRecorder) ResetOpts() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOpts", reflect.TypeOf((*MockClient)(nil).ResetOpts))
+}
+
+// TotalScannersRegistered mocks base method.
+func (m *MockClient) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TotalScannersRegistered", poolID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TotalScannersRegistered indicates an expected call of TotalScannersRegistered.
+func (mr *MockClientMockRecorder) TotalScannersRegistered(poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalScannersRegistered", reflect.TypeOf((*MockClient)(nil).TotalScannersRegistered), poolID)
+}
+
+// WillNewScannerShutdownPool mocks base method.
+func (m *MockClient) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WillNewScannerShutdownPool", poolID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// WillNewScannerShutdownPool indicates an expected call of WillNewScannerShutdownPool.
+func (mr *MockClientMockRecorder) WillNewScannerShutdownPool(poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WillNewScannerShutdownPool", reflect.TypeOf((*MockClient)(nil).WillNewScannerShutdownPool), poolID)
+}
+
+// MockeventIterator is a mock of eventIterator interface.
+type MockeventIterator struct {
+	ctrl     *gomock.Controller
+	recorder *MockeventIteratorMockRecorder
+}
+
+// MockeventIteratorMockRecorder is the mock recorder for MockeventIterator.
+type MockeventIteratorMockRecorder struct {
+	mock *MockeventIterator
+}
+
+// NewMockeventIterator creates a new mock instance.
+func NewMockeventIterator(ctrl *gomock.Controller) *MockeventIterator {
+	mock := &MockeventIterator{ctrl: ctrl}
+	mock.recorder = &MockeventIteratorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockeventIterator) EXPECT() *MockeventIteratorMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockeventIterator) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockeventIteratorMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockeventIterator)(nil).Close))
+}
+
+// Error mocks base method.
+func (m *MockeventIterator) Error() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Error")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Error indicates an expected call of Error.
+func (mr *MockeventIteratorMockRecorder) Error() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockeventIterator)(nil).Error))
+}
+
+// Next mocks base method.
+func (m *MockeventIterator) Next() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Next")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// Next indicates an expected call of Next.
+func (mr *MockeventIteratorMockRecorder) Next() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Next", reflect.TypeOf((*MockeventIterator)(nil).Next))
 }

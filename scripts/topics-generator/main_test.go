@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,9 +23,9 @@ var evtAgentEnabledTopic = crypto.Keccak256Hash([]byte(evtAgentEnabled)).Hex()
 var evtLinkTopic = crypto.Keccak256Hash([]byte(evtLink)).Hex()
 
 func TestTopicGeneration(t *testing.T) {
-	assert.Equal(t, evtAgentEnabledTopic, contract_agent_registry.AgentEnabledTopic)
-	assert.Equal(t, evtAgentUpdatedTopic, contract_agent_registry.AgentUpdatedTopic)
-	assert.Equal(t, evtScannerUpdatedTopic, contract_scanner_registry.ScannerUpdatedTopic)
-	assert.Equal(t, evtScannerEnabledTopic, contract_scanner_registry.ScannerEnabledTopic)
-	assert.Equal(t, evtLinkTopic, contract_dispatch.LinkTopic)
+	assert.Equal(t, evtAgentEnabledTopic, contract_agent_registry_0_1_4.AgentEnabledTopic)
+	assert.Equal(t, evtAgentUpdatedTopic, contract_agent_registry_0_1_4.AgentUpdatedTopic)
+	assert.Equal(t, evtScannerUpdatedTopic, contract_scanner_registry_0_1_3.ScannerUpdatedTopic)
+	assert.Equal(t, evtScannerEnabledTopic, contract_scanner_registry_0_1_3.ScannerEnabledTopic)
+	assert.Equal(t, evtLinkTopic, contract_dispatch_0_1_4.LinkTopic)
 }

@@ -1,14 +1,12 @@
 package registry
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/sirupsen/logrus"
 
-	"github.com/goccy/go-json"
-
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -26,6 +24,10 @@ type AgentMessage struct {
 	Permission int    `json:"permission"`
 }
 
+func (am *AgentMessage) LogFields() logrus.Fields {
+	return logrus.Fields{"agentId": am.AgentID}
+}
+
 type AgentSaveMessage struct {
 	AgentMessage
 	Enabled  bool    `json:"enabled"`
@@ -33,27 +35,6 @@ type AgentSaveMessage struct {
 	ChainIDs []int64 `json:"chainIds"`
 	Metadata string  `json:"metadata"`
 	Owner    string  `json:"owner"`
-}
-
-func ParseAgentSave(msg string) (*AgentSaveMessage, error) {
-	var save AgentSaveMessage
-	err := json.Unmarshal([]byte(msg), &save)
-	if err != nil {
-		return nil, err
-	}
-	if save.Action != SaveAgent {
-		return nil, fmt.Errorf("invalid action for AgentSave: %s", save.Action)
-	}
-	return &save, nil
-}
-
-func ParseAgentMessage(msg string) (*AgentMessage, error) {
-	var m AgentMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
 }
 
 func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk *domain.Block) *AgentMessage {

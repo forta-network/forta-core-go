@@ -1,0 +1,19 @@
+sources:
+  - type: ScannerPoolRegistryFilterer
+    tag: '0.1.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0
+      alias: scannerpoolregistry010
+      sourceDir: ../../generated/contract_scanner_pool_registry_0_1_0
+
+output:
+  type: ScannerPoolRegistryFilterer
+  defaultTag: '0.1.0'
+  package: contract_scanner_pool_registry
+  file: filterer.go
+  rewrite:
+  - match: ^Parse([a-zA-Z]+)Output$
+    transform: ScannerPoolRegistry$
+
+errors:
+  hide: true

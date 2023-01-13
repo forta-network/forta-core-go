@@ -1,0 +1,25 @@
+sources:
+  - type: ScannerRegistryFilterer
+    tag: '0.1.3'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3
+      alias: scannerregistry013
+      sourceDir: ../../generated/contract_scanner_registry_0_1_3
+  - type: ScannerRegistryFilterer
+    tag: '0.1.4'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_4
+      alias: scannerregistry014
+      sourceDir: ../../generated/contract_scanner_registry_0_1_4
+
+output:
+  type: ScannerRegistryFilterer
+  defaultTag: '0.1.3'
+  package: contract_scanner_registry
+  file: filterer.go
+  rewrite:
+  - match: ^Parse([a-zA-Z]+)Output$
+    transform: ScannerRegistry$
+
+errors:
+  hide: true

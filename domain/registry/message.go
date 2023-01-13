@@ -1,12 +1,10 @@
 package registry
 
 import (
-	"errors"
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
-	"github.com/goccy/go-json"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,23 +33,33 @@ func SourceFromBlock(txHash string, blk *domain.Block) Source {
 	}
 }
 
+func MessageFrom(txHash string, blk *domain.Block, action string) Message {
+	return Message{
+		Timestamp: time.Now().UTC(),
+		Action:    action,
+		Source:    SourceFromBlock(txHash, blk),
+	}
+}
+
 type Message struct {
 	Action    string    `json:"action"`
 	Timestamp time.Time `json:"timestamp"`
 	Source    Source    `json:"source"`
 }
 
-func ParseMessage(msg string) (*Message, error) {
-	var r Message
-	err := json.Unmarshal([]byte(msg), &r)
-	if err != nil {
-		return nil, err
-	}
-	if r.Action == "" {
-		log.WithFields(log.Fields{
-			"body": msg,
-		}).Error("action is not populated")
-		return nil, errors.New("action is not populated")
-	}
-	return &r, nil
+// ActionName implements the message interface.
+func (m Message) ActionName() string {
+	return m.Action
+}
+
+// Info implements the message interface.
+func (m Message) Info() Message {
+	return m
+}
+
+// MessageInterface implements a message interface.
+type MessageInterface interface {
+	Info() Message
+	ActionName() string
+	LogFields() log.Fields
 }

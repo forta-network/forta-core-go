@@ -3,22 +3,23 @@ package registry
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/big"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
-	"golang.org/x/sync/errgroup"
-
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
-
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-network/forta-core-go/contracts/contract_dispatch"
-	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_6"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_5"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_1"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_4"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_stake_allocator_0_1_0"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/ethereum"
@@ -27,55 +28,35 @@ import (
 )
 
 type listener struct {
-	ctx  context.Context
-	cfg  ListenerConfig
-	logs feeds.LogFeed
-	c    Client
-	eth  ethereum.Client
+	ctx    context.Context
+	cfg    ListenerConfig
+	logs   feeds.LogFeed
+	client Client
+	eth    ethereum.Client
 
-	scannerAddr        string
-	scannerVersionAddr string
-	agentAddr          string
-	dispatchAddr       string
-	fortaStakingAddr   string
-
-	fortaStakingFilterer   *contract_forta_staking.FortaStakingFilterer
-	scannerFilterer        *contract_scanner_registry.ScannerRegistryFilterer
-	agentsFilterer         *contract_agent_registry.AgentRegistryFilterer
-	dispatchFilterer       *contract_dispatch.DispatchFilterer
-	scannerVersionFilterer *contract_scanner_node_version.ScannerNodeVersionFilterer
+	publisher  MessagePublisher
+	handlerReg *HandlerRegistry
+	handler    MessageHandler[registry.MessageInterface]
 }
 
-type Handlers struct {
-	AfterBlockHandler func(blk *domain.Block) error
+// MessagePublisher sends messages to a remote consumer.
+type MessagePublisher interface {
+	Publish(logger *log.Entry, msg registry.MessageInterface) error
+}
 
-	// registration
-	SaveAgentHandler     func(logger *log.Entry, msg *registry.AgentSaveMessage) error
-	AgentActionHandler   func(logger *log.Entry, msg *registry.AgentMessage) error
-	SaveScannerHandler   func(logger *log.Entry, msg *registry.ScannerSaveMessage) error
-	ScannerActionHandler func(logger *log.Entry, msg *registry.ScannerMessage) error
-
-	// scanner node versions
-	ScannerNodeVersionHandler func(logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error
-
-	// assignment
-	DispatchHandler func(logger *log.Entry, msg *registry.DispatchMessage) error
-
-	// staking
-	AgentStakeHandler     func(logger *log.Entry, msg *registry.AgentStakeMessage) error
-	ScannerStakeHandler   func(logger *log.Entry, msg *registry.ScannerStakeMessage) error
-	TransferSharesHandler func(logger *log.Entry, msg *registry.TransferSharesMessage) error
-
-	AgentStakeThresholdHandler   func(logger *log.Entry, msg *registry.AgentStakeThresholdMessage) error
-	ScannerStakeThresholdHandler func(logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error
+// MessageSubscriber receives messages from a remote producer.
+type MessageSubscriber interface {
+	Subscribe(ctx context.Context, handler MessageHandler[registry.MessageInterface]) error
 }
 
 type ContractFilter struct {
-	AgentRegistry    bool
-	ScannerRegistry  bool
-	DispatchRegistry bool
-	FortaStaking     bool
-	ScannerVersion   bool
+	AgentRegistry       bool
+	ScannerRegistry     bool
+	ScannerPoolRegistry bool
+	DispatchRegistry    bool
+	FortaStaking        bool
+	ScannerVersion      bool
+	StakeAllocator      bool
 }
 
 type ListenerConfig struct {
@@ -88,6 +69,8 @@ type ListenerConfig struct {
 	Handlers       Handlers
 	ContractFilter *ContractFilter
 	Topics         []string
+	Publisher      MessagePublisher
+	NoRefresh      bool
 }
 
 type Listener interface {
@@ -96,95 +79,150 @@ type Listener interface {
 	ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error
 }
 
-func (l *listener) handleScannerRegistryEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
-	if isEvent(le, contract_scanner_registry.ScannerUpdatedTopic) {
-		su, err := l.scannerFilterer.ParseScannerUpdated(le)
+func (l *listener) handleScannerRegistryEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_scanner_registry_0_1_4.ScannerUpdatedTopic: // same with prev version
+		su, err := contracts.ScannerRegFil.ParseScannerUpdated(le)
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.SaveScannerHandler != nil {
-			scannerID := utils.ScannerIDBigIntToHex(su.ScannerId)
-			enabled, err := l.c.IsEnabledScanner(scannerID)
-			if err != nil {
-				return err
-			}
-			return l.cfg.Handlers.SaveScannerHandler(logger, registry.NewScannerSaveMessage(su, enabled, blk))
-		}
-	} else if isEvent(le, contract_scanner_registry.ScannerEnabledTopic) {
-		se, err := l.scannerFilterer.ParseScannerEnabled(le)
+		scannerID := utils.ScannerIDBigIntToHex(su.ScannerId)
+		enabled, err := l.client.IsEnabledScanner(scannerID)
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.ScannerActionHandler != nil {
-			return l.cfg.Handlers.ScannerActionHandler(logger, registry.NewScannerMessage(se, blk))
-		}
-	} else if isEvent(le, contract_scanner_registry.StakeThresholdChangedTopic) {
-		evt, err := l.scannerFilterer.ParseStakeThresholdChanged(le)
+		return l.handler(logger, registry.NewScannerSaveMessage(su, enabled, blk))
+
+	case contract_scanner_registry_0_1_4.ScannerEnabledTopic: // same with prev version
+		se, err := contracts.ScannerRegFil.ParseScannerEnabled(le)
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.ScannerStakeThresholdHandler != nil {
-			return l.cfg.Handlers.ScannerStakeThresholdHandler(logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
+
+		// enforce latest state to take sunsetting into account
+		enabled, err := l.client.IsEnabledScanner(utils.ScannerIDBigIntToHex(se.ScannerId))
+		if err != nil {
+			return err
 		}
+		se.Enabled = enabled && se.Enabled
+
+		return l.handler(logger, registry.NewScannerMessage(se, blk))
+
+	case contract_scanner_registry_0_1_4.StakeThresholdChangedTopic: // same with prev version
+		evt, err := contracts.ScannerRegFil.ParseStakeThresholdChanged(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
 	}
 	return nil
 }
 
-func (l *listener) handleScannerVersionEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
-	if isEvent(le, contract_scanner_node_version.ScannerNodeVersionUpdatedTopic) {
-		su, err := l.scannerVersionFilterer.ParseScannerNodeVersionUpdated(le)
+func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_scanner_pool_registry_0_1_0.ScannerUpdatedTopic:
+		su, err := contracts.ScannerPoolRegFil.ParseScannerUpdated(le)
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.ScannerNodeVersionHandler != nil {
-			return l.cfg.Handlers.ScannerNodeVersionHandler(logger, registry.NewScannerNodeVersionUpdated(su, blk))
+		scannerID := utils.ScannerIDBigIntToHex(su.ScannerId)
+		enabled, err := l.client.IsEnabledScanner(scannerID)
+		if err != nil {
+			return err
 		}
+		return l.handler(logger, registry.NewScannerSaveMessageFromPool(su, enabled, blk))
+
+	case contract_scanner_pool_registry_0_1_0.ManagedStakeThresholdChangedTopic:
+		evt, err := contracts.ScannerPoolRegFil.ParseManagedStakeThresholdChanged(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewScannerManagedStakeThresholdMessage(evt, le, blk))
+
+	case contract_scanner_pool_registry_0_1_0.TransferTopic:
+		evt, err := contracts.ScannerPoolRegFil.ParseTransfer(le)
+		if err != nil {
+			return err
+		}
+		// detect the new owner only if not minted
+		if evt.From.Hex() == utils.ZeroAddress {
+			return nil
+		}
+		return l.handler(logger, registry.NewScannerPoolMessageFromTransfer(evt, blk))
+
+	case contract_scanner_pool_registry_0_1_0.ScannerPoolRegisteredTopic:
+		evt, err := contracts.ScannerPoolRegFil.ParseScannerPoolRegistered(le)
+		if err != nil {
+			return err
+		}
+		owner, err := l.client.GetScannerPoolOwner(evt.ScannerPoolId)
+		if err != nil {
+			return fmt.Errorf("failed to get scanner pool owner: %v", err)
+		}
+		return l.handler(logger, registry.NewScannerPoolMessageFromRegistration(evt, owner, blk))
+
+	case contract_scanner_pool_registry_0_1_0.EnabledScannersChangedTopic:
+		evt, err := contracts.ScannerPoolRegFil.ParseEnabledScannersChanged(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewScannerPoolMessageFromEnablement(evt, blk))
 	}
 	return nil
 }
 
-func (l *listener) handleAgentRegistryEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
-	if isEvent(le, contract_agent_registry.AgentUpdatedTopic) {
-		au, err := l.agentsFilterer.ParseAgentUpdated(le)
+func (l *listener) handleScannerVersionEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_scanner_node_version_0_1_1.ScannerNodeVersionUpdatedTopic:
+		su, err := contracts.ScannerVersionFil.ParseScannerNodeVersionUpdated(le)
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.SaveAgentHandler != nil {
-			agt, err := l.c.GetAgent(utils.AgentBigIntToHex(au.AgentId))
-			if err != nil {
-				return err
-			}
-			return l.cfg.Handlers.SaveAgentHandler(logger, registry.NewAgentSaveMessage(au, agt.Enabled, blk))
-		}
-	} else if isEvent(le, contract_agent_registry.AgentEnabledTopic) {
-		ae, err := l.agentsFilterer.ParseAgentEnabled(le)
-		if err != nil {
-			return err
-		}
-		if l.cfg.Handlers.AgentActionHandler != nil {
-			return l.cfg.Handlers.AgentActionHandler(logger, registry.NewAgentMessage(ae, blk))
-		}
-	} else if isEvent(le, contract_agent_registry.StakeThresholdChangedTopic) {
-		stc, err := l.agentsFilterer.ParseStakeThresholdChanged(le)
-		if err != nil {
-			return err
-		}
-		if l.cfg.Handlers.AgentStakeThresholdHandler != nil {
-			return l.cfg.Handlers.AgentStakeThresholdHandler(logger, registry.NewAgentStakeThresholdMessage(stc, le, blk))
-		}
+		return l.handler(logger, registry.NewScannerNodeVersionUpdated(su, blk))
 	}
 	return nil
 }
 
-func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
+func (l *listener) handleAgentRegistryEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_agent_registry_0_1_6.AgentUpdatedTopic: // same with prev version
+		au, err := contracts.AgentRegFil.ParseAgentUpdated(le)
+		if err != nil {
+			return err
+		}
+		agt, err := l.client.GetAgent(utils.AgentBigIntToHex(au.AgentId))
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewAgentSaveMessage(au, agt.Enabled, blk))
+
+	case contract_agent_registry_0_1_6.AgentEnabledTopic: // same with prev version
+		ae, err := contracts.AgentRegFil.ParseAgentEnabled(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewAgentMessage(ae, blk))
+
+	case contract_agent_registry_0_1_6.StakeThresholdChangedTopic: // same with prev version
+		stc, err := contracts.AgentRegFil.ParseStakeThresholdChanged(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewAgentStakeThresholdMessage(stc, le, blk))
+	}
+	return nil
+}
+
+func (l *listener) handleFortaStakingEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
 	var subjectType uint8
 	var subjectID *big.Int
 	var changeType string
 	var value *big.Int
 	var acct common.Address
 
-	if isEvent(le, contract_forta_staking.StakeDepositedTopic) {
-		evt, err := l.fortaStakingFilterer.ParseStakeDeposited(le)
+	switch getTopic(le) {
+	case contract_forta_staking_0_1_2.StakeDepositedTopic: // same with prev version
+		evt, err := contracts.FortaStakingFil.ParseStakeDeposited(le)
 		if err != nil {
 			return err
 		}
@@ -193,16 +231,18 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		value = evt.Amount
 		acct = evt.Account
 		changeType = registry.ChangeTypeDeposit
-	} else if isEvent(le, contract_forta_staking.WithdrawalInitiatedTopic) {
-		evt, err := l.fortaStakingFilterer.ParseWithdrawalInitiated(le)
+
+	case contract_forta_staking_0_1_2.WithdrawalInitiatedTopic: // same with prev version
+		evt, err := contracts.FortaStakingFil.ParseWithdrawalInitiated(le)
 		if err != nil {
 			return err
 		}
 		subjectType = evt.SubjectType
 		subjectID = evt.Subject
 		changeType = registry.ChangeTypeWithdrawal
-	} else if isEvent(le, contract_forta_staking.SlashedTopic) {
-		evt, err := l.fortaStakingFilterer.ParseSlashed(le)
+
+	case contract_forta_staking_0_1_2.SlashedTopic: // same with prev version
+		evt, err := contracts.FortaStakingFil.ParseSlashed(le)
 		if err != nil {
 			return err
 		}
@@ -210,8 +250,9 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		subjectID = evt.Subject
 		value = evt.Value
 		changeType = registry.ChangeTypeSlash
-	} else if isEvent(le, contract_forta_staking.TransferSingleTopic) {
-		evt, err := l.fortaStakingFilterer.ParseTransferSingle(le)
+
+	case contract_forta_staking_0_1_2.TransferSingleTopic: // same with prev version
+		evt, err := contracts.FortaStakingFil.ParseTransferSingle(le)
 		if err != nil {
 			return err
 		}
@@ -219,11 +260,10 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.TransferSharesHandler != nil {
-			return l.cfg.Handlers.TransferSharesHandler(logger, m)
-		}
-	} else if isEvent(le, contract_forta_staking.TransferBatchTopic) {
-		evt, err := l.fortaStakingFilterer.ParseTransferBatch(le)
+		return l.handler(logger, m)
+
+	case contract_forta_staking_0_1_2.TransferBatchTopic: // same with prev version
+		evt, err := contracts.FortaStakingFil.ParseTransferBatch(le)
 		if err != nil {
 			return err
 		}
@@ -231,78 +271,126 @@ func (l *listener) handleFortaStakingEvent(le types.Log, blk *domain.Block, logg
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.TransferSharesHandler != nil {
-			for _, m := range ms {
-				if err := l.cfg.Handlers.TransferSharesHandler(logger, m); err != nil {
-					return err
-				}
+		for _, m := range ms {
+			if err := l.handler(logger, m); err != nil {
+				return err
 			}
-			return nil
 		}
-	} else {
+		return nil
+
+	default:
 		logger.Debug("unhandled topic, ignoring")
 		return nil
 	}
 
 	// parse ID for agent or scanner
-	if subjectType == SubjectTypeScanner {
+	switch subjectType {
+	case SubjectTypeScanner:
 		scannerID := utils.ScannerIDBigIntToHex(subjectID)
-		if l.cfg.Handlers.ScannerStakeHandler != nil {
-			return l.cfg.Handlers.ScannerStakeHandler(logger, registry.NewScannerStakeMessage(le, changeType, acct, scannerID, value, blk))
-		}
-	} else if subjectType == SubjectTypeAgent {
+		return l.handler(logger, registry.NewScannerStakeMessage(le, changeType, acct, scannerID, value, blk))
+
+	case SubjectTypeAgent:
 		agentID := utils.AgentBigIntToHex(subjectID)
-		if l.cfg.Handlers.AgentStakeHandler != nil {
-			return l.cfg.Handlers.AgentStakeHandler(logger, registry.NewAgentStakeMessage(le, changeType, acct, agentID, value, blk))
-		}
-	} else {
+		return l.handler(logger, registry.NewAgentStakeMessage(le, changeType, acct, agentID, value, blk))
+
+	case SubjectTypeScannerPool:
+		poolID := subjectID.String()
+		return l.handler(logger, registry.NewScannerPoolStakeMessage(le, changeType, acct, poolID, value, blk))
+
+	default:
 		logger.WithField("subjectID", subjectType).Warn("unhandled subject ID, ignoring")
 	}
-
 	return nil
 }
 
-func (l *listener) handleDispatchEvent(le types.Log, blk *domain.Block, logger *log.Entry) error {
-	if isEvent(le, contract_dispatch.LinkTopic) {
-		link, err := l.dispatchFilterer.ParseLink(le)
+func (l *listener) handleStakeAllocatorEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_stake_allocator_0_1_0.AllocatedStakeTopic:
+		evt, err := contracts.StakeAllocatorFil.ParseAllocatedStake(le)
 		if err != nil {
 			return err
 		}
-		if l.cfg.Handlers.DispatchHandler != nil {
-			return l.cfg.Handlers.DispatchHandler(logger, registry.NewDispatchMessage(link, blk))
-		}
-	}
-	if isEvent(le, contract_dispatch.AlreadyLinkedTopic) {
-		link, err := l.dispatchFilterer.ParseAlreadyLinked(le)
-		if err != nil {
-			return err
-		}
-		if l.cfg.Handlers.DispatchHandler != nil {
-			return l.cfg.Handlers.DispatchHandler(logger, registry.NewAlreadyLinkedDispatchMessage(link, blk))
-		}
+		return l.handler(logger, registry.NewScannerPoolAllocationMessage(le, blk, evt))
 	}
 	return nil
+}
+
+func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_dispatch_0_1_5.LinkTopic: // same with prev version
+		link, err := contracts.DispatchFil.ParseLink(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewDispatchMessage(link, blk))
+
+	case contract_dispatch_0_1_5.AlreadyLinkedTopic: // same with prev version
+		link, err := contracts.DispatchFil.ParseAlreadyLinked(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(logger, registry.NewAlreadyLinkedDispatchMessage(link, blk))
+	}
+	return nil
+}
+
+func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	// use any contract's upgraded topic to check - they are all the same
+	if getTopic(le) != UpgradedTopic {
+		return nil
+	}
+
+	// refresh contracts and log filter addresses
+	if err := l.client.RefreshContracts(); err != nil {
+		return err
+	}
+	l.setLogFilterAddrs()
+
+	// use any contract's filterer to unpack the event - pick dispatch
+	upgraded, err := contracts.DispatchFil.ParseUpgraded(le)
+	if err != nil {
+		return err
+	}
+
+	return l.handler(logger, registry.NewUpgradeMessage(upgraded, le, blk))
 }
 
 func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	if l.ctx.Err() != nil {
 		return l.ctx.Err()
 	}
+
 	logger := getLoggerForLog(le)
-	if equalsAddress(le.Address, l.scannerAddr) {
-		return l.handleScannerRegistryEvent(le, blk, logger)
+	contracts := l.client.Contracts()
+
+	// always try to handle the upgrade event first because we don't enforce address checks
+	// the addresses are limited by the filtered addresses
+	// this is no-op if the topic is irrelevant
+	// we refresh all contracts if it's relevant to any of the contracts
+	if err := l.handleUpgradeEvent(contracts, le, blk, logger); err != nil {
+		return err
 	}
-	if equalsAddress(le.Address, l.scannerVersionAddr) {
-		return l.handleScannerVersionEvent(le, blk, logger)
+
+	if equalsAddress(le.Address, contracts.Addresses.ScannerRegistry.Hex()) {
+		return l.handleScannerRegistryEvent(contracts, le, blk, logger)
 	}
-	if equalsAddress(le.Address, l.agentAddr) {
-		return l.handleAgentRegistryEvent(le, blk, logger)
+	if equalsAddress(le.Address, contracts.Addresses.ScannerNodeVersion.Hex()) {
+		return l.handleScannerVersionEvent(contracts, le, blk, logger)
 	}
-	if equalsAddress(le.Address, l.dispatchAddr) {
-		return l.handleDispatchEvent(le, blk, logger)
+	if equalsAddress(le.Address, contracts.Addresses.AgentRegistry.Hex()) {
+		return l.handleAgentRegistryEvent(contracts, le, blk, logger)
 	}
-	if equalsAddress(le.Address, l.fortaStakingAddr) {
-		return l.handleFortaStakingEvent(le, blk, logger)
+	if equalsAddress(le.Address, contracts.Addresses.Dispatch.Hex()) {
+		return l.handleDispatchEvent(contracts, le, blk, logger)
+	}
+	if equalsAddress(le.Address, contracts.Addresses.FortaStaking.Hex()) {
+		return l.handleFortaStakingEvent(contracts, le, blk, logger)
+	}
+	if contracts.Addresses.ScannerPoolRegistry != nil && equalsAddress(le.Address, contracts.Addresses.ScannerPoolRegistry.Hex()) {
+		return l.handleScannerPoolRegistryEvent(contracts, le, blk, logger)
+	}
+	if contracts.Addresses.StakeAllocator != nil && equalsAddress(le.Address, contracts.Addresses.StakeAllocator.Hex()) {
+		return l.handleStakeAllocatorEvent(contracts, le, blk, logger)
 	}
 	return nil
 }
@@ -311,8 +399,8 @@ func (l *listener) handleAfterBlock(blk *domain.Block) error {
 	if l.ctx.Err() != nil {
 		return l.ctx.Err()
 	}
-	if l.cfg.Handlers.AfterBlockHandler != nil {
-		return l.cfg.Handlers.AfterBlockHandler(blk)
+	if l.handlerReg.afterBlockHandler != nil {
+		return l.handlerReg.afterBlockHandler(blk)
 	}
 	return nil
 }
@@ -426,67 +514,81 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		ensAddr = defaultEnsAddress
 	}
 
-	client, err := ethereum.NewStreamEthClient(ctx, cfg.Name, jsonRpc)
+	ethClient, err := ethereum.NewStreamEthClient(ctx, cfg.Name, jsonRpc)
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := NewClient(ctx, ClientConfig{
+	regClient, err := NewClient(ctx, ClientConfig{
 		JsonRpcUrl: jsonRpc,
 		ENSAddress: ensAddr,
 		Name:       "registry-listener",
+		NoRefresh:  cfg.NoRefresh,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create registry client: %v", err)
 	}
 
-	regContracts := c.contracts
+	return NewListenerWithClients(ctx, cfg, ethClient, regClient, cfg.Publisher)
+}
 
-	sf, err := contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	snv, err := contract_scanner_node_version.NewScannerNodeVersionFilterer(regContracts.ScannerNodeVersion, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	af, err := contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	df, err := contract_dispatch.NewDispatchFilterer(regContracts.Dispatch, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	stkf, err := contract_forta_staking.NewFortaStakingFilterer(regContracts.FortaStaking, nil)
-	if err != nil {
-		return nil, err
-	}
+func (l *listener) setLogFilterAddrs() {
+	filter := l.cfg.ContractFilter
+	regContracts := l.client.Contracts().Addresses
 
 	var addrs []string
-	if cfg.ContractFilter != nil {
-		if cfg.ContractFilter.AgentRegistry {
+
+	if filter != nil {
+		if filter.AgentRegistry {
 			addrs = append(addrs, regContracts.AgentRegistry.Hex())
 		}
-		if cfg.ContractFilter.ScannerRegistry {
+		if filter.ScannerRegistry {
 			addrs = append(addrs, regContracts.ScannerRegistry.Hex())
 		}
-		if cfg.ContractFilter.FortaStaking {
+		if filter.FortaStaking {
 			addrs = append(addrs, regContracts.FortaStaking.Hex())
 		}
-		if cfg.ContractFilter.DispatchRegistry {
+		if filter.DispatchRegistry {
 			addrs = append(addrs, regContracts.Dispatch.Hex())
 		}
-		if cfg.ContractFilter.ScannerVersion {
+		if filter.ScannerVersion {
 			addrs = append(addrs, regContracts.ScannerNodeVersion.Hex())
 		}
-
+		if filter.ScannerPoolRegistry && regContracts.ScannerPoolRegistry != nil {
+			addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
+		}
+		if filter.StakeAllocator && regContracts.StakeAllocator != nil {
+			addrs = append(addrs, regContracts.StakeAllocator.Hex())
+		}
 	} else {
-		addrs = []string{regContracts.AgentRegistry.Hex(), regContracts.ScannerRegistry.Hex(), regContracts.Dispatch.Hex(), regContracts.FortaStaking.Hex(), regContracts.ScannerNodeVersion.Hex()}
+		// include all contracts
+		addrs = getAllContractAddrs(regContracts)
+	}
+
+	if len(addrs) == 0 {
+		panic("empty filter")
+	}
+
+	for _, addr := range addrs {
+		l.logs.AddAddress(addr)
+	}
+}
+
+func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient ethereum.Client, regClient Client, publisher MessagePublisher) (*listener, error) {
+	li := &listener{
+		ctx:        ctx,
+		client:     regClient,
+		cfg:        cfg,
+		eth:        ethClient,
+		publisher:  publisher,
+		handlerReg: NewHandlerRegistry(cfg.Handlers),
+	}
+	// if there is a publisher, publish only
+	// otherwise, handle directly
+	if publisher != nil {
+		li.handler = li.publisher.Publish
+	} else {
+		li.handler = li.handlerReg.Handle
 	}
 
 	var topics [][]string
@@ -494,33 +596,42 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		topics = [][]string{cfg.Topics}
 	}
 
-	logFeed, err := feeds.NewLogFeed(ctx, client, feeds.LogFeedConfig{
-		Addresses:  addrs,
+	var err error
+	li.logs, err = feeds.NewLogFeed(ctx, ethClient, feeds.LogFeedConfig{
 		Topics:     topics,
 		StartBlock: cfg.StartBlock,
 		EndBlock:   cfg.EndBlock,
 		Offset:     cfg.BlockOffset,
 	})
-
 	if err != nil {
 		return nil, err
 	}
+	li.setLogFilterAddrs()
 
-	return &listener{
-		ctx:                    ctx,
-		c:                      c,
-		cfg:                    cfg,
-		logs:                   logFeed,
-		eth:                    client,
-		scannerAddr:            regContracts.ScannerRegistry.Hex(),
-		scannerVersionAddr:     regContracts.ScannerNodeVersion.Hex(),
-		agentAddr:              regContracts.AgentRegistry.Hex(),
-		dispatchAddr:           regContracts.Dispatch.Hex(),
-		fortaStakingAddr:       regContracts.FortaStaking.Hex(),
-		scannerFilterer:        sf,
-		scannerVersionFilterer: snv,
-		agentsFilterer:         af,
-		dispatchFilterer:       df,
-		fortaStakingFilterer:   stkf,
-	}, nil
+	return li, nil
+}
+
+// StartWorker handles incoming messages.
+func StartWorker(ctx context.Context, subscriber MessageSubscriber, handlers Handlers) error {
+	handlerReg := NewHandlerRegistry(handlers)
+	return subscriber.Subscribe(ctx, handlerReg.Handle)
+}
+
+// ListenToUpgrades listens for contract upgrades and refreshes the contracts.
+func ListenToUpgrades(ctx context.Context, client Client, blockFeed feeds.BlockFeed) <-chan error {
+	return blockFeed.Subscribe(func(evt *domain.BlockEvent) error {
+		regContracts := client.Contracts().Addresses
+		addrs := getAllContractAddrs(regContracts)
+		for _, log := range evt.Logs {
+			ethLog := log.ToTypesLog()
+			if !isAddrIn(addrs, ethLog.Address) {
+				continue
+			}
+			if getTopic(ethLog) != UpgradedTopic {
+				continue
+			}
+			return client.RefreshContracts()
+		}
+		return nil
+	})
 }

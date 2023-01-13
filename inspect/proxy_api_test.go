@@ -36,13 +36,13 @@ func TestProxyAPIInspection(t *testing.T) {
 
 	r.Equal(
 		map[string]float64{
-			IndicatorProxyAPIAccessible:        ResultSuccess,
-			IndicatorProxyAPIChainID:           float64(5),
-			IndicatorProxyAPIModuleWeb3:        ResultSuccess,
-			IndicatorProxyAPIModuleEth:         ResultSuccess,
-			IndicatorProxyAPIModuleNet:         ResultSuccess,
-			IndicatorProxyAPIHistorySupport:    VeryOldBlockNumber,
-			IndicatorProxyAPIIsETH2:            ResultSuccess,
+			IndicatorProxyAPIAccessible:     ResultSuccess,
+			IndicatorProxyAPIChainID:        float64(5),
+			IndicatorProxyAPIModuleWeb3:     ResultSuccess,
+			IndicatorProxyAPIModuleEth:      ResultSuccess,
+			IndicatorProxyAPIModuleNet:      ResultSuccess,
+			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
+			IndicatorProxyAPIIsETH2:         ResultSuccess,
 			// trick to make test less flaky and ignore offset issues
 			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
 			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
@@ -79,16 +79,16 @@ func TestProxyAPIInspector_detectOffset(t *testing.T) {
 	}
 
 	tests := []struct {
-		name        string
-		args        args
+		name string
+		args args
 	}{
 		{
 			name: "free and free combo",
 			args: args{
 				ctx: context.Background(),
 				inspectionCfg: InspectionConfig{
-					ScanAPIURL:  "https://cloudflare-eth.com",
-					ProxyAPIURL: "https://cloudflare-eth.com",
+					ScanAPIURL:  "https://rpc.ankr.com/eth",
+					ProxyAPIURL: "https://rpc.ankr.com/eth",
 				},
 			},
 		},
