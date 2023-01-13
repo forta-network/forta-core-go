@@ -22,6 +22,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_stake_allocator_0_1_0"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/feeds"
 	"github.com/forta-network/forta-core-go/utils"
@@ -36,17 +37,17 @@ type listener struct {
 
 	publisher  MessagePublisher
 	handlerReg *HandlerRegistry
-	handler    MessageHandler[registry.MessageInterface]
+	handler    regmsg.HandlerFunc[regmsg.Interface]
 }
 
 // MessagePublisher sends messages to a remote consumer.
 type MessagePublisher interface {
-	Publish(logger *log.Entry, msg registry.MessageInterface) error
+	Publish(logger *log.Entry, msg regmsg.Interface) error
 }
 
 // MessageSubscriber receives messages from a remote producer.
 type MessageSubscriber interface {
-	Subscribe(ctx context.Context, handler MessageHandler[registry.MessageInterface]) error
+	Subscribe(ctx context.Context, handler regmsg.HandlerFunc[regmsg.Interface]) error
 }
 
 type ContractFilter struct {

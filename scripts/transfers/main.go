@@ -7,6 +7,7 @@ import (
 
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
 	rd "github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/forta-network/forta-core-go/registry"
 	log "github.com/sirupsen/logrus"
 )
@@ -17,7 +18,7 @@ func main() {
 	l, err := registry.NewListener(ctx, registry.ListenerConfig{
 		JsonRpcURL: os.Getenv("POLYGON_JSON_RPC"),
 		Handlers: registry.Handlers{
-			TransferSharesHandlers: registry.MessageHandlers[*rd.TransferSharesMessage]{
+			TransferSharesHandlers: regmsg.Handlers(
 				func(logger *log.Entry, msg *rd.TransferSharesMessage) error {
 					log.WithFields(log.Fields{
 						"to":     msg.To,
@@ -29,7 +30,8 @@ func main() {
 					}).Info("event")
 					return nil
 				},
-			}},
+			),
+		},
 		ContractFilter: &registry.ContractFilter{
 			FortaStaking: true,
 		},

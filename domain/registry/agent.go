@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
@@ -18,7 +19,7 @@ const AgentPermissionAdmin = 0
 const AgentPermissionOwner = 1
 
 type AgentMessage struct {
-	Message
+	regmsg.Message
 	AgentID    string `json:"agentId"`
 	TxHash     string `json:"txHash"`
 	Permission int    `json:"permission"`
@@ -44,10 +45,10 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 		evtName = EnableAgent
 	}
 	return &AgentMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		AgentID:    agentID,
 		Permission: int(evt.Permission),
@@ -60,10 +61,10 @@ func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated,
 	return &AgentSaveMessage{
 		AgentMessage: AgentMessage{
 			AgentID: agentID,
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    SaveAgent,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
@@ -14,7 +15,7 @@ var (
 )
 
 // ParseMessage parses given message.
-func ParseMessage(msg string) (MessageInterface, error) {
+func ParseMessage(msg string) (regmsg.Interface, error) {
 	// peek at action field quickly
 	action := gjson.Get(msg, "action").String()
 	if len(action) == 0 {
@@ -37,7 +38,7 @@ func ParseMessage(msg string) (MessageInterface, error) {
 }
 
 // MessageTypeForAction returns the correct message type for given action.
-func MessageTypeForAction(action string) (MessageInterface, bool) {
+func MessageTypeForAction(action string) (regmsg.Interface, bool) {
 	switch action {
 	case SaveAgent:
 		return &AgentSaveMessage{}, true

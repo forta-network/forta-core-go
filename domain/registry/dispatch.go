@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_dispatch"
@@ -15,7 +16,7 @@ var Link = "Link"
 var Unlink = "Unlink"
 
 type DispatchMessage struct {
-	Message
+	regmsg.Message
 	ScannerID string `json:"scannerId"`
 	AgentID   string `json:"agentId"`
 }
@@ -35,10 +36,10 @@ func NewDispatchMessage(evt *contract_dispatch.DispatchLink, blk *domain.Block) 
 		evtName = Link
 	}
 	return &DispatchMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		ScannerID: strings.ToLower(scannerID),
 		AgentID:   agentID,
@@ -53,10 +54,10 @@ func NewAlreadyLinkedDispatchMessage(evt *contract_dispatch.DispatchAlreadyLinke
 		evtName = Link
 	}
 	return &DispatchMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		ScannerID: strings.ToLower(scannerID),
 		AgentID:   agentID,
