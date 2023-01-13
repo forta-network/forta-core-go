@@ -34,15 +34,18 @@ type listener struct {
 	client Client
 	eth    ethereum.Client
 
-	proxy      MessageProxy
+	publisher  MessagePublisher
 	handlerReg *HandlerRegistry
 	handler    MessageHandler[registry.MessageInterface]
 }
 
-// MessageProxy connects a listener instance with a handler instance when
-// listener and the handler is separate.
-type MessageProxy interface {
+// MessagePublisher sends messages to a remote consumer.
+type MessagePublisher interface {
 	Publish(logger *log.Entry, msg registry.MessageInterface) error
+}
+
+// MessageSubscriber receives messages from a remote producer.
+type MessageSubscriber interface {
 	Subscribe(ctx context.Context, handler MessageHandler[registry.MessageInterface]) error
 }
 
@@ -66,7 +69,7 @@ type ListenerConfig struct {
 	Handlers       Handlers
 	ContractFilter *ContractFilter
 	Topics         []string
-	Proxy          MessageProxy
+	Publisher      MessagePublisher
 	NoRefresh      bool
 }
 
@@ -526,7 +529,7 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 		return nil, fmt.Errorf("failed to create registry client: %v", err)
 	}
 
-	return NewListenerWithClients(ctx, cfg, ethClient, regClient, cfg.Proxy)
+	return NewListenerWithClients(ctx, cfg, ethClient, regClient, cfg.Publisher)
 }
 
 func (l *listener) setLogFilterAddrs() {
@@ -571,19 +574,19 @@ func (l *listener) setLogFilterAddrs() {
 	}
 }
 
-func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient ethereum.Client, regClient Client, proxy MessageProxy) (*listener, error) {
+func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient ethereum.Client, regClient Client, publisher MessagePublisher) (*listener, error) {
 	li := &listener{
 		ctx:        ctx,
 		client:     regClient,
 		cfg:        cfg,
 		eth:        ethClient,
-		proxy:      proxy,
+		publisher:  publisher,
 		handlerReg: NewHandlerRegistry(cfg.Handlers),
 	}
-	// if there is a proxy, only use proxy to publish
+	// if there is a publisher, publish only
 	// otherwise, handle directly
-	if proxy != nil {
-		li.handler = li.proxy.Publish
+	if publisher != nil {
+		li.handler = li.publisher.Publish
 	} else {
 		li.handler = li.handlerReg.Handle
 	}
@@ -606,6 +609,12 @@ func NewListenerWithClients(ctx context.Context, cfg ListenerConfig, ethClient e
 	li.setLogFilterAddrs()
 
 	return li, nil
+}
+
+// StartWorker handles incoming messages.
+func StartWorker(ctx context.Context, subscriber MessageSubscriber, handlers Handlers) error {
+	handlerReg := NewHandlerRegistry(handlers)
+	return subscriber.Subscribe(ctx, handlerReg.Handle)
 }
 
 // ListenToUpgrades listens for contract upgrades and refreshes the contracts.
