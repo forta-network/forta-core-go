@@ -21,7 +21,6 @@ func (snvm *ScannerNodeVersionMessage) LogFields() logrus.Fields {
 }
 
 func NewScannerNodeVersionUpdated(evt *contract_scanner_node_version.ScannerNodeVersionScannerNodeVersionUpdated, blk *domain.Block) *ScannerNodeVersionMessage {
-
 	return &ScannerNodeVersionMessage{
 		Message: Message{
 			Timestamp: time.Now().UTC(),

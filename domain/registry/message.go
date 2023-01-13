@@ -52,8 +52,14 @@ func (m Message) ActionName() string {
 	return m.Action
 }
 
+// Info implements the message interface.
+func (m Message) Info() Message {
+	return m
+}
+
 // MessageInterface implements a message interface.
 type MessageInterface interface {
+	Info() Message
 	ActionName() string
 	LogFields() log.Fields
 }
