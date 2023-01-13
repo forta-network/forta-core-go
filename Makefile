@@ -67,6 +67,7 @@ mocks:
 	mockgen -source ethereum/contract_backend.go -destination ethereum/mocks/mock_ethclient.go
 	mockgen -source registry/client.go -destination registry/mocks/mock_client.go
 	mockgen -source registry/version.go -destination registry/mocks/mock_version.go
+	mockgen -source domain/registry/regmsg/regmsg.go -destination domain/registry/regmsg/mocks/mock_regmsg.go
 	mockgen -source ipfs/client.go -destination ipfs/mocks/mock_client.go
 	mockgen -source release/client.go -destination release/mocks/mock_client.go
 	mockgen -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go

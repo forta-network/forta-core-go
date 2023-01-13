@@ -5,43 +5,41 @@ import (
 
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/forta-network/forta-core-go/utils/slicemap"
 	log "github.com/sirupsen/logrus"
 )
 
-type MessageHandler[K registry.MessageInterface] func(logger *log.Entry, msg K) error
-
-type MessageHandlers[K registry.MessageInterface] []MessageHandler[K]
-
+// Handlers helps declaring all handlers in the order they are intended to be executed.
 type Handlers struct {
 	AfterBlockHandler func(blk *domain.Block) error
 
 	// implementation upgrades
-	UpgradeHandlers MessageHandlers[*registry.UpgradeMessage]
+	UpgradeHandlers regmsg.HandlerFuncs[*registry.UpgradeMessage]
 
 	// registration
-	SaveAgentHandlers         MessageHandlers[*registry.AgentSaveMessage]
-	AgentActionHandlers       MessageHandlers[*registry.AgentMessage]
-	SaveScannerHandlers       MessageHandlers[*registry.ScannerSaveMessage]
-	ScannerActionHandlers     MessageHandlers[*registry.ScannerMessage]
-	UpdateScannerPoolHandlers MessageHandlers[*registry.UpdateScannerPoolMessage]
+	SaveAgentHandlers         regmsg.HandlerFuncs[*registry.AgentSaveMessage]
+	AgentActionHandlers       regmsg.HandlerFuncs[*registry.AgentMessage]
+	SaveScannerHandlers       regmsg.HandlerFuncs[*registry.ScannerSaveMessage]
+	ScannerActionHandlers     regmsg.HandlerFuncs[*registry.ScannerMessage]
+	UpdateScannerPoolHandlers regmsg.HandlerFuncs[*registry.UpdateScannerPoolMessage]
 
 	// scanner node versions
-	ScannerNodeVersionHandlers MessageHandlers[*registry.ScannerNodeVersionMessage]
+	ScannerNodeVersionHandlers regmsg.HandlerFuncs[*registry.ScannerNodeVersionMessage]
 
 	// assignment
-	DispatchHandlers MessageHandlers[*registry.DispatchMessage]
+	DispatchHandlers regmsg.HandlerFuncs[*registry.DispatchMessage]
 
 	// staking
-	AgentStakeHandlers       MessageHandlers[*registry.AgentStakeMessage]
-	ScannerStakeHandlers     MessageHandlers[*registry.ScannerStakeMessage]
-	TransferSharesHandlers   MessageHandlers[*registry.TransferSharesMessage]
-	ScannerPoolStakeHandlers MessageHandlers[*registry.ScannerPoolStakeMessage]
+	AgentStakeHandlers       regmsg.HandlerFuncs[*registry.AgentStakeMessage]
+	ScannerStakeHandlers     regmsg.HandlerFuncs[*registry.ScannerStakeMessage]
+	TransferSharesHandlers   regmsg.HandlerFuncs[*registry.TransferSharesMessage]
+	ScannerPoolStakeHandlers regmsg.HandlerFuncs[*registry.ScannerPoolStakeMessage]
 
-	AgentStakeThresholdHandlers   MessageHandlers[*registry.AgentStakeThresholdMessage]
-	ScannerStakeThresholdHandlers MessageHandlers[*registry.ScannerStakeThresholdMessage]
+	AgentStakeThresholdHandlers   regmsg.HandlerFuncs[*registry.AgentStakeThresholdMessage]
+	ScannerStakeThresholdHandlers regmsg.HandlerFuncs[*registry.ScannerStakeThresholdMessage]
 
-	ScannerPoolAllocationHandlers MessageHandlers[*registry.ScannerPoolAllocationMessage]
+	ScannerPoolAllocationHandlers regmsg.HandlerFuncs[*registry.ScannerPoolAllocationMessage]
 }
 
 type HandlerRegistry struct {
@@ -50,7 +48,7 @@ type HandlerRegistry struct {
 }
 
 // Handle finds the right handler for the message and calls it.
-func (reg *HandlerRegistry) Handle(logger *log.Entry, msg registry.MessageInterface) error {
+func (reg *HandlerRegistry) Handle(logger *log.Entry, msg regmsg.Interface) error {
 	h, ok := reg.all.Get(msgKey(msg))
 	if !ok {
 		logger.WithField("action", msg.ActionName()).Warn("no handlers found")
@@ -87,7 +85,7 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 		// for each func in array, validate and collect
 		var (
 			methods []reflect.Value
-			msgType registry.MessageInterface
+			msgType regmsg.Interface
 		)
 		for j := 0; j < field.Len(); j++ {
 			f := field.Index(j)
@@ -96,7 +94,7 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 				in := f.Type().In(k)
 				inVal := reflect.New(in.Elem()).Interface()
 				// register handler if one of the args is a message
-				v, ok := inVal.(registry.MessageInterface)
+				v, ok := inVal.(regmsg.Interface)
 				if ok {
 					methods = append(methods, f)
 					msgType = v
@@ -112,6 +110,6 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 	return reg
 }
 
-func msgKey(msg registry.MessageInterface) string {
+func msgKey(msg regmsg.Interface) string {
 	return reflect.TypeOf(msg).String()
 }

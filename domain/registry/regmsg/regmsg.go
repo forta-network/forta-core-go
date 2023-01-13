@@ -1,4 +1,4 @@
-package registry
+package regmsg
 
 import (
 	"time"
@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Source contains message source info.
 type Source struct {
 	TxHash             string    `json:"txHash"`
 	BlockNumberDecimal int64     `json:"blockNumberDecimal"`
@@ -16,6 +17,7 @@ type Source struct {
 	Timestamp          time.Time `json:"timestamp"`
 }
 
+// SourceFromBlock creates message source from given block.
 func SourceFromBlock(txHash string, blk *domain.Block) Source {
 	if blk == nil {
 		return Source{
@@ -33,7 +35,8 @@ func SourceFromBlock(txHash string, blk *domain.Block) Source {
 	}
 }
 
-func MessageFrom(txHash string, blk *domain.Block, action string) Message {
+// From creates a message from given inputs.
+func From(txHash string, blk *domain.Block, action string) Message {
 	return Message{
 		Timestamp: time.Now().UTC(),
 		Action:    action,
@@ -41,6 +44,8 @@ func MessageFrom(txHash string, blk *domain.Block, action string) Message {
 	}
 }
 
+// Message contains base message info. In practice, the content works as a common message
+// header for all message types.
 type Message struct {
 	Action    string    `json:"action"`
 	Timestamp time.Time `json:"timestamp"`
@@ -57,9 +62,26 @@ func (m Message) Info() Message {
 	return m
 }
 
-// MessageInterface implements a message interface.
-type MessageInterface interface {
+// Interface implements a message interface. One needs to wrap the Message type
+// and implement extra method(s) to satisfy this interface.
+type Interface interface {
 	Info() Message
 	ActionName() string
 	LogFields() log.Fields
+}
+
+// HandlerFunc is a handler func type.
+type HandlerFunc[I Interface] func(logger *log.Entry, msg I) error
+
+// HandlerFuncs is an alias for the array of handler funcs.
+type HandlerFuncs[I Interface] []HandlerFunc[I]
+
+// Handlers conveniently stacks up given handler funcs into an array.
+func Handlers[I Interface](args ...HandlerFunc[I]) HandlerFuncs[I] {
+	return args
+}
+
+// HandlerInterface is an interface definition alternative to the handler func.
+type HandlerInterface[I Interface] interface {
+	Handle(logger *log.Entry, msg I) error
 }

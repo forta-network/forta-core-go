@@ -15,6 +15,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -30,7 +31,7 @@ const ChangeTypeWithdrawal = "withdrawal"
 const ChangeTypeSlash = "slash"
 
 type ThresholdMessage struct {
-	Message
+	regmsg.Message
 	Min       string `json:"min"`
 	Max       string `json:"max"`
 	Activated bool   `json:"activated"`
@@ -45,7 +46,7 @@ func (astm *AgentStakeThresholdMessage) LogFields() logrus.Fields {
 }
 
 type TransferSharesMessage struct {
-	Message
+	regmsg.Message
 	ShareID   string `json:"shareId"`
 	StakeType string `json:"stakeType"`
 	Active    bool   `json:"active"`
@@ -76,7 +77,7 @@ func (sstm *ScannerStakeThresholdMessage) LogFields() logrus.Fields {
 }
 
 type StakeMessage struct {
-	Message
+	regmsg.Message
 	ChangeType string `json:"changeType"`
 	Amount     string `json:"amount"`
 	Account    string `json:"account"`
@@ -151,10 +152,10 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 		return nil, err
 	}
 	return &TransferSharesMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Action:    TransferShares,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 		},
 		StakeType: st,
 		ShareID:   evt.Id.String(),
@@ -173,10 +174,10 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 			return nil, err
 		}
 		res = append(res, &TransferSharesMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    TransferShares,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			StakeType: st,
 			ShareID:   id.String(),
@@ -192,7 +193,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 func NewScannerStakeMessage(l types.Log, changeType string, account common.Address, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
-			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerStake),
+			Message:    regmsg.From(l.TxHash.Hex(), blk, ScannerStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -204,7 +205,7 @@ func NewScannerStakeMessage(l types.Log, changeType string, account common.Addre
 func NewAgentStakeMessage(l types.Log, changeType string, account common.Address, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
-			Message:    MessageFrom(l.TxHash.Hex(), blk, AgentStake),
+			Message:    regmsg.From(l.TxHash.Hex(), blk, AgentStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -216,7 +217,7 @@ func NewAgentStakeMessage(l types.Log, changeType string, account common.Address
 func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.Address, poolID string, value *big.Int, blk *domain.Block) *ScannerPoolStakeMessage {
 	return &ScannerPoolStakeMessage{
 		StakeMessage: StakeMessage{
-			Message:    MessageFrom(l.TxHash.Hex(), blk, ScannerPoolStake),
+			Message:    regmsg.From(l.TxHash.Hex(), blk, ScannerPoolStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -228,10 +229,10 @@ func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.A
 func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    AgentStakeThreshold,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			Min:       valueString(evt.Min),
 			Max:       valueString(evt.Max),
@@ -243,10 +244,10 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistrySta
 func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    ScannerStakeThreshold,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			Min:       valueString(evt.Min),
 			Max:       valueString(evt.Max),
@@ -259,10 +260,10 @@ func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegis
 func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ScannerPoolRegistryManagedStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    ScannerStakeThreshold,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			Min:       valueString(evt.Min),
 			Max:       valueString(evt.Max),

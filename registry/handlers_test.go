@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/forta-network/forta-core-go/domain/registry"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -37,8 +38,8 @@ func TestHandlerRegistry(t *testing.T) {
 	dispatch1 := &testHandlerImpl2{}
 
 	handlerReg := NewHandlerRegistry(Handlers{
-		SaveAgentHandlers: MessageHandlers[*registry.AgentSaveMessage]{agentSave1.HandleMessage, agentSave2.HandleMessage},
-		DispatchHandlers:  MessageHandlers[*registry.DispatchMessage]{dispatch1.HandleMessage},
+		SaveAgentHandlers: regmsg.Handlers(agentSave1.HandleMessage, agentSave2.HandleMessage),
+		DispatchHandlers:  regmsg.Handlers(dispatch1.HandleMessage),
 	})
 
 	err := handlerReg.Handle(nil, &registry.AgentSaveMessage{
