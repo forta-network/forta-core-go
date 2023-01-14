@@ -315,6 +315,21 @@ func (mr *MockClientMockRecorder) IsEnabledScanner(scannerID interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEnabledScanner", reflect.TypeOf((*MockClient)(nil).IsEnabledScanner), scannerID)
 }
 
+// NumScannersFor mocks base method.
+func (m *MockClient) NumScannersFor(agentID string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NumScannersFor", agentID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NumScannersFor indicates an expected call of NumScannersFor.
+func (mr *MockClientMockRecorder) NumScannersFor(agentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NumScannersFor", reflect.TypeOf((*MockClient)(nil).NumScannersFor), agentID)
+}
+
 // PegBlock mocks base method.
 func (m *MockClient) PegBlock(blockNum *big.Int) {
 	m.ctrl.T.Helper()

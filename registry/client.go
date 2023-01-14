@@ -103,6 +103,9 @@ type Client interface {
 	// IndexOfAssignedScanner gets index of assigned scanner
 	IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, error)
 
+	// NumScannersFor gets total number of assignments for bot.
+	NumScannersFor(agentID string) (*big.Int, error)
+
 	// GetStakingThreshold returns the min/max/activated flag for a given address
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 
@@ -573,6 +576,16 @@ func (c *client) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, er
 		}
 	}
 	return nil, nil
+}
+
+func (c *client) NumScannersFor(agentID string) (*big.Int, error) {
+	opts, err := c.getOps()
+	if err != nil {
+		return nil, err
+	}
+	aID := utils.AgentHexToBigInt(agentID)
+
+	return c.dp.NumScannersFor(opts, aID)
 }
 
 func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error {
