@@ -130,8 +130,8 @@ type Client interface {
 	// ForEachAssignedScanner loops over scanners by agent
 	ForEachAssignedScanner(agentID string, handler func(s *Scanner) error) error
 
-	// IndexOfAssignedScanner gets index of assigned scanner
-	IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, error)
+	// IndexOfAssignedScannerByChain gets index of assigned scanner inside a chain.
+	IndexOfAssignedScannerByChain(agentID, scannerID string, chainID *big.Int) (*big.Int, error)
 
 	// NumScannersFor gets total number of assignments for bot.
 	NumScannersFor(agentID string) (*big.Int, error)
@@ -796,8 +796,7 @@ func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner)
 	return nil
 }
 
-
-func (c *client) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, error) {
+func (c *client) IndexOfAssignedScannerByChain(agentID, scannerID string, chainID *big.Int) (*big.Int, error) {
 	opts, err := c.getOpts()
 	if err != nil {
 		return nil, err
@@ -808,16 +807,27 @@ func (c *client) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, er
 	if err != nil {
 		return nil, err
 	}
+
+	var idxByChain int64
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
 		scn, err := c.Contracts().Dispatch.ScannerRefAt(opts, aID, idx)
 		if err != nil {
 			return nil, err
 		}
-		if scn.ScannerId.Cmp(sID) == 0 {
-			return big.NewInt(i), nil
+
+		// if filtered by chain, ignore.
+		if chainID != nil && scn.ChainId != chainID {
+			continue
 		}
+
+		if scn.ScannerId.Cmp(sID) == 0 {
+			return big.NewInt(idxByChain), nil
+		}
+
+		idxByChain++
 	}
+
 	return nil, nil
 }
 
