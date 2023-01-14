@@ -375,6 +375,21 @@ func (mr *MockClientMockRecorder) GetStakingThreshold(scannerID interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStakingThreshold", reflect.TypeOf((*MockClient)(nil).GetStakingThreshold), scannerID)
 }
 
+// IndexOfAssignedScanner mocks base method.
+func (m *MockClient) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IndexOfAssignedScanner", agentID, scannerID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IndexOfAssignedScanner indicates an expected call of IndexOfAssignedScanner.
+func (mr *MockClientMockRecorder) IndexOfAssignedScanner(agentID, scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexOfAssignedScanner", reflect.TypeOf((*MockClient)(nil).IndexOfAssignedScanner), agentID, scannerID)
+}
+
 // IsAssigned mocks base method.
 func (m *MockClient) IsAssigned(scannerID, agentID string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -403,6 +418,21 @@ func (m *MockClient) IsEnabledScanner(scannerID string) (bool, error) {
 func (mr *MockClientMockRecorder) IsEnabledScanner(scannerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEnabledScanner", reflect.TypeOf((*MockClient)(nil).IsEnabledScanner), scannerID)
+}
+
+// NumScannersFor mocks base method.
+func (m *MockClient) NumScannersFor(agentID string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NumScannersFor", agentID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NumScannersFor indicates an expected call of NumScannersFor.
+func (mr *MockClientMockRecorder) NumScannersFor(agentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NumScannersFor", reflect.TypeOf((*MockClient)(nil).NumScannersFor), agentID)
 }
 
 // IsOperationalScanner mocks base method.
