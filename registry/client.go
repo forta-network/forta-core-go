@@ -796,29 +796,21 @@ func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner)
 	return nil
 }
 
-func (c *client) ActiveAgentStake(agentID string) (*big.Int, error) {
-	opts, err := c.getOps()
-	if err != nil {
-		return nil, err
-	}
-	id := utils.AgentHexToBigInt(agentID)
-	return c.fs.ActiveStakeFor(opts, 2, id)
-}
 
 func (c *client) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, error) {
-	opts, err := c.getOps()
+	opts, err := c.getOpts()
 	if err != nil {
 		return nil, err
 	}
 	aID := utils.AgentHexToBigInt(agentID)
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	length, err := c.dp.NumScannersFor(opts, aID)
+	length, err := c.Contracts().Dispatch.NumScannersFor(opts, aID)
 	if err != nil {
 		return nil, err
 	}
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		scn, err := c.dp.ScannerRefAt(opts, aID, idx)
+		scn, err := c.Contracts().Dispatch.ScannerRefAt(opts, aID, idx)
 		if err != nil {
 			return nil, err
 		}
@@ -830,13 +822,13 @@ func (c *client) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, er
 }
 
 func (c *client) NumScannersFor(agentID string) (*big.Int, error) {
-	opts, err := c.getOps()
+	opts, err := c.getOpts()
 	if err != nil {
 		return nil, err
 	}
 	aID := utils.AgentHexToBigInt(agentID)
 
-	return c.dp.NumScannersFor(opts, aID)
+	return c.contractsUnsafe.Dispatch.NumScannersFor(opts, aID)
 }
 
 func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error {
