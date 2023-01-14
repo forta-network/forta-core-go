@@ -817,7 +817,7 @@ func (c *client) IndexOfAssignedScannerByChain(agentID, scannerID string, chainI
 		}
 
 		// if filtered by chain, ignore.
-		if chainID != nil && scn.ChainId != chainID {
+		if chainID != nil && scn.ChainId.Cmp(chainID) != 0 {
 			continue
 		}
 
