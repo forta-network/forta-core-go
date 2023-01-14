@@ -4,17 +4,24 @@ import "github.com/forta-network/forta-core-go/utils"
 
 // AgentManifest represents the dev-provided properties of an agent
 type AgentManifest struct {
-	From           *string `json:"from"`
-	Name           *string `json:"name"`
-	AgentID        *string `json:"agentId"`
-	AgentIDHash    *string `json:"agentIdHash"`
-	Version        *string `json:"version"`
-	Timestamp      *string `json:"timestamp"`
-	ImageReference *string `json:"imageReference"`
-	Repository     *string `json:"repository"`
-	Documentation  *string `json:"documentation"`
-	ChainIDs       []int64 `json:"chainIds"`
-	Redundancy     *int    `json:"redundancy"`
+	From           *string                     `json:"from"`
+	Name           *string                     `json:"name"`
+	AgentID        *string                     `json:"agentId"`
+	AgentIDHash    *string                     `json:"agentIdHash"`
+	Version        *string                     `json:"version"`
+	Timestamp      *string                     `json:"timestamp"`
+	ImageReference *string                     `json:"imageReference"`
+	Repository     *string                     `json:"repository"`
+	Documentation  *string                     `json:"documentation"`
+	ChainIDs       []int64                     `json:"chainIds"`
+	Redundancy     *int                        `json:"redundancy"`
+	ChainSettings  map[uint]AgentChainSettings `json:"chainSettings"`
+}
+
+// AgentChainSettings is the per-chain configuration of a bot.
+type AgentChainSettings struct {
+	Shards uint `json:"shards"`
+	Target uint `json:"target"`
 }
 
 // SignedAgentManifest is the contents of an agent manifest
