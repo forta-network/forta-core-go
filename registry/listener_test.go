@@ -59,7 +59,7 @@ func TestListener_Listen(t *testing.T) {
 				UpgradedTopic,
 				Handlers{
 					UpgradeHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.UpgradeMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.UpgradeMessage) error {
 							assert.Equal(t, int64(27061991), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.Upgrade, msg.Action)
 							assert.Equal(t, strings.ToLower("0x4720c872425876B6f4b4E9130CDef667aDE553b2"), msg.Proxy)
@@ -77,7 +77,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_agent_registry_0_1_4.AgentEnabledTopic,
 				Handlers{
 					AgentActionHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.AgentMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.AgentMessage) error {
 							assert.Equal(t, int64(26030393), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.EnableAgent, msg.Action)
 							assert.Equal(t, "0x4bc8273b69f070c209c4866907d5def4c6f899af4cb47dee5e263aba6defad69", msg.AgentID)
@@ -94,7 +94,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_agent_registry_0_1_4.AgentEnabledTopic,
 				Handlers{
 					AgentActionHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.AgentMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.AgentMessage) error {
 							assert.Equal(t, int64(26029118), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.DisableAgent, msg.Action)
 							assert.Equal(t, "0x4bc8273b69f070c209c4866907d5def4c6f899af4cb47dee5e263aba6defad69", msg.AgentID)
@@ -111,7 +111,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_scanner_registry_0_1_3.ScannerEnabledTopic,
 				Handlers{
 					ScannerActionHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.ScannerMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerMessage) error {
 							assert.Equal(t, int64(27984372), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.EnableScanner, msg.Action)
 							assert.Equal(t, "0xec542ecf3d371bb95c45af6776e20e7e5ff6cbc0", msg.ScannerID)
@@ -128,7 +128,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_scanner_registry_0_1_3.ScannerEnabledTopic,
 				Handlers{
 					ScannerActionHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.ScannerMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerMessage) error {
 							assert.Equal(t, int64(28005870), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.DisableScanner, msg.Action)
 							assert.Equal(t, "0x7c4cd89c996bdc1589a50e7b2116b43fdca7e6d2", msg.ScannerID)
@@ -145,7 +145,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_scanner_registry_0_1_3.ScannerUpdatedTopic,
 				Handlers{
 					SaveScannerHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.ScannerSaveMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerSaveMessage) error {
 							assert.Equal(t, int64(25809030), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.SaveScanner, msg.Action)
 							assert.Equal(t, "0xdec088fea5feab7dc17789a92bffc10393a769de", msg.ScannerID)
@@ -162,7 +162,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_agent_registry_0_1_4.AgentUpdatedTopic,
 				Handlers{
 					SaveAgentHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.AgentSaveMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.AgentSaveMessage) error {
 							assert.Equal(t, int64(25730681), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.SaveAgent, msg.Action)
 							assert.Equal(t, "0xdc75bb779e1cbe73a21b8d3810867411f6d71eb64f79cec7e7d4fbcaa40de990", msg.AgentID)
@@ -179,7 +179,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_dispatch_0_1_4.LinkTopic,
 				Handlers{
 					DispatchHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.DispatchMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.DispatchMessage) error {
 							assert.Equal(t, int64(25730716), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.Link, msg.Action)
 							assert.Equal(t, "0xdc75bb779e1cbe73a21b8d3810867411f6d71eb64f79cec7e7d4fbcaa40de990", msg.AgentID)
@@ -197,7 +197,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_dispatch_0_1_4.LinkTopic,
 				Handlers{
 					DispatchHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.DispatchMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.DispatchMessage) error {
 							assert.Equal(t, int64(25772370), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.Unlink, msg.Action)
 							assert.Equal(t, "0x841f771742ce7d9904d061db29dcf31ef500979d73e1859b4b81c7c739499f2a", msg.AgentID)
@@ -215,7 +215,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_scanner_registry_0_1_3.StakeThresholdChangedTopic,
 				Handlers{
 					ScannerStakeThresholdHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error {
 							assert.Equal(t, int64(26465762), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ScannerStakeThreshold, msg.Action)
 							assert.Equal(t, "0", msg.Min)
@@ -233,7 +233,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_forta_staking_0_1_1.StakeDepositedTopic,
 				Handlers{
 					ScannerStakeHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.ScannerStakeMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerStakeMessage) error {
 							assert.Equal(t, int64(26498238), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ScannerStake, msg.Action)
 							assert.Equal(t, registry.ChangeTypeDeposit, msg.ChangeType)
@@ -252,7 +252,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_forta_staking_0_1_1.TransferSingleTopic,
 				Handlers{
 					TransferSharesHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.TransferSharesMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.TransferSharesMessage) error {
 							assert.Equal(t, int64(26498238), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.TransferShares, msg.Action)
 							assert.Equal(t, "0x9b0a8a8e6b2c23d572d7145f3da14438fed35374", msg.To)
@@ -269,7 +269,7 @@ func TestListener_Listen(t *testing.T) {
 				contract_scanner_node_version_0_1_0.ScannerNodeVersionUpdatedTopic,
 				Handlers{
 					ScannerNodeVersionHandlers: regmsg.Handlers(
-						func(logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error {
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerNodeVersionMessage) error {
 							assert.Equal(t, int64(31739343), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ScannerNodeVersionUpdated, msg.Action)
 							assert.Equal(t, "QmPU5yx6Puapj7o79zY4n1LkyhnZowLjoDaZv7TRhytYpt", msg.NewVersion)

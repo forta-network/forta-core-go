@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"reflect"
 
 	"github.com/forta-network/forta-core-go/domain"
@@ -48,14 +49,14 @@ type HandlerRegistry struct {
 }
 
 // Handle finds the right handler for the message and calls it.
-func (reg *HandlerRegistry) Handle(logger *log.Entry, msg regmsg.Interface) error {
+func (reg *HandlerRegistry) Handle(ctx context.Context, logger *log.Entry, msg regmsg.Interface) error {
 	h, ok := reg.all.Get(msgKey(msg))
 	if !ok {
 		logger.WithField("action", msg.ActionName()).Warn("no handlers found")
 		return nil
 	}
 	for _, f := range h {
-		ret := f.Call([]reflect.Value{reflect.ValueOf(logger), reflect.ValueOf(msg)})
+		ret := f.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(logger), reflect.ValueOf(msg)})
 		retErr := ret[0]
 		// return when any of the handlers return an error
 		if !retErr.IsNil() {
@@ -90,7 +91,8 @@ func NewHandlerRegistry(h Handlers) *HandlerRegistry {
 		for j := 0; j < field.Len(); j++ {
 			f := field.Index(j)
 			// for each arg type in func
-			for k := 0; k < f.Type().NumIn(); k++ {
+			// starts from 1 because first arg is context.Context
+			for k := 1; k < f.Type().NumIn(); k++ {
 				in := f.Type().In(k)
 				inVal := reflect.New(in.Elem()).Interface()
 				// register handler if one of the args is a message

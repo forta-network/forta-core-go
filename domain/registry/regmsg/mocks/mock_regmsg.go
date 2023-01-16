@@ -5,6 +5,7 @@
 package mock_regmsg
 
 import (
+	context "context"
 	reflect "reflect"
 
 	regmsg "github.com/forta-network/forta-core-go/domain/registry/regmsg"
@@ -101,15 +102,15 @@ func (m *MockHandlerInterface[I]) EXPECT() *MockHandlerInterfaceMockRecorder[I] 
 }
 
 // Handle mocks base method.
-func (m *MockHandlerInterface[I]) Handle(logger *logrus.Entry, msg I) error {
+func (m *MockHandlerInterface[I]) Handle(ctx context.Context, logger *logrus.Entry, msg I) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Handle", logger, msg)
+	ret := m.ctrl.Call(m, "Handle", ctx, logger, msg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Handle indicates an expected call of Handle.
-func (mr *MockHandlerInterfaceMockRecorder[I]) Handle(logger, msg interface{}) *gomock.Call {
+func (mr *MockHandlerInterfaceMockRecorder[I]) Handle(ctx, logger, msg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Handle", reflect.TypeOf((*MockHandlerInterface[I])(nil).Handle), logger, msg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Handle", reflect.TypeOf((*MockHandlerInterface[I])(nil).Handle), ctx, logger, msg)
 }
