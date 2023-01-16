@@ -42,7 +42,7 @@ type listener struct {
 
 // MessagePublisher sends messages to a remote consumer.
 type MessagePublisher interface {
-	Publish(logger *log.Entry, msg regmsg.Interface) error
+	Publish(ctx context.Context, logger *log.Entry, msg regmsg.Interface) error
 }
 
 // MessageSubscriber receives messages from a remote producer.
@@ -92,7 +92,7 @@ func (l *listener) handleScannerRegistryEvent(contracts *Contracts, le types.Log
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerSaveMessage(su, enabled, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerSaveMessage(su, enabled, blk))
 
 	case contract_scanner_registry_0_1_4.ScannerEnabledTopic: // same with prev version
 		se, err := contracts.ScannerRegFil.ParseScannerEnabled(le)
@@ -107,14 +107,14 @@ func (l *listener) handleScannerRegistryEvent(contracts *Contracts, le types.Log
 		}
 		se.Enabled = enabled && se.Enabled
 
-		return l.handler(logger, registry.NewScannerMessage(se, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerMessage(se, blk))
 
 	case contract_scanner_registry_0_1_4.StakeThresholdChangedTopic: // same with prev version
 		evt, err := contracts.ScannerRegFil.ParseStakeThresholdChanged(le)
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
 	}
 	return nil
 }
@@ -131,14 +131,14 @@ func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerSaveMessageFromPool(su, enabled, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerSaveMessageFromPool(su, enabled, blk))
 
 	case contract_scanner_pool_registry_0_1_0.ManagedStakeThresholdChangedTopic:
 		evt, err := contracts.ScannerPoolRegFil.ParseManagedStakeThresholdChanged(le)
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerManagedStakeThresholdMessage(evt, le, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerManagedStakeThresholdMessage(evt, le, blk))
 
 	case contract_scanner_pool_registry_0_1_0.TransferTopic:
 		evt, err := contracts.ScannerPoolRegFil.ParseTransfer(le)
@@ -149,7 +149,7 @@ func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types
 		if evt.From.Hex() == utils.ZeroAddress {
 			return nil
 		}
-		return l.handler(logger, registry.NewScannerPoolMessageFromTransfer(evt, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromTransfer(evt, blk))
 
 	case contract_scanner_pool_registry_0_1_0.ScannerPoolRegisteredTopic:
 		evt, err := contracts.ScannerPoolRegFil.ParseScannerPoolRegistered(le)
@@ -160,14 +160,14 @@ func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types
 		if err != nil {
 			return fmt.Errorf("failed to get scanner pool owner: %v", err)
 		}
-		return l.handler(logger, registry.NewScannerPoolMessageFromRegistration(evt, owner, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromRegistration(evt, owner, blk))
 
 	case contract_scanner_pool_registry_0_1_0.EnabledScannersChangedTopic:
 		evt, err := contracts.ScannerPoolRegFil.ParseEnabledScannersChanged(le)
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerPoolMessageFromEnablement(evt, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromEnablement(evt, blk))
 	}
 	return nil
 }
@@ -179,7 +179,7 @@ func (l *listener) handleScannerVersionEvent(contracts *Contracts, le types.Log,
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerNodeVersionUpdated(su, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerNodeVersionUpdated(su, blk))
 	}
 	return nil
 }
@@ -195,21 +195,21 @@ func (l *listener) handleAgentRegistryEvent(contracts *Contracts, le types.Log, 
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewAgentSaveMessage(au, agt.Enabled, blk))
+		return l.handler(l.ctx, logger, registry.NewAgentSaveMessage(au, agt.Enabled, blk))
 
 	case contract_agent_registry_0_1_6.AgentEnabledTopic: // same with prev version
 		ae, err := contracts.AgentRegFil.ParseAgentEnabled(le)
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewAgentMessage(ae, blk))
+		return l.handler(l.ctx, logger, registry.NewAgentMessage(ae, blk))
 
 	case contract_agent_registry_0_1_6.StakeThresholdChangedTopic: // same with prev version
 		stc, err := contracts.AgentRegFil.ParseStakeThresholdChanged(le)
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewAgentStakeThresholdMessage(stc, le, blk))
+		return l.handler(l.ctx, logger, registry.NewAgentStakeThresholdMessage(stc, le, blk))
 	}
 	return nil
 }
@@ -261,7 +261,7 @@ func (l *listener) handleFortaStakingEvent(contracts *Contracts, le types.Log, b
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, m)
+		return l.handler(l.ctx, logger, m)
 
 	case contract_forta_staking_0_1_2.TransferBatchTopic: // same with prev version
 		evt, err := contracts.FortaStakingFil.ParseTransferBatch(le)
@@ -273,7 +273,7 @@ func (l *listener) handleFortaStakingEvent(contracts *Contracts, le types.Log, b
 			return err
 		}
 		for _, m := range ms {
-			if err := l.handler(logger, m); err != nil {
+			if err := l.handler(l.ctx, logger, m); err != nil {
 				return err
 			}
 		}
@@ -288,15 +288,15 @@ func (l *listener) handleFortaStakingEvent(contracts *Contracts, le types.Log, b
 	switch subjectType {
 	case SubjectTypeScanner:
 		scannerID := utils.ScannerIDBigIntToHex(subjectID)
-		return l.handler(logger, registry.NewScannerStakeMessage(le, changeType, acct, scannerID, value, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerStakeMessage(le, changeType, acct, scannerID, value, blk))
 
 	case SubjectTypeAgent:
 		agentID := utils.AgentBigIntToHex(subjectID)
-		return l.handler(logger, registry.NewAgentStakeMessage(le, changeType, acct, agentID, value, blk))
+		return l.handler(l.ctx, logger, registry.NewAgentStakeMessage(le, changeType, acct, agentID, value, blk))
 
 	case SubjectTypeScannerPool:
 		poolID := subjectID.String()
-		return l.handler(logger, registry.NewScannerPoolStakeMessage(le, changeType, acct, poolID, value, blk))
+		return l.handler(l.ctx, logger, registry.NewScannerPoolStakeMessage(le, changeType, acct, poolID, value, blk))
 
 	default:
 		logger.WithField("subjectID", subjectType).Warn("unhandled subject ID, ignoring")
@@ -311,7 +311,7 @@ func (l *listener) handleStakeAllocatorEvent(contracts *Contracts, le types.Log,
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewScannerPoolAllocationMessage(le, blk, evt))
+		return l.handler(l.ctx, logger, registry.NewScannerPoolAllocationMessage(le, blk, evt))
 	}
 	return nil
 }
@@ -323,14 +323,14 @@ func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewDispatchMessage(link, blk))
+		return l.handler(l.ctx, logger, registry.NewDispatchMessage(link, blk))
 
 	case contract_dispatch_0_1_5.AlreadyLinkedTopic: // same with prev version
 		link, err := contracts.DispatchFil.ParseAlreadyLinked(le)
 		if err != nil {
 			return err
 		}
-		return l.handler(logger, registry.NewAlreadyLinkedDispatchMessage(link, blk))
+		return l.handler(l.ctx, logger, registry.NewAlreadyLinkedDispatchMessage(link, blk))
 	}
 	return nil
 }
@@ -353,7 +353,7 @@ func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *d
 		return err
 	}
 
-	return l.handler(logger, registry.NewUpgradeMessage(upgraded, le, blk))
+	return l.handler(l.ctx, logger, registry.NewUpgradeMessage(upgraded, le, blk))
 }
 
 func (l *listener) handleLog(blk *domain.Block, le types.Log) error {

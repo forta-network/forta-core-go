@@ -1,6 +1,7 @@
 package regmsg
 
 import (
+	"context"
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
@@ -71,7 +72,7 @@ type Interface interface {
 }
 
 // HandlerFunc is a handler func type.
-type HandlerFunc[I Interface] func(logger *log.Entry, msg I) error
+type HandlerFunc[I Interface] func(ctx context.Context, logger *log.Entry, msg I) error
 
 // HandlerFuncs is an alias for the array of handler funcs.
 type HandlerFuncs[I Interface] []HandlerFunc[I]
@@ -83,5 +84,5 @@ func Handlers[I Interface](args ...HandlerFunc[I]) HandlerFuncs[I] {
 
 // HandlerInterface is an interface definition alternative to the handler func.
 type HandlerInterface[I Interface] interface {
-	Handle(logger *log.Entry, msg I) error
+	Handle(ctx context.Context, logger *log.Entry, msg I) error
 }

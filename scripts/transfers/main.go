@@ -19,7 +19,7 @@ func main() {
 		JsonRpcURL: os.Getenv("POLYGON_JSON_RPC"),
 		Handlers: registry.Handlers{
 			TransferSharesHandlers: regmsg.Handlers(
-				func(logger *log.Entry, msg *rd.TransferSharesMessage) error {
+				func(ctx context.Context, logger *log.Entry, msg *rd.TransferSharesMessage) error {
 					log.WithFields(log.Fields{
 						"to":     msg.To,
 						"from":   msg.From,

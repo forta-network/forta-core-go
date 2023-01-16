@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"testing"
 
 	"github.com/forta-network/forta-core-go/domain/registry"
@@ -13,7 +14,7 @@ type testHandlerImpl1 struct {
 	val string
 }
 
-func (impl *testHandlerImpl1) HandleMessage(logger *logrus.Entry, msg *registry.AgentSaveMessage) error {
+func (impl *testHandlerImpl1) HandleMessage(ctx context.Context, logger *logrus.Entry, msg *registry.AgentSaveMessage) error {
 	impl.val = msg.AgentID
 	return nil
 }
@@ -22,13 +23,15 @@ type testHandlerImpl2 struct {
 	val string
 }
 
-func (impl *testHandlerImpl2) HandleMessage(logger *logrus.Entry, msg *registry.DispatchMessage) error {
+func (impl *testHandlerImpl2) HandleMessage(ctx context.Context, logger *logrus.Entry, msg *registry.DispatchMessage) error {
 	impl.val = msg.AgentID
 	return nil
 }
 
 func TestHandlerRegistry(t *testing.T) {
 	r := require.New(t)
+
+	ctx := context.Background()
 
 	testID1 := "0001"
 	testID2 := "0002"
@@ -42,12 +45,12 @@ func TestHandlerRegistry(t *testing.T) {
 		DispatchHandlers:  regmsg.Handlers(dispatch1.HandleMessage),
 	})
 
-	err := handlerReg.Handle(nil, &registry.AgentSaveMessage{
+	err := handlerReg.Handle(ctx, nil, &registry.AgentSaveMessage{
 		AgentMessage: registry.AgentMessage{AgentID: testID1},
 	})
 	r.NoError(err)
 
-	err = handlerReg.Handle(nil, &registry.DispatchMessage{
+	err = handlerReg.Handle(ctx, nil, &registry.DispatchMessage{
 		AgentID: testID2,
 	})
 	r.NoError(err)
