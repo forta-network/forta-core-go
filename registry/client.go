@@ -16,6 +16,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_stake_allocator"
+	"github.com/forta-network/forta-core-go/utils/ethutils"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/domain/registry"
@@ -513,12 +514,6 @@ func (c *client) ForEachScanner(handler func(s *Scanner) error) error {
 		})
 }
 
-type eventIterator interface {
-	Next() bool
-	Error() error
-	Close() error
-}
-
 func (c *client) ForEachScannerSinceBlock(
 	block uint64, handler func(event *contract_scanner_registry.ScannerRegistryScannerUpdated, s *Scanner) error,
 ) error {
@@ -538,35 +533,29 @@ func (c *client) ForEachScannerSinceBlock(
 		return err
 	}
 
-	it, ok := utils.GetImplementation[eventIterator](iterators)
-	if !ok {
-		return errors.New("failed to get iterator")
+	it, err := ethutils.NewEventIterator[contract_scanner_registry.ScannerRegistryScannerUpdated](iterators)
+	if err != nil {
+		return err
 	}
 
 	for it.Next() {
-		// find the event from any of the iterator implementations
-		var event *contract_scanner_registry.ScannerRegistryScannerUpdated
-		if iterators.Scannerregistry013Result != nil && iterators.Scannerregistry013Result.Event != nil {
-			event = (*contract_scanner_registry.ScannerRegistryScannerUpdated)(iterators.Scannerregistry013Result.Event)
-		}
-		if iterators.Scannerregistry014Result != nil && iterators.Scannerregistry014Result.Event != nil {
-			event = (*contract_scanner_registry.ScannerRegistryScannerUpdated)(iterators.Scannerregistry014Result.Event)
+		event, ok := it.Value()
+		if !ok {
+			break
 		}
 
-		if event != nil {
-			scn, err := contracts.ScannerReg.GetScannerState(opts, event.ScannerId)
-			if err != nil {
-				return err
-			}
-			if err := handler(event, &Scanner{
-				ScannerID: utils.ScannerIDBigIntToHex(event.ScannerId),
-				ChainID:   scn.ChainId.Int64(),
-				Enabled:   scn.Enabled,
-				Manifest:  scn.Metadata,
-				Owner:     scn.Owner.Hex(),
-			}); err != nil {
-				return err
-			}
+		scn, err := contracts.ScannerReg.GetScannerState(opts, event.ScannerId)
+		if err != nil {
+			return err
+		}
+		if err := handler(event, &Scanner{
+			ScannerID: utils.ScannerIDBigIntToHex(event.ScannerId),
+			ChainID:   scn.ChainId.Int64(),
+			Enabled:   scn.Enabled,
+			Manifest:  scn.Metadata,
+			Owner:     scn.Owner.Hex(),
+		}); err != nil {
+			return err
 		}
 	}
 
@@ -722,35 +711,29 @@ func (c *client) ForEachAgentSinceBlock(
 		return err
 	}
 
-	it, ok := utils.GetImplementation[eventIterator](iterators)
-	if !ok {
-		return errors.New("failed to get iterator")
-	}
-
-	// find the event from any of the iterator implementations
-	var event *contract_agent_registry.AgentRegistryAgentUpdated
-	if iterators.Agentregistry014Result != nil && iterators.Agentregistry014Result.Event != nil {
-		event = (*contract_agent_registry.AgentRegistryAgentUpdated)(iterators.Agentregistry014Result.Event)
-	}
-	if iterators.Agentregistry016Result != nil && iterators.Agentregistry016Result.Event != nil {
-		event = (*contract_agent_registry.AgentRegistryAgentUpdated)(iterators.Agentregistry016Result.Event)
+	it, err := ethutils.NewEventIterator[contract_agent_registry.AgentRegistryAgentUpdated](iterators)
+	if err != nil {
+		return err
 	}
 
 	for it.Next() {
-		if event != nil {
-			agt, err := contracts.AgentReg.GetAgentState(opts, event.AgentId)
-			if err != nil {
-				return err
-			}
-			if err := handler(event, &Agent{
-				AgentID:  utils.AgentBigIntToHex(event.AgentId),
-				ChainIDs: utils.IntArray(agt.ChainIds),
-				Enabled:  agt.Enabled,
-				Manifest: agt.Metadata,
-				Owner:    agt.Owner.Hex(),
-			}); err != nil {
-				return err
-			}
+		event, ok := it.Value()
+		if !ok {
+			break
+		}
+
+		agt, err := contracts.AgentReg.GetAgentState(opts, event.AgentId)
+		if err != nil {
+			return err
+		}
+		if err := handler(event, &Agent{
+			AgentID:  utils.AgentBigIntToHex(event.AgentId),
+			ChainIDs: utils.IntArray(agt.ChainIds),
+			Enabled:  agt.Enabled,
+			Manifest: agt.Metadata,
+			Owner:    agt.Owner.Hex(),
+		}); err != nil {
+			return err
 		}
 	}
 
