@@ -375,19 +375,19 @@ func (mr *MockClientMockRecorder) GetStakingThreshold(scannerID interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStakingThreshold", reflect.TypeOf((*MockClient)(nil).GetStakingThreshold), scannerID)
 }
 
-// IndexOfAssignedScannerByChain mocks base method.
-func (m *MockClient) IndexOfAssignedScannerByChain(agentID, scannerID string, chainID *big.Int) (*big.Int, error) {
+// IndexOfAssignedScanner mocks base method.
+func (m *MockClient) IndexOfAssignedScanner(agentID, scannerID string) (*big.Int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IndexOfAssignedScannerByChain", agentID, scannerID, chainID)
+	ret := m.ctrl.Call(m, "IndexOfAssignedScanner", agentID, scannerID)
 	ret0, _ := ret[0].(*big.Int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// IndexOfAssignedScannerByChain indicates an expected call of IndexOfAssignedScannerByChain.
-func (mr *MockClientMockRecorder) IndexOfAssignedScannerByChain(agentID, scannerID, chainID interface{}) *gomock.Call {
+// IndexOfAssignedScanner indicates an expected call of IndexOfAssignedScanner.
+func (mr *MockClientMockRecorder) IndexOfAssignedScanner(agentID, scannerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexOfAssignedScannerByChain", reflect.TypeOf((*MockClient)(nil).IndexOfAssignedScannerByChain), agentID, scannerID, chainID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexOfAssignedScanner", reflect.TypeOf((*MockClient)(nil).IndexOfAssignedScanner), agentID, scannerID)
 }
 
 // IsAssigned mocks base method.
@@ -420,21 +420,6 @@ func (mr *MockClientMockRecorder) IsEnabledScanner(scannerID interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEnabledScanner", reflect.TypeOf((*MockClient)(nil).IsEnabledScanner), scannerID)
 }
 
-// IsOperationalScanner mocks base method.
-func (m *MockClient) IsOperationalScanner(scannerID string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsOperationalScanner", scannerID)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsOperationalScanner indicates an expected call of IsOperationalScanner.
-func (mr *MockClientMockRecorder) IsOperationalScanner(scannerID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsOperationalScanner", reflect.TypeOf((*MockClient)(nil).IsOperationalScanner), scannerID)
-}
-
 // NumScannersFor mocks base method.
 func (m *MockClient) NumScannersFor(agentID string) (*big.Int, error) {
 	m.ctrl.T.Helper()
@@ -448,6 +433,21 @@ func (m *MockClient) NumScannersFor(agentID string) (*big.Int, error) {
 func (mr *MockClientMockRecorder) NumScannersFor(agentID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NumScannersFor", reflect.TypeOf((*MockClient)(nil).NumScannersFor), agentID)
+}
+
+// IsOperationalScanner mocks base method.
+func (m *MockClient) IsOperationalScanner(scannerID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsOperationalScanner", scannerID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsOperationalScanner indicates an expected call of IsOperationalScanner.
+func (mr *MockClientMockRecorder) IsOperationalScanner(scannerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsOperationalScanner", reflect.TypeOf((*MockClient)(nil).IsOperationalScanner), scannerID)
 }
 
 // PegBlock mocks base method.
@@ -545,4 +545,69 @@ func (m *MockClient) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
 func (mr *MockClientMockRecorder) WillNewScannerShutdownPool(poolID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WillNewScannerShutdownPool", reflect.TypeOf((*MockClient)(nil).WillNewScannerShutdownPool), poolID)
+}
+
+// MockeventIterator is a mock of eventIterator interface.
+type MockeventIterator struct {
+	ctrl     *gomock.Controller
+	recorder *MockeventIteratorMockRecorder
+}
+
+// MockeventIteratorMockRecorder is the mock recorder for MockeventIterator.
+type MockeventIteratorMockRecorder struct {
+	mock *MockeventIterator
+}
+
+// NewMockeventIterator creates a new mock instance.
+func NewMockeventIterator(ctrl *gomock.Controller) *MockeventIterator {
+	mock := &MockeventIterator{ctrl: ctrl}
+	mock.recorder = &MockeventIteratorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockeventIterator) EXPECT() *MockeventIteratorMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockeventIterator) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockeventIteratorMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockeventIterator)(nil).Close))
+}
+
+// Error mocks base method.
+func (m *MockeventIterator) Error() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Error")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Error indicates an expected call of Error.
+func (mr *MockeventIteratorMockRecorder) Error() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockeventIterator)(nil).Error))
+}
+
+// Next mocks base method.
+func (m *MockeventIterator) Next() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Next")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// Next indicates an expected call of Next.
+func (mr *MockeventIteratorMockRecorder) Next() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Next", reflect.TypeOf((*MockeventIterator)(nil).Next))
 }

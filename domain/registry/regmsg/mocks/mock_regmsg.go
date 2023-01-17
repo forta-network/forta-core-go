@@ -79,30 +79,30 @@ func (mr *MockInterfaceMockRecorder) LogFields() *gomock.Call {
 }
 
 // MockHandlerInterface is a mock of HandlerInterface interface.
-type MockHandlerInterface struct {
+type MockHandlerInterface[I regmsg.Interface] struct {
 	ctrl     *gomock.Controller
-	recorder *MockHandlerInterfaceMockRecorder
+	recorder *MockHandlerInterfaceMockRecorder[I]
 }
 
 // MockHandlerInterfaceMockRecorder is the mock recorder for MockHandlerInterface.
-type MockHandlerInterfaceMockRecorder struct {
-	mock *MockHandlerInterface
+type MockHandlerInterfaceMockRecorder[I regmsg.Interface] struct {
+	mock *MockHandlerInterface[I]
 }
 
 // NewMockHandlerInterface creates a new mock instance.
-func NewMockHandlerInterface(ctrl *gomock.Controller) *MockHandlerInterface {
-	mock := &MockHandlerInterface{ctrl: ctrl}
-	mock.recorder = &MockHandlerInterfaceMockRecorder{mock}
+func NewMockHandlerInterface[I regmsg.Interface](ctrl *gomock.Controller) *MockHandlerInterface[I] {
+	mock := &MockHandlerInterface[I]{ctrl: ctrl}
+	mock.recorder = &MockHandlerInterfaceMockRecorder[I]{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockHandlerInterface) EXPECT() *MockHandlerInterfaceMockRecorder {
+func (m *MockHandlerInterface[I]) EXPECT() *MockHandlerInterfaceMockRecorder[I] {
 	return m.recorder
 }
 
 // Handle mocks base method.
-func (m *MockHandlerInterface) Handle(ctx context.Context, logger *logrus.Entry, msg regmsg.I) error {
+func (m *MockHandlerInterface[I]) Handle(ctx context.Context, logger *logrus.Entry, msg I) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Handle", ctx, logger, msg)
 	ret0, _ := ret[0].(error)
@@ -110,7 +110,7 @@ func (m *MockHandlerInterface) Handle(ctx context.Context, logger *logrus.Entry,
 }
 
 // Handle indicates an expected call of Handle.
-func (mr *MockHandlerInterfaceMockRecorder) Handle(ctx, logger, msg interface{}) *gomock.Call {
+func (mr *MockHandlerInterfaceMockRecorder[I]) Handle(ctx, logger, msg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Handle", reflect.TypeOf((*MockHandlerInterface)(nil).Handle), ctx, logger, msg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Handle", reflect.TypeOf((*MockHandlerInterface[I])(nil).Handle), ctx, logger, msg)
 }
