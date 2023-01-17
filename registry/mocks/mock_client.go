@@ -226,18 +226,18 @@ func (mr *MockClientMockRecorder) GenerateScannerRegistrationSignature(reg inter
 }
 
 // GetActivePoolStake mocks base method.
-func (m *MockClient) GetActivePoolStake(poolID *big.Int) (*big.Int, error) {
+func (m *MockClient) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetActivePoolStake", poolID)
+	ret := m.ctrl.Call(m, "GetActivePoolStake", blockNumber, poolID)
 	ret0, _ := ret[0].(*big.Int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetActivePoolStake indicates an expected call of GetActivePoolStake.
-func (mr *MockClientMockRecorder) GetActivePoolStake(poolID interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) GetActivePoolStake(blockNumber, poolID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActivePoolStake", reflect.TypeOf((*MockClient)(nil).GetActivePoolStake), poolID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActivePoolStake", reflect.TypeOf((*MockClient)(nil).GetActivePoolStake), blockNumber, poolID)
 }
 
 // GetActiveScannerStake mocks base method.
@@ -488,18 +488,18 @@ func (mr *MockClientMockRecorder) ResetOpts() *gomock.Call {
 }
 
 // TotalScannersRegistered mocks base method.
-func (m *MockClient) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
+func (m *MockClient) TotalScannersRegistered(blockNumber, poolID *big.Int) (*big.Int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TotalScannersRegistered", poolID)
+	ret := m.ctrl.Call(m, "TotalScannersRegistered", blockNumber, poolID)
 	ret0, _ := ret[0].(*big.Int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TotalScannersRegistered indicates an expected call of TotalScannersRegistered.
-func (mr *MockClientMockRecorder) TotalScannersRegistered(poolID interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) TotalScannersRegistered(blockNumber, poolID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalScannersRegistered", reflect.TypeOf((*MockClient)(nil).TotalScannersRegistered), poolID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalScannersRegistered", reflect.TypeOf((*MockClient)(nil).TotalScannersRegistered), blockNumber, poolID)
 }
 
 // WillNewScannerShutdownPool mocks base method.
