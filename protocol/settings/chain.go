@@ -48,7 +48,7 @@ var allChainSettings = []ChainSettings{
 		InspectionInterval:  5000,
 
 		DefaultOffset:  0,
-		SafeOffset:     250,
+		SafeOffset:     500,
 		BlockThreshold: 10000,
 	},
 	{
