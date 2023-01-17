@@ -15,11 +15,12 @@ type AgentManifest struct {
 	Documentation  *string                     `json:"documentation"`
 	ChainIDs       []int64                     `json:"chainIds"`
 	Redundancy     *int                        `json:"redundancy"`
-	ChainSettings  map[uint]AgentChainSettings `json:"chainSettings"`
+	ChainSettings  []AgentChainSettings `json:"chainSettings"`
 }
 
 // AgentChainSettings is the per-chain configuration of a bot.
 type AgentChainSettings struct {
+	ChainID uint `json:"chainId"`
 	Shards uint `json:"shards"`
 	Target uint `json:"target"`
 }

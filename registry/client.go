@@ -811,7 +811,7 @@ func (c *client) IndexOfAssignedScannerByChain(agentID, scannerID string, chainI
 		idxByChain++
 	}
 
-	return nil, nil
+	return nil, fmt.Errorf("can't find shard index for %s", scannerID)
 }
 
 func (c *client) NumScannersFor(agentID string) (*big.Int, error) {
