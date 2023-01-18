@@ -311,7 +311,11 @@ func (l *listener) handleStakeAllocatorEvent(contracts *Contracts, le types.Log,
 		if err != nil {
 			return err
 		}
-		return l.handler(l.ctx, logger, registry.NewScannerPoolAllocationMessage(le, blk, evt))
+		stakePerManaged, err := l.client.GetAllocatedStakePerManaged(big.NewInt(0).SetUint64(evt.Raw.BlockNumber), evt.Subject)
+		if err != nil {
+			return fmt.Errorf("failed to get stake per managed: %v", err)
+		}
+		return l.handler(l.ctx, logger, registry.NewScannerPoolAllocationMessage(le, blk, evt, stakePerManaged))
 	}
 	return nil
 }
