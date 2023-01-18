@@ -270,6 +270,21 @@ func (mr *MockClientMockRecorder) GetAgent(agentID interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAgent", reflect.TypeOf((*MockClient)(nil).GetAgent), agentID)
 }
 
+// GetAllocatedStakePerManaged mocks base method.
+func (m *MockClient) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllocatedStakePerManaged", blockNumber, poolID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllocatedStakePerManaged indicates an expected call of GetAllocatedStakePerManaged.
+func (mr *MockClientMockRecorder) GetAllocatedStakePerManaged(blockNumber, poolID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllocatedStakePerManaged", reflect.TypeOf((*MockClient)(nil).GetAllocatedStakePerManaged), blockNumber, poolID)
+}
+
 // GetAssignmentHash mocks base method.
 func (m *MockClient) GetAssignmentHash(scannerID string) (*registry.AssignmentHash, error) {
 	m.ctrl.T.Helper()
@@ -488,18 +503,18 @@ func (mr *MockClientMockRecorder) ResetOpts() *gomock.Call {
 }
 
 // TotalScannersRegistered mocks base method.
-func (m *MockClient) TotalScannersRegistered(blockNumber, poolID *big.Int) (*big.Int, error) {
+func (m *MockClient) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TotalScannersRegistered", blockNumber, poolID)
+	ret := m.ctrl.Call(m, "TotalScannersRegistered", poolID)
 	ret0, _ := ret[0].(*big.Int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // TotalScannersRegistered indicates an expected call of TotalScannersRegistered.
-func (mr *MockClientMockRecorder) TotalScannersRegistered(blockNumber, poolID interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) TotalScannersRegistered(poolID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalScannersRegistered", reflect.TypeOf((*MockClient)(nil).TotalScannersRegistered), blockNumber, poolID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalScannersRegistered", reflect.TypeOf((*MockClient)(nil).TotalScannersRegistered), poolID)
 }
 
 // WillNewScannerShutdownPool mocks base method.
