@@ -502,21 +502,6 @@ func (mr *MockClientMockRecorder) ResetOpts() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOpts", reflect.TypeOf((*MockClient)(nil).ResetOpts))
 }
 
-// TotalScannersRegistered mocks base method.
-func (m *MockClient) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TotalScannersRegistered", poolID)
-	ret0, _ := ret[0].(*big.Int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TotalScannersRegistered indicates an expected call of TotalScannersRegistered.
-func (mr *MockClientMockRecorder) TotalScannersRegistered(poolID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TotalScannersRegistered", reflect.TypeOf((*MockClient)(nil).TotalScannersRegistered), poolID)
-}
-
 // WillNewScannerShutdownPool mocks base method.
 func (m *MockClient) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
 	m.ctrl.T.Helper()

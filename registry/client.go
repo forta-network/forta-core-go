@@ -95,9 +95,6 @@ type Client interface {
 	// GetPoolScanner returns a scanner
 	GetPoolScanner(scannerID string) (*Scanner, error)
 
-	// TotalScannersRegistered returns the count of scanners registered in a pool
-	TotalScannersRegistered(poolID *big.Int) (*big.Int, error)
-
 	// RegisterScannerOld executes the pre-delegated-staking registration.
 	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
@@ -1066,6 +1063,9 @@ func (c *client) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, err
 
 func (c *client) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error) {
 	contracts := c.Contracts()
+	if contracts.StakeAllocator == nil {
+		return nil, ErrContractNotReady
+	}
 
 	var opts bind.CallOpts
 	if c.opts != nil {
@@ -1074,13 +1074,4 @@ func (c *client) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big
 	opts.BlockNumber = blockNumber
 
 	return contracts.StakeAllocator.AllocatedStakePerManaged(&opts, SubjectTypeScannerPool, poolID)
-}
-
-func (c *client) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
-	contracts := c.Contracts()
-	if contracts.ScannerPoolReg == nil {
-		return nil, ErrContractNotReady
-	}
-
-	return contracts.ScannerPoolReg.TotalScannersRegistered(c.opts, poolID)
 }
