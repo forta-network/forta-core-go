@@ -791,10 +791,11 @@ func (c *client) IndexOfAssignedScannerByChain(agentID, scannerID string, chainI
 		return nil, err
 	}
 
+	contracts := c.Contracts()
 	var idxByChain int64
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		scn, err := c.Contracts().Dispatch.ScannerRefAt(opts, aID, idx)
+		scn, err := contracts.Dispatch.ScannerRefAt(opts, aID, idx)
 		if err != nil {
 			return nil, err
 		}
