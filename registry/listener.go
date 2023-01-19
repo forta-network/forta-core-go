@@ -627,15 +627,20 @@ func ListenToUpgrades(ctx context.Context, client Client, blockFeed feeds.BlockF
 	return blockFeed.Subscribe(func(evt *domain.BlockEvent) error {
 		regContracts := client.Contracts().Addresses
 		addrs := getAllContractAddrs(regContracts)
-		for _, log := range evt.Logs {
-			ethLog := log.ToTypesLog()
+		for _, evtLog := range evt.Logs {
+			ethLog := evtLog.ToTypesLog()
 			if !isAddrIn(addrs, ethLog.Address) {
 				continue
 			}
 			if getTopic(ethLog) != UpgradedTopic {
 				continue
 			}
-			return client.RefreshContracts()
+			if err := client.RefreshContracts(); err != nil {
+				log.WithError(err).Warn("failed to refresh contracts")
+			}
+			// we were able to match the topic and the address and attempted to handle
+			// nothing else left to do for this block
+			break
 		}
 		return nil
 	})
