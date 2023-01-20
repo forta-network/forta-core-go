@@ -242,6 +242,19 @@ func (l *listener) handleFortaStakingEvent(contracts *Contracts, le types.Log, b
 		subjectID = evt.Subject
 		changeType = registry.ChangeTypeWithdrawal
 
+	case contract_forta_staking_0_1_2.FrozeTopic:
+		evt, err := contracts.FortaStakingFil.ParseFroze(le)
+		if err != nil {
+			return err
+		}
+		subjectType = evt.SubjectType
+		subjectID = evt.Subject
+		if evt.IsFrozen {
+			changeType = registry.ChangeTypeFroze
+		} else {
+			changeType = registry.ChangeTypeUnfroze
+		}
+
 	case contract_forta_staking_0_1_2.SlashedTopic: // same with prev version
 		evt, err := contracts.FortaStakingFil.ParseSlashed(le)
 		if err != nil {

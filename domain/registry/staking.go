@@ -28,6 +28,8 @@ const TransferShares = "TransferShares"
 
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
+const ChangeTypeFroze = "froze"
+const ChangeTypeUnfroze = "unfroze"
 const ChangeTypeSlash = "slash"
 
 type ThresholdMessage struct {
