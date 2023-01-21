@@ -390,6 +390,21 @@ func (mr *MockClientMockRecorder) GetStakingThreshold(scannerID interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStakingThreshold", reflect.TypeOf((*MockClient)(nil).GetStakingThreshold), scannerID)
 }
 
+// IndexOfAssignedScannerByChain mocks base method.
+func (m *MockClient) IndexOfAssignedScannerByChain(agentID, scannerID string, chainID *big.Int) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IndexOfAssignedScannerByChain", agentID, scannerID, chainID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IndexOfAssignedScannerByChain indicates an expected call of IndexOfAssignedScannerByChain.
+func (mr *MockClientMockRecorder) IndexOfAssignedScannerByChain(agentID, scannerID, chainID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexOfAssignedScannerByChain", reflect.TypeOf((*MockClient)(nil).IndexOfAssignedScannerByChain), agentID, scannerID, chainID)
+}
+
 // IsAssigned mocks base method.
 func (m *MockClient) IsAssigned(scannerID, agentID string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -433,6 +448,21 @@ func (m *MockClient) IsOperationalScanner(scannerID string) (bool, error) {
 func (mr *MockClientMockRecorder) IsOperationalScanner(scannerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsOperationalScanner", reflect.TypeOf((*MockClient)(nil).IsOperationalScanner), scannerID)
+}
+
+// NumScannersFor mocks base method.
+func (m *MockClient) NumScannersFor(agentID string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NumScannersFor", agentID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NumScannersFor indicates an expected call of NumScannersFor.
+func (mr *MockClientMockRecorder) NumScannersFor(agentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NumScannersFor", reflect.TypeOf((*MockClient)(nil).NumScannersFor), agentID)
 }
 
 // PegBlock mocks base method.
