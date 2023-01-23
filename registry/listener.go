@@ -352,9 +352,20 @@ func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *
 	return nil
 }
 
+func hasUpgradeTopic(le types.Log) bool {
+	switch getTopic(le) {
+	case UpgradedTopic,
+		contract_forta_staking_0_1_2.StakeHelpersConfiguredTopic,
+		contract_scanner_registry_0_1_4.ConfiguredMigrationTopic:
+		return true
+
+	default:
+		return false
+	}
+}
+
 func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
-	// use any contract's upgraded topic to check - they are all the same
-	if getTopic(le) != UpgradedTopic {
+	if !hasUpgradeTopic(le) {
 		return nil
 	}
 
@@ -645,7 +656,7 @@ func ListenToUpgrades(ctx context.Context, client Client, blockFeed feeds.BlockF
 			if !isAddrIn(addrs, ethLog.Address) {
 				continue
 			}
-			if getTopic(ethLog) != UpgradedTopic {
+			if !hasUpgradeTopic(ethLog) {
 				continue
 			}
 			if err := client.RefreshContracts(); err != nil {
