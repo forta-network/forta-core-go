@@ -190,6 +190,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 					CreatedBefore: uint(createdBefore),
 					AlertIds:      subscription.AlertIds,
 					AlertId:       subscription.AlertId,
+					ChainId:       uint(subscription.ChainId),
 				},
 			)
 			if cErr != nil && errors.Is(cErr, context.DeadlineExceeded) {
