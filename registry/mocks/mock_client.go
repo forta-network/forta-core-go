@@ -532,6 +532,18 @@ func (mr *MockClientMockRecorder) ResetOpts() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetOpts", reflect.TypeOf((*MockClient)(nil).ResetOpts))
 }
 
+// SetRegistryChainID mocks base method.
+func (m *MockClient) SetRegistryChainID(chainID uint64) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetRegistryChainID", chainID)
+}
+
+// SetRegistryChainID indicates an expected call of SetRegistryChainID.
+func (mr *MockClientMockRecorder) SetRegistryChainID(chainID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRegistryChainID", reflect.TypeOf((*MockClient)(nil).SetRegistryChainID), chainID)
+}
+
 // WillNewScannerShutdownPool mocks base method.
 func (m *MockClient) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
 	m.ctrl.T.Helper()
