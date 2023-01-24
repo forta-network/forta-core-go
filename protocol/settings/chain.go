@@ -13,9 +13,9 @@ type ChainSettings struct {
 	JsonRpcRateLimiting *RateLimit
 	InspectionInterval  int // in block number
 
-	DefaultOffset   int
-	SafeOffset      int
-	RewardThreshold int
+	DefaultOffset  int
+	SafeOffset     int
+	BlockThreshold int
 }
 
 // RateLimit is token bucket algorithm parameters.
@@ -27,7 +27,7 @@ type RateLimit struct {
 // sorted by chain ID
 // inspection intervals are determined to cover around 10-15m per chain
 // reward thresholds are determined from network stats (at least 10)
-// safe offsets are adjusted to be 5-10% of the reward threshold (at least 1)
+// safe offsets are adjusted to be 5-10% of the block threshold (at least 1)
 var allChainSettings = []ChainSettings{
 	{
 		ChainID:             1,
@@ -36,9 +36,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  50,
 
-		DefaultOffset:   0,
-		SafeOffset:      1,
-		RewardThreshold: 20,
+		DefaultOffset:  0,
+		SafeOffset:     1,
+		BlockThreshold: 20,
 	},
 	{
 		ChainID:             10,
@@ -47,9 +47,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  5000,
 
-		DefaultOffset:   0,
-		SafeOffset:      250,
-		RewardThreshold: 5000,
+		DefaultOffset:  0,
+		SafeOffset:     500,
+		BlockThreshold: 10000,
 	},
 	{
 		ChainID:             56,
@@ -58,9 +58,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  250,
 
-		DefaultOffset:   0,
-		SafeOffset:      3,
-		RewardThreshold: 50,
+		DefaultOffset:  0,
+		SafeOffset:     3,
+		BlockThreshold: 50,
 	},
 	{
 		ChainID:             137,
@@ -69,9 +69,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  70,
 
-		DefaultOffset:   0,
-		SafeOffset:      4,
-		RewardThreshold: 70,
+		DefaultOffset:  0,
+		SafeOffset:     4,
+		BlockThreshold: 70,
 	},
 	{
 		ChainID:             250,
@@ -80,9 +80,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  750,
 
-		DefaultOffset:   0,
-		SafeOffset:      5,
-		RewardThreshold: 100,
+		DefaultOffset:  0,
+		SafeOffset:     5,
+		BlockThreshold: 100,
 	},
 	{
 		ChainID:             42161,
@@ -91,9 +91,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  1500,
 
-		DefaultOffset:   0,
-		SafeOffset:      60,
-		RewardThreshold: 1200,
+		DefaultOffset:  0,
+		SafeOffset:     60,
+		BlockThreshold: 1200,
 	},
 	{
 		ChainID:             43114,
@@ -102,9 +102,9 @@ var allChainSettings = []ChainSettings{
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  350,
 
-		DefaultOffset:   0,
-		SafeOffset:      4,
-		RewardThreshold: 70,
+		DefaultOffset:  0,
+		SafeOffset:     4,
+		BlockThreshold: 70,
 	},
 }
 
@@ -114,10 +114,10 @@ func ValidateChainSettings(chainID int) bool {
 	if settings.SafeOffset < 1 {
 		return false
 	}
-	if settings.RewardThreshold <= 0 {
+	if settings.BlockThreshold <= 0 {
 		return false
 	}
-	safeOffsetRate := float64(settings.SafeOffset) / float64(settings.RewardThreshold)
+	safeOffsetRate := float64(settings.SafeOffset) / float64(settings.BlockThreshold)
 	if safeOffsetRate < 0.05 || safeOffsetRate > 0.1 {
 		return false
 	}
@@ -137,9 +137,9 @@ func GetChainSettings(chainID int) *ChainSettings {
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  50, // arbitrary value - not reliable
 
-		DefaultOffset:   0,
-		SafeOffset:      2,
-		RewardThreshold: 10,
+		DefaultOffset:  0,
+		SafeOffset:     2,
+		BlockThreshold: 10,
 	}
 }
 

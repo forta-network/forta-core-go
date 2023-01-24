@@ -242,6 +242,19 @@ func (l *listener) handleFortaStakingEvent(contracts *Contracts, le types.Log, b
 		subjectID = evt.Subject
 		changeType = registry.ChangeTypeWithdrawal
 
+	case contract_forta_staking_0_1_2.FrozeTopic:
+		evt, err := contracts.FortaStakingFil.ParseFroze(le)
+		if err != nil {
+			return err
+		}
+		subjectType = evt.SubjectType
+		subjectID = evt.Subject
+		if evt.IsFrozen {
+			changeType = registry.ChangeTypeFroze
+		} else {
+			changeType = registry.ChangeTypeUnfroze
+		}
+
 	case contract_forta_staking_0_1_2.SlashedTopic: // same with prev version
 		evt, err := contracts.FortaStakingFil.ParseSlashed(le)
 		if err != nil {
@@ -311,7 +324,11 @@ func (l *listener) handleStakeAllocatorEvent(contracts *Contracts, le types.Log,
 		if err != nil {
 			return err
 		}
-		return l.handler(l.ctx, logger, registry.NewScannerPoolAllocationMessage(le, blk, evt))
+		stakePerManaged, err := l.client.GetAllocatedStakePerManaged(big.NewInt(0).SetUint64(evt.Raw.BlockNumber), evt.Subject)
+		if err != nil {
+			return fmt.Errorf("failed to get stake per managed: %v", err)
+		}
+		return l.handler(l.ctx, logger, registry.NewScannerPoolAllocationMessage(le, blk, evt, stakePerManaged))
 	}
 	return nil
 }
@@ -335,9 +352,20 @@ func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *
 	return nil
 }
 
+func hasUpgradeTopic(le types.Log) bool {
+	switch getTopic(le) {
+	case UpgradedTopic,
+		contract_forta_staking_0_1_2.StakeHelpersConfiguredTopic,
+		contract_scanner_registry_0_1_4.ConfiguredMigrationTopic:
+		return true
+
+	default:
+		return false
+	}
+}
+
 func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
-	// use any contract's upgraded topic to check - they are all the same
-	if getTopic(le) != UpgradedTopic {
+	if !hasUpgradeTopic(le) {
 		return nil
 	}
 
@@ -623,15 +651,20 @@ func ListenToUpgrades(ctx context.Context, client Client, blockFeed feeds.BlockF
 	return blockFeed.Subscribe(func(evt *domain.BlockEvent) error {
 		regContracts := client.Contracts().Addresses
 		addrs := getAllContractAddrs(regContracts)
-		for _, log := range evt.Logs {
-			ethLog := log.ToTypesLog()
+		for _, evtLog := range evt.Logs {
+			ethLog := evtLog.ToTypesLog()
 			if !isAddrIn(addrs, ethLog.Address) {
 				continue
 			}
-			if getTopic(ethLog) != UpgradedTopic {
+			if !hasUpgradeTopic(ethLog) {
 				continue
 			}
-			return client.RefreshContracts()
+			if err := client.RefreshContracts(); err != nil {
+				log.WithError(err).Warn("failed to refresh contracts")
+			}
+			// we were able to match the topic and the address and attempted to handle
+			// nothing else left to do for this block
+			break
 		}
 		return nil
 	})

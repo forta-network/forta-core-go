@@ -95,9 +95,6 @@ type Client interface {
 	// GetPoolScanner returns a scanner
 	GetPoolScanner(scannerID string) (*Scanner, error)
 
-	// TotalScannersRegistered returns the count of scanners registered in a pool
-	TotalScannersRegistered(poolID *big.Int) (*big.Int, error)
-
 	// RegisterScannerOld executes the pre-delegated-staking registration.
 	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
@@ -143,8 +140,11 @@ type Client interface {
 	// GetActiveScannerStake returns the active stake for a scanner
 	GetActiveScannerStake(scannerID string) (*big.Int, error)
 
-	// GetActivePoolStake returns the total active stake for a pool
-	GetActivePoolStake(poolID *big.Int) (*big.Int, error)
+	// GetActivePoolStake returns the total active stake for a pool at a specific block
+	GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error)
+
+	// GetAllocatedStakePerManaged Returns allocatedManagedStake (own + delegator's) in DELEGATED / total managed subjects, or 0 if not DELEGATED
+	GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error)
 
 	// EnableScanner enables a scanner. Deprecated.
 	EnableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
@@ -1089,17 +1089,23 @@ func (c *client) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
 	return c.Contracts().ScannerPoolReg.WillNewScannerShutdownPool(c.opts, poolID)
 }
 
-func (c *client) GetActivePoolStake(poolID *big.Int) (*big.Int, error) {
+func (c *client) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error) {
 	contracts := c.Contracts()
 	if contracts.ScannerPoolReg == nil {
 		return nil, ErrContractNotReady
 	}
 
-	poolStake, err := contracts.FortaStaking.ActiveStakeFor(c.opts, SubjectTypeScannerPool, poolID)
+	var opts bind.CallOpts
+	if c.opts != nil {
+		opts = *c.opts
+	}
+	opts.BlockNumber = blockNumber
+
+	poolStake, err := contracts.FortaStaking.ActiveStakeFor(&opts, SubjectTypeScannerPool, poolID)
 	if err != nil {
 		return nil, err
 	}
-	delegatorPoolStake, err := contracts.FortaStaking.ActiveStakeFor(c.opts, SubjectTypeDelegatorScannerPool, poolID)
+	delegatorPoolStake, err := contracts.FortaStaking.ActiveStakeFor(&opts, SubjectTypeDelegatorScannerPool, poolID)
 	if err != nil {
 		return nil, err
 	}
@@ -1107,11 +1113,17 @@ func (c *client) GetActivePoolStake(poolID *big.Int) (*big.Int, error) {
 	return big.NewInt(0).Add(poolStake, delegatorPoolStake), nil
 }
 
-func (c *client) TotalScannersRegistered(poolID *big.Int) (*big.Int, error) {
+func (c *client) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error) {
 	contracts := c.Contracts()
-	if contracts.ScannerPoolReg == nil {
+	if contracts.StakeAllocator == nil {
 		return nil, ErrContractNotReady
 	}
 
-	return contracts.ScannerPoolReg.TotalScannersRegistered(c.opts, poolID)
+	var opts bind.CallOpts
+	if c.opts != nil {
+		opts = *c.opts
+	}
+	opts.BlockNumber = blockNumber
+
+	return contracts.StakeAllocator.AllocatedStakePerManaged(&opts, SubjectTypeScannerPool, poolID)
 }
