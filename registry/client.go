@@ -32,9 +32,9 @@ import (
 )
 
 const (
-	scannerRegistryChainID     = 137
-	scannerRegistryDeployBlock = 20187154
-	defaultEnsAddress          = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
+	defaultScannerRegistryChainID = uint64(137)
+	scannerRegistryDeployBlock    = 20187154
+	defaultEnsAddress             = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
 )
 
 // Registry errors
@@ -67,6 +67,9 @@ type Client interface {
 
 	// ResetOpts unsets the options for the store
 	ResetOpts()
+
+	// SetRegistryChainID sets the registry chain ID in the client.
+	SetRegistryChainID(chainID uint64)
 
 	// GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
 	GetAssignmentHash(scannerID string) (*AssignmentHash, error)
@@ -188,10 +191,11 @@ type Contracts struct {
 }
 
 type client struct {
-	ctx context.Context
-	cfg ClientConfig
-	eth ethereum.Client
-	ec  *ethclient.Client
+	ctx     context.Context
+	cfg     ClientConfig
+	eth     ethereum.Client
+	ec      *ethclient.Client
+	chainID *big.Int
 
 	// call PegLatestBlock to peg the context to the latest block
 	opts       *bind.CallOpts
@@ -260,10 +264,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	ec := ethclient.NewClient(rpc)
 
 	cl := &client{
-		ctx: ctx,
-		cfg: cfg,
-		eth: eth,
-		ec:  ec,
+		ctx:     ctx,
+		cfg:     cfg,
+		eth:     eth,
+		ec:      ec,
+		chainID: big.NewInt(0).SetUint64(defaultScannerRegistryChainID),
 
 		privateKey: cfg.PrivateKey,
 
@@ -457,6 +462,11 @@ func (c *client) PegLatestBlock() error {
 	}
 	c.opts = opts
 	return nil
+}
+
+// SetRegistryChainID sets the registry chain ID in the client.
+func (c *client) SetRegistryChainID(chainID uint64) {
+	c.chainID = big.NewInt(0).SetUint64(chainID)
 }
 
 func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error) {
@@ -993,7 +1003,7 @@ func (c *client) RegisterScannerOld(ownerAddress string, chainID int64, metadata
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
 	if err != nil {
 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
 	}
@@ -1021,7 +1031,7 @@ func (c *client) EnableScanner(permission ScannerPermission, scannerAddress stri
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
 	if err != nil {
 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
 	}
@@ -1046,7 +1056,7 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, big.NewInt(scannerRegistryChainID))
+	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
 	if err != nil {
 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
 	}
