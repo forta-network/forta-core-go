@@ -53,6 +53,7 @@ runs:
     - name: Coverage threshold check
       shell: bash
       run: |
+        echo "**********${{ github.event }}*************"
         COVERAGE=${{ steps.coverage.outputs.total }}
         MASTER_COVERAGE=${{ steps.master-coverage.outputs.total }}
         COVERAGE_THRESHOLD=${{ github.event.vars.COVERAGE_THRESHOLD }}
