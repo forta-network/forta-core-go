@@ -3,47 +3,57 @@ description: Validate and test Go code
 runs:
   using: composite
   steps:
-  - name: Set up Go
-    uses: actions/setup-go@v2
-    with:
-      go-version: 1.19
-  - uses: actions/cache@v2
-    with:
-      path: |
-        ~/go/pkg/mod
-        ~/.cache/go-build
-      key: ${{ runner.os }}-go-validate-${{ hashFiles('**/go.sum') }}
-      restore-keys: |
-        ${{ runner.os }}-go-validate
-  - name: Vet
-    shell: bash
-    run: |
-      go vet $(go list -f '{{ .Dir }}' ./...)
-  - name: Lint
-    uses: golangci/golangci-lint-action@v2
-    with:
-      skip-go-installation: true
-      skip-pkg-cache: true
-      skip-build-cache: true
-      version: v1.47
-  - name: Build
-    shell: bash
-    run: go build -v ./...
-  - name: Test
-    shell: bash
-    run: |
-      make test
-  # - name: Generate coverage
-  #   shell: bash
-  #   run: |
-  #     set pipefail
-
-  #     touch ./coverage.tmp
-  #     echo 'mode: atomic' > coverage.txt
-  #     go list ./... \
-  #       | xargs -n1 -I{} sh -c \
-  #         "go test -race -covermode=atomic -coverprofile=coverage.tmp -coverpkg \
-  #           $(go list ./... | tr "\n" ",") \
-  #           {} && tail -n +2 coverage.tmp >> coverage.txt || exit 255" > /dev/null 2>&1 \
-  #       && rm coverage.tmp \
-  #       && go tool cover -func=coverage.txt > coverage.out
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.19
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-validate-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-validate
+    - name: Vet
+      shell: bash
+      run: |
+        go vet $(go list -f '{{ .Dir }}' ./...)
+    - name: Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        skip-go-installation: true
+        skip-pkg-cache: true
+        skip-build-cache: true
+        version: v1.47
+    - name: Build
+      shell: bash
+      run: go build -v ./...
+    - name: Test
+      shell: bash
+      run: |
+        make test
+    - name: Code coverage
+      id: coverage
+      run: |
+        echo "total=$(make -s coverage)" >> $GITHUB_OUTPUT
+    - name: Checkout master branch
+      uses: actions/checkout@v2
+      with:
+        ref: master
+        path: master
+    - name: Master branch code coverage
+      id: master-coverage
+      run: |
+        make test
+        echo "total=$(make -s coverage)" >> $GITHUB_OUTPUT
+      working-directory: ./master
+    - name: Coverage threshold check
+      run: |
+        COVERAGE=${{ steps.coverage.outputs.total }}
+        MASTER_COVERAGE=${{ steps.master-coverage.outputs.total }}
+        COVERAGE_THRESHOLD=${{ vars.COVERAGE_THRESHOLD }}
+        if (( $(echo "$MASTER_COVERAGE - $COVERAGE > $COVERAGE_THRESHOLD" | bc -l)  )) ; then
+          echo "coverage fell by more than $COVERAGE_THRESHOLD%"
+          exit 1
+        fi
