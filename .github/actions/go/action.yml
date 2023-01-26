@@ -48,7 +48,7 @@ runs:
         make test
         echo "total=$(make -s coverage)" >> $GITHUB_OUTPUT
       working-directory: ./master
-    - name: Coverage threshold check
+    - name: Coverage threshold check 
       run: |
         COVERAGE=${{ steps.coverage.outputs.total }}
         MASTER_COVERAGE=${{ steps.master-coverage.outputs.total }}
