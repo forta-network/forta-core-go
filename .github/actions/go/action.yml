@@ -34,6 +34,7 @@ runs:
       run: |
         make test
     - name: Code coverage
+      shell: bash
       id: coverage
       run: |
         echo "total=$(make -s coverage)" >> $GITHUB_OUTPUT
@@ -43,12 +44,14 @@ runs:
         ref: master
         path: master
     - name: Master branch code coverage
+      shell: bash
       id: master-coverage
       run: |
         make test
         echo "total=$(make -s coverage)" >> $GITHUB_OUTPUT
       working-directory: ./master
-    - name: Coverage threshold check 
+    - name: Coverage threshold check
+      shell: bash
       run: |
         COVERAGE=${{ steps.coverage.outputs.total }}
         MASTER_COVERAGE=${{ steps.master-coverage.outputs.total }}
