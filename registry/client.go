@@ -137,6 +137,9 @@ type Client interface {
 	// NumScannersFor gets total number of assignments for bot.
 	NumScannersFor(agentID string) (*big.Int, error)
 
+	// NumScannersForByChain gets total number of assignments for bot for a given chain.
+	NumScannersForByChain(agentID string, chainID *big.Int) (*big.Int, error)
+
 	// GetStakingThreshold returns the min/max/activated flag for a given address
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 
@@ -823,6 +826,37 @@ func (c *client) IndexOfAssignedScannerByChain(agentID, scannerID string, chainI
 	}
 
 	return nil, fmt.Errorf("can't find shard index for %s", scannerID)
+}
+
+func (c *client) NumScannersForByChain(agentID string, chainID *big.Int) (*big.Int, error) {
+	opts, err := c.getOpts()
+	if err != nil {
+		return nil, err
+	}
+	aID := utils.AgentHexToBigInt(agentID)
+	length, err := c.Contracts().Dispatch.NumScannersFor(opts, aID)
+	if err != nil {
+		return nil, err
+	}
+
+	contracts := c.Contracts()
+	var assigns int64
+	for i := int64(0); i < length.Int64(); i++ {
+		idx := big.NewInt(i)
+		scn, err := contracts.Dispatch.ScannerRefAt(opts, aID, idx)
+		if err != nil {
+			return nil, err
+		}
+
+		// if filtered by chain, ignore.
+		if chainID != nil && scn.ChainId.Cmp(chainID) != 0 {
+			continue
+		}
+
+		assigns++
+	}
+
+	return big.NewInt(assigns), nil
 }
 
 func (c *client) NumScannersFor(agentID string) (*big.Int, error) {

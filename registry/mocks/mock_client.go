@@ -465,6 +465,21 @@ func (mr *MockClientMockRecorder) NumScannersFor(agentID interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NumScannersFor", reflect.TypeOf((*MockClient)(nil).NumScannersFor), agentID)
 }
 
+// NumScannersForByChain mocks base method.
+func (m *MockClient) NumScannersForByChain(agentID string, chainID *big.Int) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NumScannersForByChain", agentID, chainID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NumScannersForByChain indicates an expected call of NumScannersForByChain.
+func (mr *MockClientMockRecorder) NumScannersForByChain(agentID, chainID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NumScannersForByChain", reflect.TypeOf((*MockClient)(nil).NumScannersForByChain), agentID, chainID)
+}
+
 // PegBlock mocks base method.
 func (m *MockClient) PegBlock(blockNum *big.Int) {
 	m.ctrl.T.Helper()
