@@ -74,9 +74,10 @@ func HexToInt64(hex string) int64 {
 
 // IsValidBotID tells if given bot ID is valid.
 func IsValidBotID(botID string) bool {
-	if botID[:2] != "0x" {
+	if len(botID) < 2 || botID[:2] != "0x" {
 		return false
 	}
+
 	b, err := hex.DecodeString(botID[2:])
 	return len(b) == 32 && err == nil
 }
