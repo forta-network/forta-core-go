@@ -210,13 +210,12 @@ func (mr *MockClientMockRecorder) ForEachScannerSinceBlock(block, handler interf
 }
 
 // GenerateScannerRegistrationSignature mocks base method.
-func (m *MockClient) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
+func (m *MockClient) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*registry.ScannerRegistrationInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateScannerRegistrationSignature", reg)
-	ret0, _ := ret[0].([]byte)
-	ret1, _ := ret[1].([]byte)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
+	ret0, _ := ret[0].(*registry.ScannerRegistrationInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GenerateScannerRegistrationSignature indicates an expected call of GenerateScannerRegistrationSignature.
