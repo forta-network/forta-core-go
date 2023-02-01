@@ -1,11 +1,11 @@
 package registry
 
 import (
-	"encoding/hex"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/security"
 	"github.com/forta-network/forta-core-go/security/eip712"
 )
 
@@ -58,6 +58,10 @@ type ScannerRegistrationInfo struct {
 func MakeScannerRegistrationInfo(reg *eip712.ScannerNodeRegistration, sig []byte) (*ScannerRegistrationInfo, error) {
 	var scannerRegInfo ScannerRegistrationInfo
 	scannerRegInfo.RegistrationInput = (*ScannerRegistrationInput)(reg)
-	scannerRegInfo.Signature = hex.EncodeToString(sig)
+	var err error
+	scannerRegInfo.Signature, err = security.EncodeEthereumSignature(sig)
+	if err != nil {
+		return nil, err
+	}
 	return &scannerRegInfo, nil
 }
