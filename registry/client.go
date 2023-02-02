@@ -1110,11 +1110,7 @@ func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeReg
 	if contracts.Addresses.ScannerPoolRegistry == nil {
 		return nil, ErrContractNotReady
 	}
-	chainID, err := c.eth.ChainID(c.ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to determine registry chain id: %v", chainID)
-	}
-	_, sig, err := eip712.SignScannerRegistration(c.privateKey, *contracts.Addresses.ScannerPoolRegistry, chainID, reg)
+	_, sig, err := eip712.SignScannerRegistration(c.privateKey, *contracts.Addresses.ScannerPoolRegistry, c.chainID, reg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign the registration data: %v", err)
 	}
