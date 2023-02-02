@@ -71,6 +71,9 @@ type Client interface {
 	// SetRegistryChainID sets the registry chain ID in the client.
 	SetRegistryChainID(chainID uint64)
 
+	// GetTransactionOpts returns the default transaction opts used by the client whenever a transaction is sent.
+	GetTransactionOpts() (*bind.TransactOpts, error)
+
 	// GetAssignmentHash returns a hash of all agents, helpful for knowing scanner's agents have changed
 	GetAssignmentHash(scannerID string) (*AssignmentHash, error)
 
@@ -475,6 +478,17 @@ func (c *client) PegLatestBlock() error {
 // SetRegistryChainID sets the registry chain ID in the client.
 func (c *client) SetRegistryChainID(chainID uint64) {
 	c.chainID = big.NewInt(0).SetUint64(chainID)
+}
+
+// GetTransactionOpts returns the default transaction opts used by the client whenever a transaction is sent.
+func (c *client) GetTransactionOpts() (*bind.TransactOpts, error) {
+	if c.privateKey == nil {
+		return nil, errors.New("registry client does not have a private key - please provide it using the config")
+	}
+	if c.chainID != nil {
+		return bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
+	}
+	return bind.NewKeyedTransactor(c.privateKey), nil
 }
 
 func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error) {
@@ -1042,7 +1056,7 @@ func (c *client) RegisterScannerOld(ownerAddress string, chainID int64, metadata
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
+	opts, err := c.GetTransactionOpts()
 	if err != nil {
 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
 	}
@@ -1070,7 +1084,7 @@ func (c *client) EnableScanner(permission ScannerPermission, scannerAddress stri
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
+	opts, err := c.GetTransactionOpts()
 	if err != nil {
 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
 	}
@@ -1095,7 +1109,7 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 	if err != nil {
 		return "", fmt.Errorf("failed to create contract transactor: %v", err)
 	}
-	opts, err := bind.NewKeyedTransactorWithChainID(c.privateKey, c.chainID)
+	opts, err := c.GetTransactionOpts()
 	if err != nil {
 		return "", fmt.Errorf("failed to create transaction opts: %v", err)
 	}
