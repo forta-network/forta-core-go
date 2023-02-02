@@ -105,7 +105,7 @@ type Client interface {
 	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
 
 	// GenerateScannerRegistrationSignature generates a scanner registration signature from given data.
-	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (encodedData []byte, sig []byte, err error)
+	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*ScannerRegistrationInfo, error)
 
 	// ForEachAssignedAgent invokes a handler for each agent assigned to the scanner
 	ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error
@@ -1124,16 +1124,20 @@ func (c *client) DisableScanner(permission ScannerPermission, scannerAddress str
 	return tx.Hash().Hex(), nil
 }
 
-func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) ([]byte, []byte, error) {
+func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*ScannerRegistrationInfo, error) {
 	contracts := c.Contracts()
 	if contracts.Addresses.ScannerPoolRegistry == nil {
-		return nil, nil, ErrContractNotReady
+		return nil, ErrContractNotReady
 	}
-	chainID, err := c.eth.ChainID(c.ctx)
+	_, sig, err := eip712.SignScannerRegistration(c.privateKey, *contracts.Addresses.ScannerPoolRegistry, c.chainID, reg)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to determine registry chain id: %v", chainID)
+		return nil, fmt.Errorf("failed to sign the registration data: %v", err)
 	}
-	return eip712.SignScannerRegistration(c.privateKey, *contracts.Addresses.ScannerPoolRegistry, chainID, reg)
+	info, err := MakeScannerRegistrationInfo(reg, sig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare the scanner registration info: %v", err)
+	}
+	return info, nil
 }
 
 func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {

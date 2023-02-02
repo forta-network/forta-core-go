@@ -1,7 +1,12 @@
 package registry
 
 import (
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/security"
+	"github.com/forta-network/forta-core-go/security/eip712"
 )
 
 const (
@@ -36,3 +41,27 @@ type AssignmentHash struct {
 type StakingThreshold contract_scanner_registry.GetStakeThresholdOutput
 
 const UpgradedTopic = "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b"
+
+type ScannerRegistrationInput struct {
+	Scanner       common.Address `json:"scanner"`
+	ScannerPoolId *big.Int       `json:"scannerPoolId"`
+	ChainId       *big.Int       `json:"chainId"`
+	Metadata      string         `json:"metadata"`
+	Timestamp     *big.Int       `json:"timestamp"`
+}
+
+type ScannerRegistrationInfo struct {
+	RegistrationInput *ScannerRegistrationInput `json:"registrationInput"`
+	Signature         string                    `json:"signature"`
+}
+
+func MakeScannerRegistrationInfo(reg *eip712.ScannerNodeRegistration, sig []byte) (*ScannerRegistrationInfo, error) {
+	var scannerRegInfo ScannerRegistrationInfo
+	scannerRegInfo.RegistrationInput = (*ScannerRegistrationInput)(reg)
+	var err error
+	scannerRegInfo.Signature, err = security.EncodeEthereumSignature(sig)
+	if err != nil {
+		return nil, err
+	}
+	return &scannerRegInfo, nil
+}
