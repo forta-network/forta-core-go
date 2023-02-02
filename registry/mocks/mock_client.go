@@ -8,6 +8,7 @@ import (
 	big "math/big"
 	reflect "reflect"
 
+	bind "github.com/ethereum/go-ethereum/accounts/abi/bind"
 	contract_agent_registry "github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	contract_scanner_pool_registry "github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
 	contract_scanner_registry "github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
@@ -388,6 +389,21 @@ func (m *MockClient) GetStakingThreshold(scannerID string) (*registry.StakingThr
 func (mr *MockClientMockRecorder) GetStakingThreshold(scannerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStakingThreshold", reflect.TypeOf((*MockClient)(nil).GetStakingThreshold), scannerID)
+}
+
+// GetTransactionOpts mocks base method.
+func (m *MockClient) GetTransactionOpts() (*bind.TransactOpts, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransactionOpts")
+	ret0, _ := ret[0].(*bind.TransactOpts)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransactionOpts indicates an expected call of GetTransactionOpts.
+func (mr *MockClientMockRecorder) GetTransactionOpts() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionOpts", reflect.TypeOf((*MockClient)(nil).GetTransactionOpts))
 }
 
 // IndexOfAssignedScannerByChain mocks base method.
