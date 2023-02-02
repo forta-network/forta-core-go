@@ -350,6 +350,9 @@ type Alert {
 
     """Alert chain id"""
     chainId: NonNegativeInt
+
+    "List of labels related to the alert"
+    labels: [Label]
 }
 
 """Search after specified block number and alertId"""
@@ -433,6 +436,25 @@ type Block {
 
     """Block's chain id"""
     chainId: NonNegativeInt
+}
+
+
+"Label information"
+type Label {
+    "Label name"
+    label: String
+
+    "Label confidence"
+    confidence: Float
+
+    "Label's entity"
+    entity: String
+
+    "Label's entity type"
+    entityType: String
+
+    "Label's status"
+    remove: Boolean
 }
 
 """Block range"""
