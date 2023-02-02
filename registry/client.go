@@ -171,6 +171,7 @@ type Contracts struct {
 
 	AgentReg    *contract_agent_registry.AgentRegistryCaller
 	AgentRegFil *contract_agent_registry.AgentRegistryFilterer
+	AgentRegTx  *contract_agent_registry.AgentRegistryTransactor
 
 	ScannerReg    *contract_scanner_registry.ScannerRegistryCaller
 	ScannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
@@ -287,7 +288,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil)
+	cl.contractsUnsafe.AgentRegTx, err = contract_agent_registry.NewAgentRegistryTransactor(regContracts.AgentRegistry, ec)
+	if err != nil {
+		return nil, err
+	}
+	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil, cl.contractsUnsafe.AgentRegTx)
 
 	cl.contractsUnsafe.ScannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {

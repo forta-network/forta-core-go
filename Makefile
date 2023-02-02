@@ -108,6 +108,7 @@ abigen: pull-contracts
 	./scripts/abigen.sh forta-contracts components/_old/agents/AgentRegistry_0_1_4.sol AgentRegistry_0_1_4 AgentRegistry agent_registry_0_1_4
 	$(GOMERGETYPES) --config contracts/merged/contract_agent_registry/caller.yml
 	$(GOMERGETYPES) --config contracts/merged/contract_agent_registry/filterer.yml
+	$(GOMERGETYPES) --config contracts/merged/contract_agent_registry/transactor.yml
 
 	./scripts/abigen.sh forta-contracts components/scanners/ScannerNodeVersion.sol ScannerNodeVersion ScannerNodeVersion scanner_node_version_0_1_1
 	./scripts/abigen.sh forta-contracts components/_old/scanners/ScannerNodeVersion_0_1_0.sol ScannerNodeVersion_0_1_0 ScannerNodeVersion scanner_node_version_0_1_0
