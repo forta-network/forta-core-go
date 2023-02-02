@@ -8,6 +8,7 @@ import (
 	"github.com/Khan/genqlient/graphql"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -88,6 +89,8 @@ func ToProto(response *getAlertsResponse) []*protocol.AlertEvent {
 func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.AlertEvent {
 	contracts := make([]*protocol.AlertEvent_Alert_Contract, len(alert.Contracts))
 	projects := make([]*protocol.AlertEvent_Alert_Project, len(alert.Projects))
+	labels := make([]*protocol.AlertEvent_Alert_Label, len(alert.Labels))
+
 	for i, contract := range alert.Contracts {
 		contracts[i] = &protocol.AlertEvent_Alert_Contract{
 			Name:      contract.Name,
@@ -97,6 +100,21 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 	for i, project := range alert.Projects {
 		projects[i] = &protocol.AlertEvent_Alert_Project{
 			Id: project.Id,
+		}
+	}
+
+	for i, label := range alert.Labels {
+		if label == nil {
+			logrus.WithField("alert-id", alert.AlertId).Warn("malformed alert label")
+			continue
+		}
+
+		labels[i] = &protocol.AlertEvent_Alert_Label{
+			Label:      label.Label,
+			Confidence: float32(label.Confidence),
+			Entity:     label.Entity,
+			EntityType: label.EntityType,
+			Remove:     label.Remove,
 		}
 	}
 
@@ -121,6 +139,7 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			FindingType:   alert.FindingType,
 			RelatedAlerts: alert.RelatedAlerts,
 			ChainId:       uint64(alert.ChainId),
+			Labels:        labels,
 		},
 		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
 	}
