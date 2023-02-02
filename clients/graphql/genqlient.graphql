@@ -60,6 +60,13 @@ query getAlerts($input: AlertsInput) {
             findingType
             relatedAlerts
             chainId
+            labels {
+                label,
+                confidence,
+                entity,
+                entityType,
+                remove
+            }
         }
     }
 }

@@ -273,6 +273,8 @@ type getAlertsAlertsAlertsResponseAlertsAlert struct {
 	RelatedAlerts []string `json:"relatedAlerts"`
 	// Alert chain id
 	ChainId uint `json:"chainId"`
+	// List of labels related to the alert
+	Labels []*getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel `json:"labels"`
 }
 
 // GetAlertId returns getAlertsAlertsAlertsResponseAlertsAlert.AlertId, and is useful for accessing the field via an interface.
@@ -336,6 +338,11 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetRelatedAlerts() []string {
 // GetChainId returns getAlertsAlertsAlertsResponseAlertsAlert.ChainId, and is useful for accessing the field via an interface.
 func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetChainId() uint { return v.ChainId }
 
+// GetLabels returns getAlertsAlertsAlertsResponseAlertsAlert.Labels, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlert) GetLabels() []*getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel {
+	return v.Labels
+}
+
 // getAlertsAlertsAlertsResponseAlertsAlertContractsContract includes the requested fields of the GraphQL type Contract.
 // The GraphQL type's documentation follows.
 //
@@ -354,6 +361,42 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertContractsContract) GetName() st
 func (v *getAlertsAlertsAlertsResponseAlertsAlertContractsContract) GetProjectId() string {
 	return v.ProjectId
 }
+
+// getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel includes the requested fields of the GraphQL type Label.
+// The GraphQL type's documentation follows.
+//
+// Label information
+type getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel struct {
+	// Label name
+	Label string `json:"label"`
+	// Label confidence
+	Confidence float64 `json:"confidence"`
+	// Label's entity
+	Entity string `json:"entity"`
+	// Label's entity type
+	EntityType string `json:"entityType"`
+	// Label's status
+	Remove bool `json:"remove"`
+}
+
+// GetLabel returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Label, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetLabel() string { return v.Label }
+
+// GetConfidence returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Confidence, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetConfidence() float64 {
+	return v.Confidence
+}
+
+// GetEntity returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Entity, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetEntity() string { return v.Entity }
+
+// GetEntityType returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.EntityType, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetEntityType() string {
+	return v.EntityType
+}
+
+// GetRemove returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Remove, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetRemove() bool { return v.Remove }
 
 // getAlertsAlertsAlertsResponseAlertsAlertProjectsProject includes the requested fields of the GraphQL type Project.
 // The GraphQL type's documentation follows.
@@ -650,6 +693,13 @@ query getAlerts ($input: AlertsInput) {
 			findingType
 			relatedAlerts
 			chainId
+			labels {
+				label
+				confidence
+				entity
+				entityType
+				remove
+			}
 		}
 	}
 }
