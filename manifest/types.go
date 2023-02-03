@@ -14,7 +14,6 @@ type AgentManifest struct {
 	Repository     *string                       `json:"repository"`
 	Documentation  *string                       `json:"documentation"`
 	ChainIDs       []int64                       `json:"chainIds"`
-	Redundancy     *int                          `json:"redundancy"`
 	ChainSettings  map[string]AgentChainSettings `json:"chainSettings"`
 }
 
