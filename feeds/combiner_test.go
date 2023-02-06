@@ -41,7 +41,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 				cf, err := NewCombinerFeed(
 					ctx, CombinerFeedConfig{
 						RateLimit: rate,
-						APIUrl: "https://api-dev.forta.network/graphql",
+						APIUrl:    "https://api-dev.forta.network/graphql",
 					},
 				)
 				r.NoError(err)

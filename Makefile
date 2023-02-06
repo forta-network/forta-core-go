@@ -8,7 +8,7 @@ PROTOC_GEN_GO = $(GOBIN)/protoc-gen-go
 PROTOC_GEN_GO_GRPC = $(GOBIN)/protoc-gen-go-grpc
 GOMERGETYPES = $(GOBIN)/gomergetypes
 
-PROTOC = protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GO_GRPC)
+PROTOC = ./toolbin/protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GO_GRPC)
 
 .PHONY: require-tools
 require-tools: tools
@@ -38,6 +38,11 @@ tools:
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 
 	@go install github.com/forta-network/go-merge-types/cmd/gomergetypes@89a84e7
+
+	@wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip
+	@mv protoc-21.12-linux-x86_64.zip toolbin
+	@unzip toolbin/protoc-21* -d toolbin/protoc-bin
+	@mv toolbin/protoc-bin/bin/protoc toolbin
 
 .PHONY: fmt
 fmt: require-tools

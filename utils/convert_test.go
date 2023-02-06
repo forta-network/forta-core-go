@@ -83,11 +83,11 @@ func TestIsValidBotID1(t *testing.T) {
 			name: "valid bot id",
 			args: args{"0xbe1872858e63b6ed4ef7b84fc453970dc8d89968715797662a4f43c01d598aab"},
 			want: true,
-		},{
+		}, {
 			name: "invalid bot id (empty)",
 			args: args{""},
 			want: false,
-		},{
+		}, {
 			name: "invalid bot id (bad length)",
 			args: args{"0xbe1872858e63b6ed4ef7b84fc453970dc8d8996871579766"},
 			want: false,
