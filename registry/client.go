@@ -39,7 +39,8 @@ const (
 
 // Registry errors
 var (
-	ErrContractNotReady = errors.New("contract not ready")
+	ErrContractNotReady        = errors.New("contract not ready")
+	ErrUnknownAssignmentLength = errors.New("unknown assignment length")
 )
 
 // ScannerPermission is an alias to use for enums.
@@ -520,6 +521,9 @@ func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
 	sh, err := c.Contracts().Dispatch.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
 	if err != nil {
 		return nil, err
+	}
+	if sh.Length == nil {
+		return nil, ErrUnknownAssignmentLength
 	}
 	return &AssignmentHash{
 		AgentLength: sh.Length.Int64(),
