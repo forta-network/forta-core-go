@@ -522,6 +522,7 @@ func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
 	if err != nil {
 		return nil, err
 	}
+	// this can be nil sometimes, if the JSON-RPC API messes up the response
 	if sh.Length == nil {
 		return nil, ErrUnknownAssignmentLength
 	}
