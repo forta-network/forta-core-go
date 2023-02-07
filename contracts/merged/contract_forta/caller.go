@@ -98,7 +98,7 @@ func (merged *FortaCaller) ADMINROLE(opts *bind.CallOpts) (retVal [32]byte, err 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ADMINROLE(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -128,7 +128,7 @@ func (merged *FortaCaller) DEFAULTADMINROLE(opts *bind.CallOpts) (retVal [32]byt
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.DEFAULTADMINROLE(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -158,7 +158,7 @@ func (merged *FortaCaller) DOMAINSEPARATOR(opts *bind.CallOpts) (retVal [32]byte
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.DOMAINSEPARATOR(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -188,7 +188,7 @@ func (merged *FortaCaller) MINTERROLE(opts *bind.CallOpts) (retVal [32]byte, err
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.MINTERROLE(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -218,7 +218,7 @@ func (merged *FortaCaller) SUPPLY(opts *bind.CallOpts) (retVal *big.Int, err err
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.SUPPLY(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -248,7 +248,7 @@ func (merged *FortaCaller) WHITELISTERROLE(opts *bind.CallOpts) (retVal [32]byte
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WHITELISTERROLE(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -278,7 +278,7 @@ func (merged *FortaCaller) WHITELISTROLE(opts *bind.CallOpts) (retVal [32]byte, 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WHITELISTROLE(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -308,7 +308,7 @@ func (merged *FortaCaller) Allowance(opts *bind.CallOpts, owner common.Address, 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Allowance(opts, owner, spender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -338,7 +338,7 @@ func (merged *FortaCaller) BalanceOf(opts *bind.CallOpts, account common.Address
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.BalanceOf(opts, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -378,7 +378,7 @@ func (merged *FortaCaller) Checkpoints(opts *bind.CallOpts, account common.Addre
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Checkpoints(opts, account, pos)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -412,7 +412,7 @@ func (merged *FortaCaller) Decimals(opts *bind.CallOpts) (retVal uint8, err erro
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Decimals(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -442,7 +442,7 @@ func (merged *FortaCaller) Delegates(opts *bind.CallOpts, account common.Address
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Delegates(opts, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -472,7 +472,7 @@ func (merged *FortaCaller) GetPastTotalSupply(opts *bind.CallOpts, blockNumber *
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetPastTotalSupply(opts, blockNumber)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -502,7 +502,7 @@ func (merged *FortaCaller) GetPastVotes(opts *bind.CallOpts, account common.Addr
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetPastVotes(opts, account, blockNumber)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -532,7 +532,7 @@ func (merged *FortaCaller) GetRoleAdmin(opts *bind.CallOpts, role [32]byte) (ret
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetRoleAdmin(opts, role)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -562,7 +562,7 @@ func (merged *FortaCaller) GetVotes(opts *bind.CallOpts, account common.Address)
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetVotes(opts, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -592,7 +592,7 @@ func (merged *FortaCaller) HasRole(opts *bind.CallOpts, role [32]byte, account c
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.HasRole(opts, role, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -622,7 +622,7 @@ func (merged *FortaCaller) Name(opts *bind.CallOpts) (retVal string, err error) 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Name(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -652,7 +652,7 @@ func (merged *FortaCaller) Nonces(opts *bind.CallOpts, owner common.Address) (re
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Nonces(opts, owner)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -682,7 +682,7 @@ func (merged *FortaCaller) NumCheckpoints(opts *bind.CallOpts, account common.Ad
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.NumCheckpoints(opts, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -712,7 +712,7 @@ func (merged *FortaCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -742,7 +742,7 @@ func (merged *FortaCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -772,7 +772,7 @@ func (merged *FortaCaller) Symbol(opts *bind.CallOpts) (retVal string, err error
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Symbol(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -802,7 +802,7 @@ func (merged *FortaCaller) TotalSupply(opts *bind.CallOpts) (retVal *big.Int, er
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.TotalSupply(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -832,7 +832,7 @@ func (merged *FortaCaller) Version(opts *bind.CallOpts) (retVal string, err erro
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}

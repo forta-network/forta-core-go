@@ -102,7 +102,7 @@ func (merged *FortaFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVal *
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -132,7 +132,7 @@ func (merged *FortaFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<-
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -174,7 +174,7 @@ func (merged *FortaFilterer) ParseAdminChanged(log types.Log) (retVal *FortaAdmi
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -210,7 +210,7 @@ func (merged *FortaFilterer) FilterApproval(opts *bind.FilterOpts, owner []commo
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterApproval(opts, owner, spender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -240,7 +240,7 @@ func (merged *FortaFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *fo
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchApproval(opts, sink, owner, spender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -284,7 +284,7 @@ func (merged *FortaFilterer) ParseApproval(log types.Log) (retVal *FortaApproval
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseApproval(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -322,7 +322,7 @@ func (merged *FortaFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beacon 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -352,7 +352,7 @@ func (merged *FortaFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -392,7 +392,7 @@ func (merged *FortaFilterer) ParseBeaconUpgraded(log types.Log) (retVal *FortaBe
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -426,7 +426,7 @@ func (merged *FortaFilterer) FilterDelegateChanged(opts *bind.FilterOpts, delega
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterDelegateChanged(opts, delegator, fromDelegate, toDelegate)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -456,7 +456,7 @@ func (merged *FortaFilterer) WatchDelegateChanged(opts *bind.WatchOpts, sink cha
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchDelegateChanged(opts, sink, delegator, fromDelegate, toDelegate)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -500,7 +500,7 @@ func (merged *FortaFilterer) ParseDelegateChanged(log types.Log) (retVal *FortaD
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseDelegateChanged(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -538,7 +538,7 @@ func (merged *FortaFilterer) FilterDelegateVotesChanged(opts *bind.FilterOpts, d
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterDelegateVotesChanged(opts, delegate)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -568,7 +568,7 @@ func (merged *FortaFilterer) WatchDelegateVotesChanged(opts *bind.WatchOpts, sin
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchDelegateVotesChanged(opts, sink, delegate)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -612,7 +612,7 @@ func (merged *FortaFilterer) ParseDelegateVotesChanged(log types.Log) (retVal *F
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseDelegateVotesChanged(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -650,7 +650,7 @@ func (merged *FortaFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *f
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -680,7 +680,7 @@ func (merged *FortaFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -720,7 +720,7 @@ func (merged *FortaFilterer) ParseInitialized(log types.Log) (retVal *FortaIniti
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -754,7 +754,7 @@ func (merged *FortaFilterer) FilterRoleAdminChanged(opts *bind.FilterOpts, role 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterRoleAdminChanged(opts, role, previousAdminRole, newAdminRole)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -784,7 +784,7 @@ func (merged *FortaFilterer) WatchRoleAdminChanged(opts *bind.WatchOpts, sink ch
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchRoleAdminChanged(opts, sink, role, previousAdminRole, newAdminRole)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -828,7 +828,7 @@ func (merged *FortaFilterer) ParseRoleAdminChanged(log types.Log) (retVal *Forta
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseRoleAdminChanged(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -866,7 +866,7 @@ func (merged *FortaFilterer) FilterRoleGranted(opts *bind.FilterOpts, role [][32
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterRoleGranted(opts, role, account, sender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -896,7 +896,7 @@ func (merged *FortaFilterer) WatchRoleGranted(opts *bind.WatchOpts, sink chan<- 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchRoleGranted(opts, sink, role, account, sender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -940,7 +940,7 @@ func (merged *FortaFilterer) ParseRoleGranted(log types.Log) (retVal *FortaRoleG
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseRoleGranted(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -978,7 +978,7 @@ func (merged *FortaFilterer) FilterRoleRevoked(opts *bind.FilterOpts, role [][32
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterRoleRevoked(opts, role, account, sender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1008,7 +1008,7 @@ func (merged *FortaFilterer) WatchRoleRevoked(opts *bind.WatchOpts, sink chan<- 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchRoleRevoked(opts, sink, role, account, sender)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1052,7 +1052,7 @@ func (merged *FortaFilterer) ParseRoleRevoked(log types.Log) (retVal *FortaRoleR
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseRoleRevoked(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1090,7 +1090,7 @@ func (merged *FortaFilterer) FilterTransfer(opts *bind.FilterOpts, from []common
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterTransfer(opts, from, to)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1120,7 +1120,7 @@ func (merged *FortaFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *fo
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchTransfer(opts, sink, from, to)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1164,7 +1164,7 @@ func (merged *FortaFilterer) ParseTransfer(log types.Log) (retVal *FortaTransfer
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseTransfer(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1202,7 +1202,7 @@ func (merged *FortaFilterer) FilterUpgraded(opts *bind.FilterOpts, implementatio
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1232,7 +1232,7 @@ func (merged *FortaFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *fo
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1272,7 +1272,7 @@ func (merged *FortaFilterer) ParseUpgraded(log types.Log) (retVal *FortaUpgraded
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}

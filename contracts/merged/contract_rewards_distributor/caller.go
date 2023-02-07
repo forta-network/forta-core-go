@@ -98,7 +98,7 @@ func (merged *RewardsDistributorCaller) AvailableReward(opts *bind.CallOpts, sub
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AvailableReward(opts, subjectType, subjectId, epochNumber, staker)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -128,7 +128,7 @@ func (merged *RewardsDistributorCaller) ClaimedRewardsPerEpoch(opts *bind.CallOp
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ClaimedRewardsPerEpoch(opts, arg0, arg1, arg2)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -158,7 +158,7 @@ func (merged *RewardsDistributorCaller) DefaultFeeBps(opts *bind.CallOpts) (retV
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.DefaultFeeBps(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -198,7 +198,7 @@ func (merged *RewardsDistributorCaller) DelegationFees(opts *bind.CallOpts, arg0
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.DelegationFees(opts, arg0, arg1)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -232,7 +232,7 @@ func (merged *RewardsDistributorCaller) DelegationParamsEpochDelay(opts *bind.Ca
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.DelegationParamsEpochDelay(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -262,7 +262,7 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochEndTimestamp(opts *bind.C
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetCurrentEpochEndTimestamp(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -292,7 +292,7 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochNumber(opts *bind.CallOpt
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetCurrentEpochNumber(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -322,7 +322,7 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochStartTimestamp(opts *bind
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetCurrentEpochStartTimestamp(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -352,7 +352,7 @@ func (merged *RewardsDistributorCaller) GetDelegatedSubjectType(opts *bind.CallO
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatedSubjectType(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -382,7 +382,7 @@ func (merged *RewardsDistributorCaller) GetDelegationFee(opts *bind.CallOpts, su
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegationFee(opts, subjectType, subjectId, epochNumber)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -412,7 +412,7 @@ func (merged *RewardsDistributorCaller) GetDelegatorSubjectType(opts *bind.CallO
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatorSubjectType(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -442,7 +442,7 @@ func (merged *RewardsDistributorCaller) GetEpochEndTimestamp(opts *bind.CallOpts
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetEpochEndTimestamp(opts, epochNumber)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -472,7 +472,7 @@ func (merged *RewardsDistributorCaller) GetEpochNumber(opts *bind.CallOpts, time
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetEpochNumber(opts, timestamp)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -502,7 +502,7 @@ func (merged *RewardsDistributorCaller) GetEpochStartTimestamp(opts *bind.CallOp
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetEpochStartTimestamp(opts, epochNumber)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -532,7 +532,7 @@ func (merged *RewardsDistributorCaller) GetSubjectTypeAgency(opts *bind.CallOpts
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetSubjectTypeAgency(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -562,7 +562,7 @@ func (merged *RewardsDistributorCaller) IsCurrentEpoch(opts *bind.CallOpts, time
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsCurrentEpoch(opts, timestamp)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -592,7 +592,7 @@ func (merged *RewardsDistributorCaller) IsTrustedForwarder(opts *bind.CallOpts, 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -622,7 +622,7 @@ func (merged *RewardsDistributorCaller) ProxiableUUID(opts *bind.CallOpts) (retV
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -652,7 +652,7 @@ func (merged *RewardsDistributorCaller) RewardedEpochs(opts *bind.CallOpts, arg0
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardedEpochs(opts, arg0, arg1)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -682,7 +682,7 @@ func (merged *RewardsDistributorCaller) RewardsPerEpoch(opts *bind.CallOpts, arg
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardsPerEpoch(opts, arg0, arg1)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -712,7 +712,7 @@ func (merged *RewardsDistributorCaller) RewardsToken(opts *bind.CallOpts) (retVa
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardsToken(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -742,7 +742,7 @@ func (merged *RewardsDistributorCaller) UnclaimedRewards(opts *bind.CallOpts) (r
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.UnclaimedRewards(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -772,7 +772,7 @@ func (merged *RewardsDistributorCaller) Version(opts *bind.CallOpts) (retVal str
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}

@@ -113,7 +113,7 @@ func (merged *AgentRegistryTransactor) Approve(opts *bind.TransactOpts, to commo
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Approve(opts, to, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -126,7 +126,7 @@ func (merged *AgentRegistryTransactor) Approve(opts *bind.TransactOpts, to commo
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.Approve(opts, to, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -156,7 +156,7 @@ func (merged *AgentRegistryTransactor) CreateAgent(opts *bind.TransactOpts, agen
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.CreateAgent(opts, agentId, owner, metadata, chainIds)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -169,7 +169,7 @@ func (merged *AgentRegistryTransactor) CreateAgent(opts *bind.TransactOpts, agen
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.CreateAgent(opts, agentId, arg1, metadata, chainIds)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -199,7 +199,7 @@ func (merged *AgentRegistryTransactor) DisableAgent(opts *bind.TransactOpts, age
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.DisableAgent(opts, agentId, permission)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -212,7 +212,7 @@ func (merged *AgentRegistryTransactor) DisableAgent(opts *bind.TransactOpts, age
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.DisableAgent(opts, agentId, permission)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -242,7 +242,7 @@ func (merged *AgentRegistryTransactor) EnableAgent(opts *bind.TransactOpts, agen
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.EnableAgent(opts, agentId, permission)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -255,7 +255,7 @@ func (merged *AgentRegistryTransactor) EnableAgent(opts *bind.TransactOpts, agen
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.EnableAgent(opts, agentId, permission)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -285,7 +285,7 @@ func (merged *AgentRegistryTransactor) Initialize(opts *bind.TransactOpts, __man
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Initialize(opts, __manager, __router, __name, __symbol)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -298,7 +298,7 @@ func (merged *AgentRegistryTransactor) Initialize(opts *bind.TransactOpts, __man
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.Initialize(opts, __manager, __name, __symbol)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -328,7 +328,7 @@ func (merged *AgentRegistryTransactor) Multicall(opts *bind.TransactOpts, data [
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Multicall(opts, data)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -341,7 +341,7 @@ func (merged *AgentRegistryTransactor) Multicall(opts *bind.TransactOpts, data [
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.Multicall(opts, data)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -371,7 +371,7 @@ func (merged *AgentRegistryTransactor) PrepareAgent(opts *bind.TransactOpts, com
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.PrepareAgent(opts, commit)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -384,7 +384,7 @@ func (merged *AgentRegistryTransactor) PrepareAgent(opts *bind.TransactOpts, com
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.PrepareAgent(opts, commit)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -414,7 +414,7 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom(opts *bind.TransactOpts,
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SafeTransferFrom(opts, from, to, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -427,7 +427,7 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom(opts *bind.TransactOpts,
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SafeTransferFrom(opts, from, to, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -457,7 +457,7 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom0(opts *bind.TransactOpts
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SafeTransferFrom0(opts, from, to, tokenId, data)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -470,7 +470,7 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom0(opts *bind.TransactOpts
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SafeTransferFrom0(opts, from, to, tokenId, data)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -500,7 +500,7 @@ func (merged *AgentRegistryTransactor) SetAccessManager(opts *bind.TransactOpts,
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetAccessManager(opts, newManager)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -513,7 +513,7 @@ func (merged *AgentRegistryTransactor) SetAccessManager(opts *bind.TransactOpts,
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetAccessManager(opts, newManager)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -543,7 +543,7 @@ func (merged *AgentRegistryTransactor) SetApprovalForAll(opts *bind.TransactOpts
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetApprovalForAll(opts, operator, approved)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -556,7 +556,7 @@ func (merged *AgentRegistryTransactor) SetApprovalForAll(opts *bind.TransactOpts
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetApprovalForAll(opts, operator, approved)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -586,7 +586,7 @@ func (merged *AgentRegistryTransactor) SetFrontRunningDelay(opts *bind.TransactO
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetFrontRunningDelay(opts, delay)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -599,7 +599,7 @@ func (merged *AgentRegistryTransactor) SetFrontRunningDelay(opts *bind.TransactO
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetFrontRunningDelay(opts, delay)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -629,7 +629,7 @@ func (merged *AgentRegistryTransactor) SetName(opts *bind.TransactOpts, ensRegis
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetName(opts, ensRegistry, ensName)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -642,7 +642,7 @@ func (merged *AgentRegistryTransactor) SetName(opts *bind.TransactOpts, ensRegis
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetName(opts, ensRegistry, ensName)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -672,7 +672,7 @@ func (merged *AgentRegistryTransactor) SetRouter(opts *bind.TransactOpts, newRou
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetRouter(opts, newRouter)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -702,7 +702,7 @@ func (merged *AgentRegistryTransactor) SetStakeController(opts *bind.TransactOpt
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetStakeController(opts, stakeController)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -732,7 +732,7 @@ func (merged *AgentRegistryTransactor) SetStakeThreshold(opts *bind.TransactOpts
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetStakeThreshold(opts, newStakeThreshold)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -745,7 +745,7 @@ func (merged *AgentRegistryTransactor) SetStakeThreshold(opts *bind.TransactOpts
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetStakeThreshold(opts, newStakeThresholdAlt1)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -775,7 +775,7 @@ func (merged *AgentRegistryTransactor) TransferFrom(opts *bind.TransactOpts, fro
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.TransferFrom(opts, from, to, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -788,7 +788,7 @@ func (merged *AgentRegistryTransactor) TransferFrom(opts *bind.TransactOpts, fro
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.TransferFrom(opts, from, to, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -818,7 +818,7 @@ func (merged *AgentRegistryTransactor) UpdateAgent(opts *bind.TransactOpts, agen
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.UpdateAgent(opts, agentId, metadata, chainIds)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -831,7 +831,7 @@ func (merged *AgentRegistryTransactor) UpdateAgent(opts *bind.TransactOpts, agen
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.UpdateAgent(opts, agentId, metadata, chainIds)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -861,7 +861,7 @@ func (merged *AgentRegistryTransactor) UpgradeTo(opts *bind.TransactOpts, newImp
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.UpgradeTo(opts, newImplementation)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -874,7 +874,7 @@ func (merged *AgentRegistryTransactor) UpgradeTo(opts *bind.TransactOpts, newImp
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.UpgradeTo(opts, newImplementation)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -904,7 +904,7 @@ func (merged *AgentRegistryTransactor) UpgradeToAndCall(opts *bind.TransactOpts,
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.UpgradeToAndCall(opts, newImplementation, data)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -917,7 +917,7 @@ func (merged *AgentRegistryTransactor) UpgradeToAndCall(opts *bind.TransactOpts,
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.UpgradeToAndCall(opts, newImplementation, data)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -947,7 +947,7 @@ func (merged *AgentRegistryTransactor) DisableRouter(opts *bind.TransactOpts) (r
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.DisableRouter(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -977,7 +977,7 @@ func (merged *AgentRegistryTransactor) RegisterAgent(opts *bind.TransactOpts, ag
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.RegisterAgent(opts, agentId, metadata, chainIds)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1007,7 +1007,7 @@ func (merged *AgentRegistryTransactor) SetSubjectHandler(opts *bind.TransactOpts
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetSubjectHandler(opts, subjectGateway)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
