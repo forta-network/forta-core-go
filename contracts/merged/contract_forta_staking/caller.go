@@ -111,7 +111,7 @@ func (merged *FortaStakingCaller) ActiveSharesToStake(opts *bind.CallOpts, activ
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ActiveSharesToStake(opts, activeSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -124,7 +124,7 @@ func (merged *FortaStakingCaller) ActiveSharesToStake(opts *bind.CallOpts, activ
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.ActiveSharesToStake(opts, activeSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -154,7 +154,7 @@ func (merged *FortaStakingCaller) ActiveStakeFor(opts *bind.CallOpts, subjectTyp
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ActiveStakeFor(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -167,7 +167,7 @@ func (merged *FortaStakingCaller) ActiveStakeFor(opts *bind.CallOpts, subjectTyp
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.ActiveStakeFor(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -197,7 +197,7 @@ func (merged *FortaStakingCaller) AvailableReward(opts *bind.CallOpts, subjectTy
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.AvailableReward(opts, subjectType, subject, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -227,7 +227,7 @@ func (merged *FortaStakingCaller) BalanceOf(opts *bind.CallOpts, account common.
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.BalanceOf(opts, account, id)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -240,7 +240,7 @@ func (merged *FortaStakingCaller) BalanceOf(opts *bind.CallOpts, account common.
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.BalanceOf(opts, account, id)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -270,7 +270,7 @@ func (merged *FortaStakingCaller) BalanceOfBatch(opts *bind.CallOpts, accounts [
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.BalanceOfBatch(opts, accounts, ids)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -283,7 +283,7 @@ func (merged *FortaStakingCaller) BalanceOfBatch(opts *bind.CallOpts, accounts [
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.BalanceOfBatch(opts, accounts, ids)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -313,7 +313,7 @@ func (merged *FortaStakingCaller) Exists(opts *bind.CallOpts, id *big.Int) (retV
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Exists(opts, id)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -326,7 +326,7 @@ func (merged *FortaStakingCaller) Exists(opts *bind.CallOpts, id *big.Int) (retV
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.Exists(opts, id)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -356,7 +356,7 @@ func (merged *FortaStakingCaller) InactiveSharesOf(opts *bind.CallOpts, subjectT
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.InactiveSharesOf(opts, subjectType, subject, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -369,7 +369,7 @@ func (merged *FortaStakingCaller) InactiveSharesOf(opts *bind.CallOpts, subjectT
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.InactiveSharesOf(opts, subjectType, subject, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -399,7 +399,7 @@ func (merged *FortaStakingCaller) InactiveSharesToStake(opts *bind.CallOpts, ina
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.InactiveSharesToStake(opts, inactiveSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -412,7 +412,7 @@ func (merged *FortaStakingCaller) InactiveSharesToStake(opts *bind.CallOpts, ina
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.InactiveSharesToStake(opts, inactiveSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -442,7 +442,7 @@ func (merged *FortaStakingCaller) InactiveStakeFor(opts *bind.CallOpts, subjectT
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.InactiveStakeFor(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -455,7 +455,7 @@ func (merged *FortaStakingCaller) InactiveStakeFor(opts *bind.CallOpts, subjectT
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.InactiveStakeFor(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -485,7 +485,7 @@ func (merged *FortaStakingCaller) IsApprovedForAll(opts *bind.CallOpts, account 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.IsApprovedForAll(opts, account, operator)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -498,7 +498,7 @@ func (merged *FortaStakingCaller) IsApprovedForAll(opts *bind.CallOpts, account 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.IsApprovedForAll(opts, account, operator)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -528,7 +528,7 @@ func (merged *FortaStakingCaller) IsFrozen(opts *bind.CallOpts, subjectType uint
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.IsFrozen(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -541,7 +541,7 @@ func (merged *FortaStakingCaller) IsFrozen(opts *bind.CallOpts, subjectType uint
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.IsFrozen(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -571,7 +571,7 @@ func (merged *FortaStakingCaller) IsTrustedForwarder(opts *bind.CallOpts, forwar
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -584,7 +584,7 @@ func (merged *FortaStakingCaller) IsTrustedForwarder(opts *bind.CallOpts, forwar
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -614,7 +614,7 @@ func (merged *FortaStakingCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -627,7 +627,7 @@ func (merged *FortaStakingCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -657,7 +657,7 @@ func (merged *FortaStakingCaller) SharesOf(opts *bind.CallOpts, subjectType uint
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.SharesOf(opts, subjectType, subject, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -670,7 +670,7 @@ func (merged *FortaStakingCaller) SharesOf(opts *bind.CallOpts, subjectType uint
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.SharesOf(opts, subjectType, subject, account)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -700,7 +700,7 @@ func (merged *FortaStakingCaller) StakeToActiveShares(opts *bind.CallOpts, activ
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.StakeToActiveShares(opts, activeSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -713,7 +713,7 @@ func (merged *FortaStakingCaller) StakeToActiveShares(opts *bind.CallOpts, activ
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.StakeToActiveShares(opts, activeSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -743,7 +743,7 @@ func (merged *FortaStakingCaller) StakeToInactiveShares(opts *bind.CallOpts, ina
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.StakeToInactiveShares(opts, inactiveSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -756,7 +756,7 @@ func (merged *FortaStakingCaller) StakeToInactiveShares(opts *bind.CallOpts, ina
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.StakeToInactiveShares(opts, inactiveSharesId, amount)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -786,7 +786,7 @@ func (merged *FortaStakingCaller) StakedToken(opts *bind.CallOpts) (retVal commo
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.StakedToken(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -799,7 +799,7 @@ func (merged *FortaStakingCaller) StakedToken(opts *bind.CallOpts) (retVal commo
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.StakedToken(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -829,7 +829,7 @@ func (merged *FortaStakingCaller) SupportsInterface(opts *bind.CallOpts, interfa
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -842,7 +842,7 @@ func (merged *FortaStakingCaller) SupportsInterface(opts *bind.CallOpts, interfa
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.SupportsInterface(opts, interfaceId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -872,7 +872,7 @@ func (merged *FortaStakingCaller) TotalActiveStake(opts *bind.CallOpts) (retVal 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalActiveStake(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -885,7 +885,7 @@ func (merged *FortaStakingCaller) TotalActiveStake(opts *bind.CallOpts) (retVal 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.TotalActiveStake(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -915,7 +915,7 @@ func (merged *FortaStakingCaller) TotalInactiveShares(opts *bind.CallOpts, subje
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalInactiveShares(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -928,7 +928,7 @@ func (merged *FortaStakingCaller) TotalInactiveShares(opts *bind.CallOpts, subje
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.TotalInactiveShares(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -958,7 +958,7 @@ func (merged *FortaStakingCaller) TotalInactiveStake(opts *bind.CallOpts) (retVa
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalInactiveStake(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -971,7 +971,7 @@ func (merged *FortaStakingCaller) TotalInactiveStake(opts *bind.CallOpts) (retVa
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.TotalInactiveStake(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1001,7 +1001,7 @@ func (merged *FortaStakingCaller) TotalShares(opts *bind.CallOpts, subjectType u
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalShares(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1014,7 +1014,7 @@ func (merged *FortaStakingCaller) TotalShares(opts *bind.CallOpts, subjectType u
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.TotalShares(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1044,7 +1044,7 @@ func (merged *FortaStakingCaller) TotalSupply(opts *bind.CallOpts, id *big.Int) 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalSupply(opts, id)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1057,7 +1057,7 @@ func (merged *FortaStakingCaller) TotalSupply(opts *bind.CallOpts, id *big.Int) 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.TotalSupply(opts, id)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1087,7 +1087,7 @@ func (merged *FortaStakingCaller) Treasury(opts *bind.CallOpts) (retVal common.A
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Treasury(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1100,7 +1100,7 @@ func (merged *FortaStakingCaller) Treasury(opts *bind.CallOpts) (retVal common.A
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.Treasury(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1130,7 +1130,7 @@ func (merged *FortaStakingCaller) Uri(opts *bind.CallOpts, arg0 *big.Int) (retVa
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Uri(opts, arg0)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1143,7 +1143,7 @@ func (merged *FortaStakingCaller) Uri(opts *bind.CallOpts, arg0 *big.Int) (retVa
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.Uri(opts, arg0)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1173,7 +1173,7 @@ func (merged *FortaStakingCaller) Version(opts *bind.CallOpts) (retVal string, e
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1186,7 +1186,7 @@ func (merged *FortaStakingCaller) Version(opts *bind.CallOpts) (retVal string, e
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1216,7 +1216,7 @@ func (merged *FortaStakingCaller) MAXSLASHABLEPERCENT(opts *bind.CallOpts) (retV
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.MAXSLASHABLEPERCENT(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1246,7 +1246,7 @@ func (merged *FortaStakingCaller) MAXWITHDRAWALDELAY(opts *bind.CallOpts) (retVa
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.MAXWITHDRAWALDELAY(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1276,7 +1276,7 @@ func (merged *FortaStakingCaller) MINWITHDRAWALDELAY(opts *bind.CallOpts) (retVa
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.MINWITHDRAWALDELAY(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1306,7 +1306,7 @@ func (merged *FortaStakingCaller) Allocator(opts *bind.CallOpts) (retVal common.
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.Allocator(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1336,7 +1336,7 @@ func (merged *FortaStakingCaller) GetDelegatedSubjectType(opts *bind.CallOpts, s
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.GetDelegatedSubjectType(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1366,7 +1366,7 @@ func (merged *FortaStakingCaller) GetDelegatorSubjectType(opts *bind.CallOpts, s
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.GetDelegatorSubjectType(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1396,7 +1396,7 @@ func (merged *FortaStakingCaller) GetSubjectTypeAgency(opts *bind.CallOpts, subj
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.GetSubjectTypeAgency(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1426,7 +1426,7 @@ func (merged *FortaStakingCaller) OpenProposals(opts *bind.CallOpts, arg0 *big.I
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.OpenProposals(opts, arg0)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1456,7 +1456,7 @@ func (merged *FortaStakingCaller) SlashDelegatorsPercent(opts *bind.CallOpts) (r
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.SlashDelegatorsPercent(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1486,7 +1486,7 @@ func (merged *FortaStakingCaller) SubjectGateway(opts *bind.CallOpts) (retVal co
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.SubjectGateway(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}

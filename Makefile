@@ -37,7 +37,7 @@ tools:
 	@go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 
-	@go install github.com/forta-network/go-merge-types/cmd/gomergetypes@89a84e7
+	@go install github.com/forta-network/go-merge-types/cmd/gomergetypes@ddc3807
 
 	@wget https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip
 	@mv protoc-21.12-linux-x86_64.zip toolbin

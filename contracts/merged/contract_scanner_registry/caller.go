@@ -111,7 +111,7 @@ func (merged *ScannerRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.BalanceOf(opts, owner)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -124,7 +124,7 @@ func (merged *ScannerRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.BalanceOf(opts, owner)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -154,7 +154,7 @@ func (merged *ScannerRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *b
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetApproved(opts, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -167,7 +167,7 @@ func (merged *ScannerRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *b
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetApproved(opts, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -197,7 +197,7 @@ func (merged *ScannerRegistryCaller) GetDisableFlags(opts *bind.CallOpts, scanne
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetDisableFlags(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -227,7 +227,7 @@ func (merged *ScannerRegistryCaller) GetManagerAt(opts *bind.CallOpts, scannerId
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetManagerAt(opts, scannerId, index)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -240,7 +240,7 @@ func (merged *ScannerRegistryCaller) GetManagerAt(opts *bind.CallOpts, scannerId
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetManagerAt(opts, scannerId, index)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -270,7 +270,7 @@ func (merged *ScannerRegistryCaller) GetManagerCount(opts *bind.CallOpts, scanne
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetManagerCount(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -283,7 +283,7 @@ func (merged *ScannerRegistryCaller) GetManagerCount(opts *bind.CallOpts, scanne
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetManagerCount(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -327,7 +327,7 @@ func (merged *ScannerRegistryCaller) GetScanner(opts *bind.CallOpts, scannerId *
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetScanner(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -348,7 +348,7 @@ func (merged *ScannerRegistryCaller) GetScanner(opts *bind.CallOpts, scannerId *
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetScanner(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -386,7 +386,7 @@ func (merged *ScannerRegistryCaller) GetScannerChainId(opts *bind.CallOpts, scan
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetScannerChainId(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -399,7 +399,7 @@ func (merged *ScannerRegistryCaller) GetScannerChainId(opts *bind.CallOpts, scan
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetScannerChainId(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -447,7 +447,7 @@ func (merged *ScannerRegistryCaller) GetScannerState(opts *bind.CallOpts, scanne
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetScannerState(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -472,7 +472,7 @@ func (merged *ScannerRegistryCaller) GetScannerState(opts *bind.CallOpts, scanne
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetScannerState(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -514,7 +514,7 @@ func (merged *ScannerRegistryCaller) GetStakeController(opts *bind.CallOpts) (re
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetStakeController(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -556,7 +556,7 @@ func (merged *ScannerRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, subj
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.GetStakeThreshold(opts, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -575,7 +575,7 @@ func (merged *ScannerRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, subj
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetStakeThreshold(opts, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -611,7 +611,7 @@ func (merged *ScannerRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.IsApprovedForAll(opts, owner, operator)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -624,7 +624,7 @@ func (merged *ScannerRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.IsApprovedForAll(opts, owner, operator)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -654,7 +654,7 @@ func (merged *ScannerRegistryCaller) IsEnabled(opts *bind.CallOpts, scannerId *b
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.IsEnabled(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -667,7 +667,7 @@ func (merged *ScannerRegistryCaller) IsEnabled(opts *bind.CallOpts, scannerId *b
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.IsEnabled(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -697,7 +697,7 @@ func (merged *ScannerRegistryCaller) IsManager(opts *bind.CallOpts, scannerId *b
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.IsManager(opts, scannerId, manager)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -710,7 +710,7 @@ func (merged *ScannerRegistryCaller) IsManager(opts *bind.CallOpts, scannerId *b
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.IsManager(opts, scannerId, manager)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -740,7 +740,7 @@ func (merged *ScannerRegistryCaller) IsRegistered(opts *bind.CallOpts, scannerId
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.IsRegistered(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -753,7 +753,7 @@ func (merged *ScannerRegistryCaller) IsRegistered(opts *bind.CallOpts, scannerId
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.IsRegistered(opts, scannerId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -783,7 +783,7 @@ func (merged *ScannerRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subjec
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.IsStakedOverMin(opts, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -796,7 +796,7 @@ func (merged *ScannerRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subjec
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.IsStakedOverMin(opts, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -826,7 +826,7 @@ func (merged *ScannerRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, for
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -839,7 +839,7 @@ func (merged *ScannerRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, for
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -869,7 +869,7 @@ func (merged *ScannerRegistryCaller) Name(opts *bind.CallOpts) (retVal string, e
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.Name(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -882,7 +882,7 @@ func (merged *ScannerRegistryCaller) Name(opts *bind.CallOpts) (retVal string, e
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.Name(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -912,7 +912,7 @@ func (merged *ScannerRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.I
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.OwnerOf(opts, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -925,7 +925,7 @@ func (merged *ScannerRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.I
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.OwnerOf(opts, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -955,7 +955,7 @@ func (merged *ScannerRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -968,7 +968,7 @@ func (merged *ScannerRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -998,7 +998,7 @@ func (merged *ScannerRegistryCaller) ScannerAddressToId(opts *bind.CallOpts, sca
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ScannerAddressToId(opts, scanner)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1011,7 +1011,7 @@ func (merged *ScannerRegistryCaller) ScannerAddressToId(opts *bind.CallOpts, sca
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.ScannerAddressToId(opts, scanner)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1041,7 +1041,7 @@ func (merged *ScannerRegistryCaller) SupportsInterface(opts *bind.CallOpts, inte
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1054,7 +1054,7 @@ func (merged *ScannerRegistryCaller) SupportsInterface(opts *bind.CallOpts, inte
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.SupportsInterface(opts, interfaceId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1084,7 +1084,7 @@ func (merged *ScannerRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string,
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.Symbol(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1097,7 +1097,7 @@ func (merged *ScannerRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string,
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.Symbol(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1127,7 +1127,7 @@ func (merged *ScannerRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.TokenURI(opts, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1140,7 +1140,7 @@ func (merged *ScannerRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.TokenURI(opts, tokenId)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1170,7 +1170,7 @@ func (merged *ScannerRegistryCaller) Version(opts *bind.CallOpts) (retVal string
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1183,7 +1183,7 @@ func (merged *ScannerRegistryCaller) Version(opts *bind.CallOpts) (retVal string
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1213,7 +1213,7 @@ func (merged *ScannerRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) (ret
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.GetSubjectHandler(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1243,7 +1243,7 @@ func (merged *ScannerRegistryCaller) HasMigrationEnded(opts *bind.CallOpts) (ret
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.HasMigrationEnded(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1273,7 +1273,7 @@ func (merged *ScannerRegistryCaller) OptingOutOfMigration(opts *bind.CallOpts, a
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.OptingOutOfMigration(opts, arg0)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1303,7 +1303,7 @@ func (merged *ScannerRegistryCaller) ScannerPoolRegistry(opts *bind.CallOpts) (r
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.ScannerPoolRegistry(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -1333,7 +1333,7 @@ func (merged *ScannerRegistryCaller) SunsettingTime(opts *bind.CallOpts) (retVal
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.SunsettingTime(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}

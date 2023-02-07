@@ -98,7 +98,7 @@ func (merged *StakeAllocatorCaller) AllocatedDelegatorsStakePerManaged(opts *bin
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedDelegatorsStakePerManaged(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -128,7 +128,7 @@ func (merged *StakeAllocatorCaller) AllocatedManagedStake(opts *bind.CallOpts, s
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedManagedStake(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -158,7 +158,7 @@ func (merged *StakeAllocatorCaller) AllocatedOwnStakePerManaged(opts *bind.CallO
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedOwnStakePerManaged(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -188,7 +188,7 @@ func (merged *StakeAllocatorCaller) AllocatedStakeFor(opts *bind.CallOpts, subje
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedStakeFor(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -218,7 +218,7 @@ func (merged *StakeAllocatorCaller) AllocatedStakePerManaged(opts *bind.CallOpts
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedStakePerManaged(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -248,7 +248,7 @@ func (merged *StakeAllocatorCaller) GetDelegatedSubjectType(opts *bind.CallOpts,
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatedSubjectType(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -278,7 +278,7 @@ func (merged *StakeAllocatorCaller) GetDelegatorSubjectType(opts *bind.CallOpts,
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatorSubjectType(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -308,7 +308,7 @@ func (merged *StakeAllocatorCaller) GetSubjectTypeAgency(opts *bind.CallOpts, su
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetSubjectTypeAgency(opts, subjectType)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -338,7 +338,7 @@ func (merged *StakeAllocatorCaller) IsTrustedForwarder(opts *bind.CallOpts, forw
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -368,7 +368,7 @@ func (merged *StakeAllocatorCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -398,7 +398,7 @@ func (merged *StakeAllocatorCaller) RewardsDistributor(opts *bind.CallOpts) (ret
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardsDistributor(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -428,7 +428,7 @@ func (merged *StakeAllocatorCaller) UnallocatedStakeFor(opts *bind.CallOpts, sub
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.UnallocatedStakeFor(opts, subjectType, subject)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
@@ -458,7 +458,7 @@ func (merged *StakeAllocatorCaller) Version(opts *bind.CallOpts) (retVal string,
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Version(opts)
 
-		if err != nil {
+		if methodErr != nil {
 			err = methodErr
 			return
 		}
