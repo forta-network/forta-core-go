@@ -53,6 +53,8 @@ message Alert {
   map<string, string> tags = 7;
   ScannerInfo scanner = 8;
   TrackingTimestamps timestamps = 9;
+  bool truncated = 10;
+  bytes addressesBloomFilter = 11;
 }
 
 message SignedAlert {
