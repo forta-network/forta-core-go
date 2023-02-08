@@ -314,6 +314,8 @@ message AlertEvent {
     repeated string relatedAlerts = 14;
     uint64 chainId = 15;
     repeated Label labels = 16;
+    bool truncated = 17;
+    bytes addressesBloomFilter = 18;
   }
 
   Alert alert = 1;
