@@ -352,7 +352,7 @@ func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *
 	return nil
 }
 
-func hasUpgradeTopic(le types.Log) bool {
+func isUpgradeOrMigration(le types.Log) bool {
 	switch getTopic(le) {
 	case UpgradedTopic,
 		contract_forta_staking_0_1_2.StakeHelpersConfiguredTopic,
@@ -365,7 +365,7 @@ func hasUpgradeTopic(le types.Log) bool {
 }
 
 func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
-	if !hasUpgradeTopic(le) {
+	if !isUpgradeOrMigration(le) {
 		return nil
 	}
 
@@ -374,6 +374,10 @@ func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *d
 		return err
 	}
 	l.setLogFilterAddrs()
+
+	if getTopic(le) != UpgradedTopic {
+		return nil
+	}
 
 	// use any contract's filterer to unpack the event - pick dispatch
 	upgraded, err := contracts.DispatchFil.ParseUpgraded(le)
@@ -656,7 +660,7 @@ func ListenToUpgrades(ctx context.Context, client Client, blockFeed feeds.BlockF
 			if !isAddrIn(addrs, ethLog.Address) {
 				continue
 			}
-			if !hasUpgradeTopic(ethLog) {
+			if !isUpgradeOrMigration(ethLog) {
 				continue
 			}
 			if err := client.RefreshContracts(); err != nil {
