@@ -29,6 +29,7 @@ type BotInfo struct {
 
 // ForBlockAlert calculates the hash for the block alert.
 func ForBlockAlert(inputs *Inputs) string {
+	sort.Strings(inputs.Finding.Addresses)
 	idStr := strings.Join(
 		[]string{
 			Version, "|",
@@ -50,6 +51,7 @@ func ForBlockAlert(inputs *Inputs) string {
 
 // ForTransactionAlert calculates the hash for the transaction alert.
 func ForTransactionAlert(inputs *Inputs) string {
+	sort.Strings(inputs.Finding.Addresses)
 	txAddrs := utils.MapKeys(inputs.TransactionEvent.TxAddresses)
 	sort.Strings(txAddrs)
 	idStr := strings.Join(
