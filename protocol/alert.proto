@@ -60,7 +60,7 @@ message Alert {
   ScannerInfo scanner = 8;
   TrackingTimestamps timestamps = 9;
   bool truncated = 10;
-  BloomFilter addressesBloomFilter = 11;
+  BloomFilter addressBloomFilter = 11;
 }
 
 message SignedAlert {
