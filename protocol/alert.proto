@@ -46,7 +46,7 @@ message Signature {
 message BloomFilter {
   uint64 k = 1;
   uint64 m = 2;
-  bytes bitset = 3;
+  string bitset = 3;
 }
 
 message Alert {
