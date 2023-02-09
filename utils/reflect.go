@@ -4,6 +4,14 @@ import "reflect"
 
 // GetImplementation returns the first non-nil implementation contained as a field in a struct.
 func GetImplementation[I interface{}](v interface{}) (it I, ok bool) {
+	if v == nil {
+		return
+	}
+
+	if it, ok := v.(I); ok {
+		return it, true
+	}
+
 	t := reflect.ValueOf(v)
 	if t.Kind() == reflect.Pointer {
 		t = t.Elem()

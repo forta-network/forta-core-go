@@ -22,7 +22,7 @@ func (impl2 *testImpl2) Foo() int {
 	return 222
 }
 
-type testStruct struct {
+type testWrapperStruct struct {
 	Impl1 *testImpl1
 	Impl2 *testImpl2
 }
@@ -30,14 +30,14 @@ type testStruct struct {
 func TestGetImplementation(t *testing.T) {
 	r := require.New(t)
 
-	s1 := testStruct{
+	s1 := testWrapperStruct{
 		Impl1: &testImpl1{},
 	}
 	i, ok := GetImplementation[testInterface](s1)
 	r.True(ok)
 	r.Equal(111, i.Foo())
 
-	s2 := testStruct{
+	s2 := testWrapperStruct{
 		Impl1: &testImpl1{},
 		Impl2: &testImpl2{},
 	}
@@ -45,10 +45,16 @@ func TestGetImplementation(t *testing.T) {
 	r.True(ok)
 	r.Equal(111, i.Foo())
 
-	s3 := testStruct{
+	s3 := testWrapperStruct{
 		Impl2: &testImpl2{},
 	}
 	i, ok = GetImplementation[testInterface](s3)
 	r.True(ok)
 	r.Equal(222, i.Foo())
+
+	// receive self directly if the interface is not in a wrapper struct
+	testImpl := &testImpl1{}
+	i, ok = GetImplementation[testInterface](testImpl)
+	r.True(ok)
+	r.Equal(testImpl, i)
 }
