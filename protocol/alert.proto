@@ -47,6 +47,7 @@ message BloomFilter {
   string k = 1;
   string m = 2;
   string bitset = 3;
+  uint32 itemCount = 4;
 }
 
 message Alert {
