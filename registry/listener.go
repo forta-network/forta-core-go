@@ -145,10 +145,6 @@ func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types
 		if err != nil {
 			return err
 		}
-		// detect the new owner only if not minted
-		if evt.From.Hex() == utils.ZeroAddress {
-			return nil
-		}
 		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromTransfer(evt, blk))
 
 	case contract_scanner_pool_registry_0_1_0.ScannerPoolRegisteredTopic:
@@ -394,6 +390,7 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	}
 
 	logger := getLoggerForLog(le)
+	logger.Info("handling tx log")
 	contracts := l.client.Contracts()
 
 	// always try to handle the upgrade event first because we don't enforce address checks
