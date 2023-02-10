@@ -26,6 +26,7 @@ func getLoggerForLog(le types.Log) *log.Entry {
 		"txHash":      le.TxHash.Hex(),
 		"blockNumber": le.BlockNumber,
 		"blockHash":   le.BlockHash.Hex(),
+		"topic":       getTopic(le),
 	})
 }
 

@@ -50,11 +50,15 @@ type HandlerRegistry struct {
 
 // Handle finds the right handler for the message and calls it.
 func (reg *HandlerRegistry) Handle(ctx context.Context, logger *log.Entry, msg regmsg.Interface) error {
+	logger = logger.WithField("action", msg.ActionName())
+
 	h, ok := reg.all.Get(msgKey(msg))
 	if !ok {
-		logger.WithField("action", msg.ActionName()).Warn("no handlers found")
+		logger.Warn("no handlers found")
 		return nil
 	}
+
+	logger.Info("handling message")
 	for _, f := range h {
 		ret := f.Call([]reflect.Value{reflect.ValueOf(ctx), reflect.ValueOf(logger), reflect.ValueOf(msg)})
 		retErr := ret[0]
