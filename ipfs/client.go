@@ -91,6 +91,8 @@ func (c *client) GetBytes(ctx context.Context, reference string) ([]byte, error)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode >= 500 {
 		log.WithFields(log.Fields{
 			"reference": reference,
