@@ -1170,9 +1170,12 @@ func (c *client) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, err
 	var opts bind.CallOpts
 	if c.opts != nil {
 		opts = *c.opts
+		opts.BlockNumber = blockNumber
+	} else {
+		opts = bind.CallOpts{
+			BlockNumber: blockNumber,
+		}
 	}
-	opts.BlockNumber = blockNumber
-
 	poolStake, err := contracts.FortaStaking.ActiveStakeFor(&opts, SubjectTypeScannerPool, poolID)
 	if err != nil {
 		return nil, err
@@ -1194,8 +1197,12 @@ func (c *client) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big
 	var opts bind.CallOpts
 	if c.opts != nil {
 		opts = *c.opts
+		opts.BlockNumber = blockNumber
+	} else {
+		opts = bind.CallOpts{
+			BlockNumber: blockNumber,
+		}
 	}
-	opts.BlockNumber = blockNumber
 
 	return contracts.StakeAllocator.AllocatedStakePerManaged(&opts, SubjectTypeScannerPool, poolID)
 }
