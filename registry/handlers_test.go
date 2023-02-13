@@ -45,12 +45,14 @@ func TestHandlerRegistry(t *testing.T) {
 		DispatchHandlers:  regmsg.Handlers(dispatch1.HandleMessage),
 	})
 
-	err := handlerReg.Handle(ctx, nil, &registry.AgentSaveMessage{
+	logger := logrus.NewEntry(logrus.StandardLogger())
+
+	err := handlerReg.Handle(ctx, logger, &registry.AgentSaveMessage{
 		AgentMessage: registry.AgentMessage{AgentID: testID1},
 	})
 	r.NoError(err)
 
-	err = handlerReg.Handle(ctx, nil, &registry.DispatchMessage{
+	err = handlerReg.Handle(ctx, logger, &registry.DispatchMessage{
 		AgentID: testID2,
 	})
 	r.NoError(err)
