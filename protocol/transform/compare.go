@@ -1,14 +1,15 @@
 package transform
 
-import "github.com/forta-network/forta-core-go/protocol"
+import (
+	"reflect"
 
-func IsSameBotSubscription(a, b *protocol.CombinerBotSubscription) bool {
+	"github.com/forta-network/forta-core-go/protocol"
+)
+
+func Equal(a, b *protocol.CombinerBotSubscription) bool {
 	if a == nil || b == nil {
 		return false
 	}
 
-	sameBot := a.BotId == b.BotId
-	sameAlert := a.AlertId == b.AlertId
-
-	return sameAlert && sameBot
+	return reflect.DeepEqual(a, b)
 }
