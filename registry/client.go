@@ -148,7 +148,7 @@ type Client interface {
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 
 	// GetActiveScannerStake returns the active stake for a scanner
-	GetActiveScannerStake(scannerID string) (*big.Int, error)
+	GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error)
 
 	// GetActivePoolStake returns the total active stake for a pool at a specific block
 	GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error)
@@ -949,9 +949,20 @@ func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
 	return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
-func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {
+func (c *client) GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error) {
+
+	var opts bind.CallOpts
+	if c.opts != nil {
+		opts = *c.opts
+		opts.BlockNumber = blockNumber
+	} else {
+		opts = bind.CallOpts{
+			BlockNumber: blockNumber,
+		}
+	}
+
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.Contracts().FortaStaking.ActiveStakeFor(c.opts, 0, sID)
+	return c.Contracts().FortaStaking.ActiveStakeFor(&opts, SubjectTypeScanner, sID)
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
