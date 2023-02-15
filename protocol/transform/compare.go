@@ -1,7 +1,8 @@
 package transform
 
 import (
-	"reflect"
+	"sort"
+	"strings"
 
 	"github.com/forta-network/forta-core-go/protocol"
 )
@@ -11,5 +12,23 @@ func Equal(a, b *protocol.CombinerBotSubscription) bool {
 		return false
 	}
 
-	return reflect.DeepEqual(a, b)
+	if a.BotId != b.BotId {
+		return false
+	}
+
+	if a.AlertId != b.AlertId {
+		return false
+	}
+
+	if a.ChainId != b.ChainId {
+		return false
+	}
+
+	sort.Strings(a.AlertIds)
+	sort.Strings(b.AlertIds)
+	if !strings.EqualFold(strings.Join(a.AlertIds, ","), strings.Join(b.AlertIds, ",")) {
+		return false
+	}
+
+	return true
 }
