@@ -1,14 +1,31 @@
 package transform
 
-import "github.com/forta-network/forta-core-go/protocol"
+import (
+	"sort"
+	"strings"
 
-func IsSameBotSubscription(a, b *protocol.CombinerBotSubscription) bool {
+	"github.com/forta-network/forta-core-go/protocol"
+)
+
+func Equal(a, b *protocol.CombinerBotSubscription) bool {
 	if a == nil || b == nil {
 		return false
 	}
 
-	sameBot := a.BotId == b.BotId
-	sameAlert := a.AlertId == b.AlertId
+	if a.BotId != b.BotId {
+		return false
+	}
 
-	return sameAlert && sameBot
+	if a.AlertId != b.AlertId {
+		return false
+	}
+
+	if a.ChainId != b.ChainId {
+		return false
+	}
+
+	sort.Strings(a.AlertIds)
+	sort.Strings(b.AlertIds)
+
+	return strings.EqualFold(strings.Join(a.AlertIds, ","), strings.Join(b.AlertIds, ","))
 }
