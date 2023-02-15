@@ -26,9 +26,6 @@ func Equal(a, b *protocol.CombinerBotSubscription) bool {
 
 	sort.Strings(a.AlertIds)
 	sort.Strings(b.AlertIds)
-	if !strings.EqualFold(strings.Join(a.AlertIds, ","), strings.Join(b.AlertIds, ",")) {
-		return false
-	}
 
-	return true
+	return strings.EqualFold(strings.Join(a.AlertIds, ","), strings.Join(b.AlertIds, ","))
 }
