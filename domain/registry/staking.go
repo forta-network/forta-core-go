@@ -22,6 +22,7 @@ import (
 const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
 const ScannerPoolStake = "ScannerPoolStake"
+const ScannerPoolDelegatorStake = "ScannerPoolDelegatorStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
 const TransferShares = "TransferShares"
@@ -138,6 +139,8 @@ func extractStakeType(id *big.Int) (string, error) {
 		return AgentStake, nil
 	case 2:
 		return ScannerPoolStake, nil
+	case 3:
+		return ScannerPoolDelegatorStake, nil
 	default:
 		return "", fmt.Errorf("invalid stake type '%d': %s", lastByte, id.String())
 	}
