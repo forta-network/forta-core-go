@@ -148,7 +148,7 @@ type Client interface {
 	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
 
 	// GetActiveScannerStake returns the active stake for a scanner
-	GetActiveScannerStake(scannerID string) (*big.Int, error)
+	GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error)
 
 	// GetActivePoolStake returns the total active stake for a pool at a specific block
 	GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error)
@@ -949,9 +949,23 @@ func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
 	return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
-func (c *client) GetActiveScannerStake(scannerID string) (*big.Int, error) {
+func (c *client) getBlockOpts(blockNumber *big.Int) *bind.CallOpts {
+	if c.opts != nil {
+		opts := *c.opts
+		opts.BlockNumber = blockNumber
+		return &opts
+	}
+	return &bind.CallOpts{
+		BlockNumber: blockNumber,
+	}
+}
+
+func (c *client) GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error) {
+
+	opts := c.getBlockOpts(blockNumber)
+
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.Contracts().FortaStaking.ActiveStakeFor(c.opts, 0, sID)
+	return c.Contracts().FortaStaking.ActiveStakeFor(opts, SubjectTypeScanner, sID)
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
@@ -1167,17 +1181,12 @@ func (c *client) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, err
 		return nil, ErrContractNotReady
 	}
 
-	var opts bind.CallOpts
-	if c.opts != nil {
-		opts = *c.opts
-	}
-	opts.BlockNumber = blockNumber
-
-	poolStake, err := contracts.FortaStaking.ActiveStakeFor(&opts, SubjectTypeScannerPool, poolID)
+	opts := c.getBlockOpts(blockNumber)
+	poolStake, err := contracts.FortaStaking.ActiveStakeFor(opts, SubjectTypeScannerPool, poolID)
 	if err != nil {
 		return nil, err
 	}
-	delegatorPoolStake, err := contracts.FortaStaking.ActiveStakeFor(&opts, SubjectTypeDelegatorScannerPool, poolID)
+	delegatorPoolStake, err := contracts.FortaStaking.ActiveStakeFor(opts, SubjectTypeDelegatorScannerPool, poolID)
 	if err != nil {
 		return nil, err
 	}
@@ -1191,11 +1200,6 @@ func (c *client) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big
 		return nil, ErrContractNotReady
 	}
 
-	var opts bind.CallOpts
-	if c.opts != nil {
-		opts = *c.opts
-	}
-	opts.BlockNumber = blockNumber
-
-	return contracts.StakeAllocator.AllocatedStakePerManaged(&opts, SubjectTypeScannerPool, poolID)
+	opts := c.getBlockOpts(blockNumber)
+	return contracts.StakeAllocator.AllocatedStakePerManaged(opts, SubjectTypeScannerPool, poolID)
 }

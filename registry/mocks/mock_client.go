@@ -241,18 +241,18 @@ func (mr *MockClientMockRecorder) GetActivePoolStake(blockNumber, poolID interfa
 }
 
 // GetActiveScannerStake mocks base method.
-func (m *MockClient) GetActiveScannerStake(scannerID string) (*big.Int, error) {
+func (m *MockClient) GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetActiveScannerStake", scannerID)
+	ret := m.ctrl.Call(m, "GetActiveScannerStake", blockNumber, scannerID)
 	ret0, _ := ret[0].(*big.Int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetActiveScannerStake indicates an expected call of GetActiveScannerStake.
-func (mr *MockClientMockRecorder) GetActiveScannerStake(scannerID interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) GetActiveScannerStake(blockNumber, scannerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveScannerStake", reflect.TypeOf((*MockClient)(nil).GetActiveScannerStake), scannerID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveScannerStake", reflect.TypeOf((*MockClient)(nil).GetActiveScannerStake), blockNumber, scannerID)
 }
 
 // GetAgent mocks base method.
