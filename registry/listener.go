@@ -371,17 +371,22 @@ func (l *listener) handleUpgradeEvent(contracts *Contracts, le types.Log, blk *d
 	}
 	l.setLogFilterAddrs()
 
-	if getTopic(le) != UpgradedTopic {
-		return nil
+	var upgradeMsg *registry.UpgradeMessage
+
+	switch getTopic(le) {
+	case UpgradedTopic:
+		// use any contract's filterer to unpack the event - pick dispatch
+		upgraded, err := contracts.DispatchFil.ParseUpgraded(le)
+		if err != nil {
+			return err
+		}
+		upgradeMsg = registry.NewUpgradeMessageFromUpgrade(upgraded, le, blk)
+
+	default:
+		upgradeMsg = registry.NewUpgradeMessageFromConfigurationChange(le.TxHash, le, blk)
 	}
 
-	// use any contract's filterer to unpack the event - pick dispatch
-	upgraded, err := contracts.DispatchFil.ParseUpgraded(le)
-	if err != nil {
-		return err
-	}
-
-	return l.handler(l.ctx, logger, registry.NewUpgradeMessage(upgraded, le, blk))
+	return l.handler(l.ctx, logger, upgradeMsg)
 }
 
 func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
