@@ -11,6 +11,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_0"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
 
@@ -32,6 +33,22 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 		Name:           "listener",
 		JsonRpcURL:     jrpc,
 		ENSAddress:     defaultEnsAddress,
+		ContractFilter: filter,
+		Topics:         []string{topic},
+		Handlers:       handlers,
+		NoRefresh:      true,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return l
+}
+
+func testMumbaiListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
+	l, err := NewListener(ctx, ListenerConfig{
+		Name:           "listener",
+		JsonRpcURL:     "https://rpc.ankr.com/polygon_mumbai",
+		ENSAddress:     devConfig.ENSAddress,
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
@@ -70,6 +87,23 @@ func TestListener_Listen(t *testing.T) {
 				},
 			),
 			block: 27061991,
+		},
+		{
+			name: "configuration-change",
+			listener: testMumbaiListener(ctx, &ContractFilter{FortaStaking: true},
+				contract_forta_staking_0_1_2.StakeHelpersConfiguredTopic,
+				Handlers{
+					UpgradeHandlers: regmsg.Handlers(
+						func(ctx context.Context, logger *log.Entry, msg *registry.UpgradeMessage) error {
+							assert.Equal(t, int64(31808525), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.ConfigurationChange, msg.Action)
+							assert.Equal(t, strings.ToLower("0x64d5192f03bd98db1de2aa8b4abac5419eac32ce"), msg.Proxy)
+							return found
+						},
+					),
+				},
+			),
+			block: 31808525,
 		},
 		{
 			name: "agent-enable",
