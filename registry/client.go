@@ -936,7 +936,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	contracts := c.Contracts()
 
-	if operational, err := c.isNonMigratedScannerOperational(scannerID); err != nil && operational {
+	if operational, err := c.isNonMigratedScannerOperational(scannerID); err == nil && operational {
 		return true, nil
 	}
 
