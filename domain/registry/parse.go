@@ -82,7 +82,7 @@ func MessageTypeForAction(action string) (regmsg.Interface, bool) {
 	case AgentStakeThreshold:
 		return &AgentStakeThresholdMessage{}, true
 
-	case Upgrade:
+	case Upgrade, ConfigurationChange:
 		return &UpgradeMessage{}, true
 	}
 	return nil, false

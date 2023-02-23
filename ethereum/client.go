@@ -66,7 +66,7 @@ var ErrNotFound = fmt.Errorf("not found")
 var permanentErrors = []string{
 	"method not found",
 	"hash is not currently canonical",
-	"unknown block",
+	//"unknown block",
 	"unable to complete request at this time",
 	"503 service unavailable",
 	"trace_block is not available",
