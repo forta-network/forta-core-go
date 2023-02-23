@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/big"
 	"sync"
+	"time"
 
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
@@ -591,10 +592,16 @@ func (c *client) ForEachScannerSinceBlock(
 		if err != nil {
 			return err
 		}
+
+		enabled, err := c.IsEnabledScanner(utils.ScannerIDBigIntToHex(event.ScannerId))
+		if err != nil {
+			return err
+		}
+
 		if err := handler(event, &Scanner{
 			ScannerID: utils.ScannerIDBigIntToHex(event.ScannerId),
 			ChainID:   scn.ChainId.Int64(),
-			Enabled:   scn.Enabled,
+			Enabled:   enabled,
 			Manifest:  scn.Metadata,
 			Owner:     scn.Owner.Hex(),
 		}); err != nil {
@@ -928,10 +935,27 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	contracts := c.Contracts()
-	if c.migrationEnded() && contracts.ScannerPoolReg != nil {
-		return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
+
+	if operational, err := c.isNonMigratedScannerOperational(scannerID); err != nil && operational {
+		return true, nil
 	}
-	return contracts.ScannerReg.IsEnabled(c.opts, utils.ScannerIDHexToBigInt(scannerID))
+
+	return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
+}
+
+func (c *client) isNonMigratedScannerOperational(scannerID string) (bool, error) {
+	contracts := c.Contracts()
+
+	// WARNING: we are not able to check if the scanner was disabled by the operator
+	// because getDisableFlags is not an exposed method anymore
+	// this is just for until Mar 14 and it's a rare case that anyone want to have stake and disable a non-migrated scanner
+
+	if time.Now().After(time.Date(2023, 3, 14, 0, 0, 0, 0, time.UTC)) {
+		return false, nil
+	}
+
+	// this checks both that the scanner is registered (exists) and it is staked over min
+	return contracts.ScannerReg.IsStakedOverMin(c.opts, utils.ScannerIDHexToBigInt(scannerID))
 }
 
 func (c *client) migrationEnded() bool {
@@ -986,7 +1010,7 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 		return nil, nil
 	}
 
-	enabled, err := contracts.ScannerReg.IsEnabled(c.opts, sID)
+	enabled, err := c.IsEnabledScanner(scannerID)
 	if err != nil {
 		return nil, err
 	}
