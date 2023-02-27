@@ -50,6 +50,14 @@ message BloomFilter {
   uint32 itemCount = 4;
 }
 
+message AddressDetails {
+  string type = 1;
+  repeated string sources = 2;
+  string projectId = 3;
+  string address = 4;
+  string name = 5;
+}
+
 message Alert {
   string id = 1;
   AlertType type = 2;
@@ -62,6 +70,7 @@ message Alert {
   TrackingTimestamps timestamps = 9;
   bool truncated = 10;
   BloomFilter addressBloomFilter = 11;
+  repeated AddressDetails addressDetails = 12;
 }
 
 message SignedAlert {
