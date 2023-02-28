@@ -8,6 +8,10 @@ import (
 	"github.com/forta-network/forta-core-go/protocol"
 )
 
+const (
+	NumMaxAddresses = 50
+)
+
 func RecreateBloomFilter(bf *protocol.BloomFilter) (*bloom.BloomFilter, error) {
 	b, err := base64.StdEncoding.DecodeString(bf.Bitset)
 	if err != nil {
