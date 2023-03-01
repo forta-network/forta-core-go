@@ -3,9 +3,11 @@ package utils
 import (
 	"bytes"
 	"encoding/base64"
+	"math/big"
 
 	"github.com/bits-and-blooms/bloom"
 	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/forta-network/forta-core-go/utils"
 )
 
 const (
@@ -13,7 +15,39 @@ const (
 	AddressBloomFilterFPRate = 1e-3
 )
 
-func RecreateBloomFilter(bf *protocol.BloomFilter) (*bloom.BloomFilter, error) {
+func CreateBloomFilter(items []string, fpRate float64) (*protocol.BloomFilter, error) {
+	// create bloom filter from all addresses
+	bf := bloom.NewWithEstimates(uint(len(items)), fpRate)
+	for _, address := range items {
+		bf.Add([]byte(address))
+	}
+
+	// extract bitset from bloom filter
+	var b bytes.Buffer
+
+	_, err := bf.WriteTo(&b)
+	if err != nil {
+		return nil, err
+	}
+
+	// create bloom filter
+	bitset := base64.StdEncoding.EncodeToString(b.Bytes())
+
+	kBigInt := new(big.Int).SetUint64(uint64(bf.K()))
+	mBigInt := new(big.Int).SetUint64(uint64(bf.Cap()))
+
+	kHexStr := utils.BigIntToHex(kBigInt)
+	mHexStr := utils.BigIntToHex(mBigInt)
+
+	return &protocol.BloomFilter{
+		K:         kHexStr,
+		M:         mHexStr,
+		Bitset:    bitset,
+		ItemCount: uint32(len(items)),
+	}, nil
+}
+
+func CreateBloomFilterFromProto(bf *protocol.BloomFilter) (*bloom.BloomFilter, error) {
 	b, err := base64.StdEncoding.DecodeString(bf.Bitset)
 	if err != nil {
 		return nil, err
