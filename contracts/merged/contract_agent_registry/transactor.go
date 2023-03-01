@@ -6,12 +6,9 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	agentregistry014 "github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
 
 	agentregistry016 "github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_6"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -20,29 +17,26 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/core/types"
-
 )
 
 // AgentRegistryTransactor is a new type which can multiplex calls to different implementation types.
 type AgentRegistryTransactor struct {
-
 	typ0 *agentregistry014.AgentRegistryTransactor
 
 	typ1 *agentregistry016.AgentRegistryTransactor
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewAgentRegistryTransactor creates a new merged type.
 func NewAgentRegistryTransactor(address common.Address, transactor bind.ContractTransactor) (*AgentRegistryTransactor, error) {
 	var (
 		mergedType AgentRegistryTransactor
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.4"
-
 
 	mergedType.typ0, err = agentregistry014.NewAgentRegistryTransactor(address, transactor)
 	if err != nil {
@@ -53,7 +47,6 @@ func NewAgentRegistryTransactor(address common.Address, transactor bind.Contract
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize agentregistry016.AgentRegistryTransactor: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -97,18 +90,12 @@ func (merged *AgentRegistryTransactor) Safe() {
 	merged.unsafe = false
 }
 
-
-
-
 // Approve multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) Approve(opts *bind.TransactOpts, to common.Address, tokenId *big.Int) (retVal *types.Transaction, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Approve(opts, to, tokenId)
@@ -136,12 +123,9 @@ func (merged *AgentRegistryTransactor) Approve(opts *bind.TransactOpts, to commo
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.Approve not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // CreateAgent multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) CreateAgent(opts *bind.TransactOpts, agentId *big.Int, owner common.Address, metadata string, chainIds []*big.Int, arg1 common.Address) (retVal *types.Transaction, err error) {
@@ -149,9 +133,6 @@ func (merged *AgentRegistryTransactor) CreateAgent(opts *bind.TransactOpts, agen
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.CreateAgent(opts, agentId, owner, metadata, chainIds)
@@ -179,12 +160,9 @@ func (merged *AgentRegistryTransactor) CreateAgent(opts *bind.TransactOpts, agen
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.CreateAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // DisableAgent multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) DisableAgent(opts *bind.TransactOpts, agentId *big.Int, permission uint8) (retVal *types.Transaction, err error) {
@@ -192,9 +170,6 @@ func (merged *AgentRegistryTransactor) DisableAgent(opts *bind.TransactOpts, age
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.DisableAgent(opts, agentId, permission)
@@ -222,12 +197,9 @@ func (merged *AgentRegistryTransactor) DisableAgent(opts *bind.TransactOpts, age
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.DisableAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // EnableAgent multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) EnableAgent(opts *bind.TransactOpts, agentId *big.Int, permission uint8) (retVal *types.Transaction, err error) {
@@ -235,9 +207,6 @@ func (merged *AgentRegistryTransactor) EnableAgent(opts *bind.TransactOpts, agen
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.EnableAgent(opts, agentId, permission)
@@ -265,12 +234,9 @@ func (merged *AgentRegistryTransactor) EnableAgent(opts *bind.TransactOpts, agen
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.EnableAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Initialize multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) Initialize(opts *bind.TransactOpts, __manager common.Address, __router common.Address, __name string, __symbol string) (retVal *types.Transaction, err error) {
@@ -278,9 +244,6 @@ func (merged *AgentRegistryTransactor) Initialize(opts *bind.TransactOpts, __man
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Initialize(opts, __manager, __router, __name, __symbol)
@@ -308,12 +271,9 @@ func (merged *AgentRegistryTransactor) Initialize(opts *bind.TransactOpts, __man
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.Initialize not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Multicall multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) Multicall(opts *bind.TransactOpts, data [][]byte) (retVal *types.Transaction, err error) {
@@ -321,9 +281,6 @@ func (merged *AgentRegistryTransactor) Multicall(opts *bind.TransactOpts, data [
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Multicall(opts, data)
@@ -351,12 +308,9 @@ func (merged *AgentRegistryTransactor) Multicall(opts *bind.TransactOpts, data [
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.Multicall not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // PrepareAgent multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) PrepareAgent(opts *bind.TransactOpts, commit [32]byte) (retVal *types.Transaction, err error) {
@@ -364,9 +318,6 @@ func (merged *AgentRegistryTransactor) PrepareAgent(opts *bind.TransactOpts, com
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.PrepareAgent(opts, commit)
@@ -394,12 +345,9 @@ func (merged *AgentRegistryTransactor) PrepareAgent(opts *bind.TransactOpts, com
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.PrepareAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SafeTransferFrom multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SafeTransferFrom(opts *bind.TransactOpts, from common.Address, to common.Address, tokenId *big.Int) (retVal *types.Transaction, err error) {
@@ -407,9 +355,6 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom(opts *bind.TransactOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SafeTransferFrom(opts, from, to, tokenId)
@@ -437,12 +382,9 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom(opts *bind.TransactOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SafeTransferFrom not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SafeTransferFrom0 multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SafeTransferFrom0(opts *bind.TransactOpts, from common.Address, to common.Address, tokenId *big.Int, data []byte) (retVal *types.Transaction, err error) {
@@ -450,9 +392,6 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom0(opts *bind.TransactOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SafeTransferFrom0(opts, from, to, tokenId, data)
@@ -480,12 +419,9 @@ func (merged *AgentRegistryTransactor) SafeTransferFrom0(opts *bind.TransactOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SafeTransferFrom0 not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetAccessManager multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetAccessManager(opts *bind.TransactOpts, newManager common.Address) (retVal *types.Transaction, err error) {
@@ -493,9 +429,6 @@ func (merged *AgentRegistryTransactor) SetAccessManager(opts *bind.TransactOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetAccessManager(opts, newManager)
@@ -523,12 +456,9 @@ func (merged *AgentRegistryTransactor) SetAccessManager(opts *bind.TransactOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetAccessManager not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetApprovalForAll multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetApprovalForAll(opts *bind.TransactOpts, operator common.Address, approved bool) (retVal *types.Transaction, err error) {
@@ -536,9 +466,6 @@ func (merged *AgentRegistryTransactor) SetApprovalForAll(opts *bind.TransactOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetApprovalForAll(opts, operator, approved)
@@ -566,12 +493,9 @@ func (merged *AgentRegistryTransactor) SetApprovalForAll(opts *bind.TransactOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetFrontRunningDelay multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetFrontRunningDelay(opts *bind.TransactOpts, delay *big.Int) (retVal *types.Transaction, err error) {
@@ -579,9 +503,6 @@ func (merged *AgentRegistryTransactor) SetFrontRunningDelay(opts *bind.TransactO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetFrontRunningDelay(opts, delay)
@@ -609,12 +530,9 @@ func (merged *AgentRegistryTransactor) SetFrontRunningDelay(opts *bind.TransactO
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetFrontRunningDelay not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetName multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetName(opts *bind.TransactOpts, ensRegistry common.Address, ensName string) (retVal *types.Transaction, err error) {
@@ -622,9 +540,6 @@ func (merged *AgentRegistryTransactor) SetName(opts *bind.TransactOpts, ensRegis
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetName(opts, ensRegistry, ensName)
@@ -652,12 +567,9 @@ func (merged *AgentRegistryTransactor) SetName(opts *bind.TransactOpts, ensRegis
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetName not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetRouter multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetRouter(opts *bind.TransactOpts, newRouter common.Address) (retVal *types.Transaction, err error) {
@@ -665,9 +577,6 @@ func (merged *AgentRegistryTransactor) SetRouter(opts *bind.TransactOpts, newRou
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetRouter(opts, newRouter)
@@ -682,12 +591,9 @@ func (merged *AgentRegistryTransactor) SetRouter(opts *bind.TransactOpts, newRou
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetRouter not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetStakeController multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetStakeController(opts *bind.TransactOpts, stakeController common.Address) (retVal *types.Transaction, err error) {
@@ -695,9 +601,6 @@ func (merged *AgentRegistryTransactor) SetStakeController(opts *bind.TransactOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetStakeController(opts, stakeController)
@@ -712,12 +615,9 @@ func (merged *AgentRegistryTransactor) SetStakeController(opts *bind.TransactOpt
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetStakeController not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetStakeThreshold multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetStakeThreshold(opts *bind.TransactOpts, newStakeThreshold agentregistry014.IStakeSubjectStakeThreshold, newStakeThresholdAlt1 agentregistry016.IStakeSubjectStakeThreshold) (retVal *types.Transaction, err error) {
@@ -725,9 +625,6 @@ func (merged *AgentRegistryTransactor) SetStakeThreshold(opts *bind.TransactOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SetStakeThreshold(opts, newStakeThreshold)
@@ -755,12 +652,9 @@ func (merged *AgentRegistryTransactor) SetStakeThreshold(opts *bind.TransactOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetStakeThreshold not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // TransferFrom multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) TransferFrom(opts *bind.TransactOpts, from common.Address, to common.Address, tokenId *big.Int) (retVal *types.Transaction, err error) {
@@ -768,9 +662,6 @@ func (merged *AgentRegistryTransactor) TransferFrom(opts *bind.TransactOpts, fro
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.TransferFrom(opts, from, to, tokenId)
@@ -798,12 +689,9 @@ func (merged *AgentRegistryTransactor) TransferFrom(opts *bind.TransactOpts, fro
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.TransferFrom not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // UpdateAgent multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) UpdateAgent(opts *bind.TransactOpts, agentId *big.Int, metadata string, chainIds []*big.Int) (retVal *types.Transaction, err error) {
@@ -811,9 +699,6 @@ func (merged *AgentRegistryTransactor) UpdateAgent(opts *bind.TransactOpts, agen
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.UpdateAgent(opts, agentId, metadata, chainIds)
@@ -841,12 +726,9 @@ func (merged *AgentRegistryTransactor) UpdateAgent(opts *bind.TransactOpts, agen
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.UpdateAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // UpgradeTo multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) UpgradeTo(opts *bind.TransactOpts, newImplementation common.Address) (retVal *types.Transaction, err error) {
@@ -854,9 +736,6 @@ func (merged *AgentRegistryTransactor) UpgradeTo(opts *bind.TransactOpts, newImp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.UpgradeTo(opts, newImplementation)
@@ -884,12 +763,9 @@ func (merged *AgentRegistryTransactor) UpgradeTo(opts *bind.TransactOpts, newImp
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.UpgradeTo not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // UpgradeToAndCall multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) UpgradeToAndCall(opts *bind.TransactOpts, newImplementation common.Address, data []byte) (retVal *types.Transaction, err error) {
@@ -897,9 +773,6 @@ func (merged *AgentRegistryTransactor) UpgradeToAndCall(opts *bind.TransactOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.UpgradeToAndCall(opts, newImplementation, data)
@@ -927,12 +800,9 @@ func (merged *AgentRegistryTransactor) UpgradeToAndCall(opts *bind.TransactOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.UpgradeToAndCall not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // DisableRouter multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) DisableRouter(opts *bind.TransactOpts) (retVal *types.Transaction, err error) {
@@ -940,9 +810,6 @@ func (merged *AgentRegistryTransactor) DisableRouter(opts *bind.TransactOpts) (r
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.DisableRouter(opts)
@@ -957,12 +824,9 @@ func (merged *AgentRegistryTransactor) DisableRouter(opts *bind.TransactOpts) (r
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.DisableRouter not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // RegisterAgent multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) RegisterAgent(opts *bind.TransactOpts, agentId *big.Int, metadata string, chainIds []*big.Int) (retVal *types.Transaction, err error) {
@@ -970,9 +834,6 @@ func (merged *AgentRegistryTransactor) RegisterAgent(opts *bind.TransactOpts, ag
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.RegisterAgent(opts, agentId, metadata, chainIds)
@@ -987,12 +848,9 @@ func (merged *AgentRegistryTransactor) RegisterAgent(opts *bind.TransactOpts, ag
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryTransactor.RegisterAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SetSubjectHandler multiplexes to different implementations of the method.
 func (merged *AgentRegistryTransactor) SetSubjectHandler(opts *bind.TransactOpts, subjectGateway common.Address) (retVal *types.Transaction, err error) {
@@ -1000,9 +858,6 @@ func (merged *AgentRegistryTransactor) SetSubjectHandler(opts *bind.TransactOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.SetSubjectHandler(opts, subjectGateway)
@@ -1016,7 +871,6 @@ func (merged *AgentRegistryTransactor) SetSubjectHandler(opts *bind.TransactOpts
 
 		return
 	}
-
 
 	err = import_fmt.Errorf("AgentRegistryTransactor.SetSubjectHandler not implemented (tag=%s)", merged.currTag)
 	return

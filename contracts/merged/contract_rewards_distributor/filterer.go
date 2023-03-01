@@ -6,10 +6,7 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	rewardsdistributor010 "github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -20,33 +17,29 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
-
 )
 
 // RewardsDistributorFilterer is a new type which can multiplex calls to different implementation types.
 type RewardsDistributorFilterer struct {
-
 	typ0 *rewardsdistributor010.RewardsDistributorFilterer
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewRewardsDistributorFilterer creates a new merged type.
 func NewRewardsDistributorFilterer(address common.Address, filterer bind.ContractFilterer) (*RewardsDistributorFilterer, error) {
 	var (
 		mergedType RewardsDistributorFilterer
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.0"
-
 
 	mergedType.typ0, err = rewardsdistributor010.NewRewardsDistributorFilterer(address, filterer)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize rewardsdistributor010.RewardsDistributorFilterer: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -86,18 +79,12 @@ func (merged *RewardsDistributorFilterer) Safe() {
 	merged.unsafe = false
 }
 
-
-
-
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterAccessManagerUpdated(opts *bind.FilterOpts, newAddressManager []common.Address) (retVal *rewardsdistributor010.RewardsDistributorAccessManagerUpdatedIterator, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -112,12 +99,9 @@ func (merged *RewardsDistributorFilterer) FilterAccessManagerUpdated(opts *bind.
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorAccessManagerUpdated, newAddressManager []common.Address) (retVal event.Subscription, err error) {
@@ -125,9 +109,6 @@ func (merged *RewardsDistributorFilterer) WatchAccessManagerUpdated(opts *bind.W
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -142,19 +123,15 @@ func (merged *RewardsDistributorFilterer) WatchAccessManagerUpdated(opts *bind.W
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorAccessManagerUpdated is a merged return type.
 type RewardsDistributorAccessManagerUpdated struct {
-
 	NewAddressManager common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -164,10 +141,7 @@ func (merged *RewardsDistributorFilterer) ParseAccessManagerUpdated(log types.Lo
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorAccessManagerUpdated{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -177,21 +151,16 @@ func (merged *RewardsDistributorFilterer) ParseAccessManagerUpdated(log types.Lo
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterAdminChanged multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVal *rewardsdistributor010.RewardsDistributorAdminChangedIterator, err error) {
@@ -199,9 +168,6 @@ func (merged *RewardsDistributorFilterer) FilterAdminChanged(opts *bind.FilterOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -216,12 +182,9 @@ func (merged *RewardsDistributorFilterer) FilterAdminChanged(opts *bind.FilterOp
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorAdminChanged) (retVal event.Subscription, err error) {
@@ -229,9 +192,6 @@ func (merged *RewardsDistributorFilterer) WatchAdminChanged(opts *bind.WatchOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -246,21 +206,17 @@ func (merged *RewardsDistributorFilterer) WatchAdminChanged(opts *bind.WatchOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorAdminChanged is a merged return type.
 type RewardsDistributorAdminChanged struct {
-
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -270,10 +226,7 @@ func (merged *RewardsDistributorFilterer) ParseAdminChanged(log types.Log) (retV
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorAdminChanged{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -283,23 +236,18 @@ func (merged *RewardsDistributorFilterer) ParseAdminChanged(log types.Log) (retV
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beacon []common.Address) (retVal *rewardsdistributor010.RewardsDistributorBeaconUpgradedIterator, err error) {
@@ -307,9 +255,6 @@ func (merged *RewardsDistributorFilterer) FilterBeaconUpgraded(opts *bind.Filter
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -324,12 +269,9 @@ func (merged *RewardsDistributorFilterer) FilterBeaconUpgraded(opts *bind.Filter
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorBeaconUpgraded, beacon []common.Address) (retVal event.Subscription, err error) {
@@ -337,9 +279,6 @@ func (merged *RewardsDistributorFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -354,19 +293,15 @@ func (merged *RewardsDistributorFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorBeaconUpgraded is a merged return type.
 type RewardsDistributorBeaconUpgraded struct {
-
 	Beacon common.Address
 
 	Raw types.Log
-
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -376,10 +311,7 @@ func (merged *RewardsDistributorFilterer) ParseBeaconUpgraded(log types.Log) (re
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorBeaconUpgraded{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -389,21 +321,16 @@ func (merged *RewardsDistributorFilterer) ParseBeaconUpgraded(log types.Log) (re
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterClaimedRewards multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterClaimedRewards(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int, to []common.Address) (retVal *rewardsdistributor010.RewardsDistributorClaimedRewardsIterator, err error) {
@@ -411,9 +338,6 @@ func (merged *RewardsDistributorFilterer) FilterClaimedRewards(opts *bind.Filter
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterClaimedRewards(opts, subjectType, subject, to)
@@ -428,12 +352,9 @@ func (merged *RewardsDistributorFilterer) FilterClaimedRewards(opts *bind.Filter
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterClaimedRewards not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchClaimedRewards multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchClaimedRewards(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorClaimedRewards, subjectType []uint8, subject []*big.Int, to []common.Address) (retVal event.Subscription, err error) {
@@ -441,9 +362,6 @@ func (merged *RewardsDistributorFilterer) WatchClaimedRewards(opts *bind.WatchOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchClaimedRewards(opts, sink, subjectType, subject, to)
@@ -458,15 +376,12 @@ func (merged *RewardsDistributorFilterer) WatchClaimedRewards(opts *bind.WatchOp
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchClaimedRewards not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorClaimedRewards is a merged return type.
 type RewardsDistributorClaimedRewards struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -478,7 +393,6 @@ type RewardsDistributorClaimedRewards struct {
 	Value *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseClaimedRewards multiplexes to different implementations of the method.
@@ -488,10 +402,7 @@ func (merged *RewardsDistributorFilterer) ParseClaimedRewards(log types.Log) (re
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorClaimedRewards{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseClaimedRewards(log)
@@ -500,7 +411,6 @@ func (merged *RewardsDistributorFilterer) ParseClaimedRewards(log types.Log) (re
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -514,16 +424,12 @@ func (merged *RewardsDistributorFilterer) ParseClaimedRewards(log types.Log) (re
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseClaimedRewards not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterDidAccumulateRate multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterDidAccumulateRate(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int, staker []common.Address) (retVal *rewardsdistributor010.RewardsDistributorDidAccumulateRateIterator, err error) {
@@ -531,9 +437,6 @@ func (merged *RewardsDistributorFilterer) FilterDidAccumulateRate(opts *bind.Fil
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterDidAccumulateRate(opts, subjectType, subject, staker)
@@ -548,12 +451,9 @@ func (merged *RewardsDistributorFilterer) FilterDidAccumulateRate(opts *bind.Fil
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterDidAccumulateRate not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchDidAccumulateRate multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchDidAccumulateRate(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorDidAccumulateRate, subjectType []uint8, subject []*big.Int, staker []common.Address) (retVal event.Subscription, err error) {
@@ -561,9 +461,6 @@ func (merged *RewardsDistributorFilterer) WatchDidAccumulateRate(opts *bind.Watc
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchDidAccumulateRate(opts, sink, subjectType, subject, staker)
@@ -578,15 +475,12 @@ func (merged *RewardsDistributorFilterer) WatchDidAccumulateRate(opts *bind.Watc
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchDidAccumulateRate not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorDidAccumulateRate is a merged return type.
 type RewardsDistributorDidAccumulateRate struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -598,7 +492,6 @@ type RewardsDistributorDidAccumulateRate struct {
 	SharesAmount *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseDidAccumulateRate multiplexes to different implementations of the method.
@@ -608,10 +501,7 @@ func (merged *RewardsDistributorFilterer) ParseDidAccumulateRate(log types.Log) 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorDidAccumulateRate{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseDidAccumulateRate(log)
@@ -620,7 +510,6 @@ func (merged *RewardsDistributorFilterer) ParseDidAccumulateRate(log types.Log) 
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -634,16 +523,12 @@ func (merged *RewardsDistributorFilterer) ParseDidAccumulateRate(log types.Log) 
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseDidAccumulateRate not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterDidReduceRate multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterDidReduceRate(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int, staker []common.Address) (retVal *rewardsdistributor010.RewardsDistributorDidReduceRateIterator, err error) {
@@ -651,9 +536,6 @@ func (merged *RewardsDistributorFilterer) FilterDidReduceRate(opts *bind.FilterO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterDidReduceRate(opts, subjectType, subject, staker)
@@ -668,12 +550,9 @@ func (merged *RewardsDistributorFilterer) FilterDidReduceRate(opts *bind.FilterO
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterDidReduceRate not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchDidReduceRate multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchDidReduceRate(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorDidReduceRate, subjectType []uint8, subject []*big.Int, staker []common.Address) (retVal event.Subscription, err error) {
@@ -681,9 +560,6 @@ func (merged *RewardsDistributorFilterer) WatchDidReduceRate(opts *bind.WatchOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchDidReduceRate(opts, sink, subjectType, subject, staker)
@@ -698,15 +574,12 @@ func (merged *RewardsDistributorFilterer) WatchDidReduceRate(opts *bind.WatchOpt
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchDidReduceRate not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorDidReduceRate is a merged return type.
 type RewardsDistributorDidReduceRate struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -718,7 +591,6 @@ type RewardsDistributorDidReduceRate struct {
 	SharesAmount *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseDidReduceRate multiplexes to different implementations of the method.
@@ -728,10 +600,7 @@ func (merged *RewardsDistributorFilterer) ParseDidReduceRate(log types.Log) (ret
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorDidReduceRate{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseDidReduceRate(log)
@@ -740,7 +609,6 @@ func (merged *RewardsDistributorFilterer) ParseDidReduceRate(log types.Log) (ret
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -754,16 +622,12 @@ func (merged *RewardsDistributorFilterer) ParseDidReduceRate(log types.Log) (ret
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseDidReduceRate not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterDidTransferRewardShares multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterDidTransferRewardShares(opts *bind.FilterOpts, sharesId []*big.Int, from []common.Address, to []common.Address) (retVal *rewardsdistributor010.RewardsDistributorDidTransferRewardSharesIterator, err error) {
@@ -771,9 +635,6 @@ func (merged *RewardsDistributorFilterer) FilterDidTransferRewardShares(opts *bi
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterDidTransferRewardShares(opts, sharesId, from, to)
@@ -788,12 +649,9 @@ func (merged *RewardsDistributorFilterer) FilterDidTransferRewardShares(opts *bi
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterDidTransferRewardShares not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchDidTransferRewardShares multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchDidTransferRewardShares(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorDidTransferRewardShares, sharesId []*big.Int, from []common.Address, to []common.Address) (retVal event.Subscription, err error) {
@@ -801,9 +659,6 @@ func (merged *RewardsDistributorFilterer) WatchDidTransferRewardShares(opts *bin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchDidTransferRewardShares(opts, sink, sharesId, from, to)
@@ -818,15 +673,12 @@ func (merged *RewardsDistributorFilterer) WatchDidTransferRewardShares(opts *bin
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchDidTransferRewardShares not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorDidTransferRewardShares is a merged return type.
 type RewardsDistributorDidTransferRewardShares struct {
-
 	SharesId *big.Int
 
 	SubjectType uint8
@@ -838,7 +690,6 @@ type RewardsDistributorDidTransferRewardShares struct {
 	SharesAmount *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseDidTransferRewardShares multiplexes to different implementations of the method.
@@ -848,10 +699,7 @@ func (merged *RewardsDistributorFilterer) ParseDidTransferRewardShares(log types
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorDidTransferRewardShares{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseDidTransferRewardShares(log)
@@ -860,7 +708,6 @@ func (merged *RewardsDistributorFilterer) ParseDidTransferRewardShares(log types
 			err = methodErr
 			return
 		}
-
 
 		retVal.SharesId = val.SharesId
 
@@ -874,16 +721,12 @@ func (merged *RewardsDistributorFilterer) ParseDidTransferRewardShares(log types
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseDidTransferRewardShares not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterInitialized multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *rewardsdistributor010.RewardsDistributorInitializedIterator, err error) {
@@ -891,9 +734,6 @@ func (merged *RewardsDistributorFilterer) FilterInitialized(opts *bind.FilterOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -908,12 +748,9 @@ func (merged *RewardsDistributorFilterer) FilterInitialized(opts *bind.FilterOpt
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorInitialized) (retVal event.Subscription, err error) {
@@ -921,9 +758,6 @@ func (merged *RewardsDistributorFilterer) WatchInitialized(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -938,19 +772,15 @@ func (merged *RewardsDistributorFilterer) WatchInitialized(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorInitialized is a merged return type.
 type RewardsDistributorInitialized struct {
-
 	Version uint8
 
 	Raw types.Log
-
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -960,10 +790,7 @@ func (merged *RewardsDistributorFilterer) ParseInitialized(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorInitialized{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -973,21 +800,16 @@ func (merged *RewardsDistributorFilterer) ParseInitialized(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterRewarded multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterRewarded(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int) (retVal *rewardsdistributor010.RewardsDistributorRewardedIterator, err error) {
@@ -995,9 +817,6 @@ func (merged *RewardsDistributorFilterer) FilterRewarded(opts *bind.FilterOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterRewarded(opts, subjectType, subject)
@@ -1012,12 +831,9 @@ func (merged *RewardsDistributorFilterer) FilterRewarded(opts *bind.FilterOpts, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterRewarded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchRewarded multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchRewarded(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorRewarded, subjectType []uint8, subject []*big.Int) (retVal event.Subscription, err error) {
@@ -1025,9 +841,6 @@ func (merged *RewardsDistributorFilterer) WatchRewarded(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchRewarded(opts, sink, subjectType, subject)
@@ -1042,15 +855,12 @@ func (merged *RewardsDistributorFilterer) WatchRewarded(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchRewarded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorRewarded is a merged return type.
 type RewardsDistributorRewarded struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -1060,7 +870,6 @@ type RewardsDistributorRewarded struct {
 	EpochNumber *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseRewarded multiplexes to different implementations of the method.
@@ -1070,10 +879,7 @@ func (merged *RewardsDistributorFilterer) ParseRewarded(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorRewarded{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseRewarded(log)
@@ -1082,7 +888,6 @@ func (merged *RewardsDistributorFilterer) ParseRewarded(log types.Log) (retVal *
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -1094,16 +899,12 @@ func (merged *RewardsDistributorFilterer) ParseRewarded(log types.Log) (retVal *
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseRewarded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterRouterUpdated(opts *bind.FilterOpts, router []common.Address) (retVal *rewardsdistributor010.RewardsDistributorRouterUpdatedIterator, err error) {
@@ -1111,9 +912,6 @@ func (merged *RewardsDistributorFilterer) FilterRouterUpdated(opts *bind.FilterO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -1128,12 +926,9 @@ func (merged *RewardsDistributorFilterer) FilterRouterUpdated(opts *bind.FilterO
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorRouterUpdated, router []common.Address) (retVal event.Subscription, err error) {
@@ -1141,9 +936,6 @@ func (merged *RewardsDistributorFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -1158,19 +950,15 @@ func (merged *RewardsDistributorFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorRouterUpdated is a merged return type.
 type RewardsDistributorRouterUpdated struct {
-
 	Router common.Address
 
 	Raw types.Log
-
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -1180,10 +968,7 @@ func (merged *RewardsDistributorFilterer) ParseRouterUpdated(log types.Log) (ret
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorRouterUpdated{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -1193,21 +978,16 @@ func (merged *RewardsDistributorFilterer) ParseRouterUpdated(log types.Log) (ret
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSetDelegationFee multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterSetDelegationFee(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int) (retVal *rewardsdistributor010.RewardsDistributorSetDelegationFeeIterator, err error) {
@@ -1215,9 +995,6 @@ func (merged *RewardsDistributorFilterer) FilterSetDelegationFee(opts *bind.Filt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterSetDelegationFee(opts, subjectType, subject)
@@ -1232,12 +1009,9 @@ func (merged *RewardsDistributorFilterer) FilterSetDelegationFee(opts *bind.Filt
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterSetDelegationFee not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSetDelegationFee multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchSetDelegationFee(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorSetDelegationFee, subjectType []uint8, subject []*big.Int) (retVal event.Subscription, err error) {
@@ -1245,9 +1019,6 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationFee(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchSetDelegationFee(opts, sink, subjectType, subject)
@@ -1262,15 +1033,12 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationFee(opts *bind.Watch
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchSetDelegationFee not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorSetDelegationFee is a merged return type.
 type RewardsDistributorSetDelegationFee struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -1280,7 +1048,6 @@ type RewardsDistributorSetDelegationFee struct {
 	FeeBps *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseSetDelegationFee multiplexes to different implementations of the method.
@@ -1290,10 +1057,7 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationFee(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorSetDelegationFee{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseSetDelegationFee(log)
@@ -1302,7 +1066,6 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationFee(log types.Log) (
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -1314,16 +1077,12 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationFee(log types.Log) (
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseSetDelegationFee not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSetDelegationParams multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterSetDelegationParams(opts *bind.FilterOpts) (retVal *rewardsdistributor010.RewardsDistributorSetDelegationParamsIterator, err error) {
@@ -1331,9 +1090,6 @@ func (merged *RewardsDistributorFilterer) FilterSetDelegationParams(opts *bind.F
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterSetDelegationParams(opts)
@@ -1348,12 +1104,9 @@ func (merged *RewardsDistributorFilterer) FilterSetDelegationParams(opts *bind.F
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterSetDelegationParams not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSetDelegationParams multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchSetDelegationParams(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorSetDelegationParams) (retVal event.Subscription, err error) {
@@ -1361,9 +1114,6 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationParams(opts *bind.Wa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchSetDelegationParams(opts, sink)
@@ -1378,21 +1128,17 @@ func (merged *RewardsDistributorFilterer) WatchSetDelegationParams(opts *bind.Wa
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchSetDelegationParams not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorSetDelegationParams is a merged return type.
 type RewardsDistributorSetDelegationParams struct {
-
 	EpochDelay *big.Int
 
 	DefaultFeeBps *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseSetDelegationParams multiplexes to different implementations of the method.
@@ -1402,10 +1148,7 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationParams(log types.Log
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorSetDelegationParams{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseSetDelegationParams(log)
@@ -1415,23 +1158,18 @@ func (merged *RewardsDistributorFilterer) ParseSetDelegationParams(log types.Log
 			return
 		}
 
-
 		retVal.EpochDelay = val.EpochDelay
 
 		retVal.DefaultFeeBps = val.DefaultFeeBps
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseSetDelegationParams not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterTokensSwept multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterTokensSwept(opts *bind.FilterOpts, token []common.Address) (retVal *rewardsdistributor010.RewardsDistributorTokensSweptIterator, err error) {
@@ -1439,9 +1177,6 @@ func (merged *RewardsDistributorFilterer) FilterTokensSwept(opts *bind.FilterOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterTokensSwept(opts, token)
@@ -1456,12 +1191,9 @@ func (merged *RewardsDistributorFilterer) FilterTokensSwept(opts *bind.FilterOpt
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterTokensSwept not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchTokensSwept multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorTokensSwept, token []common.Address) (retVal event.Subscription, err error) {
@@ -1469,9 +1201,6 @@ func (merged *RewardsDistributorFilterer) WatchTokensSwept(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchTokensSwept(opts, sink, token)
@@ -1486,15 +1215,12 @@ func (merged *RewardsDistributorFilterer) WatchTokensSwept(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchTokensSwept not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorTokensSwept is a merged return type.
 type RewardsDistributorTokensSwept struct {
-
 	Token common.Address
 
 	To common.Address
@@ -1502,7 +1228,6 @@ type RewardsDistributorTokensSwept struct {
 	Amount *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseTokensSwept multiplexes to different implementations of the method.
@@ -1512,10 +1237,7 @@ func (merged *RewardsDistributorFilterer) ParseTokensSwept(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorTokensSwept{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseTokensSwept(log)
@@ -1525,7 +1247,6 @@ func (merged *RewardsDistributorFilterer) ParseTokensSwept(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.Token = val.Token
 
 		retVal.To = val.To
@@ -1534,16 +1255,12 @@ func (merged *RewardsDistributorFilterer) ParseTokensSwept(log types.Log) (retVa
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseTokensSwept not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterUpgraded multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) FilterUpgraded(opts *bind.FilterOpts, implementation []common.Address) (retVal *rewardsdistributor010.RewardsDistributorUpgradedIterator, err error) {
@@ -1551,9 +1268,6 @@ func (merged *RewardsDistributorFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -1568,12 +1282,9 @@ func (merged *RewardsDistributorFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *RewardsDistributorFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *rewardsdistributor010.RewardsDistributorUpgraded, implementation []common.Address) (retVal event.Subscription, err error) {
@@ -1581,9 +1292,6 @@ func (merged *RewardsDistributorFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -1598,19 +1306,15 @@ func (merged *RewardsDistributorFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("RewardsDistributorFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // RewardsDistributorUpgraded is a merged return type.
 type RewardsDistributorUpgraded struct {
-
 	Implementation common.Address
 
 	Raw types.Log
-
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -1620,10 +1324,7 @@ func (merged *RewardsDistributorFilterer) ParseUpgraded(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &RewardsDistributorUpgraded{}
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -1633,15 +1334,12 @@ func (merged *RewardsDistributorFilterer) ParseUpgraded(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("RewardsDistributorFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return
