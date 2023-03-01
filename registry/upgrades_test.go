@@ -23,7 +23,7 @@ func TestListenToUpgrades(t *testing.T) {
 
 	jsonRpc := os.Getenv("POLYGON_JSON_RPC")
 	if jsonRpc == "" {
-		jsonRpc = "https://polygon-rpc.com"
+		jsonRpc = "https://rpc.ankr.com/polygon"
 	}
 	ctx := context.Background()
 

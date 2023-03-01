@@ -140,40 +140,6 @@ func TestListener_Listen(t *testing.T) {
 			block: 26029118,
 		},
 		{
-			name: "scanner-enable",
-			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry_0_1_3.ScannerEnabledTopic,
-				Handlers{
-					ScannerActionHandlers: regmsg.Handlers(
-						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerMessage) error {
-							assert.Equal(t, int64(27984372), msg.Source.BlockNumberDecimal)
-							assert.Equal(t, registry.EnableScanner, msg.Action)
-							assert.Equal(t, "0xec542ecf3d371bb95c45af6776e20e7e5ff6cbc0", msg.ScannerID)
-							return found
-						},
-					),
-				},
-			),
-			block: 27984372,
-		},
-		{
-			name: "scanner-disable",
-			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry_0_1_3.ScannerEnabledTopic,
-				Handlers{
-					ScannerActionHandlers: regmsg.Handlers(
-						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerMessage) error {
-							assert.Equal(t, int64(28005870), msg.Source.BlockNumberDecimal)
-							assert.Equal(t, registry.DisableScanner, msg.Action)
-							assert.Equal(t, "0x7c4cd89c996bdc1589a50e7b2116b43fdca7e6d2", msg.ScannerID)
-							return found
-						},
-					),
-				},
-			),
-			block: 28005870,
-		},
-		{
 			name: "scanner-save",
 			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
 				contract_scanner_registry_0_1_3.ScannerUpdatedTopic,

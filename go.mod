@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/Khan/genqlient v0.5.0
+	github.com/bits-and-blooms/bloom v2.0.3+incompatible
 	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/ethereum/go-ethereum v1.10.16
 	github.com/go-openapi/errors v0.20.2
@@ -219,6 +220,7 @@ require (
 	github.com/whyrusleeping/multiaddr-filter v0.0.0-20160516205228-e903e4adabd7 // indirect
 	github.com/whyrusleeping/tar-utils v0.0.0-20180509141711-8c6c8ba81d5c // indirect
 	github.com/whyrusleeping/timecache v0.0.0-20160911033111-cfcb2f1abfee // indirect
+	github.com/willf/bitset v1.1.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.mongodb.org/mongo-driver v1.8.3 // indirect
 	go.opencensus.io v0.23.0 // indirect
