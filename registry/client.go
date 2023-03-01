@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_rewards_distributor"
 	"math/big"
 	"sync"
 
@@ -154,6 +155,9 @@ type Client interface {
 
 	// WillNewScannerShutdownPool tells if registering a new scanner could shutdown a pool.
 	WillNewScannerShutdownPool(poolID *big.Int) (bool, error)
+
+	// GetAvailablePoolRewardsForDelegator returns amount of rewards for a specific caller
+	GetAvailablePoolRewardsForDelegator(poolID *big.Int, epoch *big.Int, delegator string) (*big.Int, error)
 }
 
 // Contracts contains the latest state of the contracts.
@@ -183,6 +187,8 @@ type Contracts struct {
 
 	StakeAllocator    *contract_stake_allocator.StakeAllocatorCaller
 	StakeAllocatorFil *contract_stake_allocator.StakeAllocatorFilterer
+
+	RewardsDistributor *contract_rewards_distributor.RewardsDistributorCaller
 }
 
 type client struct {
@@ -324,6 +330,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 	cl.versionManager.SetUpdateRule("FortaStaking", cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStakingFil)
+
+	cl.contractsUnsafe.RewardsDistributor, err = contract_rewards_distributor.NewRewardsDistributorCaller(regContracts.RewardsDistributor, ec)
+	if err != nil {
+		return nil, err
+	}
 
 	if cfg.NoRefresh {
 		return cl, nil
@@ -1003,6 +1014,10 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		Manifest: agt.Metadata,
 		Owner:    agt.Owner.Hex(),
 	}, nil
+}
+
+func (c *client) GetAvailablePoolRewardsForDelegator(poolID *big.Int, epoch *big.Int, delegator string) (*big.Int, error) {
+	return c.Contracts().RewardsDistributor.AvailableReward(c.opts, SubjectTypeScannerPool, poolID, epoch, common.HexToAddress(delegator))
 }
 
 func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*ScannerRegistrationInfo, error) {

@@ -3,6 +3,8 @@ package ens
 import (
 	"bytes"
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -19,6 +21,10 @@ const (
 	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
 	StakingContract            = "staking.forta.eth"
 	FortaContract              = "forta.eth"
+	RewardsDistributorContract = "rewards.forta.eth"
+
+	ENSAddressDev  = "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9"
+	ENSAddressProd = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
 )
 
 // ENS resolves inputs.
@@ -63,6 +69,7 @@ func NewENStoreWithResolver(resolver Resolver) *ENSStore {
 // Resolver resolves inputs.
 type Resolver interface {
 	Resolve(input string) (common.Address, error)
+	IsProd() bool
 }
 
 // ENSResolver resolves names from an ENS contract.
@@ -99,6 +106,10 @@ func (rf ResolverFunc) Resolve(input string) (common.Address, error) {
 	return rf(input)
 }
 
+func (ensResolver *ENSResolver) IsProd() bool {
+	return strings.EqualFold(ensResolver.resolverAddr, ENSAddressProd)
+}
+
 func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContracts, error) {
 	agentReg, err := ensstore.Resolve(AgentRegistryContract)
 	if err != nil {
@@ -130,6 +141,16 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
+	rewards, err := ensstore.Resolve(RewardsDistributorContract)
+	if err != nil {
+		if ensstore.Resolver.IsProd() {
+			log.WithError(err).Error("cannot resolve rewards contract, falling back")
+			rewards = common.HexToAddress("0xf7239f26b79145297737166b0C66F4919af9c507")
+		} else {
+			return nil, err
+		}
+	}
+
 	regContracts := &registry.RegistryContracts{
 		AgentRegistry:      agentReg,
 		ScannerRegistry:    scannerReg,
@@ -137,6 +158,7 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		ScannerNodeVersion: scannerNodeVersion,
 		FortaStaking:       fortaStaking,
 		Forta:              forta,
+		RewardsDistributor: rewards,
 	}
 
 	return regContracts, nil
