@@ -6,12 +6,9 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	scannerregistry013 "github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
 
 	scannerregistry014 "github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_4"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -22,29 +19,26 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
-
 )
 
 // ScannerRegistryFilterer is a new type which can multiplex calls to different implementation types.
 type ScannerRegistryFilterer struct {
-
 	typ0 *scannerregistry013.ScannerRegistryFilterer
 
 	typ1 *scannerregistry014.ScannerRegistryFilterer
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewScannerRegistryFilterer creates a new merged type.
 func NewScannerRegistryFilterer(address common.Address, filterer bind.ContractFilterer) (*ScannerRegistryFilterer, error) {
 	var (
 		mergedType ScannerRegistryFilterer
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.3"
-
 
 	mergedType.typ0, err = scannerregistry013.NewScannerRegistryFilterer(address, filterer)
 	if err != nil {
@@ -55,7 +49,6 @@ func NewScannerRegistryFilterer(address common.Address, filterer bind.ContractFi
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize scannerregistry014.ScannerRegistryFilterer: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -99,15 +92,11 @@ func (merged *ScannerRegistryFilterer) Safe() {
 	merged.unsafe = false
 }
 
-
-
 // FilterAccessManagerUpdatedOutput is a merged return type.
 type FilterAccessManagerUpdatedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryAccessManagerUpdatedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryAccessManagerUpdatedIterator
-
 }
 
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
@@ -117,10 +106,7 @@ func (merged *ScannerRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Fil
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAccessManagerUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -130,9 +116,7 @@ func (merged *ScannerRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Fil
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -145,19 +129,14 @@ func (merged *ScannerRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Fil
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryAccessManagerUpdated, newAddressManager []common.Address, sinkAlt1 chan<- *scannerregistry014.ScannerRegistryAccessManagerUpdated) (retVal event.Subscription, err error) {
@@ -165,9 +144,6 @@ func (merged *ScannerRegistryFilterer) WatchAccessManagerUpdated(opts *bind.Watc
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -195,19 +171,15 @@ func (merged *ScannerRegistryFilterer) WatchAccessManagerUpdated(opts *bind.Watc
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryAccessManagerUpdated is a merged return type.
 type ScannerRegistryAccessManagerUpdated struct {
-
 	NewAddressManager common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -217,10 +189,7 @@ func (merged *ScannerRegistryFilterer) ParseAccessManagerUpdated(log types.Log) 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryAccessManagerUpdated{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -230,11 +199,9 @@ func (merged *ScannerRegistryFilterer) ParseAccessManagerUpdated(log types.Log) 
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -247,28 +214,22 @@ func (merged *ScannerRegistryFilterer) ParseAccessManagerUpdated(log types.Log) 
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterAdminChangedOutput is a merged return type.
 type FilterAdminChangedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryAdminChangedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryAdminChangedIterator
-
 }
 
 // FilterAdminChanged multiplexes to different implementations of the method.
@@ -278,10 +239,7 @@ func (merged *ScannerRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts)
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAdminChangedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -291,9 +249,7 @@ func (merged *ScannerRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts)
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -306,19 +262,14 @@ func (merged *ScannerRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts)
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryAdminChanged, sinkAlt2 chan<- *scannerregistry014.ScannerRegistryAdminChanged) (retVal event.Subscription, err error) {
@@ -326,9 +277,6 @@ func (merged *ScannerRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -356,21 +304,17 @@ func (merged *ScannerRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, s
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryAdminChanged is a merged return type.
 type ScannerRegistryAdminChanged struct {
-
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -380,10 +324,7 @@ func (merged *ScannerRegistryFilterer) ParseAdminChanged(log types.Log) (retVal 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryAdminChanged{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -393,13 +334,11 @@ func (merged *ScannerRegistryFilterer) ParseAdminChanged(log types.Log) (retVal 
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -412,30 +351,24 @@ func (merged *ScannerRegistryFilterer) ParseAdminChanged(log types.Log) (retVal 
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterApprovalOutput is a merged return type.
 type FilterApprovalOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryApprovalIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryApprovalIterator
-
 }
 
 // FilterApproval multiplexes to different implementations of the method.
@@ -445,10 +378,7 @@ func (merged *ScannerRegistryFilterer) FilterApproval(opts *bind.FilterOpts, own
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterApprovalOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterApproval(opts, owner, approved, tokenId)
@@ -458,9 +388,7 @@ func (merged *ScannerRegistryFilterer) FilterApproval(opts *bind.FilterOpts, own
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -473,19 +401,14 @@ func (merged *ScannerRegistryFilterer) FilterApproval(opts *bind.FilterOpts, own
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchApproval multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryApproval, owner []common.Address, approved []common.Address, tokenId []*big.Int, sinkAlt3 chan<- *scannerregistry014.ScannerRegistryApproval) (retVal event.Subscription, err error) {
@@ -493,9 +416,6 @@ func (merged *ScannerRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchApproval(opts, sink, owner, approved, tokenId)
@@ -523,15 +443,12 @@ func (merged *ScannerRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryApproval is a merged return type.
 type ScannerRegistryApproval struct {
-
 	Owner common.Address
 
 	Approved common.Address
@@ -539,7 +456,6 @@ type ScannerRegistryApproval struct {
 	TokenId *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseApproval multiplexes to different implementations of the method.
@@ -549,10 +465,7 @@ func (merged *ScannerRegistryFilterer) ParseApproval(log types.Log) (retVal *Sca
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryApproval{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseApproval(log)
@@ -562,7 +475,6 @@ func (merged *ScannerRegistryFilterer) ParseApproval(log types.Log) (retVal *Sca
 			return
 		}
 
-
 		retVal.Owner = val.Owner
 
 		retVal.Approved = val.Approved
@@ -570,7 +482,6 @@ func (merged *ScannerRegistryFilterer) ParseApproval(log types.Log) (retVal *Sca
 		retVal.TokenId = val.TokenId
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -583,7 +494,6 @@ func (merged *ScannerRegistryFilterer) ParseApproval(log types.Log) (retVal *Sca
 			return
 		}
 
-
 		retVal.Owner = val.Owner
 
 		retVal.Approved = val.Approved
@@ -592,23 +502,18 @@ func (merged *ScannerRegistryFilterer) ParseApproval(log types.Log) (retVal *Sca
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterApprovalForAllOutput is a merged return type.
 type FilterApprovalForAllOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryApprovalForAllIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryApprovalForAllIterator
-
 }
 
 // FilterApprovalForAll multiplexes to different implementations of the method.
@@ -618,10 +523,7 @@ func (merged *ScannerRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpt
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterApprovalForAllOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterApprovalForAll(opts, owner, operator)
@@ -631,9 +533,7 @@ func (merged *ScannerRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -646,19 +546,14 @@ func (merged *ScannerRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchApprovalForAll multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryApprovalForAll, owner []common.Address, operator []common.Address, sinkAlt4 chan<- *scannerregistry014.ScannerRegistryApprovalForAll) (retVal event.Subscription, err error) {
@@ -666,9 +561,6 @@ func (merged *ScannerRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, owner, operator)
@@ -696,15 +588,12 @@ func (merged *ScannerRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryApprovalForAll is a merged return type.
 type ScannerRegistryApprovalForAll struct {
-
 	Owner common.Address
 
 	Operator common.Address
@@ -712,7 +601,6 @@ type ScannerRegistryApprovalForAll struct {
 	Approved bool
 
 	Raw types.Log
-
 }
 
 // ParseApprovalForAll multiplexes to different implementations of the method.
@@ -722,10 +610,7 @@ func (merged *ScannerRegistryFilterer) ParseApprovalForAll(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryApprovalForAll{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseApprovalForAll(log)
@@ -735,7 +620,6 @@ func (merged *ScannerRegistryFilterer) ParseApprovalForAll(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.Owner = val.Owner
 
 		retVal.Operator = val.Operator
@@ -743,7 +627,6 @@ func (merged *ScannerRegistryFilterer) ParseApprovalForAll(log types.Log) (retVa
 		retVal.Approved = val.Approved
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -756,7 +639,6 @@ func (merged *ScannerRegistryFilterer) ParseApprovalForAll(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.Owner = val.Owner
 
 		retVal.Operator = val.Operator
@@ -765,23 +647,18 @@ func (merged *ScannerRegistryFilterer) ParseApprovalForAll(log types.Log) (retVa
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterBeaconUpgradedOutput is a merged return type.
 type FilterBeaconUpgradedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryBeaconUpgradedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryBeaconUpgradedIterator
-
 }
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
@@ -791,10 +668,7 @@ func (merged *ScannerRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpt
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterBeaconUpgradedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -804,9 +678,7 @@ func (merged *ScannerRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -819,19 +691,14 @@ func (merged *ScannerRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryBeaconUpgraded, beacon []common.Address, sinkAlt5 chan<- *scannerregistry014.ScannerRegistryBeaconUpgraded) (retVal event.Subscription, err error) {
@@ -839,9 +706,6 @@ func (merged *ScannerRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -869,19 +733,15 @@ func (merged *ScannerRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryBeaconUpgraded is a merged return type.
 type ScannerRegistryBeaconUpgraded struct {
-
 	Beacon common.Address
 
 	Raw types.Log
-
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -891,10 +751,7 @@ func (merged *ScannerRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryBeaconUpgraded{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -904,11 +761,9 @@ func (merged *ScannerRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -921,28 +776,22 @@ func (merged *ScannerRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterInitializedOutput is a merged return type.
 type FilterInitializedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryInitializedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryInitializedIterator
-
 }
 
 // FilterInitialized multiplexes to different implementations of the method.
@@ -952,10 +801,7 @@ func (merged *ScannerRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterInitializedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -965,9 +811,7 @@ func (merged *ScannerRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) 
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -980,19 +824,14 @@ func (merged *ScannerRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) 
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryInitialized, sinkAlt6 chan<- *scannerregistry014.ScannerRegistryInitialized) (retVal event.Subscription, err error) {
@@ -1000,9 +839,6 @@ func (merged *ScannerRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -1030,19 +866,15 @@ func (merged *ScannerRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryInitialized is a merged return type.
 type ScannerRegistryInitialized struct {
-
 	Version uint8
 
 	Raw types.Log
-
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -1052,10 +884,7 @@ func (merged *ScannerRegistryFilterer) ParseInitialized(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryInitialized{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -1065,11 +894,9 @@ func (merged *ScannerRegistryFilterer) ParseInitialized(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1082,28 +909,22 @@ func (merged *ScannerRegistryFilterer) ParseInitialized(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterManagerEnabledOutput is a merged return type.
 type FilterManagerEnabledOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryManagerEnabledIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryManagerEnabledIterator
-
 }
 
 // FilterManagerEnabled multiplexes to different implementations of the method.
@@ -1113,10 +934,7 @@ func (merged *ScannerRegistryFilterer) FilterManagerEnabled(opts *bind.FilterOpt
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterManagerEnabledOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterManagerEnabled(opts, scannerId, manager)
@@ -1126,9 +944,7 @@ func (merged *ScannerRegistryFilterer) FilterManagerEnabled(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -1141,19 +957,14 @@ func (merged *ScannerRegistryFilterer) FilterManagerEnabled(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterManagerEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchManagerEnabled multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchManagerEnabled(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryManagerEnabled, scannerId []*big.Int, manager []common.Address, sinkAlt7 chan<- *scannerregistry014.ScannerRegistryManagerEnabled) (retVal event.Subscription, err error) {
@@ -1161,9 +972,6 @@ func (merged *ScannerRegistryFilterer) WatchManagerEnabled(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchManagerEnabled(opts, sink, scannerId, manager)
@@ -1191,15 +999,12 @@ func (merged *ScannerRegistryFilterer) WatchManagerEnabled(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchManagerEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryManagerEnabled is a merged return type.
 type ScannerRegistryManagerEnabled struct {
-
 	ScannerId *big.Int
 
 	Manager common.Address
@@ -1207,7 +1012,6 @@ type ScannerRegistryManagerEnabled struct {
 	Enabled bool
 
 	Raw types.Log
-
 }
 
 // ParseManagerEnabled multiplexes to different implementations of the method.
@@ -1217,10 +1021,7 @@ func (merged *ScannerRegistryFilterer) ParseManagerEnabled(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryManagerEnabled{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseManagerEnabled(log)
@@ -1230,7 +1031,6 @@ func (merged *ScannerRegistryFilterer) ParseManagerEnabled(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.ScannerId = val.ScannerId
 
 		retVal.Manager = val.Manager
@@ -1238,7 +1038,6 @@ func (merged *ScannerRegistryFilterer) ParseManagerEnabled(log types.Log) (retVa
 		retVal.Enabled = val.Enabled
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1251,7 +1050,6 @@ func (merged *ScannerRegistryFilterer) ParseManagerEnabled(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.ScannerId = val.ScannerId
 
 		retVal.Manager = val.Manager
@@ -1260,23 +1058,18 @@ func (merged *ScannerRegistryFilterer) ParseManagerEnabled(log types.Log) (retVa
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseManagerEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterRouterUpdatedOutput is a merged return type.
 type FilterRouterUpdatedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryRouterUpdatedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryRouterUpdatedIterator
-
 }
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
@@ -1286,10 +1079,7 @@ func (merged *ScannerRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterRouterUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -1299,9 +1089,7 @@ func (merged *ScannerRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -1314,19 +1102,14 @@ func (merged *ScannerRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryRouterUpdated, router []common.Address, sinkAlt8 chan<- *scannerregistry014.ScannerRegistryRouterUpdated) (retVal event.Subscription, err error) {
@@ -1334,9 +1117,6 @@ func (merged *ScannerRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -1364,19 +1144,15 @@ func (merged *ScannerRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryRouterUpdated is a merged return type.
 type ScannerRegistryRouterUpdated struct {
-
 	Router common.Address
 
 	Raw types.Log
-
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -1386,10 +1162,7 @@ func (merged *ScannerRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryRouterUpdated{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -1399,11 +1172,9 @@ func (merged *ScannerRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1416,28 +1187,22 @@ func (merged *ScannerRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterScannerEnabledOutput is a merged return type.
 type FilterScannerEnabledOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryScannerEnabledIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryScannerEnabledIterator
-
 }
 
 // FilterScannerEnabled multiplexes to different implementations of the method.
@@ -1447,10 +1212,7 @@ func (merged *ScannerRegistryFilterer) FilterScannerEnabled(opts *bind.FilterOpt
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterScannerEnabledOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterScannerEnabled(opts, scannerId, enabled)
@@ -1460,9 +1222,7 @@ func (merged *ScannerRegistryFilterer) FilterScannerEnabled(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -1475,19 +1235,14 @@ func (merged *ScannerRegistryFilterer) FilterScannerEnabled(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterScannerEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchScannerEnabled multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchScannerEnabled(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryScannerEnabled, scannerId []*big.Int, enabled []bool, sinkAlt9 chan<- *scannerregistry014.ScannerRegistryScannerEnabled) (retVal event.Subscription, err error) {
@@ -1495,9 +1250,6 @@ func (merged *ScannerRegistryFilterer) WatchScannerEnabled(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchScannerEnabled(opts, sink, scannerId, enabled)
@@ -1525,15 +1277,12 @@ func (merged *ScannerRegistryFilterer) WatchScannerEnabled(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchScannerEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryScannerEnabled is a merged return type.
 type ScannerRegistryScannerEnabled struct {
-
 	ScannerId *big.Int
 
 	Enabled bool
@@ -1543,7 +1292,6 @@ type ScannerRegistryScannerEnabled struct {
 	Value bool
 
 	Raw types.Log
-
 }
 
 // ParseScannerEnabled multiplexes to different implementations of the method.
@@ -1553,10 +1301,7 @@ func (merged *ScannerRegistryFilterer) ParseScannerEnabled(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryScannerEnabled{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseScannerEnabled(log)
@@ -1565,7 +1310,6 @@ func (merged *ScannerRegistryFilterer) ParseScannerEnabled(log types.Log) (retVa
 			err = methodErr
 			return
 		}
-
 
 		retVal.ScannerId = val.ScannerId
 
@@ -1576,7 +1320,6 @@ func (merged *ScannerRegistryFilterer) ParseScannerEnabled(log types.Log) (retVa
 		retVal.Value = val.Value
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1589,7 +1332,6 @@ func (merged *ScannerRegistryFilterer) ParseScannerEnabled(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.ScannerId = val.ScannerId
 
 		retVal.Enabled = val.Enabled
@@ -1600,23 +1342,18 @@ func (merged *ScannerRegistryFilterer) ParseScannerEnabled(log types.Log) (retVa
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseScannerEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterScannerUpdatedOutput is a merged return type.
 type FilterScannerUpdatedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryScannerUpdatedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryScannerUpdatedIterator
-
 }
 
 // FilterScannerUpdated multiplexes to different implementations of the method.
@@ -1626,10 +1363,7 @@ func (merged *ScannerRegistryFilterer) FilterScannerUpdated(opts *bind.FilterOpt
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterScannerUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterScannerUpdated(opts, scannerId, chainId)
@@ -1639,9 +1373,7 @@ func (merged *ScannerRegistryFilterer) FilterScannerUpdated(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -1654,19 +1386,14 @@ func (merged *ScannerRegistryFilterer) FilterScannerUpdated(opts *bind.FilterOpt
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterScannerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchScannerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchScannerUpdated(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryScannerUpdated, scannerId []*big.Int, chainId []*big.Int, sinkAlt10 chan<- *scannerregistry014.ScannerRegistryScannerUpdated) (retVal event.Subscription, err error) {
@@ -1674,9 +1401,6 @@ func (merged *ScannerRegistryFilterer) WatchScannerUpdated(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchScannerUpdated(opts, sink, scannerId, chainId)
@@ -1704,15 +1428,12 @@ func (merged *ScannerRegistryFilterer) WatchScannerUpdated(opts *bind.WatchOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchScannerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryScannerUpdated is a merged return type.
 type ScannerRegistryScannerUpdated struct {
-
 	ScannerId *big.Int
 
 	ChainId *big.Int
@@ -1720,7 +1441,6 @@ type ScannerRegistryScannerUpdated struct {
 	Metadata string
 
 	Raw types.Log
-
 }
 
 // ParseScannerUpdated multiplexes to different implementations of the method.
@@ -1730,10 +1450,7 @@ func (merged *ScannerRegistryFilterer) ParseScannerUpdated(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryScannerUpdated{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseScannerUpdated(log)
@@ -1743,7 +1460,6 @@ func (merged *ScannerRegistryFilterer) ParseScannerUpdated(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.ScannerId = val.ScannerId
 
 		retVal.ChainId = val.ChainId
@@ -1751,7 +1467,6 @@ func (merged *ScannerRegistryFilterer) ParseScannerUpdated(log types.Log) (retVa
 		retVal.Metadata = val.Metadata
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1764,7 +1479,6 @@ func (merged *ScannerRegistryFilterer) ParseScannerUpdated(log types.Log) (retVa
 			return
 		}
 
-
 		retVal.ScannerId = val.ScannerId
 
 		retVal.ChainId = val.ChainId
@@ -1773,16 +1487,12 @@ func (merged *ScannerRegistryFilterer) ParseScannerUpdated(log types.Log) (retVa
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseScannerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterStakeControllerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) FilterStakeControllerUpdated(opts *bind.FilterOpts, newstakeController []common.Address) (retVal *scannerregistry013.ScannerRegistryStakeControllerUpdatedIterator, err error) {
@@ -1790,9 +1500,6 @@ func (merged *ScannerRegistryFilterer) FilterStakeControllerUpdated(opts *bind.F
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterStakeControllerUpdated(opts, newstakeController)
@@ -1807,12 +1514,9 @@ func (merged *ScannerRegistryFilterer) FilterStakeControllerUpdated(opts *bind.F
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterStakeControllerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchStakeControllerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchStakeControllerUpdated(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryStakeControllerUpdated, newstakeController []common.Address) (retVal event.Subscription, err error) {
@@ -1820,9 +1524,6 @@ func (merged *ScannerRegistryFilterer) WatchStakeControllerUpdated(opts *bind.Wa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchStakeControllerUpdated(opts, sink, newstakeController)
@@ -1837,19 +1538,15 @@ func (merged *ScannerRegistryFilterer) WatchStakeControllerUpdated(opts *bind.Wa
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchStakeControllerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryStakeControllerUpdated is a merged return type.
 type ScannerRegistryStakeControllerUpdated struct {
-
 	NewstakeController common.Address
 
 	Raw types.Log
-
 }
 
 // ParseStakeControllerUpdated multiplexes to different implementations of the method.
@@ -1859,10 +1556,7 @@ func (merged *ScannerRegistryFilterer) ParseStakeControllerUpdated(log types.Log
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryStakeControllerUpdated{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseStakeControllerUpdated(log)
@@ -1872,28 +1566,22 @@ func (merged *ScannerRegistryFilterer) ParseStakeControllerUpdated(log types.Log
 			return
 		}
 
-
 		retVal.NewstakeController = val.NewstakeController
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseStakeControllerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterStakeThresholdChangedOutput is a merged return type.
 type FilterStakeThresholdChangedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryStakeThresholdChangedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryStakeThresholdChangedIterator
-
 }
 
 // FilterStakeThresholdChanged multiplexes to different implementations of the method.
@@ -1903,10 +1591,7 @@ func (merged *ScannerRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Fi
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterStakeThresholdChangedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterStakeThresholdChanged(opts, chainId)
@@ -1916,9 +1601,7 @@ func (merged *ScannerRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Fi
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -1931,19 +1614,14 @@ func (merged *ScannerRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Fi
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterStakeThresholdChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchStakeThresholdChanged multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchStakeThresholdChanged(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryStakeThresholdChanged, chainId []*big.Int, sinkAlt11 chan<- *scannerregistry014.ScannerRegistryStakeThresholdChanged) (retVal event.Subscription, err error) {
@@ -1951,9 +1629,6 @@ func (merged *ScannerRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Wat
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchStakeThresholdChanged(opts, sink, chainId)
@@ -1981,15 +1656,12 @@ func (merged *ScannerRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Wat
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchStakeThresholdChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryStakeThresholdChanged is a merged return type.
 type ScannerRegistryStakeThresholdChanged struct {
-
 	ChainId *big.Int
 
 	Min *big.Int
@@ -1999,7 +1671,6 @@ type ScannerRegistryStakeThresholdChanged struct {
 	Activated bool
 
 	Raw types.Log
-
 }
 
 // ParseStakeThresholdChanged multiplexes to different implementations of the method.
@@ -2009,10 +1680,7 @@ func (merged *ScannerRegistryFilterer) ParseStakeThresholdChanged(log types.Log)
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryStakeThresholdChanged{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseStakeThresholdChanged(log)
@@ -2021,7 +1689,6 @@ func (merged *ScannerRegistryFilterer) ParseStakeThresholdChanged(log types.Log)
 			err = methodErr
 			return
 		}
-
 
 		retVal.ChainId = val.ChainId
 
@@ -2032,7 +1699,6 @@ func (merged *ScannerRegistryFilterer) ParseStakeThresholdChanged(log types.Log)
 		retVal.Activated = val.Activated
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2045,7 +1711,6 @@ func (merged *ScannerRegistryFilterer) ParseStakeThresholdChanged(log types.Log)
 			return
 		}
 
-
 		retVal.ChainId = val.ChainId
 
 		retVal.Min = val.Min
@@ -2056,23 +1721,18 @@ func (merged *ScannerRegistryFilterer) ParseStakeThresholdChanged(log types.Log)
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseStakeThresholdChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterTransferOutput is a merged return type.
 type FilterTransferOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryTransferIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryTransferIterator
-
 }
 
 // FilterTransfer multiplexes to different implementations of the method.
@@ -2082,10 +1742,7 @@ func (merged *ScannerRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, fro
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterTransferOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterTransfer(opts, from, to, tokenId)
@@ -2095,9 +1752,7 @@ func (merged *ScannerRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, fro
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -2110,19 +1765,14 @@ func (merged *ScannerRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, fro
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchTransfer multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryTransfer, from []common.Address, to []common.Address, tokenId []*big.Int, sinkAlt12 chan<- *scannerregistry014.ScannerRegistryTransfer) (retVal event.Subscription, err error) {
@@ -2130,9 +1780,6 @@ func (merged *ScannerRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchTransfer(opts, sink, from, to, tokenId)
@@ -2160,15 +1807,12 @@ func (merged *ScannerRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryTransfer is a merged return type.
 type ScannerRegistryTransfer struct {
-
 	From common.Address
 
 	To common.Address
@@ -2176,7 +1820,6 @@ type ScannerRegistryTransfer struct {
 	TokenId *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseTransfer multiplexes to different implementations of the method.
@@ -2186,10 +1829,7 @@ func (merged *ScannerRegistryFilterer) ParseTransfer(log types.Log) (retVal *Sca
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryTransfer{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseTransfer(log)
@@ -2199,7 +1839,6 @@ func (merged *ScannerRegistryFilterer) ParseTransfer(log types.Log) (retVal *Sca
 			return
 		}
 
-
 		retVal.From = val.From
 
 		retVal.To = val.To
@@ -2207,7 +1846,6 @@ func (merged *ScannerRegistryFilterer) ParseTransfer(log types.Log) (retVal *Sca
 		retVal.TokenId = val.TokenId
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2220,7 +1858,6 @@ func (merged *ScannerRegistryFilterer) ParseTransfer(log types.Log) (retVal *Sca
 			return
 		}
 
-
 		retVal.From = val.From
 
 		retVal.To = val.To
@@ -2229,23 +1866,18 @@ func (merged *ScannerRegistryFilterer) ParseTransfer(log types.Log) (retVal *Sca
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterUpgradedOutput is a merged return type.
 type FilterUpgradedOutput struct {
-
 	Scannerregistry013Result *scannerregistry013.ScannerRegistryUpgradedIterator
 
 	Scannerregistry014Result *scannerregistry014.ScannerRegistryUpgradedIterator
-
 }
 
 // FilterUpgraded multiplexes to different implementations of the method.
@@ -2255,10 +1887,7 @@ func (merged *ScannerRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imp
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterUpgradedOutput{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -2268,9 +1897,7 @@ func (merged *ScannerRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imp
 			return
 		}
 
-
 		retVal.Scannerregistry013Result = val
-
 
 		return
 	}
@@ -2283,19 +1910,14 @@ func (merged *ScannerRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imp
 			return
 		}
 
-
 		retVal.Scannerregistry014Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *scannerregistry013.ScannerRegistryUpgraded, implementation []common.Address, sinkAlt13 chan<- *scannerregistry014.ScannerRegistryUpgraded) (retVal event.Subscription, err error) {
@@ -2303,9 +1925,6 @@ func (merged *ScannerRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -2333,19 +1952,15 @@ func (merged *ScannerRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink 
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryUpgraded is a merged return type.
 type ScannerRegistryUpgraded struct {
-
 	Implementation common.Address
 
 	Raw types.Log
-
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -2355,10 +1970,7 @@ func (merged *ScannerRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Sca
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryUpgraded{}
-
-
 
 	if merged.currTag == "0.1.3" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -2368,11 +1980,9 @@ func (merged *ScannerRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Sca
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2385,21 +1995,16 @@ func (merged *ScannerRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Sca
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterConfiguredMigration multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) FilterConfiguredMigration(opts *bind.FilterOpts) (retVal *scannerregistry014.ScannerRegistryConfiguredMigrationIterator, err error) {
@@ -2407,9 +2012,6 @@ func (merged *ScannerRegistryFilterer) FilterConfiguredMigration(opts *bind.Filt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.FilterConfiguredMigration(opts)
@@ -2424,12 +2026,9 @@ func (merged *ScannerRegistryFilterer) FilterConfiguredMigration(opts *bind.Filt
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterConfiguredMigration not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchConfiguredMigration multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchConfiguredMigration(opts *bind.WatchOpts, sink chan<- *scannerregistry014.ScannerRegistryConfiguredMigration) (retVal event.Subscription, err error) {
@@ -2437,9 +2036,6 @@ func (merged *ScannerRegistryFilterer) WatchConfiguredMigration(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.WatchConfiguredMigration(opts, sink)
@@ -2454,21 +2050,17 @@ func (merged *ScannerRegistryFilterer) WatchConfiguredMigration(opts *bind.Watch
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchConfiguredMigration not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryConfiguredMigration is a merged return type.
 type ScannerRegistryConfiguredMigration struct {
-
 	SunsettingTime *big.Int
 
 	ScannerPoolRegistry common.Address
 
 	Raw types.Log
-
 }
 
 // ParseConfiguredMigration multiplexes to different implementations of the method.
@@ -2478,10 +2070,7 @@ func (merged *ScannerRegistryFilterer) ParseConfiguredMigration(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryConfiguredMigration{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.ParseConfiguredMigration(log)
@@ -2491,23 +2080,18 @@ func (merged *ScannerRegistryFilterer) ParseConfiguredMigration(log types.Log) (
 			return
 		}
 
-
 		retVal.SunsettingTime = val.SunsettingTime
 
 		retVal.ScannerPoolRegistry = val.ScannerPoolRegistry
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseConfiguredMigration not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterDeregisteredScanner multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) FilterDeregisteredScanner(opts *bind.FilterOpts) (retVal *scannerregistry014.ScannerRegistryDeregisteredScannerIterator, err error) {
@@ -2515,9 +2099,6 @@ func (merged *ScannerRegistryFilterer) FilterDeregisteredScanner(opts *bind.Filt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.FilterDeregisteredScanner(opts)
@@ -2532,12 +2113,9 @@ func (merged *ScannerRegistryFilterer) FilterDeregisteredScanner(opts *bind.Filt
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterDeregisteredScanner not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchDeregisteredScanner multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchDeregisteredScanner(opts *bind.WatchOpts, sink chan<- *scannerregistry014.ScannerRegistryDeregisteredScanner) (retVal event.Subscription, err error) {
@@ -2545,9 +2123,6 @@ func (merged *ScannerRegistryFilterer) WatchDeregisteredScanner(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.WatchDeregisteredScanner(opts, sink)
@@ -2562,19 +2137,15 @@ func (merged *ScannerRegistryFilterer) WatchDeregisteredScanner(opts *bind.Watch
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchDeregisteredScanner not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistryDeregisteredScanner is a merged return type.
 type ScannerRegistryDeregisteredScanner struct {
-
 	ScannerId *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseDeregisteredScanner multiplexes to different implementations of the method.
@@ -2584,10 +2155,7 @@ func (merged *ScannerRegistryFilterer) ParseDeregisteredScanner(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistryDeregisteredScanner{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.ParseDeregisteredScanner(log)
@@ -2597,21 +2165,16 @@ func (merged *ScannerRegistryFilterer) ParseDeregisteredScanner(log types.Log) (
 			return
 		}
 
-
 		retVal.ScannerId = val.ScannerId
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseDeregisteredScanner not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSubjectHandlerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.FilterOpts, newHandler []common.Address) (retVal *scannerregistry014.ScannerRegistrySubjectHandlerUpdatedIterator, err error) {
@@ -2619,9 +2182,6 @@ func (merged *ScannerRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.Fi
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.FilterSubjectHandlerUpdated(opts, newHandler)
@@ -2636,12 +2196,9 @@ func (merged *ScannerRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.Fi
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.FilterSubjectHandlerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSubjectHandlerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.WatchOpts, sink chan<- *scannerregistry014.ScannerRegistrySubjectHandlerUpdated, newHandler []common.Address) (retVal event.Subscription, err error) {
@@ -2649,9 +2206,6 @@ func (merged *ScannerRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.Wat
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.WatchSubjectHandlerUpdated(opts, sink, newHandler)
@@ -2666,19 +2220,15 @@ func (merged *ScannerRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.Wat
 		return
 	}
 
-
 	err = import_fmt.Errorf("ScannerRegistryFilterer.WatchSubjectHandlerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRegistrySubjectHandlerUpdated is a merged return type.
 type ScannerRegistrySubjectHandlerUpdated struct {
-
 	NewHandler common.Address
 
 	Raw types.Log
-
 }
 
 // ParseSubjectHandlerUpdated multiplexes to different implementations of the method.
@@ -2688,10 +2238,7 @@ func (merged *ScannerRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log)
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRegistrySubjectHandlerUpdated{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ1.ParseSubjectHandlerUpdated(log)
@@ -2701,15 +2248,12 @@ func (merged *ScannerRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log)
 			return
 		}
 
-
 		retVal.NewHandler = val.NewHandler
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("ScannerRegistryFilterer.ParseSubjectHandlerUpdated not implemented (tag=%s)", merged.currTag)
 	return

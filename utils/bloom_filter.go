@@ -72,4 +72,3 @@ func CreateBloomFilterFromProto(bf *protocol.BloomFilter) (*bloom.BloomFilter, e
 
 	return bFilter, nil
 }
-

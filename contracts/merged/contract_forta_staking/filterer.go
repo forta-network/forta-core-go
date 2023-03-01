@@ -6,12 +6,9 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	fortastaking011 "github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
 
 	fortastaking012 "github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -22,29 +19,26 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
-
 )
 
 // FortaStakingFilterer is a new type which can multiplex calls to different implementation types.
 type FortaStakingFilterer struct {
-
 	typ0 *fortastaking011.FortaStakingFilterer
 
 	typ1 *fortastaking012.FortaStakingFilterer
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewFortaStakingFilterer creates a new merged type.
 func NewFortaStakingFilterer(address common.Address, filterer bind.ContractFilterer) (*FortaStakingFilterer, error) {
 	var (
 		mergedType FortaStakingFilterer
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.1"
-
 
 	mergedType.typ0, err = fortastaking011.NewFortaStakingFilterer(address, filterer)
 	if err != nil {
@@ -55,7 +49,6 @@ func NewFortaStakingFilterer(address common.Address, filterer bind.ContractFilte
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize fortastaking012.FortaStakingFilterer: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -99,15 +92,11 @@ func (merged *FortaStakingFilterer) Safe() {
 	merged.unsafe = false
 }
 
-
-
 // FilterAccessManagerUpdatedOutput is a merged return type.
 type FilterAccessManagerUpdatedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingAccessManagerUpdatedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingAccessManagerUpdatedIterator
-
 }
 
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
@@ -117,10 +106,7 @@ func (merged *FortaStakingFilterer) FilterAccessManagerUpdated(opts *bind.Filter
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAccessManagerUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -130,9 +116,7 @@ func (merged *FortaStakingFilterer) FilterAccessManagerUpdated(opts *bind.Filter
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -145,19 +129,14 @@ func (merged *FortaStakingFilterer) FilterAccessManagerUpdated(opts *bind.Filter
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingAccessManagerUpdated, newAddressManager []common.Address, sinkAlt1 chan<- *fortastaking012.FortaStakingAccessManagerUpdated) (retVal event.Subscription, err error) {
@@ -165,9 +144,6 @@ func (merged *FortaStakingFilterer) WatchAccessManagerUpdated(opts *bind.WatchOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -195,19 +171,15 @@ func (merged *FortaStakingFilterer) WatchAccessManagerUpdated(opts *bind.WatchOp
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingAccessManagerUpdated is a merged return type.
 type FortaStakingAccessManagerUpdated struct {
-
 	NewAddressManager common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -217,10 +189,7 @@ func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (re
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingAccessManagerUpdated{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -230,11 +199,9 @@ func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (re
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -247,28 +214,22 @@ func (merged *FortaStakingFilterer) ParseAccessManagerUpdated(log types.Log) (re
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterAdminChangedOutput is a merged return type.
 type FilterAdminChangedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingAdminChangedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingAdminChangedIterator
-
 }
 
 // FilterAdminChanged multiplexes to different implementations of the method.
@@ -278,10 +239,7 @@ func (merged *FortaStakingFilterer) FilterAdminChanged(opts *bind.FilterOpts) (r
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAdminChangedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -291,9 +249,7 @@ func (merged *FortaStakingFilterer) FilterAdminChanged(opts *bind.FilterOpts) (r
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -306,19 +262,14 @@ func (merged *FortaStakingFilterer) FilterAdminChanged(opts *bind.FilterOpts) (r
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingAdminChanged, sinkAlt2 chan<- *fortastaking012.FortaStakingAdminChanged) (retVal event.Subscription, err error) {
@@ -326,9 +277,6 @@ func (merged *FortaStakingFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -356,21 +304,17 @@ func (merged *FortaStakingFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingAdminChanged is a merged return type.
 type FortaStakingAdminChanged struct {
-
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -380,10 +324,7 @@ func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *Fo
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingAdminChanged{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -393,13 +334,11 @@ func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *Fo
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -412,30 +351,24 @@ func (merged *FortaStakingFilterer) ParseAdminChanged(log types.Log) (retVal *Fo
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterApprovalForAllOutput is a merged return type.
 type FilterApprovalForAllOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingApprovalForAllIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingApprovalForAllIterator
-
 }
 
 // FilterApprovalForAll multiplexes to different implementations of the method.
@@ -445,10 +378,7 @@ func (merged *FortaStakingFilterer) FilterApprovalForAll(opts *bind.FilterOpts, 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterApprovalForAllOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterApprovalForAll(opts, account, operator)
@@ -458,9 +388,7 @@ func (merged *FortaStakingFilterer) FilterApprovalForAll(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -473,19 +401,14 @@ func (merged *FortaStakingFilterer) FilterApprovalForAll(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchApprovalForAll multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchApprovalForAll(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingApprovalForAll, account []common.Address, operator []common.Address, sinkAlt3 chan<- *fortastaking012.FortaStakingApprovalForAll) (retVal event.Subscription, err error) {
@@ -493,9 +416,6 @@ func (merged *FortaStakingFilterer) WatchApprovalForAll(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, account, operator)
@@ -523,15 +443,12 @@ func (merged *FortaStakingFilterer) WatchApprovalForAll(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingApprovalForAll is a merged return type.
 type FortaStakingApprovalForAll struct {
-
 	Account common.Address
 
 	Operator common.Address
@@ -539,7 +456,6 @@ type FortaStakingApprovalForAll struct {
 	Approved bool
 
 	Raw types.Log
-
 }
 
 // ParseApprovalForAll multiplexes to different implementations of the method.
@@ -549,10 +465,7 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingApprovalForAll{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseApprovalForAll(log)
@@ -562,7 +475,6 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Account = val.Account
 
 		retVal.Operator = val.Operator
@@ -570,7 +482,6 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 		retVal.Approved = val.Approved
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -583,7 +494,6 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Account = val.Account
 
 		retVal.Operator = val.Operator
@@ -592,23 +502,18 @@ func (merged *FortaStakingFilterer) ParseApprovalForAll(log types.Log) (retVal *
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterBeaconUpgradedOutput is a merged return type.
 type FilterBeaconUpgradedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingBeaconUpgradedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingBeaconUpgradedIterator
-
 }
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
@@ -618,10 +523,7 @@ func (merged *FortaStakingFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterBeaconUpgradedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -631,9 +533,7 @@ func (merged *FortaStakingFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -646,19 +546,14 @@ func (merged *FortaStakingFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingBeaconUpgraded, beacon []common.Address, sinkAlt4 chan<- *fortastaking012.FortaStakingBeaconUpgraded) (retVal event.Subscription, err error) {
@@ -666,9 +561,6 @@ func (merged *FortaStakingFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -696,19 +588,15 @@ func (merged *FortaStakingFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingBeaconUpgraded is a merged return type.
 type FortaStakingBeaconUpgraded struct {
-
 	Beacon common.Address
 
 	Raw types.Log
-
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -718,10 +606,7 @@ func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingBeaconUpgraded{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -731,11 +616,9 @@ func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -748,28 +631,22 @@ func (merged *FortaStakingFilterer) ParseBeaconUpgraded(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterDelaySetOutput is a merged return type.
 type FilterDelaySetOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingDelaySetIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingDelaySetIterator
-
 }
 
 // FilterDelaySet multiplexes to different implementations of the method.
@@ -779,10 +656,7 @@ func (merged *FortaStakingFilterer) FilterDelaySet(opts *bind.FilterOpts) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterDelaySetOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterDelaySet(opts)
@@ -792,9 +666,7 @@ func (merged *FortaStakingFilterer) FilterDelaySet(opts *bind.FilterOpts) (retVa
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -807,19 +679,14 @@ func (merged *FortaStakingFilterer) FilterDelaySet(opts *bind.FilterOpts) (retVa
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterDelaySet not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchDelaySet multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchDelaySet(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingDelaySet, sinkAlt5 chan<- *fortastaking012.FortaStakingDelaySet) (retVal event.Subscription, err error) {
@@ -827,9 +694,6 @@ func (merged *FortaStakingFilterer) WatchDelaySet(opts *bind.WatchOpts, sink cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchDelaySet(opts, sink)
@@ -857,19 +721,15 @@ func (merged *FortaStakingFilterer) WatchDelaySet(opts *bind.WatchOpts, sink cha
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchDelaySet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingDelaySet is a merged return type.
 type FortaStakingDelaySet struct {
-
 	NewWithdrawalDelay *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseDelaySet multiplexes to different implementations of the method.
@@ -879,10 +739,7 @@ func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *FortaS
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingDelaySet{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseDelaySet(log)
@@ -892,11 +749,9 @@ func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *FortaS
 			return
 		}
 
-
 		retVal.NewWithdrawalDelay = val.NewWithdrawalDelay
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -909,28 +764,22 @@ func (merged *FortaStakingFilterer) ParseDelaySet(log types.Log) (retVal *FortaS
 			return
 		}
 
-
 		retVal.NewWithdrawalDelay = val.NewWithdrawalDelay
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseDelaySet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterFrozeOutput is a merged return type.
 type FilterFrozeOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingFrozeIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingFrozeIterator
-
 }
 
 // FilterFroze multiplexes to different implementations of the method.
@@ -940,10 +789,7 @@ func (merged *FortaStakingFilterer) FilterFroze(opts *bind.FilterOpts, subjectTy
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterFrozeOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterFroze(opts, subjectType, subject, by)
@@ -953,9 +799,7 @@ func (merged *FortaStakingFilterer) FilterFroze(opts *bind.FilterOpts, subjectTy
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -968,19 +812,14 @@ func (merged *FortaStakingFilterer) FilterFroze(opts *bind.FilterOpts, subjectTy
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterFroze not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchFroze multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchFroze(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingFroze, subjectType []uint8, subject []*big.Int, by []common.Address, sinkAlt6 chan<- *fortastaking012.FortaStakingFroze) (retVal event.Subscription, err error) {
@@ -988,9 +827,6 @@ func (merged *FortaStakingFilterer) WatchFroze(opts *bind.WatchOpts, sink chan<-
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchFroze(opts, sink, subjectType, subject, by)
@@ -1018,15 +854,12 @@ func (merged *FortaStakingFilterer) WatchFroze(opts *bind.WatchOpts, sink chan<-
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchFroze not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingFroze is a merged return type.
 type FortaStakingFroze struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -1036,7 +869,6 @@ type FortaStakingFroze struct {
 	IsFrozen bool
 
 	Raw types.Log
-
 }
 
 // ParseFroze multiplexes to different implementations of the method.
@@ -1046,10 +878,7 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingFroze{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseFroze(log)
@@ -1058,7 +887,6 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -1069,7 +897,6 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 		retVal.IsFrozen = val.IsFrozen
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1082,7 +909,6 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -1093,23 +919,18 @@ func (merged *FortaStakingFilterer) ParseFroze(log types.Log) (retVal *FortaStak
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseFroze not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterInitializedOutput is a merged return type.
 type FilterInitializedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingInitializedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingInitializedIterator
-
 }
 
 // FilterInitialized multiplexes to different implementations of the method.
@@ -1119,10 +940,7 @@ func (merged *FortaStakingFilterer) FilterInitialized(opts *bind.FilterOpts) (re
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterInitializedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -1132,9 +950,7 @@ func (merged *FortaStakingFilterer) FilterInitialized(opts *bind.FilterOpts) (re
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -1147,19 +963,14 @@ func (merged *FortaStakingFilterer) FilterInitialized(opts *bind.FilterOpts) (re
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingInitialized, sinkAlt7 chan<- *fortastaking012.FortaStakingInitialized) (retVal event.Subscription, err error) {
@@ -1167,9 +978,6 @@ func (merged *FortaStakingFilterer) WatchInitialized(opts *bind.WatchOpts, sink 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -1197,19 +1005,15 @@ func (merged *FortaStakingFilterer) WatchInitialized(opts *bind.WatchOpts, sink 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingInitialized is a merged return type.
 type FortaStakingInitialized struct {
-
 	Version uint8
 
 	Raw types.Log
-
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -1219,10 +1023,7 @@ func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *For
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingInitialized{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -1232,11 +1033,9 @@ func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *For
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1249,28 +1048,22 @@ func (merged *FortaStakingFilterer) ParseInitialized(log types.Log) (retVal *For
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterMaxStakeReachedOutput is a merged return type.
 type FilterMaxStakeReachedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingMaxStakeReachedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingMaxStakeReachedIterator
-
 }
 
 // FilterMaxStakeReached multiplexes to different implementations of the method.
@@ -1280,10 +1073,7 @@ func (merged *FortaStakingFilterer) FilterMaxStakeReached(opts *bind.FilterOpts,
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterMaxStakeReachedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterMaxStakeReached(opts, subjectType, subject)
@@ -1293,9 +1083,7 @@ func (merged *FortaStakingFilterer) FilterMaxStakeReached(opts *bind.FilterOpts,
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -1308,19 +1096,14 @@ func (merged *FortaStakingFilterer) FilterMaxStakeReached(opts *bind.FilterOpts,
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterMaxStakeReached not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchMaxStakeReached multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchMaxStakeReached(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingMaxStakeReached, subjectType []uint8, subject []*big.Int, sinkAlt8 chan<- *fortastaking012.FortaStakingMaxStakeReached) (retVal event.Subscription, err error) {
@@ -1328,9 +1111,6 @@ func (merged *FortaStakingFilterer) WatchMaxStakeReached(opts *bind.WatchOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchMaxStakeReached(opts, sink, subjectType, subject)
@@ -1358,21 +1138,17 @@ func (merged *FortaStakingFilterer) WatchMaxStakeReached(opts *bind.WatchOpts, s
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchMaxStakeReached not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingMaxStakeReached is a merged return type.
 type FortaStakingMaxStakeReached struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseMaxStakeReached multiplexes to different implementations of the method.
@@ -1382,10 +1158,7 @@ func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingMaxStakeReached{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseMaxStakeReached(log)
@@ -1395,13 +1168,11 @@ func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal 
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1414,23 +1185,18 @@ func (merged *FortaStakingFilterer) ParseMaxStakeReached(log types.Log) (retVal 
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseMaxStakeReached not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterReleased multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) FilterReleased(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int, to []common.Address) (retVal *fortastaking011.FortaStakingReleasedIterator, err error) {
@@ -1438,9 +1204,6 @@ func (merged *FortaStakingFilterer) FilterReleased(opts *bind.FilterOpts, subjec
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterReleased(opts, subjectType, subject, to)
@@ -1455,12 +1218,9 @@ func (merged *FortaStakingFilterer) FilterReleased(opts *bind.FilterOpts, subjec
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterReleased not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchReleased multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchReleased(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingReleased, subjectType []uint8, subject []*big.Int, to []common.Address) (retVal event.Subscription, err error) {
@@ -1468,9 +1228,6 @@ func (merged *FortaStakingFilterer) WatchReleased(opts *bind.WatchOpts, sink cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchReleased(opts, sink, subjectType, subject, to)
@@ -1485,15 +1242,12 @@ func (merged *FortaStakingFilterer) WatchReleased(opts *bind.WatchOpts, sink cha
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchReleased not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingReleased is a merged return type.
 type FortaStakingReleased struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -1503,7 +1257,6 @@ type FortaStakingReleased struct {
 	Value *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseReleased multiplexes to different implementations of the method.
@@ -1513,10 +1266,7 @@ func (merged *FortaStakingFilterer) ParseReleased(log types.Log) (retVal *FortaS
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingReleased{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseReleased(log)
@@ -1525,7 +1275,6 @@ func (merged *FortaStakingFilterer) ParseReleased(log types.Log) (retVal *FortaS
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -1537,16 +1286,12 @@ func (merged *FortaStakingFilterer) ParseReleased(log types.Log) (retVal *FortaS
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseReleased not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterRewarded multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) FilterRewarded(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int, from []common.Address) (retVal *fortastaking011.FortaStakingRewardedIterator, err error) {
@@ -1554,9 +1299,6 @@ func (merged *FortaStakingFilterer) FilterRewarded(opts *bind.FilterOpts, subjec
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterRewarded(opts, subjectType, subject, from)
@@ -1571,12 +1313,9 @@ func (merged *FortaStakingFilterer) FilterRewarded(opts *bind.FilterOpts, subjec
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterRewarded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchRewarded multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchRewarded(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingRewarded, subjectType []uint8, subject []*big.Int, from []common.Address) (retVal event.Subscription, err error) {
@@ -1584,9 +1323,6 @@ func (merged *FortaStakingFilterer) WatchRewarded(opts *bind.WatchOpts, sink cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchRewarded(opts, sink, subjectType, subject, from)
@@ -1601,15 +1337,12 @@ func (merged *FortaStakingFilterer) WatchRewarded(opts *bind.WatchOpts, sink cha
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchRewarded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingRewarded is a merged return type.
 type FortaStakingRewarded struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -1619,7 +1352,6 @@ type FortaStakingRewarded struct {
 	Value *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseRewarded multiplexes to different implementations of the method.
@@ -1629,10 +1361,7 @@ func (merged *FortaStakingFilterer) ParseRewarded(log types.Log) (retVal *FortaS
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingRewarded{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseRewarded(log)
@@ -1641,7 +1370,6 @@ func (merged *FortaStakingFilterer) ParseRewarded(log types.Log) (retVal *FortaS
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -1653,23 +1381,18 @@ func (merged *FortaStakingFilterer) ParseRewarded(log types.Log) (retVal *FortaS
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseRewarded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterRouterUpdatedOutput is a merged return type.
 type FilterRouterUpdatedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingRouterUpdatedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingRouterUpdatedIterator
-
 }
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
@@ -1679,10 +1402,7 @@ func (merged *FortaStakingFilterer) FilterRouterUpdated(opts *bind.FilterOpts, r
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterRouterUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -1692,9 +1412,7 @@ func (merged *FortaStakingFilterer) FilterRouterUpdated(opts *bind.FilterOpts, r
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -1707,19 +1425,14 @@ func (merged *FortaStakingFilterer) FilterRouterUpdated(opts *bind.FilterOpts, r
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingRouterUpdated, router []common.Address, sinkAlt9 chan<- *fortastaking012.FortaStakingRouterUpdated) (retVal event.Subscription, err error) {
@@ -1727,9 +1440,6 @@ func (merged *FortaStakingFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -1757,19 +1467,15 @@ func (merged *FortaStakingFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sin
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingRouterUpdated is a merged return type.
 type FortaStakingRouterUpdated struct {
-
 	Router common.Address
 
 	Raw types.Log
-
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -1779,10 +1485,7 @@ func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *F
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingRouterUpdated{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -1792,11 +1495,9 @@ func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *F
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1809,28 +1510,22 @@ func (merged *FortaStakingFilterer) ParseRouterUpdated(log types.Log) (retVal *F
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterSlashedOutput is a merged return type.
 type FilterSlashedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingSlashedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingSlashedIterator
-
 }
 
 // FilterSlashed multiplexes to different implementations of the method.
@@ -1840,10 +1535,7 @@ func (merged *FortaStakingFilterer) FilterSlashed(opts *bind.FilterOpts, subject
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterSlashedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterSlashed(opts, subjectType, subject, by)
@@ -1853,9 +1545,7 @@ func (merged *FortaStakingFilterer) FilterSlashed(opts *bind.FilterOpts, subject
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -1868,19 +1558,14 @@ func (merged *FortaStakingFilterer) FilterSlashed(opts *bind.FilterOpts, subject
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterSlashed not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSlashed multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchSlashed(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingSlashed, subjectType []uint8, subject []*big.Int, by []common.Address, sinkAlt10 chan<- *fortastaking012.FortaStakingSlashed) (retVal event.Subscription, err error) {
@@ -1888,9 +1573,6 @@ func (merged *FortaStakingFilterer) WatchSlashed(opts *bind.WatchOpts, sink chan
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchSlashed(opts, sink, subjectType, subject, by)
@@ -1918,15 +1600,12 @@ func (merged *FortaStakingFilterer) WatchSlashed(opts *bind.WatchOpts, sink chan
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchSlashed not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingSlashed is a merged return type.
 type FortaStakingSlashed struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -1936,7 +1615,6 @@ type FortaStakingSlashed struct {
 	Value *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseSlashed multiplexes to different implementations of the method.
@@ -1946,10 +1624,7 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingSlashed{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseSlashed(log)
@@ -1958,7 +1633,6 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -1969,7 +1643,6 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 		retVal.Value = val.Value
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1982,7 +1655,6 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -1993,23 +1665,18 @@ func (merged *FortaStakingFilterer) ParseSlashed(log types.Log) (retVal *FortaSt
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseSlashed not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterSlashedShareSentOutput is a merged return type.
 type FilterSlashedShareSentOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingSlashedShareSentIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingSlashedShareSentIterator
-
 }
 
 // FilterSlashedShareSent multiplexes to different implementations of the method.
@@ -2019,10 +1686,7 @@ func (merged *FortaStakingFilterer) FilterSlashedShareSent(opts *bind.FilterOpts
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterSlashedShareSentOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterSlashedShareSent(opts, subjectType, subject, by)
@@ -2032,9 +1696,7 @@ func (merged *FortaStakingFilterer) FilterSlashedShareSent(opts *bind.FilterOpts
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -2047,19 +1709,14 @@ func (merged *FortaStakingFilterer) FilterSlashedShareSent(opts *bind.FilterOpts
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterSlashedShareSent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSlashedShareSent multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchSlashedShareSent(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingSlashedShareSent, subjectType []uint8, subject []*big.Int, by []common.Address, sinkAlt11 chan<- *fortastaking012.FortaStakingSlashedShareSent) (retVal event.Subscription, err error) {
@@ -2067,9 +1724,6 @@ func (merged *FortaStakingFilterer) WatchSlashedShareSent(opts *bind.WatchOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchSlashedShareSent(opts, sink, subjectType, subject, by)
@@ -2097,15 +1751,12 @@ func (merged *FortaStakingFilterer) WatchSlashedShareSent(opts *bind.WatchOpts, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchSlashedShareSent not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingSlashedShareSent is a merged return type.
 type FortaStakingSlashedShareSent struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -2115,7 +1766,6 @@ type FortaStakingSlashedShareSent struct {
 	Value *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseSlashedShareSent multiplexes to different implementations of the method.
@@ -2125,10 +1775,7 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingSlashedShareSent{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseSlashedShareSent(log)
@@ -2137,7 +1784,6 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -2148,7 +1794,6 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 		retVal.Value = val.Value
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2161,7 +1806,6 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -2172,23 +1816,18 @@ func (merged *FortaStakingFilterer) ParseSlashedShareSent(log types.Log) (retVal
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseSlashedShareSent not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterStakeDepositedOutput is a merged return type.
 type FilterStakeDepositedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingStakeDepositedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingStakeDepositedIterator
-
 }
 
 // FilterStakeDeposited multiplexes to different implementations of the method.
@@ -2198,10 +1837,7 @@ func (merged *FortaStakingFilterer) FilterStakeDeposited(opts *bind.FilterOpts, 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterStakeDepositedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterStakeDeposited(opts, subjectType, subject, account)
@@ -2211,9 +1847,7 @@ func (merged *FortaStakingFilterer) FilterStakeDeposited(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -2226,19 +1860,14 @@ func (merged *FortaStakingFilterer) FilterStakeDeposited(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterStakeDeposited not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchStakeDeposited multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchStakeDeposited(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingStakeDeposited, subjectType []uint8, subject []*big.Int, account []common.Address, sinkAlt12 chan<- *fortastaking012.FortaStakingStakeDeposited) (retVal event.Subscription, err error) {
@@ -2246,9 +1875,6 @@ func (merged *FortaStakingFilterer) WatchStakeDeposited(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchStakeDeposited(opts, sink, subjectType, subject, account)
@@ -2276,15 +1902,12 @@ func (merged *FortaStakingFilterer) WatchStakeDeposited(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchStakeDeposited not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingStakeDeposited is a merged return type.
 type FortaStakingStakeDeposited struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -2294,7 +1917,6 @@ type FortaStakingStakeDeposited struct {
 	Amount *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseStakeDeposited multiplexes to different implementations of the method.
@@ -2304,10 +1926,7 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingStakeDeposited{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseStakeDeposited(log)
@@ -2316,7 +1935,6 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -2327,7 +1945,6 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 		retVal.Amount = val.Amount
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2340,7 +1957,6 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -2351,16 +1967,12 @@ func (merged *FortaStakingFilterer) ParseStakeDeposited(log types.Log) (retVal *
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseStakeDeposited not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterStakeParamsManagerSet multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) FilterStakeParamsManagerSet(opts *bind.FilterOpts, newManager []common.Address) (retVal *fortastaking011.FortaStakingStakeParamsManagerSetIterator, err error) {
@@ -2368,9 +1980,6 @@ func (merged *FortaStakingFilterer) FilterStakeParamsManagerSet(opts *bind.Filte
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterStakeParamsManagerSet(opts, newManager)
@@ -2385,12 +1994,9 @@ func (merged *FortaStakingFilterer) FilterStakeParamsManagerSet(opts *bind.Filte
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterStakeParamsManagerSet not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchStakeParamsManagerSet multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchStakeParamsManagerSet(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingStakeParamsManagerSet, newManager []common.Address) (retVal event.Subscription, err error) {
@@ -2398,9 +2004,6 @@ func (merged *FortaStakingFilterer) WatchStakeParamsManagerSet(opts *bind.WatchO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchStakeParamsManagerSet(opts, sink, newManager)
@@ -2415,19 +2018,15 @@ func (merged *FortaStakingFilterer) WatchStakeParamsManagerSet(opts *bind.WatchO
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchStakeParamsManagerSet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingStakeParamsManagerSet is a merged return type.
 type FortaStakingStakeParamsManagerSet struct {
-
 	NewManager common.Address
 
 	Raw types.Log
-
 }
 
 // ParseStakeParamsManagerSet multiplexes to different implementations of the method.
@@ -2437,10 +2036,7 @@ func (merged *FortaStakingFilterer) ParseStakeParamsManagerSet(log types.Log) (r
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingStakeParamsManagerSet{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseStakeParamsManagerSet(log)
@@ -2450,28 +2046,22 @@ func (merged *FortaStakingFilterer) ParseStakeParamsManagerSet(log types.Log) (r
 			return
 		}
 
-
 		retVal.NewManager = val.NewManager
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseStakeParamsManagerSet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterTokensSweptOutput is a merged return type.
 type FilterTokensSweptOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingTokensSweptIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingTokensSweptIterator
-
 }
 
 // FilterTokensSwept multiplexes to different implementations of the method.
@@ -2481,10 +2071,7 @@ func (merged *FortaStakingFilterer) FilterTokensSwept(opts *bind.FilterOpts, tok
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterTokensSweptOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterTokensSwept(opts, token)
@@ -2494,9 +2081,7 @@ func (merged *FortaStakingFilterer) FilterTokensSwept(opts *bind.FilterOpts, tok
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -2509,19 +2094,14 @@ func (merged *FortaStakingFilterer) FilterTokensSwept(opts *bind.FilterOpts, tok
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterTokensSwept not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchTokensSwept multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingTokensSwept, token []common.Address, sinkAlt13 chan<- *fortastaking012.FortaStakingTokensSwept) (retVal event.Subscription, err error) {
@@ -2529,9 +2109,6 @@ func (merged *FortaStakingFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchTokensSwept(opts, sink, token)
@@ -2559,15 +2136,12 @@ func (merged *FortaStakingFilterer) WatchTokensSwept(opts *bind.WatchOpts, sink 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchTokensSwept not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingTokensSwept is a merged return type.
 type FortaStakingTokensSwept struct {
-
 	Token common.Address
 
 	To common.Address
@@ -2575,7 +2149,6 @@ type FortaStakingTokensSwept struct {
 	Amount *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseTokensSwept multiplexes to different implementations of the method.
@@ -2585,10 +2158,7 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingTokensSwept{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseTokensSwept(log)
@@ -2598,7 +2168,6 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 			return
 		}
 
-
 		retVal.Token = val.Token
 
 		retVal.To = val.To
@@ -2606,7 +2175,6 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 		retVal.Amount = val.Amount
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2619,7 +2187,6 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 			return
 		}
 
-
 		retVal.Token = val.Token
 
 		retVal.To = val.To
@@ -2628,23 +2195,18 @@ func (merged *FortaStakingFilterer) ParseTokensSwept(log types.Log) (retVal *For
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseTokensSwept not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterTransferBatchOutput is a merged return type.
 type FilterTransferBatchOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingTransferBatchIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingTransferBatchIterator
-
 }
 
 // FilterTransferBatch multiplexes to different implementations of the method.
@@ -2654,10 +2216,7 @@ func (merged *FortaStakingFilterer) FilterTransferBatch(opts *bind.FilterOpts, o
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterTransferBatchOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterTransferBatch(opts, operator, from, to)
@@ -2667,9 +2226,7 @@ func (merged *FortaStakingFilterer) FilterTransferBatch(opts *bind.FilterOpts, o
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -2682,19 +2239,14 @@ func (merged *FortaStakingFilterer) FilterTransferBatch(opts *bind.FilterOpts, o
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterTransferBatch not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchTransferBatch multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchTransferBatch(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingTransferBatch, operator []common.Address, from []common.Address, to []common.Address, sinkAlt14 chan<- *fortastaking012.FortaStakingTransferBatch) (retVal event.Subscription, err error) {
@@ -2702,9 +2254,6 @@ func (merged *FortaStakingFilterer) WatchTransferBatch(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchTransferBatch(opts, sink, operator, from, to)
@@ -2732,15 +2281,12 @@ func (merged *FortaStakingFilterer) WatchTransferBatch(opts *bind.WatchOpts, sin
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchTransferBatch not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingTransferBatch is a merged return type.
 type FortaStakingTransferBatch struct {
-
 	Operator common.Address
 
 	From common.Address
@@ -2752,7 +2298,6 @@ type FortaStakingTransferBatch struct {
 	Values []*big.Int
 
 	Raw types.Log
-
 }
 
 // ParseTransferBatch multiplexes to different implementations of the method.
@@ -2762,10 +2307,7 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingTransferBatch{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseTransferBatch(log)
@@ -2774,7 +2316,6 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 			err = methodErr
 			return
 		}
-
 
 		retVal.Operator = val.Operator
 
@@ -2787,7 +2328,6 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 		retVal.Values = val.Values
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2800,7 +2340,6 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 			return
 		}
 
-
 		retVal.Operator = val.Operator
 
 		retVal.From = val.From
@@ -2813,23 +2352,18 @@ func (merged *FortaStakingFilterer) ParseTransferBatch(log types.Log) (retVal *F
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseTransferBatch not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterTransferSingleOutput is a merged return type.
 type FilterTransferSingleOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingTransferSingleIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingTransferSingleIterator
-
 }
 
 // FilterTransferSingle multiplexes to different implementations of the method.
@@ -2839,10 +2373,7 @@ func (merged *FortaStakingFilterer) FilterTransferSingle(opts *bind.FilterOpts, 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterTransferSingleOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterTransferSingle(opts, operator, from, to)
@@ -2852,9 +2383,7 @@ func (merged *FortaStakingFilterer) FilterTransferSingle(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -2867,19 +2396,14 @@ func (merged *FortaStakingFilterer) FilterTransferSingle(opts *bind.FilterOpts, 
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterTransferSingle not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchTransferSingle multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchTransferSingle(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingTransferSingle, operator []common.Address, from []common.Address, to []common.Address, sinkAlt15 chan<- *fortastaking012.FortaStakingTransferSingle) (retVal event.Subscription, err error) {
@@ -2887,9 +2411,6 @@ func (merged *FortaStakingFilterer) WatchTransferSingle(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchTransferSingle(opts, sink, operator, from, to)
@@ -2917,15 +2438,12 @@ func (merged *FortaStakingFilterer) WatchTransferSingle(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchTransferSingle not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingTransferSingle is a merged return type.
 type FortaStakingTransferSingle struct {
-
 	Operator common.Address
 
 	From common.Address
@@ -2937,7 +2455,6 @@ type FortaStakingTransferSingle struct {
 	Value *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseTransferSingle multiplexes to different implementations of the method.
@@ -2947,10 +2464,7 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingTransferSingle{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseTransferSingle(log)
@@ -2959,7 +2473,6 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 			err = methodErr
 			return
 		}
-
 
 		retVal.Operator = val.Operator
 
@@ -2972,7 +2485,6 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 		retVal.Value = val.Value
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -2985,7 +2497,6 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Operator = val.Operator
 
 		retVal.From = val.From
@@ -2998,23 +2509,18 @@ func (merged *FortaStakingFilterer) ParseTransferSingle(log types.Log) (retVal *
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseTransferSingle not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterTreasurySetOutput is a merged return type.
 type FilterTreasurySetOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingTreasurySetIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingTreasurySetIterator
-
 }
 
 // FilterTreasurySet multiplexes to different implementations of the method.
@@ -3024,10 +2530,7 @@ func (merged *FortaStakingFilterer) FilterTreasurySet(opts *bind.FilterOpts) (re
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterTreasurySetOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterTreasurySet(opts)
@@ -3037,9 +2540,7 @@ func (merged *FortaStakingFilterer) FilterTreasurySet(opts *bind.FilterOpts) (re
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -3052,19 +2553,14 @@ func (merged *FortaStakingFilterer) FilterTreasurySet(opts *bind.FilterOpts) (re
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterTreasurySet not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchTreasurySet multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchTreasurySet(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingTreasurySet, sinkAlt16 chan<- *fortastaking012.FortaStakingTreasurySet) (retVal event.Subscription, err error) {
@@ -3072,9 +2568,6 @@ func (merged *FortaStakingFilterer) WatchTreasurySet(opts *bind.WatchOpts, sink 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchTreasurySet(opts, sink)
@@ -3102,19 +2595,15 @@ func (merged *FortaStakingFilterer) WatchTreasurySet(opts *bind.WatchOpts, sink 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchTreasurySet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingTreasurySet is a merged return type.
 type FortaStakingTreasurySet struct {
-
 	NewTreasury common.Address
 
 	Raw types.Log
-
 }
 
 // ParseTreasurySet multiplexes to different implementations of the method.
@@ -3124,10 +2613,7 @@ func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *For
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingTreasurySet{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseTreasurySet(log)
@@ -3137,11 +2623,9 @@ func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *For
 			return
 		}
 
-
 		retVal.NewTreasury = val.NewTreasury
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -3154,28 +2638,22 @@ func (merged *FortaStakingFilterer) ParseTreasurySet(log types.Log) (retVal *For
 			return
 		}
 
-
 		retVal.NewTreasury = val.NewTreasury
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseTreasurySet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterURIOutput is a merged return type.
 type FilterURIOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingURIIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingURIIterator
-
 }
 
 // FilterURI multiplexes to different implementations of the method.
@@ -3185,10 +2663,7 @@ func (merged *FortaStakingFilterer) FilterURI(opts *bind.FilterOpts, id []*big.I
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterURIOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterURI(opts, id)
@@ -3198,9 +2673,7 @@ func (merged *FortaStakingFilterer) FilterURI(opts *bind.FilterOpts, id []*big.I
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -3213,19 +2686,14 @@ func (merged *FortaStakingFilterer) FilterURI(opts *bind.FilterOpts, id []*big.I
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterURI not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchURI multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchURI(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingURI, id []*big.Int, sinkAlt17 chan<- *fortastaking012.FortaStakingURI) (retVal event.Subscription, err error) {
@@ -3233,9 +2701,6 @@ func (merged *FortaStakingFilterer) WatchURI(opts *bind.WatchOpts, sink chan<- *
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchURI(opts, sink, id)
@@ -3263,21 +2728,17 @@ func (merged *FortaStakingFilterer) WatchURI(opts *bind.WatchOpts, sink chan<- *
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchURI not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingURI is a merged return type.
 type FortaStakingURI struct {
-
 	Value string
 
 	Id *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseURI multiplexes to different implementations of the method.
@@ -3287,10 +2748,7 @@ func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *FortaStakin
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingURI{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseURI(log)
@@ -3300,13 +2758,11 @@ func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *FortaStakin
 			return
 		}
 
-
 		retVal.Value = val.Value
 
 		retVal.Id = val.Id
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -3319,30 +2775,24 @@ func (merged *FortaStakingFilterer) ParseURI(log types.Log) (retVal *FortaStakin
 			return
 		}
 
-
 		retVal.Value = val.Value
 
 		retVal.Id = val.Id
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseURI not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterUpgradedOutput is a merged return type.
 type FilterUpgradedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingUpgradedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingUpgradedIterator
-
 }
 
 // FilterUpgraded multiplexes to different implementations of the method.
@@ -3352,10 +2802,7 @@ func (merged *FortaStakingFilterer) FilterUpgraded(opts *bind.FilterOpts, implem
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterUpgradedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -3365,9 +2812,7 @@ func (merged *FortaStakingFilterer) FilterUpgraded(opts *bind.FilterOpts, implem
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -3380,19 +2825,14 @@ func (merged *FortaStakingFilterer) FilterUpgraded(opts *bind.FilterOpts, implem
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingUpgraded, implementation []common.Address, sinkAlt18 chan<- *fortastaking012.FortaStakingUpgraded) (retVal event.Subscription, err error) {
@@ -3400,9 +2840,6 @@ func (merged *FortaStakingFilterer) WatchUpgraded(opts *bind.WatchOpts, sink cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -3430,19 +2867,15 @@ func (merged *FortaStakingFilterer) WatchUpgraded(opts *bind.WatchOpts, sink cha
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingUpgraded is a merged return type.
 type FortaStakingUpgraded struct {
-
 	Implementation common.Address
 
 	Raw types.Log
-
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -3452,10 +2885,7 @@ func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *FortaS
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingUpgraded{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -3465,11 +2895,9 @@ func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *FortaS
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -3482,28 +2910,22 @@ func (merged *FortaStakingFilterer) ParseUpgraded(log types.Log) (retVal *FortaS
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterWithdrawalExecutedOutput is a merged return type.
 type FilterWithdrawalExecutedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingWithdrawalExecutedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingWithdrawalExecutedIterator
-
 }
 
 // FilterWithdrawalExecuted multiplexes to different implementations of the method.
@@ -3513,10 +2935,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalExecuted(opts *bind.FilterOp
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterWithdrawalExecutedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterWithdrawalExecuted(opts, subjectType, subject, account)
@@ -3526,9 +2945,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalExecuted(opts *bind.FilterOp
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -3541,19 +2958,14 @@ func (merged *FortaStakingFilterer) FilterWithdrawalExecuted(opts *bind.FilterOp
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterWithdrawalExecuted not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchWithdrawalExecuted multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchWithdrawalExecuted(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingWithdrawalExecuted, subjectType []uint8, subject []*big.Int, account []common.Address, sinkAlt19 chan<- *fortastaking012.FortaStakingWithdrawalExecuted) (retVal event.Subscription, err error) {
@@ -3561,9 +2973,6 @@ func (merged *FortaStakingFilterer) WatchWithdrawalExecuted(opts *bind.WatchOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchWithdrawalExecuted(opts, sink, subjectType, subject, account)
@@ -3591,15 +3000,12 @@ func (merged *FortaStakingFilterer) WatchWithdrawalExecuted(opts *bind.WatchOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchWithdrawalExecuted not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingWithdrawalExecuted is a merged return type.
 type FortaStakingWithdrawalExecuted struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -3607,7 +3013,6 @@ type FortaStakingWithdrawalExecuted struct {
 	Account common.Address
 
 	Raw types.Log
-
 }
 
 // ParseWithdrawalExecuted multiplexes to different implementations of the method.
@@ -3617,10 +3022,7 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingWithdrawalExecuted{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseWithdrawalExecuted(log)
@@ -3630,7 +3032,6 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -3638,7 +3039,6 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 		retVal.Account = val.Account
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -3651,7 +3051,6 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -3660,23 +3059,18 @@ func (merged *FortaStakingFilterer) ParseWithdrawalExecuted(log types.Log) (retV
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseWithdrawalExecuted not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterWithdrawalInitiatedOutput is a merged return type.
 type FilterWithdrawalInitiatedOutput struct {
-
 	Fortastaking011Result *fortastaking011.FortaStakingWithdrawalInitiatedIterator
 
 	Fortastaking012Result *fortastaking012.FortaStakingWithdrawalInitiatedIterator
-
 }
 
 // FilterWithdrawalInitiated multiplexes to different implementations of the method.
@@ -3686,10 +3080,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalInitiated(opts *bind.FilterO
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterWithdrawalInitiatedOutput{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.FilterWithdrawalInitiated(opts, subjectType, subject, account)
@@ -3699,9 +3090,7 @@ func (merged *FortaStakingFilterer) FilterWithdrawalInitiated(opts *bind.FilterO
 			return
 		}
 
-
 		retVal.Fortastaking011Result = val
-
 
 		return
 	}
@@ -3714,19 +3103,14 @@ func (merged *FortaStakingFilterer) FilterWithdrawalInitiated(opts *bind.FilterO
 			return
 		}
 
-
 		retVal.Fortastaking012Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterWithdrawalInitiated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchWithdrawalInitiated multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchWithdrawalInitiated(opts *bind.WatchOpts, sink chan<- *fortastaking011.FortaStakingWithdrawalInitiated, subjectType []uint8, subject []*big.Int, account []common.Address, sinkAlt20 chan<- *fortastaking012.FortaStakingWithdrawalInitiated) (retVal event.Subscription, err error) {
@@ -3734,9 +3118,6 @@ func (merged *FortaStakingFilterer) WatchWithdrawalInitiated(opts *bind.WatchOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.WatchWithdrawalInitiated(opts, sink, subjectType, subject, account)
@@ -3764,15 +3145,12 @@ func (merged *FortaStakingFilterer) WatchWithdrawalInitiated(opts *bind.WatchOpt
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchWithdrawalInitiated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingWithdrawalInitiated is a merged return type.
 type FortaStakingWithdrawalInitiated struct {
-
 	SubjectType uint8
 
 	Subject *big.Int
@@ -3782,7 +3160,6 @@ type FortaStakingWithdrawalInitiated struct {
 	Deadline uint64
 
 	Raw types.Log
-
 }
 
 // ParseWithdrawalInitiated multiplexes to different implementations of the method.
@@ -3792,10 +3169,7 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingWithdrawalInitiated{}
-
-
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ParseWithdrawalInitiated(log)
@@ -3804,7 +3178,6 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 			err = methodErr
 			return
 		}
-
 
 		retVal.SubjectType = val.SubjectType
 
@@ -3815,7 +3188,6 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 		retVal.Deadline = val.Deadline
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -3828,7 +3200,6 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 			return
 		}
 
-
 		retVal.SubjectType = val.SubjectType
 
 		retVal.Subject = val.Subject
@@ -3839,16 +3210,12 @@ func (merged *FortaStakingFilterer) ParseWithdrawalInitiated(log types.Log) (ret
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseWithdrawalInitiated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSlashDelegatorsPercentSet multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) FilterSlashDelegatorsPercentSet(opts *bind.FilterOpts) (retVal *fortastaking012.FortaStakingSlashDelegatorsPercentSetIterator, err error) {
@@ -3856,9 +3223,6 @@ func (merged *FortaStakingFilterer) FilterSlashDelegatorsPercentSet(opts *bind.F
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.FilterSlashDelegatorsPercentSet(opts)
@@ -3873,12 +3237,9 @@ func (merged *FortaStakingFilterer) FilterSlashDelegatorsPercentSet(opts *bind.F
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterSlashDelegatorsPercentSet not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSlashDelegatorsPercentSet multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchSlashDelegatorsPercentSet(opts *bind.WatchOpts, sink chan<- *fortastaking012.FortaStakingSlashDelegatorsPercentSet) (retVal event.Subscription, err error) {
@@ -3886,9 +3247,6 @@ func (merged *FortaStakingFilterer) WatchSlashDelegatorsPercentSet(opts *bind.Wa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.WatchSlashDelegatorsPercentSet(opts, sink)
@@ -3903,19 +3261,15 @@ func (merged *FortaStakingFilterer) WatchSlashDelegatorsPercentSet(opts *bind.Wa
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchSlashDelegatorsPercentSet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingSlashDelegatorsPercentSet is a merged return type.
 type FortaStakingSlashDelegatorsPercentSet struct {
-
 	Percent *big.Int
 
 	Raw types.Log
-
 }
 
 // ParseSlashDelegatorsPercentSet multiplexes to different implementations of the method.
@@ -3925,10 +3279,7 @@ func (merged *FortaStakingFilterer) ParseSlashDelegatorsPercentSet(log types.Log
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingSlashDelegatorsPercentSet{}
-
-
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.ParseSlashDelegatorsPercentSet(log)
@@ -3938,21 +3289,16 @@ func (merged *FortaStakingFilterer) ParseSlashDelegatorsPercentSet(log types.Log
 			return
 		}
 
-
 		retVal.Percent = val.Percent
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseSlashDelegatorsPercentSet not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterStakeHelpersConfigured multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) FilterStakeHelpersConfigured(opts *bind.FilterOpts, subjectGateway []common.Address, allocator []common.Address) (retVal *fortastaking012.FortaStakingStakeHelpersConfiguredIterator, err error) {
@@ -3960,9 +3306,6 @@ func (merged *FortaStakingFilterer) FilterStakeHelpersConfigured(opts *bind.Filt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.FilterStakeHelpersConfigured(opts, subjectGateway, allocator)
@@ -3977,12 +3320,9 @@ func (merged *FortaStakingFilterer) FilterStakeHelpersConfigured(opts *bind.Filt
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.FilterStakeHelpersConfigured not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchStakeHelpersConfigured multiplexes to different implementations of the method.
 func (merged *FortaStakingFilterer) WatchStakeHelpersConfigured(opts *bind.WatchOpts, sink chan<- *fortastaking012.FortaStakingStakeHelpersConfigured, subjectGateway []common.Address, allocator []common.Address) (retVal event.Subscription, err error) {
@@ -3990,9 +3330,6 @@ func (merged *FortaStakingFilterer) WatchStakeHelpersConfigured(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.WatchStakeHelpersConfigured(opts, sink, subjectGateway, allocator)
@@ -4007,21 +3344,17 @@ func (merged *FortaStakingFilterer) WatchStakeHelpersConfigured(opts *bind.Watch
 		return
 	}
 
-
 	err = import_fmt.Errorf("FortaStakingFilterer.WatchStakeHelpersConfigured not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FortaStakingStakeHelpersConfigured is a merged return type.
 type FortaStakingStakeHelpersConfigured struct {
-
 	SubjectGateway common.Address
 
 	Allocator common.Address
 
 	Raw types.Log
-
 }
 
 // ParseStakeHelpersConfigured multiplexes to different implementations of the method.
@@ -4031,10 +3364,7 @@ func (merged *FortaStakingFilterer) ParseStakeHelpersConfigured(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FortaStakingStakeHelpersConfigured{}
-
-
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.ParseStakeHelpersConfigured(log)
@@ -4044,17 +3374,14 @@ func (merged *FortaStakingFilterer) ParseStakeHelpersConfigured(log types.Log) (
 			return
 		}
 
-
 		retVal.SubjectGateway = val.SubjectGateway
 
 		retVal.Allocator = val.Allocator
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("FortaStakingFilterer.ParseStakeHelpersConfigured not implemented (tag=%s)", merged.currTag)
 	return
