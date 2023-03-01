@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	NumMaxAddresses = 50
+	NumMaxAddressesPerAlert = 50
 )
 
 func RecreateBloomFilter(bf *protocol.BloomFilter) (*bloom.BloomFilter, error) {
