@@ -3,9 +3,6 @@ package ens
 import (
 	"bytes"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"strings"
-
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -69,7 +66,6 @@ func NewENStoreWithResolver(resolver Resolver) *ENSStore {
 // Resolver resolves inputs.
 type Resolver interface {
 	Resolve(input string) (common.Address, error)
-	IsProd() bool
 }
 
 // ENSResolver resolves names from an ENS contract.
@@ -106,10 +102,6 @@ func (rf ResolverFunc) Resolve(input string) (common.Address, error) {
 	return rf(input)
 }
 
-func (ensResolver *ENSResolver) IsProd() bool {
-	return strings.EqualFold(ensResolver.resolverAddr, ENSAddressProd)
-}
-
 func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContracts, error) {
 	agentReg, err := ensstore.Resolve(AgentRegistryContract)
 	if err != nil {
@@ -143,12 +135,7 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 
 	rewards, err := ensstore.Resolve(RewardsDistributorContract)
 	if err != nil {
-		if ensstore.Resolver.IsProd() {
-			log.WithError(err).Error("cannot resolve rewards contract, falling back")
-			rewards = common.HexToAddress("0xf7239f26b79145297737166b0C66F4919af9c507")
-		} else {
-			return nil, err
-		}
+		return nil, err
 	}
 
 	regContracts := &registry.RegistryContracts{
