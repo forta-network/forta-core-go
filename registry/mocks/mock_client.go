@@ -270,6 +270,21 @@ func (mr *MockClientMockRecorder) GetAssignmentHash(scannerID interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignmentHash", reflect.TypeOf((*MockClient)(nil).GetAssignmentHash), scannerID)
 }
 
+// GetAvailablePoolRewardsForDelegator mocks base method.
+func (m *MockClient) GetAvailablePoolRewardsForDelegator(poolID, epoch *big.Int, delegator string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAvailablePoolRewardsForDelegator", poolID, epoch, delegator)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAvailablePoolRewardsForDelegator indicates an expected call of GetAvailablePoolRewardsForDelegator.
+func (mr *MockClientMockRecorder) GetAvailablePoolRewardsForDelegator(poolID, epoch, delegator interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAvailablePoolRewardsForDelegator", reflect.TypeOf((*MockClient)(nil).GetAvailablePoolRewardsForDelegator), poolID, epoch, delegator)
+}
+
 // GetPoolScanner mocks base method.
 func (m *MockClient) GetPoolScanner(scannerID string) (*registry.Scanner, error) {
 	m.ctrl.T.Helper()
