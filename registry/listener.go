@@ -80,45 +80,6 @@ type Listener interface {
 	ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error
 }
 
-func (l *listener) handleScannerRegistryEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
-	switch getTopic(le) {
-	case contract_scanner_registry_0_1_4.ScannerUpdatedTopic: // same with prev version
-		su, err := contracts.ScannerRegFil.ParseScannerUpdated(le)
-		if err != nil {
-			return err
-		}
-		scannerID := utils.ScannerIDBigIntToHex(su.ScannerId)
-		enabled, err := l.client.IsEnabledScanner(scannerID)
-		if err != nil {
-			return err
-		}
-		return l.handler(l.ctx, logger, registry.NewScannerSaveMessage(su, enabled, blk))
-
-	case contract_scanner_registry_0_1_4.ScannerEnabledTopic: // same with prev version
-		se, err := contracts.ScannerRegFil.ParseScannerEnabled(le)
-		if err != nil {
-			return err
-		}
-
-		// enforce latest state to take sunsetting into account
-		enabled, err := l.client.IsEnabledScanner(utils.ScannerIDBigIntToHex(se.ScannerId))
-		if err != nil {
-			return err
-		}
-		se.Enabled = enabled && se.Enabled
-
-		return l.handler(l.ctx, logger, registry.NewScannerMessage(se, blk))
-
-	case contract_scanner_registry_0_1_4.StakeThresholdChangedTopic: // same with prev version
-		evt, err := contracts.ScannerRegFil.ParseStakeThresholdChanged(le)
-		if err != nil {
-			return err
-		}
-		return l.handler(l.ctx, logger, registry.NewScannerStakeThresholdMessage(evt, le, blk))
-	}
-	return nil
-}
-
 func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
 	switch getTopic(le) {
 	case contract_scanner_pool_registry_0_1_0.ScannerUpdatedTopic:
@@ -406,9 +367,6 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 		return err
 	}
 
-	if equalsAddress(le.Address, contracts.Addresses.ScannerRegistry.Hex()) {
-		return l.handleScannerRegistryEvent(contracts, le, blk, logger)
-	}
 	if equalsAddress(le.Address, contracts.Addresses.ScannerNodeVersion.Hex()) {
 		return l.handleScannerVersionEvent(contracts, le, blk, logger)
 	}

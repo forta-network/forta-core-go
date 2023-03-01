@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"math/big"
-	"os"
 	"strings"
 	"testing"
 
@@ -13,7 +12,7 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_0"
-	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0"
 
 	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
@@ -25,18 +24,13 @@ import (
 // This actually calls out to polygon to get some known blocks and parse the actions
 // by default it gets the data at https://polygon-rpc.com, otherwise override with ENV var POLYGON_JSON_RPC
 func testListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
-	jrpc := os.Getenv("POLYGON_JSON_RPC")
-	if jrpc == "" {
-		jrpc = defaultConfig.JsonRpcUrl
-	}
 	l, err := NewListener(ctx, ListenerConfig{
 		Name:           "listener",
-		JsonRpcURL:     jrpc,
+		JsonRpcURL:     "https://rpc.ankr.com/polygon",
 		ENSAddress:     defaultEnsAddress,
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
-		NoRefresh:      true,
 	})
 	if err != nil {
 		panic(err)
@@ -52,7 +46,6 @@ func testMumbaiListener(ctx context.Context, filter *ContractFilter, topic strin
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
-		NoRefresh:      true,
 	})
 	if err != nil {
 		panic(err)
@@ -68,7 +61,7 @@ type listenerTest struct {
 
 func TestListener_Listen(t *testing.T) {
 	ctx := context.Background()
-	found := errors.New("found")
+	handledEvent := errors.New("handled event")
 	tests := []listenerTest{
 		{
 			name: "upgrade",
@@ -81,7 +74,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, registry.Upgrade, msg.Action)
 							assert.Equal(t, strings.ToLower("0x4720c872425876B6f4b4E9130CDef667aDE553b2"), msg.Proxy)
 							assert.Equal(t, strings.ToLower("0x68608f260ba3be8808b83fd686eccfe6a9f468f7"), msg.NewImplementation)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -98,7 +91,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, int64(31808525), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ConfigurationChange, msg.Action)
 							assert.Equal(t, strings.ToLower("0x64d5192f03bd98db1de2aa8b4abac5419eac32ce"), msg.Proxy)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -115,7 +108,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, int64(26030393), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.EnableAgent, msg.Action)
 							assert.Equal(t, "0x4bc8273b69f070c209c4866907d5def4c6f899af4cb47dee5e263aba6defad69", msg.AgentID)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -132,7 +125,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, int64(26029118), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.DisableAgent, msg.Action)
 							assert.Equal(t, "0x4bc8273b69f070c209c4866907d5def4c6f899af4cb47dee5e263aba6defad69", msg.AgentID)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -140,21 +133,38 @@ func TestListener_Listen(t *testing.T) {
 			block: 26029118,
 		},
 		{
-			name: "scanner-save",
-			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry_0_1_3.ScannerUpdatedTopic,
+			name: "scanner-enable",
+			listener: testListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
+				contract_scanner_pool_registry_0_1_0.EnabledScannersChangedTopic,
 				Handlers{
-					SaveScannerHandlers: regmsg.Handlers(
-						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerSaveMessage) error {
-							assert.Equal(t, int64(25809030), msg.Source.BlockNumberDecimal)
-							assert.Equal(t, registry.SaveScanner, msg.Action)
-							assert.Equal(t, "0xdec088fea5feab7dc17789a92bffc10393a769de", msg.ScannerID)
-							return found
+					UpdateScannerPoolHandlers: regmsg.Handlers(
+						func(ctx context.Context, logger *log.Entry, msg *registry.UpdateScannerPoolMessage) error {
+							assert.Equal(t, int64(39834786), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.UpdateScannerPool, msg.Action)
+							assert.Equal(t, "70", msg.PoolID)
+							return handledEvent
 						},
 					),
 				},
 			),
-			block: 25809030,
+			block: 39834786,
+		},
+		{
+			name: "scanner-save",
+			listener: testMumbaiListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
+				contract_scanner_pool_registry_0_1_0.ScannerUpdatedTopic,
+				Handlers{
+					SaveScannerHandlers: regmsg.Handlers(
+						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerSaveMessage) error {
+							assert.Equal(t, int64(32041109), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.SaveScanner, msg.Action)
+							assert.Equal(t, strings.ToLower("0x1bDB17526EAd91E9c855bCBFF3154300083e16f2"), msg.ScannerID)
+							return handledEvent
+						},
+					),
+				},
+			),
+			block: 32041109,
 		},
 		{
 			name: "agent-save",
@@ -166,7 +176,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, int64(25730681), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.SaveAgent, msg.Action)
 							assert.Equal(t, "0xdc75bb779e1cbe73a21b8d3810867411f6d71eb64f79cec7e7d4fbcaa40de990", msg.AgentID)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -184,7 +194,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, registry.Link, msg.Action)
 							assert.Equal(t, "0xdc75bb779e1cbe73a21b8d3810867411f6d71eb64f79cec7e7d4fbcaa40de990", msg.AgentID)
 							assert.Equal(t, "0xb0697be4e0ee8f18d741b5b1c940c4bcac9c7eb4", msg.ScannerID)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -202,7 +212,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, registry.Unlink, msg.Action)
 							assert.Equal(t, "0x841f771742ce7d9904d061db29dcf31ef500979d73e1859b4b81c7c739499f2a", msg.AgentID)
 							assert.Equal(t, "0xaa64b99aed1b93e705b35f4a5ff2822871888b9d", msg.ScannerID)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -211,21 +221,21 @@ func TestListener_Listen(t *testing.T) {
 		},
 		{
 			name: "scanner-stake-threshold",
-			listener: testListener(ctx, &ContractFilter{ScannerRegistry: true},
-				contract_scanner_registry_0_1_3.StakeThresholdChangedTopic,
+			listener: testMumbaiListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
+				contract_scanner_pool_registry_0_1_0.ManagedStakeThresholdChangedTopic,
 				Handlers{
 					ScannerStakeThresholdHandlers: regmsg.Handlers(
 						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error {
-							assert.Equal(t, int64(26465762), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, int64(32015173), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ScannerStakeThreshold, msg.Action)
-							assert.Equal(t, "0", msg.Min)
-							assert.Equal(t, "750000000000000000000", msg.Max)
-							return found
+							assert.Equal(t, "500000000000000000000", msg.Min)
+							assert.Equal(t, "15000000000000000000000", msg.Max)
+							return handledEvent
 						},
 					),
 				},
 			),
-			block: 26465762,
+			block: 32015173,
 		},
 		{
 			name: "scanner-stake",
@@ -239,7 +249,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, registry.ChangeTypeDeposit, msg.ChangeType)
 							assert.Equal(t, "0x58ee631aaef6882a392da1c25486ee181ff1b7d5", msg.ScannerID)
 							assert.Equal(t, "500000000000000000000", msg.Amount)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -257,7 +267,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, registry.TransferShares, msg.Action)
 							assert.Equal(t, "0x9b0a8a8e6b2c23d572d7145f3da14438fed35374", msg.To)
 							assert.Equal(t, "500000000000000000000", msg.Amount)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -274,7 +284,7 @@ func TestListener_Listen(t *testing.T) {
 							assert.Equal(t, registry.ScannerNodeVersionUpdated, msg.Action)
 							assert.Equal(t, "QmPU5yx6Puapj7o79zY4n1LkyhnZowLjoDaZv7TRhytYpt", msg.NewVersion)
 							assert.Equal(t, "QmQX4FELAScb8n1cjAr6wK4WF73b2jGv9FSRtUWhysnKu1", msg.OldVersion)
-							return found
+							return handledEvent
 						},
 					),
 				},
@@ -287,7 +297,7 @@ func TestListener_Listen(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			r := require.New(t)
 			err := testCase.listener.ProcessBlockRange(big.NewInt(testCase.block), big.NewInt(testCase.block))
-			r.Equal(found, err)
+			r.Equal(handledEvent, err)
 		})
 	}
 }
