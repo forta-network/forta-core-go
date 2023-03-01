@@ -12,16 +12,18 @@ import (
 )
 
 const (
-	DispatchContract           = "dispatch.forta.eth"
-	AgentRegistryContract      = "agents.registries.forta.eth"
-	ScannerRegistryContract    = "scanners.registries.forta.eth"
-	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
-	StakingContract            = "staking.forta.eth"
-	FortaContract              = "forta.eth"
-	RewardsDistributorContract = "rewards.forta.eth"
+	DispatchContract            = "dispatch.forta.eth"
+	AgentRegistryContract       = "agents.registries.forta.eth"
+	ScannerRegistryContract     = "scanners.registries.forta.eth"
+	ScannerNodeVersionContract  = "scanner-node-version.forta.eth"
+	StakingContract             = "staking.forta.eth"
+	FortaContract               = "forta.eth"
+	RewardsDistributorContract  = "rewards.forta.eth"
+	StakeAllocatorContract      = "allocator.forta.eth"
+	ScannerPoolRegistryContract = "pool.registries.forta.eth"
 
-	ENSAddressDev  = "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9"
-	ENSAddressProd = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
+	ENSResolverDev  = "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9"
+	ENSResolverProd = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
 )
 
 // ENS resolves inputs.

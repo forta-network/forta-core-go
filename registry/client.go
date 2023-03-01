@@ -34,7 +34,6 @@ import (
 const (
 	defaultScannerRegistryChainID = uint64(137)
 	scannerRegistryDeployBlock    = 20187154
-	defaultEnsAddress             = "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7"
 )
 
 // Registry errors
@@ -229,13 +228,13 @@ type ClientConfig struct {
 
 var defaultConfig = ClientConfig{
 	JsonRpcUrl: "https://polygon-rpc.com",
-	ENSAddress: defaultEnsAddress,
+	ENSAddress: ens.ENSResolverProd,
 	Name:       "registry-client",
 }
 
 var devConfig = ClientConfig{
 	JsonRpcUrl: "https://rpc-mumbai.matic.today",
-	ENSAddress: "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9",
+	ENSAddress: ens.ENSResolverDev,
 	Name:       "registry-client",
 }
 
@@ -416,7 +415,7 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 	// avoids need to provide ENS address outside of dev environment use cases
 	ensAddr := cfg.ENSAddress
 	if ensAddr == "" {
-		ensAddr = defaultEnsAddress
+		ensAddr = ens.ENSResolverProd
 	}
 	ensStore, err := ens.DialENSStoreAt(cfg.JsonRpcUrl, ensAddr)
 	if err != nil {
