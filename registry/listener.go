@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/forta-network/forta-core-go/ens"
 	"math/big"
 	"sync"
 
@@ -492,7 +493,7 @@ func NewDefaultListener(ctx context.Context, handlers Handlers) (*listener, erro
 	return NewListener(ctx, ListenerConfig{
 		Name:       "listener",
 		JsonRpcURL: defaultConfig.JsonRpcUrl,
-		ENSAddress: defaultEnsAddress,
+		ENSAddress: ens.ENSResolverProd,
 		Handlers:   handlers,
 	})
 }
@@ -504,7 +505,7 @@ func NewListener(ctx context.Context, cfg ListenerConfig) (*listener, error) {
 	}
 	ensAddr := cfg.ENSAddress
 	if ensAddr == "" {
-		ensAddr = defaultEnsAddress
+		ensAddr = ens.ENSResolverProd
 	}
 
 	ethClient, err := ethereum.NewStreamEthClient(ctx, cfg.Name, jsonRpc)

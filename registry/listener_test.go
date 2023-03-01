@@ -3,6 +3,7 @@ package registry
 import (
 	"context"
 	"errors"
+	"github.com/forta-network/forta-core-go/ens"
 	"math/big"
 	"strings"
 	"testing"
@@ -27,7 +28,7 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 	l, err := NewListener(ctx, ListenerConfig{
 		Name:           "listener",
 		JsonRpcURL:     "https://rpc.ankr.com/polygon",
-		ENSAddress:     defaultEnsAddress,
+		ENSAddress:     ens.ENSResolverProd,
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
