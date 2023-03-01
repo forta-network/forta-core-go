@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_dispatch"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_forta_staking"
@@ -102,9 +101,6 @@ type Client interface {
 	// GetPoolScanner returns a scanner
 	GetPoolScanner(scannerID string) (*Scanner, error)
 
-	// RegisterScannerOld executes the pre-delegated-staking registration.
-	RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error)
-
 	// GenerateScannerRegistrationSignature generates a scanner registration signature from given data.
 	GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*ScannerRegistrationInfo, error)
 
@@ -144,9 +140,6 @@ type Client interface {
 	// NumScannersForByChain gets total number of assignments for bot for a given chain.
 	NumScannersForByChain(agentID string, chainID *big.Int) (*big.Int, error)
 
-	// GetStakingThreshold returns the min/max/activated flag for a given address
-	GetStakingThreshold(scannerID string) (*StakingThreshold, error)
-
 	// GetActiveScannerStake returns the active stake for a scanner
 	GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error)
 
@@ -155,12 +148,6 @@ type Client interface {
 
 	// GetAllocatedStakePerManaged Returns allocatedManagedStake (own + delegator's) in DELEGATED / total managed subjects, or 0 if not DELEGATED
 	GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error)
-
-	// EnableScanner enables a scanner. Deprecated.
-	EnableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
-
-	// DisableScanner disables a scanner. Deprecated.
-	DisableScanner(ScannerPermission ScannerPermission, scannerAddress string) (txHash string, err error)
 
 	// GetScannerPoolOwner finds out the owner of the scanner pool.
 	GetScannerPoolOwner(poolID *big.Int) (owner string, err error)
@@ -177,8 +164,8 @@ type Contracts struct {
 	AgentRegFil *contract_agent_registry.AgentRegistryFilterer
 	AgentRegTx  *contract_agent_registry.AgentRegistryTransactor
 
-	ScannerReg    *contract_scanner_registry.ScannerRegistryCaller
-	ScannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
+	scannerReg    *contract_scanner_registry.ScannerRegistryCaller
+	scannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
 
 	Dispatch    *contract_dispatch.DispatchCaller
 	DispatchFil *contract_dispatch.DispatchFilterer
@@ -189,7 +176,7 @@ type Contracts struct {
 	FortaStaking    *contract_forta_staking.FortaStakingCaller
 	FortaStakingFil *contract_forta_staking.FortaStakingFilterer
 
-	// post-migration contracts
+	// delegated staking contracts
 
 	ScannerPoolReg    *contract_scanner_pool_registry.ScannerPoolRegistryCaller
 	ScannerPoolRegFil *contract_scanner_pool_registry.ScannerPoolRegistryFilterer
@@ -298,15 +285,15 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	}
 	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil, cl.contractsUnsafe.AgentRegTx)
 
-	cl.contractsUnsafe.ScannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
+	cl.contractsUnsafe.scannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.ScannerRegFil, err = contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	cl.contractsUnsafe.scannerRegFil, err = contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerRegFil)
+	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contractsUnsafe.scannerReg, cl.contractsUnsafe.scannerReg, cl.contractsUnsafe.scannerRegFil)
 
 	cl.contractsUnsafe.Dispatch, err = contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
@@ -350,18 +337,18 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 }
 
 func (c *client) RefreshContracts() error {
+	c.contractsMu.Lock()
+	defer c.contractsMu.Unlock()
+
 	if err := c.versionManager.Refresh(); err != nil {
 		return err
 	}
-
-	c.contractsMu.Lock()
-	defer c.contractsMu.Unlock()
 
 	// find out post-delegated-staking-migration contracts from known contracts
 
 	var detectedNew bool
 
-	scannerPoolRegAddr, err := c.contractsUnsafe.ScannerReg.ScannerPoolRegistry(c.opts)
+	scannerPoolRegAddr, err := c.contractsUnsafe.scannerReg.ScannerPoolRegistry(c.opts)
 	if err == nil && scannerPoolRegAddr.Hex() != utils.ZeroAddress {
 		c.contractsUnsafe.Addresses.ScannerPoolRegistry = &scannerPoolRegAddr
 		c.contractsUnsafe.ScannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, c.ec)
@@ -381,7 +368,7 @@ func (c *client) RefreshContracts() error {
 		log.WithFields(log.Fields{
 			"name":    "ScannerPoolRegistry",
 			"version": version,
-		}).Info("detected post-migration contract")
+		}).Info("detected delegated staking contract")
 	}
 
 	stakeAllocatorAddr, err := c.contractsUnsafe.FortaStaking.Allocator(c.opts)
@@ -404,7 +391,7 @@ func (c *client) RefreshContracts() error {
 		log.WithFields(log.Fields{
 			"name":    "StakeAllocator",
 			"version": version,
-		}).Info("detected post-migration contract")
+		}).Info("detected delegated staking contract")
 	}
 
 	if detectedNew {
@@ -492,15 +479,6 @@ func (c *client) GetTransactionOpts() (*bind.TransactOpts, error) {
 	return bind.NewKeyedTransactor(c.privateKey), nil
 }
 
-func (c *client) GetStakingThreshold(scannerID string) (*StakingThreshold, error) {
-	sID := utils.ScannerIDHexToBigInt(scannerID)
-	res, err := c.Contracts().ScannerReg.GetStakeThreshold(c.opts, sID)
-	if err != nil {
-		return nil, err
-	}
-	return (*StakingThreshold)(res), nil
-}
-
 func (c *client) GetScannerNodeVersion() (string, error) {
 	scannerVersion, err := c.Contracts().ScannerVersion.ScannerNodeVersion(c.opts)
 	if err != nil {
@@ -567,7 +545,7 @@ func (c *client) ForEachScannerSinceBlock(
 
 	contracts := c.Contracts()
 
-	iterators, err := contracts.ScannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
+	iterators, err := contracts.scannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
 	}, nil, nil)
@@ -587,7 +565,7 @@ func (c *client) ForEachScannerSinceBlock(
 			break
 		}
 
-		scn, err := contracts.ScannerReg.GetScannerState(opts, event.ScannerId)
+		scn, err := contracts.scannerReg.GetScannerState(opts, event.ScannerId)
 		if err != nil {
 			return err
 		}
@@ -928,17 +906,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
 	contracts := c.Contracts()
-	if c.migrationEnded() && contracts.ScannerPoolReg != nil {
-		return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
-	}
-	return contracts.ScannerReg.IsEnabled(c.opts, utils.ScannerIDHexToBigInt(scannerID))
-}
-
-func (c *client) migrationEnded() bool {
-	// ignoring error here because the old contract doesn't have this method in its ABI
-	// only successful request and a "true" in response is true
-	migrationEnded, _ := c.Contracts().ScannerReg.HasMigrationEnded(c.opts)
-	return migrationEnded
+	return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
 func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
@@ -969,35 +937,7 @@ func (c *client) GetActiveScannerStake(blockNumber *big.Int, scannerID string) (
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
-	if c.migrationEnded() {
-		return c.GetPoolScanner(scannerID)
-	}
-
-	contracts := c.Contracts()
-
-	sID := utils.ScannerIDHexToBigInt(scannerID)
-	scn, err := contracts.ScannerReg.GetScanner(c.opts, sID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if !scn.Registered {
-		return nil, nil
-	}
-
-	enabled, err := contracts.ScannerReg.IsEnabled(c.opts, sID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Scanner{
-		ScannerID: utils.ScannerIDBigIntToHex(sID),
-		ChainID:   scn.ChainId.Int64(),
-		Enabled:   enabled,
-		Manifest:  scn.Metadata,
-		Owner:     scn.Owner.Hex(),
-	}, nil
+	return c.GetPoolScanner(scannerID)
 }
 
 func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
@@ -1063,84 +1003,6 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 		Manifest: agt.Metadata,
 		Owner:    agt.Owner.Hex(),
 	}, nil
-}
-
-func (c *client) RegisterScannerOld(ownerAddress string, chainID int64, metadata string) (txHash string, err error) {
-	if c.privateKey == nil {
-		return "", errors.New("no private key provided to the client")
-	}
-	contracts := c.Contracts()
-	// point directly to 0.1.3 because the registration method does not exist in newer versions
-	reg, err := contract_scanner_registry_0_1_3.NewScannerRegistryTransactor(contracts.Addresses.ScannerRegistry, c.ec)
-	if err != nil {
-		return "", fmt.Errorf("failed to create contract transactor: %v", err)
-	}
-	opts, err := c.GetTransactionOpts()
-	if err != nil {
-		return "", fmt.Errorf("failed to create transaction opts: %v", err)
-	}
-	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
-	}
-	tx, err := reg.Register(opts, common.HexToAddress(ownerAddress), big.NewInt(int64(chainID)), metadata)
-	if err != nil {
-		return "", fmt.Errorf("failed to send the transaction: %v", err)
-	}
-	return tx.Hash().Hex(), nil
-}
-
-func (c *client) EnableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
-	if c.migrationEnded() {
-		return "", errors.New("migration ended")
-	}
-	if c.privateKey == nil {
-		return "", errors.New("no private key provided to the client")
-	}
-	contracts := c.Contracts()
-	// point directly to 0.1.3 because the enable method does not exist in newer versions
-	reg, err := contract_scanner_registry_0_1_3.NewScannerRegistryTransactor(contracts.Addresses.ScannerRegistry, c.ec)
-	if err != nil {
-		return "", fmt.Errorf("failed to create contract transactor: %v", err)
-	}
-	opts, err := c.GetTransactionOpts()
-	if err != nil {
-		return "", fmt.Errorf("failed to create transaction opts: %v", err)
-	}
-	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
-	}
-	tx, err := reg.EnableScanner(opts, utils.ScannerIDHexToBigInt(scannerAddress), uint8(permission))
-	if err != nil {
-		return "", fmt.Errorf("failed to send the transaction: %v", err)
-	}
-	return tx.Hash().Hex(), nil
-}
-
-func (c *client) DisableScanner(permission ScannerPermission, scannerAddress string) (txHash string, err error) {
-	if c.privateKey == nil {
-		return "", errors.New("no private key provided to the client")
-	}
-	contracts := c.Contracts()
-	// point directly to 0.1.3 because the disable method does not exist in newer versions
-	reg, err := contract_scanner_registry_0_1_3.NewScannerRegistryTransactor(contracts.Addresses.ScannerRegistry, c.ec)
-	if err != nil {
-		return "", fmt.Errorf("failed to create contract transactor: %v", err)
-	}
-	opts, err := c.GetTransactionOpts()
-	if err != nil {
-		return "", fmt.Errorf("failed to create transaction opts: %v", err)
-	}
-	opts.GasPrice, err = c.ec.SuggestGasPrice(c.ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to get gas price suggestion: %v", err)
-	}
-	tx, err := reg.DisableScanner(opts, utils.ScannerIDHexToBigInt(scannerAddress), uint8(permission))
-	if err != nil {
-		return "", fmt.Errorf("failed to send the transaction: %v", err)
-	}
-	return tx.Hash().Hex(), nil
 }
 
 func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*ScannerRegistrationInfo, error) {
