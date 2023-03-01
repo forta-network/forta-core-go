@@ -48,6 +48,7 @@ func CreateBloomFilter(items []string, fpRate float64) (*protocol.BloomFilter, e
 	}, nil
 }
 
+// CreateBloomFilterFromProto restores a bloom filter from encoded protocol data.
 func CreateBloomFilterFromProto(bf *protocol.BloomFilter) (*bloom.BloomFilter, error) {
 	b, err := base64.StdEncoding.DecodeString(bf.Bitset)
 	if err != nil {
