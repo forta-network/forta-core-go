@@ -14,6 +14,7 @@ const (
 	AddressBloomFilterFPRate = 1e-3
 )
 
+// CreateBloomFilter creates a new bloom filter using given items and false positive rate.
 func CreateBloomFilter(items []string, fpRate float64) (*protocol.BloomFilter, error) {
 	// create bloom filter from all addresses
 	bf := bloom.NewWithEstimates(uint(len(items)), fpRate)
