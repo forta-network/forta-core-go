@@ -9,6 +9,7 @@ import (
 	"github.com/forta-network/forta-core-go/protocol"
 )
 
+// Bloom filter related constants
 const (
 	NumMaxAddressesPerAlert  = 50
 	AddressBloomFilterFPRate = 1e-3
