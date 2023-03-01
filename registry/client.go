@@ -164,8 +164,8 @@ type Contracts struct {
 	AgentRegFil *contract_agent_registry.AgentRegistryFilterer
 	AgentRegTx  *contract_agent_registry.AgentRegistryTransactor
 
-	scannerReg    *contract_scanner_registry.ScannerRegistryCaller
-	scannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
+	ScannerReg    *contract_scanner_registry.ScannerRegistryCaller
+	ScannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
 
 	Dispatch    *contract_dispatch.DispatchCaller
 	DispatchFil *contract_dispatch.DispatchFilterer
@@ -285,15 +285,15 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	}
 	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil, cl.contractsUnsafe.AgentRegTx)
 
-	cl.contractsUnsafe.scannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
+	cl.contractsUnsafe.ScannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.scannerRegFil, err = contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	cl.contractsUnsafe.ScannerRegFil, err = contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contractsUnsafe.scannerReg, cl.contractsUnsafe.scannerReg, cl.contractsUnsafe.scannerRegFil)
+	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerRegFil)
 
 	cl.contractsUnsafe.Dispatch, err = contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
@@ -348,7 +348,7 @@ func (c *client) RefreshContracts() error {
 
 	var detectedNew bool
 
-	scannerPoolRegAddr, err := c.contractsUnsafe.scannerReg.ScannerPoolRegistry(c.opts)
+	scannerPoolRegAddr, err := c.contractsUnsafe.ScannerReg.ScannerPoolRegistry(c.opts)
 	if err == nil && scannerPoolRegAddr.Hex() != utils.ZeroAddress {
 		c.contractsUnsafe.Addresses.ScannerPoolRegistry = &scannerPoolRegAddr
 		c.contractsUnsafe.ScannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, c.ec)
@@ -545,7 +545,7 @@ func (c *client) ForEachScannerSinceBlock(
 
 	contracts := c.Contracts()
 
-	iterators, err := contracts.scannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
+	iterators, err := contracts.ScannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
 		Start:   block,
 		Context: c.ctx,
 	}, nil, nil)
@@ -565,7 +565,7 @@ func (c *client) ForEachScannerSinceBlock(
 			break
 		}
 
-		scn, err := contracts.scannerReg.GetScannerState(opts, event.ScannerId)
+		scn, err := contracts.ScannerReg.GetScannerState(opts, event.ScannerId)
 		if err != nil {
 			return err
 		}
