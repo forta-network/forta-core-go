@@ -7,7 +7,6 @@ import (
 
 	"github.com/bits-and-blooms/bloom"
 	"github.com/forta-network/forta-core-go/protocol"
-	"github.com/forta-network/forta-core-go/utils"
 )
 
 const (
@@ -36,8 +35,8 @@ func CreateBloomFilter(items []string, fpRate float64) (*protocol.BloomFilter, e
 	kBigInt := new(big.Int).SetUint64(uint64(bf.K()))
 	mBigInt := new(big.Int).SetUint64(uint64(bf.Cap()))
 
-	kHexStr := utils.BigIntToHex(kBigInt)
-	mHexStr := utils.BigIntToHex(mBigInt)
+	kHexStr := BigIntToHex(kBigInt)
+	mHexStr := BigIntToHex(mBigInt)
 
 	return &protocol.BloomFilter{
 		K:         kHexStr,
