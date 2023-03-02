@@ -379,10 +379,10 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	if equalsAddress(le.Address, contracts.Addresses.FortaStaking.Hex()) {
 		return l.handleFortaStakingEvent(contracts, le, blk, logger)
 	}
-	if contracts.Addresses.ScannerPoolRegistry != nil && equalsAddress(le.Address, contracts.Addresses.ScannerPoolRegistry.Hex()) {
+	if equalsAddress(le.Address, contracts.Addresses.ScannerPoolRegistry.Hex()) {
 		return l.handleScannerPoolRegistryEvent(contracts, le, blk, logger)
 	}
-	if contracts.Addresses.StakeAllocator != nil && equalsAddress(le.Address, contracts.Addresses.StakeAllocator.Hex()) {
+	if equalsAddress(le.Address, contracts.Addresses.StakeAllocator.Hex()) {
 		return l.handleStakeAllocatorEvent(contracts, le, blk, logger)
 	}
 	return nil
@@ -547,10 +547,10 @@ func (l *listener) setLogFilterAddrs() {
 		if filter.ScannerVersion {
 			addrs = append(addrs, regContracts.ScannerNodeVersion.Hex())
 		}
-		if filter.ScannerPoolRegistry && regContracts.ScannerPoolRegistry != nil {
+		if filter.ScannerPoolRegistry {
 			addrs = append(addrs, regContracts.ScannerPoolRegistry.Hex())
 		}
-		if filter.StakeAllocator && regContracts.StakeAllocator != nil {
+		if filter.StakeAllocator {
 			addrs = append(addrs, regContracts.StakeAllocator.Hex())
 		}
 	} else {

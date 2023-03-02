@@ -13,12 +13,16 @@ import (
 )
 
 const (
-	DispatchContract           = "dispatch.forta.eth"
-	AgentRegistryContract      = "agents.registries.forta.eth"
-	ScannerRegistryContract    = "scanners.registries.forta.eth"
-	ScannerNodeVersionContract = "scanner-node-version.forta.eth"
-	StakingContract            = "staking.forta.eth"
-	FortaContract              = "forta.eth"
+	DispatchContract            = "dispatch.forta.eth"
+	AgentRegistryContract       = "agents.registries.forta.eth"
+	ScannerRegistryContract     = "scanners.registries.forta.eth"
+	ScannerPoolRegistryContract = "pools.registries.forta.eth"
+	ScannerNodeVersionContract  = "scanner-node-version.forta.eth"
+	StakingContract             = "staking.forta.eth"
+	FortaContract               = "forta.eth"
+	MigrationContract           = "migration.forta.eth"
+	RewardsContract             = "rewards.forta.eth"
+	StakeAllocatorContract      = "allocator.forta.eth"
 )
 
 // ENS resolves inputs.
@@ -110,6 +114,11 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
+	scannerPoolReg, err := ensstore.Resolve(ScannerPoolRegistryContract)
+	if err != nil {
+		return nil, err
+	}
+
 	dispatch, err := ensstore.Resolve(DispatchContract)
 	if err != nil {
 		return nil, err
@@ -130,13 +139,32 @@ func (ensstore *ENSStore) ResolveRegistryContracts() (*registry.RegistryContract
 		return nil, err
 	}
 
+	migration, err := ensstore.Resolve(MigrationContract)
+	if err != nil {
+		return nil, err
+	}
+
+	rewards, err := ensstore.Resolve(RewardsContract)
+	if err != nil {
+		return nil, err
+	}
+
+	allocator, err := ensstore.Resolve(StakeAllocatorContract)
+	if err != nil {
+		return nil, err
+	}
+
 	regContracts := &registry.RegistryContracts{
-		AgentRegistry:      agentReg,
-		ScannerRegistry:    scannerReg,
-		Dispatch:           dispatch,
-		ScannerNodeVersion: scannerNodeVersion,
-		FortaStaking:       fortaStaking,
-		Forta:              forta,
+		AgentRegistry:       agentReg,
+		ScannerRegistry:     scannerReg,
+		ScannerPoolRegistry: scannerPoolReg,
+		Dispatch:            dispatch,
+		ScannerNodeVersion:  scannerNodeVersion,
+		FortaStaking:        fortaStaking,
+		Forta:               forta,
+		Migration:           migration,
+		Rewards:             rewards,
+		StakeAllocator:      allocator,
 	}
 
 	return regContracts, nil
