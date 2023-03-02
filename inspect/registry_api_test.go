@@ -2,6 +2,7 @@ package inspect
 
 import (
 	"context"
+	"github.com/forta-network/forta-core-go/ens"
 	"testing"
 
 	"github.com/kelseyhightower/envconfig"
@@ -23,7 +24,7 @@ func TestRegistryAPIInspection(t *testing.T) {
 	results, err := inspector.Inspect(
 		context.Background(), InspectionConfig{
 			RegistryAPIURL:     testRegistryEnv.RegistryAPI,
-			ENSContractAddress: "0x08f42fcc52a9C2F391bF507C4E8688D0b53e1bd7",
+			ENSContractAddress: ens.ENSResolverProd,
 			ScannerAddress:     "0x3DC45b47B7559Ca3b231E5384D825F9B461A0398",
 		},
 	)
