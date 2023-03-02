@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"sync"
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_dispatch"
@@ -16,7 +15,6 @@ import (
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_stake_allocator"
 	"github.com/forta-network/forta-core-go/utils/ethutils"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/domain/registry"
 	"github.com/forta-network/forta-core-go/security/eip712"
@@ -196,8 +194,7 @@ type client struct {
 	opts       *bind.CallOpts
 	privateKey *ecdsa.PrivateKey
 
-	contractsUnsafe Contracts
-	contractsMu     sync.RWMutex
+	contracts Contracts
 
 	versionManager *VersionManager
 }
@@ -269,61 +266,81 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 
 		versionManager: &VersionManager{},
 	}
-	cl.contractsUnsafe.Addresses = *regContracts
+	cl.contracts.Addresses = *regContracts
 
-	cl.contractsUnsafe.AgentReg, err = contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
+	cl.contracts.AgentReg, err = contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.AgentRegFil, err = contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
+	cl.contracts.AgentRegFil, err = contract_agent_registry.NewAgentRegistryFilterer(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.AgentRegTx, err = contract_agent_registry.NewAgentRegistryTransactor(regContracts.AgentRegistry, ec)
+	cl.contracts.AgentRegTx, err = contract_agent_registry.NewAgentRegistryTransactor(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentReg, cl.contractsUnsafe.AgentRegFil, cl.contractsUnsafe.AgentRegTx)
+	cl.versionManager.SetUpdateRule("AgentRegistry", cl.contracts.AgentReg, cl.contracts.AgentReg, cl.contracts.AgentRegFil, cl.contracts.AgentRegTx)
 
-	cl.contractsUnsafe.ScannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
+	cl.contracts.ScannerReg, err = contract_scanner_registry.NewScannerRegistryCaller(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.ScannerRegFil, err = contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
+	cl.contracts.ScannerRegFil, err = contract_scanner_registry.NewScannerRegistryFilterer(regContracts.ScannerRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerReg, cl.contractsUnsafe.ScannerRegFil)
+	cl.versionManager.SetUpdateRule("ScannerRegistry", cl.contracts.ScannerReg, cl.contracts.ScannerReg, cl.contracts.ScannerRegFil)
 
-	cl.contractsUnsafe.Dispatch, err = contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
+	cl.contracts.ScannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(regContracts.ScannerPoolRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.DispatchFil, err = contract_dispatch.NewDispatchFilterer(regContracts.Dispatch, ec)
+	cl.contracts.ScannerPoolRegFil, err = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(regContracts.ScannerPoolRegistry, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("Dispatch", cl.contractsUnsafe.Dispatch, cl.contractsUnsafe.Dispatch, cl.contractsUnsafe.DispatchFil)
+	cl.versionManager.SetUpdateRule("ScannerPoolRegistry", cl.contracts.ScannerPoolReg, cl.contracts.ScannerPoolReg, cl.contracts.ScannerPoolRegFil)
 
-	cl.contractsUnsafe.ScannerVersion, err = contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
+	cl.contracts.Dispatch, err = contract_dispatch.NewDispatchCaller(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.ScannerVersionFil, err = contract_scanner_node_version.NewScannerNodeVersionFilterer(regContracts.ScannerNodeVersion, ec)
+	cl.contracts.DispatchFil, err = contract_dispatch.NewDispatchFilterer(regContracts.Dispatch, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("ScannerNodeVersion", cl.contractsUnsafe.ScannerVersion, cl.contractsUnsafe.ScannerVersion, cl.contractsUnsafe.ScannerVersionFil)
+	cl.versionManager.SetUpdateRule("Dispatch", cl.contracts.Dispatch, cl.contracts.Dispatch, cl.contracts.DispatchFil)
 
-	cl.contractsUnsafe.FortaStaking, err = contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
+	cl.contracts.ScannerVersion, err = contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.contractsUnsafe.FortaStakingFil, err = contract_forta_staking.NewFortaStakingFilterer(regContracts.FortaStaking, ec)
+	cl.contracts.ScannerVersionFil, err = contract_scanner_node_version.NewScannerNodeVersionFilterer(regContracts.ScannerNodeVersion, ec)
 	if err != nil {
 		return nil, err
 	}
-	cl.versionManager.SetUpdateRule("FortaStaking", cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStaking, cl.contractsUnsafe.FortaStakingFil)
+	cl.versionManager.SetUpdateRule("ScannerNodeVersion", cl.contracts.ScannerVersion, cl.contracts.ScannerVersion, cl.contracts.ScannerVersionFil)
+
+	cl.contracts.FortaStaking, err = contract_forta_staking.NewFortaStakingCaller(regContracts.FortaStaking, ec)
+	if err != nil {
+		return nil, err
+	}
+	cl.contracts.FortaStakingFil, err = contract_forta_staking.NewFortaStakingFilterer(regContracts.FortaStaking, ec)
+	if err != nil {
+		return nil, err
+	}
+	cl.versionManager.SetUpdateRule("FortaStaking", cl.contracts.FortaStaking, cl.contracts.FortaStaking, cl.contracts.FortaStakingFil)
+
+	cl.contracts.StakeAllocator, err = contract_stake_allocator.NewStakeAllocatorCaller(regContracts.StakeAllocator, ec)
+	if err != nil {
+		return nil, err
+	}
+	cl.contracts.StakeAllocatorFil, err = contract_stake_allocator.NewStakeAllocatorFilterer(regContracts.StakeAllocator, ec)
+	if err != nil {
+		return nil, err
+	}
+	cl.versionManager.SetUpdateRule("StakeAllocator", cl.contracts.StakeAllocator, cl.contracts.StakeAllocator, cl.contracts.StakeAllocatorFil)
 
 	if cfg.NoRefresh {
 		return cl, nil
@@ -337,68 +354,7 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 }
 
 func (c *client) RefreshContracts() error {
-	c.contractsMu.Lock()
-	defer c.contractsMu.Unlock()
-
-	if err := c.versionManager.Refresh(); err != nil {
-		return err
-	}
-
-	// find out post-delegated-staking-migration contracts from known contracts
-
-	var detectedNew bool
-
-	scannerPoolRegAddr, err := c.contractsUnsafe.ScannerReg.ScannerPoolRegistry(c.opts)
-	if err == nil && scannerPoolRegAddr.Hex() != utils.ZeroAddress {
-		c.contractsUnsafe.Addresses.ScannerPoolRegistry = &scannerPoolRegAddr
-		c.contractsUnsafe.ScannerPoolReg, err = contract_scanner_pool_registry.NewScannerPoolRegistryCaller(scannerPoolRegAddr, c.ec)
-		if err != nil {
-			return err
-		}
-		c.contractsUnsafe.ScannerPoolRegFil, err = contract_scanner_pool_registry.NewScannerPoolRegistryFilterer(scannerPoolRegAddr, c.ec)
-		if err != nil {
-			return err
-		}
-		c.versionManager.SetUpdateRule("ScannerPoolRegistry", c.contractsUnsafe.ScannerPoolReg, c.contractsUnsafe.ScannerPoolReg, c.contractsUnsafe.ScannerPoolRegFil)
-		detectedNew = true
-		version, err := c.contractsUnsafe.ScannerPoolReg.Version(c.opts)
-		if err != nil {
-			return err
-		}
-		log.WithFields(log.Fields{
-			"name":    "ScannerPoolRegistry",
-			"version": version,
-		}).Info("detected delegated staking contract")
-	}
-
-	stakeAllocatorAddr, err := c.contractsUnsafe.FortaStaking.Allocator(c.opts)
-	if err == nil && stakeAllocatorAddr.Hex() != utils.ZeroAddress {
-		c.contractsUnsafe.Addresses.StakeAllocator = &stakeAllocatorAddr
-		c.contractsUnsafe.StakeAllocator, err = contract_stake_allocator.NewStakeAllocatorCaller(stakeAllocatorAddr, c.ec)
-		if err != nil {
-			return err
-		}
-		c.contractsUnsafe.StakeAllocatorFil, err = contract_stake_allocator.NewStakeAllocatorFilterer(stakeAllocatorAddr, c.ec)
-		if err != nil {
-			return err
-		}
-		c.versionManager.SetUpdateRule("StakeAllocator", c.contractsUnsafe.StakeAllocator, c.contractsUnsafe.StakeAllocator, c.contractsUnsafe.StakeAllocatorFil)
-		detectedNew = true
-		version, err := c.contractsUnsafe.StakeAllocator.Version(c.opts)
-		if err != nil {
-			return err
-		}
-		log.WithFields(log.Fields{
-			"name":    "StakeAllocator",
-			"version": version,
-		}).Info("detected delegated staking contract")
-	}
-
-	if detectedNew {
-		return c.versionManager.Refresh()
-	}
-
-	return nil
+	return c.versionManager.Refresh()
 }
 
 func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
@@ -415,11 +371,8 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 }
 
 func (c *client) Contracts() *Contracts {
-	c.contractsMu.RLock()
-	defer c.contractsMu.RUnlock()
-
 	// return reference to a copy
-	contracts := c.contractsUnsafe
+	contracts := c.contracts
 	return &contracts
 }
 
@@ -480,7 +433,7 @@ func (c *client) GetTransactionOpts() (*bind.TransactOpts, error) {
 }
 
 func (c *client) GetScannerNodeVersion() (string, error) {
-	scannerVersion, err := c.Contracts().ScannerVersion.ScannerNodeVersion(c.opts)
+	scannerVersion, err := c.contracts.ScannerVersion.ScannerNodeVersion(c.opts)
 	if err != nil {
 		return "", err
 	}
@@ -488,7 +441,7 @@ func (c *client) GetScannerNodeVersion() (string, error) {
 }
 
 func (c *client) GetScannerNodePrereleaseVersion() (string, error) {
-	scannerVersion, err := c.Contracts().ScannerVersion.ScannerNodeBetaVersion(c.opts)
+	scannerVersion, err := c.contracts.ScannerVersion.ScannerNodeBetaVersion(c.opts)
 	if err != nil {
 		return "", err
 	}
@@ -496,7 +449,7 @@ func (c *client) GetScannerNodePrereleaseVersion() (string, error) {
 }
 
 func (c *client) GetAssignmentHash(scannerID string) (*AssignmentHash, error) {
-	sh, err := c.Contracts().Dispatch.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
+	sh, err := c.contracts.Dispatch.ScannerHash(c.opts, utils.ScannerIDHexToBigInt(scannerID))
 	if err != nil {
 		return nil, err
 	}
@@ -520,7 +473,7 @@ func (c *client) getOpts() (*bind.CallOpts, error) {
 func (c *client) IsAssigned(scannerID string, agentID string) (bool, error) {
 	agtID := utils.AgentHexToBigInt(agentID)
 	scnID := utils.ScannerIDHexToBigInt(scannerID)
-	linked, err := c.Contracts().Dispatch.AreTheyLinked(c.opts, agtID, scnID)
+	linked, err := c.contracts.Dispatch.AreTheyLinked(c.opts, agtID, scnID)
 	if err != nil {
 		return false, err
 	}
@@ -543,7 +496,7 @@ func (c *client) ForEachScannerSinceBlock(
 		return err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	iterators, err := contracts.ScannerRegFil.FilterScannerUpdated(&bind.FilterOpts{
 		Start:   block,
@@ -586,7 +539,7 @@ func (c *client) ForEachScannerSinceBlock(
 func (c *client) ForEachPoolScannerSinceBlock(
 	block uint64, handler func(event *contract_scanner_pool_registry.ScannerPoolRegistryScannerUpdated, s *Scanner) error,
 ) error {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	if contracts.ScannerPoolReg == nil || contracts.ScannerPoolRegFil == nil {
 		return ErrContractNotReady
 	}
@@ -634,7 +587,7 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 		return err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	cID := big.NewInt(chainID)
 	length, err := contracts.AgentReg.GetAgentCountByChain(opts, cID)
@@ -644,7 +597,7 @@ func (c *client) ForEachChainAgent(chainID int64, handler func(a *Agent) error) 
 
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
-		agtID, err := c.Contracts().AgentReg.GetAgentByChainAndIndex(opts, cID, idx)
+		agtID, err := c.contracts.AgentReg.GetAgentByChainAndIndex(opts, cID, idx)
 		if err != nil {
 			return err
 		}
@@ -672,7 +625,7 @@ func (c *client) ForEachAgentID(handler func(agentID string) error) error {
 		return err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	length, err := contracts.AgentReg.GetAgentCount(opts)
 	if err != nil {
@@ -699,7 +652,7 @@ func (c *client) ForEachAgent(handler func(a *Agent) error) error {
 	}
 
 	return c.ForEachAgentID(func(agentID string) error {
-		agt, err := c.Contracts().AgentReg.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
+		agt, err := c.contracts.AgentReg.GetAgentState(opts, utils.AgentHexToBigInt(agentID))
 		if err != nil {
 			return err
 		}
@@ -721,7 +674,7 @@ func (c *client) ForEachAgentSinceBlock(
 		return err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	iterators, err := contracts.AgentRegFil.FilterAgentUpdated(&bind.FilterOpts{
 		Start:   block,
@@ -768,7 +721,7 @@ func (c *client) ForEachAssignedScanner(agentID string, handler func(s *Scanner)
 		return err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	aID := utils.AgentHexToBigInt(agentID)
 	length, err := contracts.Dispatch.NumScannersFor(opts, aID)
@@ -801,12 +754,12 @@ func (c *client) IndexOfAssignedScannerByChain(agentID, scannerID string, chainI
 	}
 	aID := utils.AgentHexToBigInt(agentID)
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	length, err := c.Contracts().Dispatch.NumScannersFor(opts, aID)
+	length, err := c.contracts.Dispatch.NumScannersFor(opts, aID)
 	if err != nil {
 		return nil, err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 	var idxByChain int64
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
@@ -836,12 +789,12 @@ func (c *client) NumScannersForByChain(agentID string, chainID *big.Int) (*big.I
 		return nil, err
 	}
 	aID := utils.AgentHexToBigInt(agentID)
-	length, err := c.Contracts().Dispatch.NumScannersFor(opts, aID)
+	length, err := c.contracts.Dispatch.NumScannersFor(opts, aID)
 	if err != nil {
 		return nil, err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 	var assigns int64
 	for i := int64(0); i < length.Int64(); i++ {
 		idx := big.NewInt(i)
@@ -868,7 +821,7 @@ func (c *client) NumScannersFor(agentID string) (*big.Int, error) {
 	}
 	aID := utils.AgentHexToBigInt(agentID)
 
-	return c.contractsUnsafe.Dispatch.NumScannersFor(opts, aID)
+	return c.contracts.Dispatch.NumScannersFor(opts, aID)
 }
 
 func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) error) error {
@@ -878,7 +831,7 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 		return err
 	}
 
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	sID := utils.ScannerIDHexToBigInt(scannerID)
 	length, err := contracts.Dispatch.NumAgentsFor(opts, sID)
@@ -905,12 +858,12 @@ func (c *client) ForEachAssignedAgent(scannerID string, handler func(a *Agent) e
 }
 
 func (c *client) IsEnabledScanner(scannerID string) (bool, error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	return contracts.ScannerPoolReg.IsScannerOperational(c.opts, common.HexToAddress(scannerID))
 }
 
 func (c *client) IsOperationalScanner(scannerID string) (bool, error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	if contracts.ScannerPoolReg == nil || contracts.ScannerPoolRegFil == nil {
 		return false, ErrContractNotReady
 	}
@@ -933,7 +886,7 @@ func (c *client) GetActiveScannerStake(blockNumber *big.Int, scannerID string) (
 	opts := c.getBlockOpts(blockNumber)
 
 	sID := utils.ScannerIDHexToBigInt(scannerID)
-	return c.Contracts().FortaStaking.ActiveStakeFor(opts, SubjectTypeScanner, sID)
+	return c.contracts.FortaStaking.ActiveStakeFor(opts, SubjectTypeScanner, sID)
 }
 
 func (c *client) GetScanner(scannerID string) (*Scanner, error) {
@@ -941,7 +894,7 @@ func (c *client) GetScanner(scannerID string) (*Scanner, error) {
 }
 
 func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	if contracts.ScannerPoolReg == nil || contracts.ScannerPoolRegFil == nil {
 		return nil, ErrContractNotReady
 	}
@@ -978,7 +931,7 @@ func (c *client) GetPoolScanner(scannerID string) (*Scanner, error) {
 }
 
 func (c *client) GetAgent(agentID string) (*Agent, error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 
 	aID := utils.AgentHexToBigInt(agentID)
 	agt, err := contracts.AgentReg.GetAgent(c.opts, aID)
@@ -1006,11 +959,7 @@ func (c *client) GetAgent(agentID string) (*Agent, error) {
 }
 
 func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeRegistration) (*ScannerRegistrationInfo, error) {
-	contracts := c.Contracts()
-	if contracts.Addresses.ScannerPoolRegistry == nil {
-		return nil, ErrContractNotReady
-	}
-	_, sig, err := eip712.SignScannerRegistration(c.privateKey, *contracts.Addresses.ScannerPoolRegistry, c.chainID, reg)
+	_, sig, err := eip712.SignScannerRegistration(c.privateKey, c.contracts.Addresses.ScannerPoolRegistry, c.chainID, reg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign the registration data: %v", err)
 	}
@@ -1022,7 +971,7 @@ func (c *client) GenerateScannerRegistrationSignature(reg *eip712.ScannerNodeReg
 }
 
 func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	if contracts.ScannerPoolReg == nil {
 		return "", ErrContractNotReady
 	}
@@ -1034,11 +983,11 @@ func (c *client) GetScannerPoolOwner(poolID *big.Int) (owner string, err error) 
 }
 
 func (c *client) WillNewScannerShutdownPool(poolID *big.Int) (bool, error) {
-	return c.Contracts().ScannerPoolReg.WillNewScannerShutdownPool(c.opts, poolID)
+	return c.contracts.ScannerPoolReg.WillNewScannerShutdownPool(c.opts, poolID)
 }
 
 func (c *client) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	if contracts.ScannerPoolReg == nil {
 		return nil, ErrContractNotReady
 	}
@@ -1057,7 +1006,7 @@ func (c *client) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, err
 }
 
 func (c *client) GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error) {
-	contracts := c.Contracts()
+	contracts := c.contracts
 	if contracts.StakeAllocator == nil {
 		return nil, ErrContractNotReady
 	}
