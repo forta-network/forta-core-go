@@ -5,8 +5,9 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
-	"github.com/forta-network/forta-core-go/contracts/merged/contract_rewards_distributor"
 	"math/big"
+
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_rewards_distributor"
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_dispatch"
@@ -183,7 +184,8 @@ type Contracts struct {
 	StakeAllocator    *contract_stake_allocator.StakeAllocatorCaller
 	StakeAllocatorFil *contract_stake_allocator.StakeAllocatorFilterer
 
-	RewardsDistributor *contract_rewards_distributor.RewardsDistributorCaller
+	RewardsDistributor    *contract_rewards_distributor.RewardsDistributorCaller
+	RewardsDistributorFil *contract_rewards_distributor.RewardsDistributorFilterer
 }
 
 type client struct {
@@ -349,6 +351,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	if err != nil {
 		return nil, err
 	}
+	cl.contracts.RewardsDistributorFil, err = contract_rewards_distributor.NewRewardsDistributorFilterer(regContracts.Rewards, ec)
+	if err != nil {
+		return nil, err
+	}
+	cl.versionManager.SetUpdateRule("RewardsDistributor", cl.contracts.RewardsDistributor, cl.contracts.RewardsDistributor, cl.contracts.RewardsDistributorFil)
 
 	if cfg.NoRefresh {
 		return cl, nil

@@ -84,9 +84,9 @@ func (vm *VersionManager) refreshRule(rule *UpdateRule) error {
 		"version": version,
 	})
 	if anyChange {
-		logger.Info("contract was successfully set to use new version")
+		logger.Info("using new version of the contract")
 	} else {
-		logger.Debug("contract is already up-to-date")
+		logger.Info("contract is already up-to-date")
 	}
 	return nil
 }
