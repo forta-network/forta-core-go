@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/forta-network/forta-core-go/utils/httpclient"
 	ipfsapi "github.com/ipfs/go-ipfs-api"
 	files "github.com/ipfs/go-ipfs-files"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
@@ -87,7 +88,7 @@ func (c *client) GetBytes(ctx context.Context, reference string) ([]byte, error)
 	defer cncl()
 
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, c.buildUrl(reference), nil)
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpclient.Default.Do(req)
 	if err != nil {
 		return nil, err
 	}
