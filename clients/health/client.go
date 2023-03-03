@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/forta-network/forta-core-go/utils/httpclient"
 )
 
 // HealthClient makes health check requests.
@@ -80,7 +82,7 @@ func (hc *healthClient) SendReports(src, dest, authToken string) error {
 	if len(authToken) > 0 {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
 	}
-	resp, err = http.DefaultClient.Do(req)
+	resp, err = httpclient.Default.Do(req)
 	if err != nil {
 		return fmt.Errorf("post request failed: %v", err)
 	}

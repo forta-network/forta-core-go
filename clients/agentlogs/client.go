@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/forta-network/forta-core-go/utils/httpclient"
 )
 
 // Agent contains agent data.
@@ -76,7 +78,7 @@ func (client *client) SendLogs(agents Agents, authToken string) error {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", authToken))
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpclient.Default.Do(req)
 	if err != nil {
 		return fmt.Errorf("request failed: %v", err)
 	}
