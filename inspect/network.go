@@ -117,10 +117,11 @@ func sendOutboundRequest(ctx context.Context) error {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
-	_, err = httpclient.Default.Do(req)
+	resp, err := httpclient.Default.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
+	defer resp.Body.Close()
 
 	return nil
 }

@@ -43,7 +43,7 @@ type errorResponse struct {
 func (hc *healthClient) CheckHealth(name, port string) (reports Reports) {
 	rawurl := containerURL(port)
 	apiName := "health-api"
-	resp, err := http.Get(rawurl)
+	resp, err := httpclient.Default.Get(rawurl)
 	if err != nil {
 		return singleReport(apiName, StatusDown, fmt.Sprintf("request failed: %v", err))
 	}
@@ -69,7 +69,7 @@ func (hc *healthClient) CheckHealth(name, port string) (reports Reports) {
 }
 
 func (hc *healthClient) SendReports(src, dest, authToken string) error {
-	resp, err := http.Get(src)
+	resp, err := httpclient.Default.Get(src)
 	if err != nil {
 		return fmt.Errorf("get request failed: %v", err)
 	}
