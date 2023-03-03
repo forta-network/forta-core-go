@@ -18,6 +18,7 @@ import (
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/utils"
+	"github.com/forta-network/forta-core-go/utils/httpclient"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -400,7 +401,8 @@ func NewRpcClient(ctx context.Context, url string) (*rpc.Client, error) {
 		return rpc.DialWebsocketWithDialer(ctx, url, "", dialer)
 	}
 
-	tr := &http.Transport{
+	client := *httpclient.Default
+	client.Transport = &http.Transport{
 		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   5 * time.Second,
@@ -411,7 +413,7 @@ func NewRpcClient(ctx context.Context, url string) (*rpc.Client, error) {
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	return rpc.DialHTTPWithClient(url, &http.Client{Transport: tr})
+	return rpc.DialHTTPWithClient(url, &client)
 }
 
 // NewStreamEthClient creates a new ethereum client
