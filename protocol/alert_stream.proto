@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package network.forta;
+
+option go_package = "./;protocol";
+
+import public "agent.proto";
+import public "alert.proto";
+
+service AlertStreamService {
+  rpc Subscribe (AlertStreamRequest) returns (stream AlertStreamResponse) {}
+}
+
+message AlertStreamRequest {
+  repeated CombinerBotSubscription subscriptions = 1;
+}
+
+message AlertStreamResponse {
+  AlertEvent alert = 1;
+}
