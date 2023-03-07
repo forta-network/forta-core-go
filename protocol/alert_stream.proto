@@ -13,6 +13,7 @@ service AlertStreamService {
 
 message AlertStreamRequest {
   repeated CombinerBotSubscription subscriptions = 1;
+  string authKey = 2;
 }
 
 message AlertStreamResponse {
