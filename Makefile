@@ -78,6 +78,7 @@ mocks:
 	mockgen -source release/client.go -destination release/mocks/mock_client.go
 	mockgen -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go
 	mockgen -source manifest/client.go -destination manifest/mocks/mock_client.go
+	mockgen -source protocol/alert_stream_grpc.pb.go -destination protocol/mocks/mock_alert_stream_grpc.go
 
 .PHONY: test
 test:
