@@ -6,9 +6,12 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	scannernodeversion010 "github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_0"
 
 	scannernodeversion011 "github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_1"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -17,26 +20,29 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/ethereum/go-ethereum/common"
+
 )
 
 // ScannerNodeVersionFilterer is a new type which can multiplex calls to different implementation types.
 type ScannerNodeVersionFilterer struct {
+
 	typ0 *scannernodeversion010.ScannerNodeVersionFilterer
 
 	typ1 *scannernodeversion011.ScannerNodeVersionFilterer
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewScannerNodeVersionFilterer creates a new merged type.
 func NewScannerNodeVersionFilterer(address common.Address, filterer bind.ContractFilterer) (*ScannerNodeVersionFilterer, error) {
 	var (
 		mergedType ScannerNodeVersionFilterer
-		err        error
+		err error
 	)
-	mergedType.currTag = "0.1.0"
+	mergedType.currTag = "0.1.1"
+
 
 	mergedType.typ0, err = scannernodeversion010.NewScannerNodeVersionFilterer(address, filterer)
 	if err != nil {
@@ -47,6 +53,7 @@ func NewScannerNodeVersionFilterer(address common.Address, filterer bind.Contrac
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize scannernodeversion011.ScannerNodeVersionFilterer: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -73,7 +80,7 @@ func (merged *ScannerNodeVersionFilterer) Use(tag string) (changed bool) {
 	}
 	// use the default tag if the provided tag is unknown
 	if !IsKnownTagForScannerNodeVersionFilterer(tag) {
-		tag = "0.1.0"
+		tag = "0.1.1"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -90,11 +97,15 @@ func (merged *ScannerNodeVersionFilterer) Safe() {
 	merged.unsafe = false
 }
 
+
+
 // FilterAccessManagerUpdatedOutput is a merged return type.
 type FilterAccessManagerUpdatedOutput struct {
+
 	Scannernodeversion010Result *scannernodeversion010.ScannerNodeVersionAccessManagerUpdatedIterator
 
 	Scannernodeversion011Result *scannernodeversion011.ScannerNodeVersionAccessManagerUpdatedIterator
+
 }
 
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
@@ -104,7 +115,10 @@ func (merged *ScannerNodeVersionFilterer) FilterAccessManagerUpdated(opts *bind.
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAccessManagerUpdatedOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -114,7 +128,9 @@ func (merged *ScannerNodeVersionFilterer) FilterAccessManagerUpdated(opts *bind.
 			return
 		}
 
+
 		retVal.Scannernodeversion010Result = val
+
 
 		return
 	}
@@ -127,14 +143,19 @@ func (merged *ScannerNodeVersionFilterer) FilterAccessManagerUpdated(opts *bind.
 			return
 		}
 
+
 		retVal.Scannernodeversion011Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *scannernodeversion010.ScannerNodeVersionAccessManagerUpdated, newAddressManager []common.Address, sinkAlt1 chan<- *scannernodeversion011.ScannerNodeVersionAccessManagerUpdated) (retVal event.Subscription, err error) {
@@ -142,6 +163,9 @@ func (merged *ScannerNodeVersionFilterer) WatchAccessManagerUpdated(opts *bind.W
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -169,15 +193,19 @@ func (merged *ScannerNodeVersionFilterer) WatchAccessManagerUpdated(opts *bind.W
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionAccessManagerUpdated is a merged return type.
 type ScannerNodeVersionAccessManagerUpdated struct {
+
 	NewAddressManager common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -187,7 +215,10 @@ func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Lo
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionAccessManagerUpdated{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -197,9 +228,11 @@ func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Lo
 			return
 		}
 
+
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -212,22 +245,28 @@ func (merged *ScannerNodeVersionFilterer) ParseAccessManagerUpdated(log types.Lo
 			return
 		}
 
+
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterAdminChangedOutput is a merged return type.
 type FilterAdminChangedOutput struct {
+
 	Scannernodeversion010Result *scannernodeversion010.ScannerNodeVersionAdminChangedIterator
 
 	Scannernodeversion011Result *scannernodeversion011.ScannerNodeVersionAdminChangedIterator
+
 }
 
 // FilterAdminChanged multiplexes to different implementations of the method.
@@ -237,7 +276,10 @@ func (merged *ScannerNodeVersionFilterer) FilterAdminChanged(opts *bind.FilterOp
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAdminChangedOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -247,7 +289,9 @@ func (merged *ScannerNodeVersionFilterer) FilterAdminChanged(opts *bind.FilterOp
 			return
 		}
 
+
 		retVal.Scannernodeversion010Result = val
+
 
 		return
 	}
@@ -260,14 +304,19 @@ func (merged *ScannerNodeVersionFilterer) FilterAdminChanged(opts *bind.FilterOp
 			return
 		}
 
+
 		retVal.Scannernodeversion011Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *scannernodeversion010.ScannerNodeVersionAdminChanged, sinkAlt2 chan<- *scannernodeversion011.ScannerNodeVersionAdminChanged) (retVal event.Subscription, err error) {
@@ -275,6 +324,9 @@ func (merged *ScannerNodeVersionFilterer) WatchAdminChanged(opts *bind.WatchOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -302,17 +354,21 @@ func (merged *ScannerNodeVersionFilterer) WatchAdminChanged(opts *bind.WatchOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionAdminChanged is a merged return type.
 type ScannerNodeVersionAdminChanged struct {
+
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -322,7 +378,10 @@ func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retV
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionAdminChanged{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -332,11 +391,13 @@ func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retV
 			return
 		}
 
+
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -349,24 +410,30 @@ func (merged *ScannerNodeVersionFilterer) ParseAdminChanged(log types.Log) (retV
 			return
 		}
 
+
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterBeaconUpgradedOutput is a merged return type.
 type FilterBeaconUpgradedOutput struct {
+
 	Scannernodeversion010Result *scannernodeversion010.ScannerNodeVersionBeaconUpgradedIterator
 
 	Scannernodeversion011Result *scannernodeversion011.ScannerNodeVersionBeaconUpgradedIterator
+
 }
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
@@ -376,7 +443,10 @@ func (merged *ScannerNodeVersionFilterer) FilterBeaconUpgraded(opts *bind.Filter
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterBeaconUpgradedOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -386,7 +456,9 @@ func (merged *ScannerNodeVersionFilterer) FilterBeaconUpgraded(opts *bind.Filter
 			return
 		}
 
+
 		retVal.Scannernodeversion010Result = val
+
 
 		return
 	}
@@ -399,14 +471,19 @@ func (merged *ScannerNodeVersionFilterer) FilterBeaconUpgraded(opts *bind.Filter
 			return
 		}
 
+
 		retVal.Scannernodeversion011Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *scannernodeversion010.ScannerNodeVersionBeaconUpgraded, beacon []common.Address, sinkAlt3 chan<- *scannernodeversion011.ScannerNodeVersionBeaconUpgraded) (retVal event.Subscription, err error) {
@@ -414,6 +491,9 @@ func (merged *ScannerNodeVersionFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -441,15 +521,19 @@ func (merged *ScannerNodeVersionFilterer) WatchBeaconUpgraded(opts *bind.WatchOp
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionBeaconUpgraded is a merged return type.
 type ScannerNodeVersionBeaconUpgraded struct {
+
 	Beacon common.Address
 
 	Raw types.Log
+
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -459,7 +543,10 @@ func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (re
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionBeaconUpgraded{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -469,9 +556,11 @@ func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (re
 			return
 		}
 
+
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -484,22 +573,28 @@ func (merged *ScannerNodeVersionFilterer) ParseBeaconUpgraded(log types.Log) (re
 			return
 		}
 
+
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterRouterUpdatedOutput is a merged return type.
 type FilterRouterUpdatedOutput struct {
+
 	Scannernodeversion010Result *scannernodeversion010.ScannerNodeVersionRouterUpdatedIterator
 
 	Scannernodeversion011Result *scannernodeversion011.ScannerNodeVersionRouterUpdatedIterator
+
 }
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
@@ -509,7 +604,10 @@ func (merged *ScannerNodeVersionFilterer) FilterRouterUpdated(opts *bind.FilterO
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterRouterUpdatedOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -519,7 +617,9 @@ func (merged *ScannerNodeVersionFilterer) FilterRouterUpdated(opts *bind.FilterO
 			return
 		}
 
+
 		retVal.Scannernodeversion010Result = val
+
 
 		return
 	}
@@ -532,14 +632,19 @@ func (merged *ScannerNodeVersionFilterer) FilterRouterUpdated(opts *bind.FilterO
 			return
 		}
 
+
 		retVal.Scannernodeversion011Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *scannernodeversion010.ScannerNodeVersionRouterUpdated, router []common.Address, sinkAlt4 chan<- *scannernodeversion011.ScannerNodeVersionRouterUpdated) (retVal event.Subscription, err error) {
@@ -547,6 +652,9 @@ func (merged *ScannerNodeVersionFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -574,15 +682,19 @@ func (merged *ScannerNodeVersionFilterer) WatchRouterUpdated(opts *bind.WatchOpt
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionRouterUpdated is a merged return type.
 type ScannerNodeVersionRouterUpdated struct {
+
 	Router common.Address
 
 	Raw types.Log
+
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -592,7 +704,10 @@ func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (ret
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionRouterUpdated{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -602,9 +717,11 @@ func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (ret
 			return
 		}
 
+
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -617,22 +734,28 @@ func (merged *ScannerNodeVersionFilterer) ParseRouterUpdated(log types.Log) (ret
 			return
 		}
 
+
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterScannerNodeVersionUpdatedOutput is a merged return type.
 type FilterScannerNodeVersionUpdatedOutput struct {
+
 	Scannernodeversion010Result *scannernodeversion010.ScannerNodeVersionScannerNodeVersionUpdatedIterator
 
 	Scannernodeversion011Result *scannernodeversion011.ScannerNodeVersionScannerNodeVersionUpdatedIterator
+
 }
 
 // FilterScannerNodeVersionUpdated multiplexes to different implementations of the method.
@@ -642,7 +765,10 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeVersionUpdated(opts *
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterScannerNodeVersionUpdatedOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterScannerNodeVersionUpdated(opts)
@@ -652,7 +778,9 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeVersionUpdated(opts *
 			return
 		}
 
+
 		retVal.Scannernodeversion010Result = val
+
 
 		return
 	}
@@ -665,14 +793,19 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeVersionUpdated(opts *
 			return
 		}
 
+
 		retVal.Scannernodeversion011Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterScannerNodeVersionUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchScannerNodeVersionUpdated multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchScannerNodeVersionUpdated(opts *bind.WatchOpts, sink chan<- *scannernodeversion010.ScannerNodeVersionScannerNodeVersionUpdated, sinkAlt5 chan<- *scannernodeversion011.ScannerNodeVersionScannerNodeVersionUpdated) (retVal event.Subscription, err error) {
@@ -680,6 +813,9 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeVersionUpdated(opts *b
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchScannerNodeVersionUpdated(opts, sink)
@@ -707,17 +843,21 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeVersionUpdated(opts *b
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchScannerNodeVersionUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionScannerNodeVersionUpdated is a merged return type.
 type ScannerNodeVersionScannerNodeVersionUpdated struct {
+
 	NewVersion string
 
 	OldVersion string
 
 	Raw types.Log
+
 }
 
 // ParseScannerNodeVersionUpdated multiplexes to different implementations of the method.
@@ -727,7 +867,10 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log typ
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionScannerNodeVersionUpdated{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseScannerNodeVersionUpdated(log)
@@ -737,11 +880,13 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log typ
 			return
 		}
 
+
 		retVal.NewVersion = val.NewVersion
 
 		retVal.OldVersion = val.OldVersion
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -754,24 +899,30 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeVersionUpdated(log typ
 			return
 		}
 
+
 		retVal.NewVersion = val.NewVersion
 
 		retVal.OldVersion = val.OldVersion
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseScannerNodeVersionUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterUpgradedOutput is a merged return type.
 type FilterUpgradedOutput struct {
+
 	Scannernodeversion010Result *scannernodeversion010.ScannerNodeVersionUpgradedIterator
 
 	Scannernodeversion011Result *scannernodeversion011.ScannerNodeVersionUpgradedIterator
+
 }
 
 // FilterUpgraded multiplexes to different implementations of the method.
@@ -781,7 +932,10 @@ func (merged *ScannerNodeVersionFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterUpgradedOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -791,7 +945,9 @@ func (merged *ScannerNodeVersionFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 			return
 		}
 
+
 		retVal.Scannernodeversion010Result = val
+
 
 		return
 	}
@@ -804,14 +960,19 @@ func (merged *ScannerNodeVersionFilterer) FilterUpgraded(opts *bind.FilterOpts, 
 			return
 		}
 
+
 		retVal.Scannernodeversion011Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *scannernodeversion010.ScannerNodeVersionUpgraded, implementation []common.Address, sinkAlt6 chan<- *scannernodeversion011.ScannerNodeVersionUpgraded) (retVal event.Subscription, err error) {
@@ -819,6 +980,9 @@ func (merged *ScannerNodeVersionFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -846,15 +1010,19 @@ func (merged *ScannerNodeVersionFilterer) WatchUpgraded(opts *bind.WatchOpts, si
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionUpgraded is a merged return type.
 type ScannerNodeVersionUpgraded struct {
+
 	Implementation common.Address
 
 	Raw types.Log
+
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -864,7 +1032,10 @@ func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionUpgraded{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -874,9 +1045,11 @@ func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *
 			return
 		}
 
+
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -889,16 +1062,21 @@ func (merged *ScannerNodeVersionFilterer) ParseUpgraded(log types.Log) (retVal *
 			return
 		}
 
+
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterInitialized multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *scannernodeversion011.ScannerNodeVersionInitializedIterator, err error) {
@@ -906,6 +1084,9 @@ func (merged *ScannerNodeVersionFilterer) FilterInitialized(opts *bind.FilterOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ1.FilterInitialized(opts)
@@ -920,9 +1101,12 @@ func (merged *ScannerNodeVersionFilterer) FilterInitialized(opts *bind.FilterOpt
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *scannernodeversion011.ScannerNodeVersionInitialized) (retVal event.Subscription, err error) {
@@ -930,6 +1114,9 @@ func (merged *ScannerNodeVersionFilterer) WatchInitialized(opts *bind.WatchOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ1.WatchInitialized(opts, sink)
@@ -944,15 +1131,19 @@ func (merged *ScannerNodeVersionFilterer) WatchInitialized(opts *bind.WatchOpts,
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionInitialized is a merged return type.
 type ScannerNodeVersionInitialized struct {
+
 	Version uint8
 
 	Raw types.Log
+
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -962,7 +1153,10 @@ func (merged *ScannerNodeVersionFilterer) ParseInitialized(log types.Log) (retVa
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionInitialized{}
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ1.ParseInitialized(log)
@@ -972,16 +1166,21 @@ func (merged *ScannerNodeVersionFilterer) ParseInitialized(log types.Log) (retVa
 			return
 		}
 
+
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterScannerNodeBetaVersionUpdated multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) FilterScannerNodeBetaVersionUpdated(opts *bind.FilterOpts) (retVal *scannernodeversion011.ScannerNodeVersionScannerNodeBetaVersionUpdatedIterator, err error) {
@@ -989,6 +1188,9 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeBetaVersionUpdated(op
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ1.FilterScannerNodeBetaVersionUpdated(opts)
@@ -1003,9 +1205,12 @@ func (merged *ScannerNodeVersionFilterer) FilterScannerNodeBetaVersionUpdated(op
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.FilterScannerNodeBetaVersionUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchScannerNodeBetaVersionUpdated multiplexes to different implementations of the method.
 func (merged *ScannerNodeVersionFilterer) WatchScannerNodeBetaVersionUpdated(opts *bind.WatchOpts, sink chan<- *scannernodeversion011.ScannerNodeVersionScannerNodeBetaVersionUpdated) (retVal event.Subscription, err error) {
@@ -1013,6 +1218,9 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeBetaVersionUpdated(opt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ1.WatchScannerNodeBetaVersionUpdated(opts, sink)
@@ -1027,17 +1235,21 @@ func (merged *ScannerNodeVersionFilterer) WatchScannerNodeBetaVersionUpdated(opt
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.WatchScannerNodeBetaVersionUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // ScannerNodeVersionScannerNodeBetaVersionUpdated is a merged return type.
 type ScannerNodeVersionScannerNodeBetaVersionUpdated struct {
+
 	NewVersion string
 
 	OldVersion string
 
 	Raw types.Log
+
 }
 
 // ParseScannerNodeBetaVersionUpdated multiplexes to different implementations of the method.
@@ -1047,7 +1259,10 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeBetaVersionUpdated(log
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &ScannerNodeVersionScannerNodeBetaVersionUpdated{}
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ1.ParseScannerNodeBetaVersionUpdated(log)
@@ -1057,14 +1272,17 @@ func (merged *ScannerNodeVersionFilterer) ParseScannerNodeBetaVersionUpdated(log
 			return
 		}
 
+
 		retVal.NewVersion = val.NewVersion
 
 		retVal.OldVersion = val.OldVersion
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerNodeVersionFilterer.ParseScannerNodeBetaVersionUpdated not implemented (tag=%s)", merged.currTag)
 	return

@@ -6,7 +6,10 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	forta020 "github.com/forta-network/forta-core-go/contracts/generated/contract_forta_0_2_0"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -17,29 +20,33 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
+
 )
 
 // FortaFilterer is a new type which can multiplex calls to different implementation types.
 type FortaFilterer struct {
+
 	typ0 *forta020.FortaFilterer
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewFortaFilterer creates a new merged type.
 func NewFortaFilterer(address common.Address, filterer bind.ContractFilterer) (*FortaFilterer, error) {
 	var (
 		mergedType FortaFilterer
-		err        error
+		err error
 	)
 	mergedType.currTag = "0.2.0"
+
 
 	mergedType.typ0, err = forta020.NewFortaFilterer(address, filterer)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize forta020.FortaFilterer: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -79,12 +86,18 @@ func (merged *FortaFilterer) Safe() {
 	merged.unsafe = false
 }
 
+
+
+
 // FilterAdminChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVal *forta020.FortaAdminChangedIterator, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -99,9 +112,12 @@ func (merged *FortaFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVal *
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *forta020.FortaAdminChanged) (retVal event.Subscription, err error) {
@@ -109,6 +125,9 @@ func (merged *FortaFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<-
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -123,17 +142,21 @@ func (merged *FortaFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<-
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaAdminChanged is a merged return type.
 type FortaAdminChanged struct {
+
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -143,7 +166,10 @@ func (merged *FortaFilterer) ParseAdminChanged(log types.Log) (retVal *FortaAdmi
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaAdminChanged{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -153,18 +179,23 @@ func (merged *FortaFilterer) ParseAdminChanged(log types.Log) (retVal *FortaAdmi
 			return
 		}
 
+
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterApproval multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterApproval(opts *bind.FilterOpts, owner []common.Address, spender []common.Address) (retVal *forta020.FortaApprovalIterator, err error) {
@@ -172,6 +203,9 @@ func (merged *FortaFilterer) FilterApproval(opts *bind.FilterOpts, owner []commo
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterApproval(opts, owner, spender)
@@ -186,9 +220,12 @@ func (merged *FortaFilterer) FilterApproval(opts *bind.FilterOpts, owner []commo
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchApproval multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *forta020.FortaApproval, owner []common.Address, spender []common.Address) (retVal event.Subscription, err error) {
@@ -196,6 +233,9 @@ func (merged *FortaFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *fo
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchApproval(opts, sink, owner, spender)
@@ -210,12 +250,15 @@ func (merged *FortaFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *fo
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaApproval is a merged return type.
 type FortaApproval struct {
+
 	Owner common.Address
 
 	Spender common.Address
@@ -223,6 +266,7 @@ type FortaApproval struct {
 	Value *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseApproval multiplexes to different implementations of the method.
@@ -232,7 +276,10 @@ func (merged *FortaFilterer) ParseApproval(log types.Log) (retVal *FortaApproval
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaApproval{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseApproval(log)
@@ -242,6 +289,7 @@ func (merged *FortaFilterer) ParseApproval(log types.Log) (retVal *FortaApproval
 			return
 		}
 
+
 		retVal.Owner = val.Owner
 
 		retVal.Spender = val.Spender
@@ -250,12 +298,16 @@ func (merged *FortaFilterer) ParseApproval(log types.Log) (retVal *FortaApproval
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beacon []common.Address) (retVal *forta020.FortaBeaconUpgradedIterator, err error) {
@@ -263,6 +315,9 @@ func (merged *FortaFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beacon 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -277,9 +332,12 @@ func (merged *FortaFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beacon 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *forta020.FortaBeaconUpgraded, beacon []common.Address) (retVal event.Subscription, err error) {
@@ -287,6 +345,9 @@ func (merged *FortaFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -301,15 +362,19 @@ func (merged *FortaFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaBeaconUpgraded is a merged return type.
 type FortaBeaconUpgraded struct {
+
 	Beacon common.Address
 
 	Raw types.Log
+
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -319,7 +384,10 @@ func (merged *FortaFilterer) ParseBeaconUpgraded(log types.Log) (retVal *FortaBe
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaBeaconUpgraded{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -329,16 +397,21 @@ func (merged *FortaFilterer) ParseBeaconUpgraded(log types.Log) (retVal *FortaBe
 			return
 		}
 
+
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterDelegateChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterDelegateChanged(opts *bind.FilterOpts, delegator []common.Address, fromDelegate []common.Address, toDelegate []common.Address) (retVal *forta020.FortaDelegateChangedIterator, err error) {
@@ -346,6 +419,9 @@ func (merged *FortaFilterer) FilterDelegateChanged(opts *bind.FilterOpts, delega
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterDelegateChanged(opts, delegator, fromDelegate, toDelegate)
@@ -360,9 +436,12 @@ func (merged *FortaFilterer) FilterDelegateChanged(opts *bind.FilterOpts, delega
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterDelegateChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchDelegateChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchDelegateChanged(opts *bind.WatchOpts, sink chan<- *forta020.FortaDelegateChanged, delegator []common.Address, fromDelegate []common.Address, toDelegate []common.Address) (retVal event.Subscription, err error) {
@@ -370,6 +449,9 @@ func (merged *FortaFilterer) WatchDelegateChanged(opts *bind.WatchOpts, sink cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchDelegateChanged(opts, sink, delegator, fromDelegate, toDelegate)
@@ -384,12 +466,15 @@ func (merged *FortaFilterer) WatchDelegateChanged(opts *bind.WatchOpts, sink cha
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchDelegateChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaDelegateChanged is a merged return type.
 type FortaDelegateChanged struct {
+
 	Delegator common.Address
 
 	FromDelegate common.Address
@@ -397,6 +482,7 @@ type FortaDelegateChanged struct {
 	ToDelegate common.Address
 
 	Raw types.Log
+
 }
 
 // ParseDelegateChanged multiplexes to different implementations of the method.
@@ -406,7 +492,10 @@ func (merged *FortaFilterer) ParseDelegateChanged(log types.Log) (retVal *FortaD
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaDelegateChanged{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseDelegateChanged(log)
@@ -416,6 +505,7 @@ func (merged *FortaFilterer) ParseDelegateChanged(log types.Log) (retVal *FortaD
 			return
 		}
 
+
 		retVal.Delegator = val.Delegator
 
 		retVal.FromDelegate = val.FromDelegate
@@ -424,12 +514,16 @@ func (merged *FortaFilterer) ParseDelegateChanged(log types.Log) (retVal *FortaD
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseDelegateChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterDelegateVotesChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterDelegateVotesChanged(opts *bind.FilterOpts, delegate []common.Address) (retVal *forta020.FortaDelegateVotesChangedIterator, err error) {
@@ -437,6 +531,9 @@ func (merged *FortaFilterer) FilterDelegateVotesChanged(opts *bind.FilterOpts, d
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterDelegateVotesChanged(opts, delegate)
@@ -451,9 +548,12 @@ func (merged *FortaFilterer) FilterDelegateVotesChanged(opts *bind.FilterOpts, d
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterDelegateVotesChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchDelegateVotesChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchDelegateVotesChanged(opts *bind.WatchOpts, sink chan<- *forta020.FortaDelegateVotesChanged, delegate []common.Address) (retVal event.Subscription, err error) {
@@ -461,6 +561,9 @@ func (merged *FortaFilterer) WatchDelegateVotesChanged(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchDelegateVotesChanged(opts, sink, delegate)
@@ -475,12 +578,15 @@ func (merged *FortaFilterer) WatchDelegateVotesChanged(opts *bind.WatchOpts, sin
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchDelegateVotesChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaDelegateVotesChanged is a merged return type.
 type FortaDelegateVotesChanged struct {
+
 	Delegate common.Address
 
 	PreviousBalance *big.Int
@@ -488,6 +594,7 @@ type FortaDelegateVotesChanged struct {
 	NewBalance *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseDelegateVotesChanged multiplexes to different implementations of the method.
@@ -497,7 +604,10 @@ func (merged *FortaFilterer) ParseDelegateVotesChanged(log types.Log) (retVal *F
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaDelegateVotesChanged{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseDelegateVotesChanged(log)
@@ -507,6 +617,7 @@ func (merged *FortaFilterer) ParseDelegateVotesChanged(log types.Log) (retVal *F
 			return
 		}
 
+
 		retVal.Delegate = val.Delegate
 
 		retVal.PreviousBalance = val.PreviousBalance
@@ -515,12 +626,16 @@ func (merged *FortaFilterer) ParseDelegateVotesChanged(log types.Log) (retVal *F
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseDelegateVotesChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterInitialized multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *forta020.FortaInitializedIterator, err error) {
@@ -528,6 +643,9 @@ func (merged *FortaFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *f
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -542,9 +660,12 @@ func (merged *FortaFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *f
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *forta020.FortaInitialized) (retVal event.Subscription, err error) {
@@ -552,6 +673,9 @@ func (merged *FortaFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -566,15 +690,19 @@ func (merged *FortaFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaInitialized is a merged return type.
 type FortaInitialized struct {
+
 	Version uint8
 
 	Raw types.Log
+
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -584,7 +712,10 @@ func (merged *FortaFilterer) ParseInitialized(log types.Log) (retVal *FortaIniti
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaInitialized{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -594,16 +725,21 @@ func (merged *FortaFilterer) ParseInitialized(log types.Log) (retVal *FortaIniti
 			return
 		}
 
+
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterRoleAdminChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterRoleAdminChanged(opts *bind.FilterOpts, role [][32]byte, previousAdminRole [][32]byte, newAdminRole [][32]byte) (retVal *forta020.FortaRoleAdminChangedIterator, err error) {
@@ -611,6 +747,9 @@ func (merged *FortaFilterer) FilterRoleAdminChanged(opts *bind.FilterOpts, role 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterRoleAdminChanged(opts, role, previousAdminRole, newAdminRole)
@@ -625,9 +764,12 @@ func (merged *FortaFilterer) FilterRoleAdminChanged(opts *bind.FilterOpts, role 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterRoleAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchRoleAdminChanged multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchRoleAdminChanged(opts *bind.WatchOpts, sink chan<- *forta020.FortaRoleAdminChanged, role [][32]byte, previousAdminRole [][32]byte, newAdminRole [][32]byte) (retVal event.Subscription, err error) {
@@ -635,6 +777,9 @@ func (merged *FortaFilterer) WatchRoleAdminChanged(opts *bind.WatchOpts, sink ch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchRoleAdminChanged(opts, sink, role, previousAdminRole, newAdminRole)
@@ -649,12 +794,15 @@ func (merged *FortaFilterer) WatchRoleAdminChanged(opts *bind.WatchOpts, sink ch
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchRoleAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaRoleAdminChanged is a merged return type.
 type FortaRoleAdminChanged struct {
+
 	Role [32]byte
 
 	PreviousAdminRole [32]byte
@@ -662,6 +810,7 @@ type FortaRoleAdminChanged struct {
 	NewAdminRole [32]byte
 
 	Raw types.Log
+
 }
 
 // ParseRoleAdminChanged multiplexes to different implementations of the method.
@@ -671,7 +820,10 @@ func (merged *FortaFilterer) ParseRoleAdminChanged(log types.Log) (retVal *Forta
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaRoleAdminChanged{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseRoleAdminChanged(log)
@@ -681,6 +833,7 @@ func (merged *FortaFilterer) ParseRoleAdminChanged(log types.Log) (retVal *Forta
 			return
 		}
 
+
 		retVal.Role = val.Role
 
 		retVal.PreviousAdminRole = val.PreviousAdminRole
@@ -689,12 +842,16 @@ func (merged *FortaFilterer) ParseRoleAdminChanged(log types.Log) (retVal *Forta
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseRoleAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterRoleGranted multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterRoleGranted(opts *bind.FilterOpts, role [][32]byte, account []common.Address, sender []common.Address) (retVal *forta020.FortaRoleGrantedIterator, err error) {
@@ -702,6 +859,9 @@ func (merged *FortaFilterer) FilterRoleGranted(opts *bind.FilterOpts, role [][32
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterRoleGranted(opts, role, account, sender)
@@ -716,9 +876,12 @@ func (merged *FortaFilterer) FilterRoleGranted(opts *bind.FilterOpts, role [][32
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterRoleGranted not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchRoleGranted multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchRoleGranted(opts *bind.WatchOpts, sink chan<- *forta020.FortaRoleGranted, role [][32]byte, account []common.Address, sender []common.Address) (retVal event.Subscription, err error) {
@@ -726,6 +889,9 @@ func (merged *FortaFilterer) WatchRoleGranted(opts *bind.WatchOpts, sink chan<- 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchRoleGranted(opts, sink, role, account, sender)
@@ -740,12 +906,15 @@ func (merged *FortaFilterer) WatchRoleGranted(opts *bind.WatchOpts, sink chan<- 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchRoleGranted not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaRoleGranted is a merged return type.
 type FortaRoleGranted struct {
+
 	Role [32]byte
 
 	Account common.Address
@@ -753,6 +922,7 @@ type FortaRoleGranted struct {
 	Sender common.Address
 
 	Raw types.Log
+
 }
 
 // ParseRoleGranted multiplexes to different implementations of the method.
@@ -762,7 +932,10 @@ func (merged *FortaFilterer) ParseRoleGranted(log types.Log) (retVal *FortaRoleG
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaRoleGranted{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseRoleGranted(log)
@@ -772,6 +945,7 @@ func (merged *FortaFilterer) ParseRoleGranted(log types.Log) (retVal *FortaRoleG
 			return
 		}
 
+
 		retVal.Role = val.Role
 
 		retVal.Account = val.Account
@@ -780,12 +954,16 @@ func (merged *FortaFilterer) ParseRoleGranted(log types.Log) (retVal *FortaRoleG
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseRoleGranted not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterRoleRevoked multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterRoleRevoked(opts *bind.FilterOpts, role [][32]byte, account []common.Address, sender []common.Address) (retVal *forta020.FortaRoleRevokedIterator, err error) {
@@ -793,6 +971,9 @@ func (merged *FortaFilterer) FilterRoleRevoked(opts *bind.FilterOpts, role [][32
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterRoleRevoked(opts, role, account, sender)
@@ -807,9 +988,12 @@ func (merged *FortaFilterer) FilterRoleRevoked(opts *bind.FilterOpts, role [][32
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterRoleRevoked not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchRoleRevoked multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchRoleRevoked(opts *bind.WatchOpts, sink chan<- *forta020.FortaRoleRevoked, role [][32]byte, account []common.Address, sender []common.Address) (retVal event.Subscription, err error) {
@@ -817,6 +1001,9 @@ func (merged *FortaFilterer) WatchRoleRevoked(opts *bind.WatchOpts, sink chan<- 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchRoleRevoked(opts, sink, role, account, sender)
@@ -831,12 +1018,15 @@ func (merged *FortaFilterer) WatchRoleRevoked(opts *bind.WatchOpts, sink chan<- 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchRoleRevoked not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaRoleRevoked is a merged return type.
 type FortaRoleRevoked struct {
+
 	Role [32]byte
 
 	Account common.Address
@@ -844,6 +1034,7 @@ type FortaRoleRevoked struct {
 	Sender common.Address
 
 	Raw types.Log
+
 }
 
 // ParseRoleRevoked multiplexes to different implementations of the method.
@@ -853,7 +1044,10 @@ func (merged *FortaFilterer) ParseRoleRevoked(log types.Log) (retVal *FortaRoleR
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaRoleRevoked{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseRoleRevoked(log)
@@ -863,6 +1057,7 @@ func (merged *FortaFilterer) ParseRoleRevoked(log types.Log) (retVal *FortaRoleR
 			return
 		}
 
+
 		retVal.Role = val.Role
 
 		retVal.Account = val.Account
@@ -871,12 +1066,16 @@ func (merged *FortaFilterer) ParseRoleRevoked(log types.Log) (retVal *FortaRoleR
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseRoleRevoked not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterTransfer multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterTransfer(opts *bind.FilterOpts, from []common.Address, to []common.Address) (retVal *forta020.FortaTransferIterator, err error) {
@@ -884,6 +1083,9 @@ func (merged *FortaFilterer) FilterTransfer(opts *bind.FilterOpts, from []common
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterTransfer(opts, from, to)
@@ -898,9 +1100,12 @@ func (merged *FortaFilterer) FilterTransfer(opts *bind.FilterOpts, from []common
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchTransfer multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *forta020.FortaTransfer, from []common.Address, to []common.Address) (retVal event.Subscription, err error) {
@@ -908,6 +1113,9 @@ func (merged *FortaFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *fo
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchTransfer(opts, sink, from, to)
@@ -922,12 +1130,15 @@ func (merged *FortaFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *fo
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaTransfer is a merged return type.
 type FortaTransfer struct {
+
 	From common.Address
 
 	To common.Address
@@ -935,6 +1146,7 @@ type FortaTransfer struct {
 	Value *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseTransfer multiplexes to different implementations of the method.
@@ -944,7 +1156,10 @@ func (merged *FortaFilterer) ParseTransfer(log types.Log) (retVal *FortaTransfer
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaTransfer{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseTransfer(log)
@@ -954,6 +1169,7 @@ func (merged *FortaFilterer) ParseTransfer(log types.Log) (retVal *FortaTransfer
 			return
 		}
 
+
 		retVal.From = val.From
 
 		retVal.To = val.To
@@ -962,12 +1178,16 @@ func (merged *FortaFilterer) ParseTransfer(log types.Log) (retVal *FortaTransfer
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterUpgraded multiplexes to different implementations of the method.
 func (merged *FortaFilterer) FilterUpgraded(opts *bind.FilterOpts, implementation []common.Address) (retVal *forta020.FortaUpgradedIterator, err error) {
@@ -975,6 +1195,9 @@ func (merged *FortaFilterer) FilterUpgraded(opts *bind.FilterOpts, implementatio
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -989,9 +1212,12 @@ func (merged *FortaFilterer) FilterUpgraded(opts *bind.FilterOpts, implementatio
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *FortaFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *forta020.FortaUpgraded, implementation []common.Address) (retVal event.Subscription, err error) {
@@ -999,6 +1225,9 @@ func (merged *FortaFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *fo
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -1013,15 +1242,19 @@ func (merged *FortaFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *fo
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FortaUpgraded is a merged return type.
 type FortaUpgraded struct {
+
 	Implementation common.Address
 
 	Raw types.Log
+
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -1031,7 +1264,10 @@ func (merged *FortaFilterer) ParseUpgraded(log types.Log) (retVal *FortaUpgraded
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FortaUpgraded{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -1041,12 +1277,15 @@ func (merged *FortaFilterer) ParseUpgraded(log types.Log) (retVal *FortaUpgraded
 			return
 		}
 
+
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return

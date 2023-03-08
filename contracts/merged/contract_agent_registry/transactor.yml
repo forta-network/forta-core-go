@@ -14,7 +14,7 @@ sources:
 
 output:
   type: AgentRegistryTransactor
-  defaultTag: '0.1.4'
+  defaultTag: '0.1.6'
   package: contract_agent_registry
   file: transactor.go
 

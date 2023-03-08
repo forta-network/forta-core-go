@@ -14,7 +14,7 @@ sources:
 
 output:
   type: FortaStakingFilterer
-  defaultTag: '0.1.1'
+  defaultTag: '0.1.2'
   package: contract_forta_staking
   file: filterer.go
   rewrite:

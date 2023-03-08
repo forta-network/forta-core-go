@@ -31,6 +31,7 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
+		NoRefresh:      true,
 	})
 	if err != nil {
 		panic(err)
@@ -46,6 +47,7 @@ func testMumbaiListener(ctx context.Context, filter *ContractFilter, topic strin
 		ContractFilter: filter,
 		Topics:         []string{topic},
 		Handlers:       handlers,
+		NoRefresh:      true,
 	})
 	if err != nil {
 		panic(err)
