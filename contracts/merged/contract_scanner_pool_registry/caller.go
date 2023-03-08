@@ -6,36 +6,43 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	scannerpoolregistry010 "github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
+
 )
 
 // ScannerPoolRegistryCaller is a new type which can multiplex calls to different implementation types.
 type ScannerPoolRegistryCaller struct {
+
 	typ0 *scannerpoolregistry010.ScannerPoolRegistryCaller
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewScannerPoolRegistryCaller creates a new merged type.
 func NewScannerPoolRegistryCaller(address common.Address, caller bind.ContractCaller) (*ScannerPoolRegistryCaller, error) {
 	var (
 		mergedType ScannerPoolRegistryCaller
-		err        error
+		err error
 	)
 	mergedType.currTag = "0.1.0"
+
 
 	mergedType.typ0, err = scannerpoolregistry010.NewScannerPoolRegistryCaller(address, caller)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize scannerpoolregistry010.ScannerPoolRegistryCaller: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -75,12 +82,18 @@ func (merged *ScannerPoolRegistryCaller) Safe() {
 	merged.unsafe = false
 }
 
+
+
+
 // BalanceOf multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common.Address) (retVal *big.Int, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.BalanceOf(opts, owner)
@@ -95,9 +108,12 @@ func (merged *ScannerPoolRegistryCaller) BalanceOf(opts *bind.CallOpts, owner co
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.BalanceOf not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetApproved multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *big.Int) (retVal common.Address, err error) {
@@ -105,6 +121,9 @@ func (merged *ScannerPoolRegistryCaller) GetApproved(opts *bind.CallOpts, tokenI
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetApproved(opts, tokenId)
@@ -119,17 +138,21 @@ func (merged *ScannerPoolRegistryCaller) GetApproved(opts *bind.CallOpts, tokenI
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetApproved not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // GetManagedStakeThresholdOutput is a merged return type.
 type GetManagedStakeThresholdOutput struct {
+
 	Min *big.Int
 
 	Max *big.Int
 
 	Activated bool
+
 }
 
 // GetManagedStakeThreshold multiplexes to different implementations of the method.
@@ -139,7 +162,10 @@ func (merged *ScannerPoolRegistryCaller) GetManagedStakeThreshold(opts *bind.Cal
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &GetManagedStakeThresholdOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetManagedStakeThreshold(opts, managedId)
@@ -149,18 +175,23 @@ func (merged *ScannerPoolRegistryCaller) GetManagedStakeThreshold(opts *bind.Cal
 			return
 		}
 
+
 		retVal.Min = val.Min
 
 		retVal.Max = val.Max
 
 		retVal.Activated = val.Activated
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetManagedStakeThreshold not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetManagerAt multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) GetManagerAt(opts *bind.CallOpts, scannerPoolId *big.Int, index *big.Int) (retVal common.Address, err error) {
@@ -168,6 +199,9 @@ func (merged *ScannerPoolRegistryCaller) GetManagerAt(opts *bind.CallOpts, scann
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetManagerAt(opts, scannerPoolId, index)
@@ -182,9 +216,12 @@ func (merged *ScannerPoolRegistryCaller) GetManagerAt(opts *bind.CallOpts, scann
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetManagerAt not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetManagerCount multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) GetManagerCount(opts *bind.CallOpts, scannerPoolId *big.Int) (retVal *big.Int, err error) {
@@ -192,6 +229,9 @@ func (merged *ScannerPoolRegistryCaller) GetManagerCount(opts *bind.CallOpts, sc
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetManagerCount(opts, scannerPoolId)
@@ -206,12 +246,15 @@ func (merged *ScannerPoolRegistryCaller) GetManagerCount(opts *bind.CallOpts, sc
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetManagerCount not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // GetScannerOutput is a merged return type.
 type GetScannerOutput struct {
+
 	Registered bool
 
 	Disabled bool
@@ -221,6 +264,7 @@ type GetScannerOutput struct {
 	ChainId *big.Int
 
 	Metadata string
+
 }
 
 // GetScanner multiplexes to different implementations of the method.
@@ -230,7 +274,10 @@ func (merged *ScannerPoolRegistryCaller) GetScanner(opts *bind.CallOpts, scanner
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &GetScannerOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetScanner(opts, scanner)
@@ -239,6 +286,7 @@ func (merged *ScannerPoolRegistryCaller) GetScanner(opts *bind.CallOpts, scanner
 			err = methodErr
 			return
 		}
+
 
 		retVal.Registered = val.Registered
 
@@ -250,15 +298,19 @@ func (merged *ScannerPoolRegistryCaller) GetScanner(opts *bind.CallOpts, scanner
 
 		retVal.Metadata = val.Metadata
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetScanner not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // GetScannerStateOutput is a merged return type.
 type GetScannerStateOutput struct {
+
 	Registered bool
 
 	Owner common.Address
@@ -270,6 +322,7 @@ type GetScannerStateOutput struct {
 	Operational bool
 
 	Disabled bool
+
 }
 
 // GetScannerState multiplexes to different implementations of the method.
@@ -279,7 +332,10 @@ func (merged *ScannerPoolRegistryCaller) GetScannerState(opts *bind.CallOpts, sc
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &GetScannerStateOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetScannerState(opts, scanner)
@@ -288,6 +344,7 @@ func (merged *ScannerPoolRegistryCaller) GetScannerState(opts *bind.CallOpts, sc
 			err = methodErr
 			return
 		}
+
 
 		retVal.Registered = val.Registered
 
@@ -301,12 +358,16 @@ func (merged *ScannerPoolRegistryCaller) GetScannerState(opts *bind.CallOpts, sc
 
 		retVal.Disabled = val.Disabled
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetScannerState not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetSubjectHandler multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -314,6 +375,9 @@ func (merged *ScannerPoolRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetSubjectHandler(opts)
@@ -328,9 +392,12 @@ func (merged *ScannerPoolRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetSubjectHandler not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetTotalManagedSubjects multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) GetTotalManagedSubjects(opts *bind.CallOpts, subject *big.Int) (retVal *big.Int, err error) {
@@ -338,6 +405,9 @@ func (merged *ScannerPoolRegistryCaller) GetTotalManagedSubjects(opts *bind.Call
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetTotalManagedSubjects(opts, subject)
@@ -352,9 +422,12 @@ func (merged *ScannerPoolRegistryCaller) GetTotalManagedSubjects(opts *bind.Call
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.GetTotalManagedSubjects not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsApprovedForAll multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner common.Address, operator common.Address) (retVal bool, err error) {
@@ -362,6 +435,9 @@ func (merged *ScannerPoolRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, o
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsApprovedForAll(opts, owner, operator)
@@ -376,9 +452,12 @@ func (merged *ScannerPoolRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, o
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsApprovedForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsManager multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsManager(opts *bind.CallOpts, scannerPoolId *big.Int, manager common.Address) (retVal bool, err error) {
@@ -386,6 +465,9 @@ func (merged *ScannerPoolRegistryCaller) IsManager(opts *bind.CallOpts, scannerP
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsManager(opts, scannerPoolId, manager)
@@ -400,9 +482,12 @@ func (merged *ScannerPoolRegistryCaller) IsManager(opts *bind.CallOpts, scannerP
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsManager not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsRegistered multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsRegistered(opts *bind.CallOpts, scannerPoolId *big.Int) (retVal bool, err error) {
@@ -410,6 +495,9 @@ func (merged *ScannerPoolRegistryCaller) IsRegistered(opts *bind.CallOpts, scann
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsRegistered(opts, scannerPoolId)
@@ -424,9 +512,12 @@ func (merged *ScannerPoolRegistryCaller) IsRegistered(opts *bind.CallOpts, scann
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsRegistered not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsScannerDisabled multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsScannerDisabled(opts *bind.CallOpts, scanner common.Address) (retVal bool, err error) {
@@ -434,6 +525,9 @@ func (merged *ScannerPoolRegistryCaller) IsScannerDisabled(opts *bind.CallOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsScannerDisabled(opts, scanner)
@@ -448,9 +542,12 @@ func (merged *ScannerPoolRegistryCaller) IsScannerDisabled(opts *bind.CallOpts, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsScannerDisabled not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsScannerOperational multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsScannerOperational(opts *bind.CallOpts, scanner common.Address) (retVal bool, err error) {
@@ -458,6 +555,9 @@ func (merged *ScannerPoolRegistryCaller) IsScannerOperational(opts *bind.CallOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsScannerOperational(opts, scanner)
@@ -472,9 +572,12 @@ func (merged *ScannerPoolRegistryCaller) IsScannerOperational(opts *bind.CallOpt
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsScannerOperational not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsScannerRegistered multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsScannerRegistered(opts *bind.CallOpts, scanner common.Address) (retVal bool, err error) {
@@ -482,6 +585,9 @@ func (merged *ScannerPoolRegistryCaller) IsScannerRegistered(opts *bind.CallOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsScannerRegistered(opts, scanner)
@@ -496,9 +602,12 @@ func (merged *ScannerPoolRegistryCaller) IsScannerRegistered(opts *bind.CallOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsScannerRegistered not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsScannerRegisteredTo multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsScannerRegisteredTo(opts *bind.CallOpts, scanner common.Address, scannerPoolId *big.Int) (retVal bool, err error) {
@@ -506,6 +615,9 @@ func (merged *ScannerPoolRegistryCaller) IsScannerRegisteredTo(opts *bind.CallOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsScannerRegisteredTo(opts, scanner, scannerPoolId)
@@ -520,9 +632,12 @@ func (merged *ScannerPoolRegistryCaller) IsScannerRegisteredTo(opts *bind.CallOp
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsScannerRegisteredTo not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsTrustedForwarder multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder common.Address) (retVal bool, err error) {
@@ -530,6 +645,9 @@ func (merged *ScannerPoolRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
@@ -544,9 +662,12 @@ func (merged *ScannerPoolRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts,
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.IsTrustedForwarder not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // MonitoredChainId multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) MonitoredChainId(opts *bind.CallOpts, scannerPoolId *big.Int) (retVal *big.Int, err error) {
@@ -554,6 +675,9 @@ func (merged *ScannerPoolRegistryCaller) MonitoredChainId(opts *bind.CallOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.MonitoredChainId(opts, scannerPoolId)
@@ -568,9 +692,12 @@ func (merged *ScannerPoolRegistryCaller) MonitoredChainId(opts *bind.CallOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.MonitoredChainId not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Name multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) Name(opts *bind.CallOpts) (retVal string, err error) {
@@ -578,6 +705,9 @@ func (merged *ScannerPoolRegistryCaller) Name(opts *bind.CallOpts) (retVal strin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Name(opts)
@@ -592,9 +722,12 @@ func (merged *ScannerPoolRegistryCaller) Name(opts *bind.CallOpts) (retVal strin
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.Name not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // OwnerOf multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) OwnerOf(opts *bind.CallOpts, subject *big.Int) (retVal common.Address, err error) {
@@ -602,6 +735,9 @@ func (merged *ScannerPoolRegistryCaller) OwnerOf(opts *bind.CallOpts, subject *b
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.OwnerOf(opts, subject)
@@ -616,9 +752,12 @@ func (merged *ScannerPoolRegistryCaller) OwnerOf(opts *bind.CallOpts, subject *b
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.OwnerOf not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -626,6 +765,9 @@ func (merged *ScannerPoolRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (ret
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -640,9 +782,12 @@ func (merged *ScannerPoolRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (ret
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // RegisteredScannerAddressAtIndex multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) RegisteredScannerAddressAtIndex(opts *bind.CallOpts, scannerPoolId *big.Int, index *big.Int) (retVal common.Address, err error) {
@@ -650,6 +795,9 @@ func (merged *ScannerPoolRegistryCaller) RegisteredScannerAddressAtIndex(opts *b
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RegisteredScannerAddressAtIndex(opts, scannerPoolId, index)
@@ -664,12 +812,15 @@ func (merged *ScannerPoolRegistryCaller) RegisteredScannerAddressAtIndex(opts *b
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.RegisteredScannerAddressAtIndex not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // RegisteredScannerAtIndexOutput is a merged return type.
 type RegisteredScannerAtIndexOutput struct {
+
 	Registered bool
 
 	Disabled bool
@@ -679,6 +830,7 @@ type RegisteredScannerAtIndexOutput struct {
 	ChainId *big.Int
 
 	Metadata string
+
 }
 
 // RegisteredScannerAtIndex multiplexes to different implementations of the method.
@@ -688,7 +840,10 @@ func (merged *ScannerPoolRegistryCaller) RegisteredScannerAtIndex(opts *bind.Cal
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &RegisteredScannerAtIndexOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RegisteredScannerAtIndex(opts, scannerPoolId, index)
@@ -697,6 +852,7 @@ func (merged *ScannerPoolRegistryCaller) RegisteredScannerAtIndex(opts *bind.Cal
 			err = methodErr
 			return
 		}
+
 
 		retVal.Registered = val.Registered
 
@@ -708,12 +864,16 @@ func (merged *ScannerPoolRegistryCaller) RegisteredScannerAtIndex(opts *bind.Cal
 
 		retVal.Metadata = val.Metadata
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.RegisteredScannerAtIndex not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // RegistrationDelay multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) RegistrationDelay(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -721,6 +881,9 @@ func (merged *ScannerPoolRegistryCaller) RegistrationDelay(opts *bind.CallOpts) 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RegistrationDelay(opts)
@@ -735,9 +898,12 @@ func (merged *ScannerPoolRegistryCaller) RegistrationDelay(opts *bind.CallOpts) 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.RegistrationDelay not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ScannerAddressToId multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) ScannerAddressToId(opts *bind.CallOpts, scanner common.Address) (retVal *big.Int, err error) {
@@ -745,6 +911,9 @@ func (merged *ScannerPoolRegistryCaller) ScannerAddressToId(opts *bind.CallOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ScannerAddressToId(opts, scanner)
@@ -759,9 +928,12 @@ func (merged *ScannerPoolRegistryCaller) ScannerAddressToId(opts *bind.CallOpts,
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.ScannerAddressToId not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ScannerIdToAddress multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) ScannerIdToAddress(opts *bind.CallOpts, scannerId *big.Int) (retVal common.Address, err error) {
@@ -769,6 +941,9 @@ func (merged *ScannerPoolRegistryCaller) ScannerIdToAddress(opts *bind.CallOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ScannerIdToAddress(opts, scannerId)
@@ -783,9 +958,12 @@ func (merged *ScannerPoolRegistryCaller) ScannerIdToAddress(opts *bind.CallOpts,
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.ScannerIdToAddress not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SupportsInterface multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4]byte) (retVal bool, err error) {
@@ -793,6 +971,9 @@ func (merged *ScannerPoolRegistryCaller) SupportsInterface(opts *bind.CallOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
@@ -807,9 +988,12 @@ func (merged *ScannerPoolRegistryCaller) SupportsInterface(opts *bind.CallOpts, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.SupportsInterface not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Symbol multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string, err error) {
@@ -817,6 +1001,9 @@ func (merged *ScannerPoolRegistryCaller) Symbol(opts *bind.CallOpts) (retVal str
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Symbol(opts)
@@ -831,9 +1018,12 @@ func (merged *ScannerPoolRegistryCaller) Symbol(opts *bind.CallOpts) (retVal str
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.Symbol not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TokenByIndex multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) TokenByIndex(opts *bind.CallOpts, index *big.Int) (retVal *big.Int, err error) {
@@ -841,6 +1031,9 @@ func (merged *ScannerPoolRegistryCaller) TokenByIndex(opts *bind.CallOpts, index
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.TokenByIndex(opts, index)
@@ -855,9 +1048,12 @@ func (merged *ScannerPoolRegistryCaller) TokenByIndex(opts *bind.CallOpts, index
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.TokenByIndex not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TokenOfOwnerByIndex multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) TokenOfOwnerByIndex(opts *bind.CallOpts, owner common.Address, index *big.Int) (retVal *big.Int, err error) {
@@ -865,6 +1061,9 @@ func (merged *ScannerPoolRegistryCaller) TokenOfOwnerByIndex(opts *bind.CallOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.TokenOfOwnerByIndex(opts, owner, index)
@@ -879,9 +1078,12 @@ func (merged *ScannerPoolRegistryCaller) TokenOfOwnerByIndex(opts *bind.CallOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.TokenOfOwnerByIndex not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TokenURI multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.Int) (retVal string, err error) {
@@ -889,6 +1091,9 @@ func (merged *ScannerPoolRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.TokenURI(opts, tokenId)
@@ -903,9 +1108,12 @@ func (merged *ScannerPoolRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.TokenURI not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalScannersRegistered multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) TotalScannersRegistered(opts *bind.CallOpts, scannerPoolId *big.Int) (retVal *big.Int, err error) {
@@ -913,6 +1121,9 @@ func (merged *ScannerPoolRegistryCaller) TotalScannersRegistered(opts *bind.Call
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.TotalScannersRegistered(opts, scannerPoolId)
@@ -927,9 +1138,12 @@ func (merged *ScannerPoolRegistryCaller) TotalScannersRegistered(opts *bind.Call
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.TotalScannersRegistered not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalSupply multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) TotalSupply(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -937,6 +1151,9 @@ func (merged *ScannerPoolRegistryCaller) TotalSupply(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.TotalSupply(opts)
@@ -951,9 +1168,12 @@ func (merged *ScannerPoolRegistryCaller) TotalSupply(opts *bind.CallOpts) (retVa
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.TotalSupply not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Version multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -961,6 +1181,9 @@ func (merged *ScannerPoolRegistryCaller) Version(opts *bind.CallOpts) (retVal st
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -975,9 +1198,12 @@ func (merged *ScannerPoolRegistryCaller) Version(opts *bind.CallOpts) (retVal st
 		return
 	}
 
+
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.Version not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WillNewScannerShutdownPool multiplexes to different implementations of the method.
 func (merged *ScannerPoolRegistryCaller) WillNewScannerShutdownPool(opts *bind.CallOpts, scannerPoolId *big.Int) (retVal bool, err error) {
@@ -985,6 +1211,9 @@ func (merged *ScannerPoolRegistryCaller) WillNewScannerShutdownPool(opts *bind.C
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WillNewScannerShutdownPool(opts, scannerPoolId)
@@ -998,6 +1227,7 @@ func (merged *ScannerPoolRegistryCaller) WillNewScannerShutdownPool(opts *bind.C
 
 		return
 	}
+
 
 	err = import_fmt.Errorf("ScannerPoolRegistryCaller.WillNewScannerShutdownPool not implemented (tag=%s)", merged.currTag)
 	return

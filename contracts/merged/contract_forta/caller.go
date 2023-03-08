@@ -6,36 +6,43 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	forta020 "github.com/forta-network/forta-core-go/contracts/generated/contract_forta_0_2_0"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+
 )
 
 // FortaCaller is a new type which can multiplex calls to different implementation types.
 type FortaCaller struct {
+
 	typ0 *forta020.FortaCaller
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewFortaCaller creates a new merged type.
 func NewFortaCaller(address common.Address, caller bind.ContractCaller) (*FortaCaller, error) {
 	var (
 		mergedType FortaCaller
-		err        error
+		err error
 	)
 	mergedType.currTag = "0.2.0"
+
 
 	mergedType.typ0, err = forta020.NewFortaCaller(address, caller)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize forta020.FortaCaller: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -75,12 +82,18 @@ func (merged *FortaCaller) Safe() {
 	merged.unsafe = false
 }
 
+
+
+
 // ADMINROLE multiplexes to different implementations of the method.
 func (merged *FortaCaller) ADMINROLE(opts *bind.CallOpts) (retVal [32]byte, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ADMINROLE(opts)
@@ -95,9 +108,12 @@ func (merged *FortaCaller) ADMINROLE(opts *bind.CallOpts) (retVal [32]byte, err 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.ADMINROLE not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // DEFAULTADMINROLE multiplexes to different implementations of the method.
 func (merged *FortaCaller) DEFAULTADMINROLE(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -105,6 +121,9 @@ func (merged *FortaCaller) DEFAULTADMINROLE(opts *bind.CallOpts) (retVal [32]byt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.DEFAULTADMINROLE(opts)
@@ -119,9 +138,12 @@ func (merged *FortaCaller) DEFAULTADMINROLE(opts *bind.CallOpts) (retVal [32]byt
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.DEFAULTADMINROLE not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // DOMAINSEPARATOR multiplexes to different implementations of the method.
 func (merged *FortaCaller) DOMAINSEPARATOR(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -129,6 +151,9 @@ func (merged *FortaCaller) DOMAINSEPARATOR(opts *bind.CallOpts) (retVal [32]byte
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.DOMAINSEPARATOR(opts)
@@ -143,9 +168,12 @@ func (merged *FortaCaller) DOMAINSEPARATOR(opts *bind.CallOpts) (retVal [32]byte
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.DOMAINSEPARATOR not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // MINTERROLE multiplexes to different implementations of the method.
 func (merged *FortaCaller) MINTERROLE(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -153,6 +181,9 @@ func (merged *FortaCaller) MINTERROLE(opts *bind.CallOpts) (retVal [32]byte, err
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.MINTERROLE(opts)
@@ -167,9 +198,12 @@ func (merged *FortaCaller) MINTERROLE(opts *bind.CallOpts) (retVal [32]byte, err
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.MINTERROLE not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SUPPLY multiplexes to different implementations of the method.
 func (merged *FortaCaller) SUPPLY(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -177,6 +211,9 @@ func (merged *FortaCaller) SUPPLY(opts *bind.CallOpts) (retVal *big.Int, err err
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.SUPPLY(opts)
@@ -191,9 +228,12 @@ func (merged *FortaCaller) SUPPLY(opts *bind.CallOpts) (retVal *big.Int, err err
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.SUPPLY not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WHITELISTERROLE multiplexes to different implementations of the method.
 func (merged *FortaCaller) WHITELISTERROLE(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -201,6 +241,9 @@ func (merged *FortaCaller) WHITELISTERROLE(opts *bind.CallOpts) (retVal [32]byte
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WHITELISTERROLE(opts)
@@ -215,9 +258,12 @@ func (merged *FortaCaller) WHITELISTERROLE(opts *bind.CallOpts) (retVal [32]byte
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.WHITELISTERROLE not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WHITELISTROLE multiplexes to different implementations of the method.
 func (merged *FortaCaller) WHITELISTROLE(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -225,6 +271,9 @@ func (merged *FortaCaller) WHITELISTROLE(opts *bind.CallOpts) (retVal [32]byte, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.WHITELISTROLE(opts)
@@ -239,9 +288,12 @@ func (merged *FortaCaller) WHITELISTROLE(opts *bind.CallOpts) (retVal [32]byte, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.WHITELISTROLE not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Allowance multiplexes to different implementations of the method.
 func (merged *FortaCaller) Allowance(opts *bind.CallOpts, owner common.Address, spender common.Address) (retVal *big.Int, err error) {
@@ -249,6 +301,9 @@ func (merged *FortaCaller) Allowance(opts *bind.CallOpts, owner common.Address, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Allowance(opts, owner, spender)
@@ -263,9 +318,12 @@ func (merged *FortaCaller) Allowance(opts *bind.CallOpts, owner common.Address, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.Allowance not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // BalanceOf multiplexes to different implementations of the method.
 func (merged *FortaCaller) BalanceOf(opts *bind.CallOpts, account common.Address) (retVal *big.Int, err error) {
@@ -273,6 +331,9 @@ func (merged *FortaCaller) BalanceOf(opts *bind.CallOpts, account common.Address
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.BalanceOf(opts, account)
@@ -287,15 +348,19 @@ func (merged *FortaCaller) BalanceOf(opts *bind.CallOpts, account common.Address
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.BalanceOf not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // CheckpointsOutput is a merged return type.
 type CheckpointsOutput struct {
+
 	FromBlock uint32
 
 	Votes *big.Int
+
 }
 
 // Checkpoints multiplexes to different implementations of the method.
@@ -305,7 +370,10 @@ func (merged *FortaCaller) Checkpoints(opts *bind.CallOpts, account common.Addre
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &CheckpointsOutput{}
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Checkpoints(opts, account, pos)
@@ -315,16 +383,21 @@ func (merged *FortaCaller) Checkpoints(opts *bind.CallOpts, account common.Addre
 			return
 		}
 
+
 		retVal.FromBlock = val.FromBlock
 
 		retVal.Votes = val.Votes
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaCaller.Checkpoints not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Decimals multiplexes to different implementations of the method.
 func (merged *FortaCaller) Decimals(opts *bind.CallOpts) (retVal uint8, err error) {
@@ -332,6 +405,9 @@ func (merged *FortaCaller) Decimals(opts *bind.CallOpts) (retVal uint8, err erro
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Decimals(opts)
@@ -346,9 +422,12 @@ func (merged *FortaCaller) Decimals(opts *bind.CallOpts) (retVal uint8, err erro
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.Decimals not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Delegates multiplexes to different implementations of the method.
 func (merged *FortaCaller) Delegates(opts *bind.CallOpts, account common.Address) (retVal common.Address, err error) {
@@ -356,6 +435,9 @@ func (merged *FortaCaller) Delegates(opts *bind.CallOpts, account common.Address
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Delegates(opts, account)
@@ -370,9 +452,12 @@ func (merged *FortaCaller) Delegates(opts *bind.CallOpts, account common.Address
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.Delegates not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetPastTotalSupply multiplexes to different implementations of the method.
 func (merged *FortaCaller) GetPastTotalSupply(opts *bind.CallOpts, blockNumber *big.Int) (retVal *big.Int, err error) {
@@ -380,6 +465,9 @@ func (merged *FortaCaller) GetPastTotalSupply(opts *bind.CallOpts, blockNumber *
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetPastTotalSupply(opts, blockNumber)
@@ -394,9 +482,12 @@ func (merged *FortaCaller) GetPastTotalSupply(opts *bind.CallOpts, blockNumber *
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.GetPastTotalSupply not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetPastVotes multiplexes to different implementations of the method.
 func (merged *FortaCaller) GetPastVotes(opts *bind.CallOpts, account common.Address, blockNumber *big.Int) (retVal *big.Int, err error) {
@@ -404,6 +495,9 @@ func (merged *FortaCaller) GetPastVotes(opts *bind.CallOpts, account common.Addr
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetPastVotes(opts, account, blockNumber)
@@ -418,9 +512,12 @@ func (merged *FortaCaller) GetPastVotes(opts *bind.CallOpts, account common.Addr
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.GetPastVotes not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetRoleAdmin multiplexes to different implementations of the method.
 func (merged *FortaCaller) GetRoleAdmin(opts *bind.CallOpts, role [32]byte) (retVal [32]byte, err error) {
@@ -428,6 +525,9 @@ func (merged *FortaCaller) GetRoleAdmin(opts *bind.CallOpts, role [32]byte) (ret
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetRoleAdmin(opts, role)
@@ -442,9 +542,12 @@ func (merged *FortaCaller) GetRoleAdmin(opts *bind.CallOpts, role [32]byte) (ret
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.GetRoleAdmin not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetVotes multiplexes to different implementations of the method.
 func (merged *FortaCaller) GetVotes(opts *bind.CallOpts, account common.Address) (retVal *big.Int, err error) {
@@ -452,6 +555,9 @@ func (merged *FortaCaller) GetVotes(opts *bind.CallOpts, account common.Address)
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.GetVotes(opts, account)
@@ -466,9 +572,12 @@ func (merged *FortaCaller) GetVotes(opts *bind.CallOpts, account common.Address)
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.GetVotes not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // HasRole multiplexes to different implementations of the method.
 func (merged *FortaCaller) HasRole(opts *bind.CallOpts, role [32]byte, account common.Address) (retVal bool, err error) {
@@ -476,6 +585,9 @@ func (merged *FortaCaller) HasRole(opts *bind.CallOpts, role [32]byte, account c
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.HasRole(opts, role, account)
@@ -490,9 +602,12 @@ func (merged *FortaCaller) HasRole(opts *bind.CallOpts, role [32]byte, account c
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.HasRole not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Name multiplexes to different implementations of the method.
 func (merged *FortaCaller) Name(opts *bind.CallOpts) (retVal string, err error) {
@@ -500,6 +615,9 @@ func (merged *FortaCaller) Name(opts *bind.CallOpts) (retVal string, err error) 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Name(opts)
@@ -514,9 +632,12 @@ func (merged *FortaCaller) Name(opts *bind.CallOpts) (retVal string, err error) 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.Name not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Nonces multiplexes to different implementations of the method.
 func (merged *FortaCaller) Nonces(opts *bind.CallOpts, owner common.Address) (retVal *big.Int, err error) {
@@ -524,6 +645,9 @@ func (merged *FortaCaller) Nonces(opts *bind.CallOpts, owner common.Address) (re
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Nonces(opts, owner)
@@ -538,9 +662,12 @@ func (merged *FortaCaller) Nonces(opts *bind.CallOpts, owner common.Address) (re
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.Nonces not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // NumCheckpoints multiplexes to different implementations of the method.
 func (merged *FortaCaller) NumCheckpoints(opts *bind.CallOpts, account common.Address) (retVal uint32, err error) {
@@ -548,6 +675,9 @@ func (merged *FortaCaller) NumCheckpoints(opts *bind.CallOpts, account common.Ad
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.NumCheckpoints(opts, account)
@@ -562,9 +692,12 @@ func (merged *FortaCaller) NumCheckpoints(opts *bind.CallOpts, account common.Ad
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.NumCheckpoints not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *FortaCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -572,6 +705,9 @@ func (merged *FortaCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -586,9 +722,12 @@ func (merged *FortaCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SupportsInterface multiplexes to different implementations of the method.
 func (merged *FortaCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4]byte) (retVal bool, err error) {
@@ -596,6 +735,9 @@ func (merged *FortaCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
@@ -610,9 +752,12 @@ func (merged *FortaCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.SupportsInterface not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Symbol multiplexes to different implementations of the method.
 func (merged *FortaCaller) Symbol(opts *bind.CallOpts) (retVal string, err error) {
@@ -620,6 +765,9 @@ func (merged *FortaCaller) Symbol(opts *bind.CallOpts) (retVal string, err error
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Symbol(opts)
@@ -634,9 +782,12 @@ func (merged *FortaCaller) Symbol(opts *bind.CallOpts) (retVal string, err error
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.Symbol not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalSupply multiplexes to different implementations of the method.
 func (merged *FortaCaller) TotalSupply(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -644,6 +795,9 @@ func (merged *FortaCaller) TotalSupply(opts *bind.CallOpts) (retVal *big.Int, er
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.TotalSupply(opts)
@@ -658,9 +812,12 @@ func (merged *FortaCaller) TotalSupply(opts *bind.CallOpts) (retVal *big.Int, er
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaCaller.TotalSupply not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Version multiplexes to different implementations of the method.
 func (merged *FortaCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -668,6 +825,9 @@ func (merged *FortaCaller) Version(opts *bind.CallOpts) (retVal string, err erro
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.2.0" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -681,6 +841,7 @@ func (merged *FortaCaller) Version(opts *bind.CallOpts) (retVal string, err erro
 
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaCaller.Version not implemented (tag=%s)", merged.currTag)
 	return

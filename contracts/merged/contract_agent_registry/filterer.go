@@ -6,9 +6,12 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	agentregistry014 "github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
 
 	agentregistry016 "github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_6"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -19,26 +22,29 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
+
 )
 
 // AgentRegistryFilterer is a new type which can multiplex calls to different implementation types.
 type AgentRegistryFilterer struct {
+
 	typ0 *agentregistry014.AgentRegistryFilterer
 
 	typ1 *agentregistry016.AgentRegistryFilterer
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewAgentRegistryFilterer creates a new merged type.
 func NewAgentRegistryFilterer(address common.Address, filterer bind.ContractFilterer) (*AgentRegistryFilterer, error) {
 	var (
 		mergedType AgentRegistryFilterer
-		err        error
+		err error
 	)
-	mergedType.currTag = "0.1.4"
+	mergedType.currTag = "0.1.6"
+
 
 	mergedType.typ0, err = agentregistry014.NewAgentRegistryFilterer(address, filterer)
 	if err != nil {
@@ -49,6 +55,7 @@ func NewAgentRegistryFilterer(address common.Address, filterer bind.ContractFilt
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize agentregistry016.AgentRegistryFilterer: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -75,7 +82,7 @@ func (merged *AgentRegistryFilterer) Use(tag string) (changed bool) {
 	}
 	// use the default tag if the provided tag is unknown
 	if !IsKnownTagForAgentRegistryFilterer(tag) {
-		tag = "0.1.4"
+		tag = "0.1.6"
 	}
 	changed = merged.currTag != tag
 	merged.currTag = tag
@@ -92,11 +99,15 @@ func (merged *AgentRegistryFilterer) Safe() {
 	merged.unsafe = false
 }
 
+
+
 // FilterAccessManagerUpdatedOutput is a merged return type.
 type FilterAccessManagerUpdatedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryAccessManagerUpdatedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryAccessManagerUpdatedIterator
+
 }
 
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
@@ -106,7 +117,10 @@ func (merged *AgentRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Filte
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAccessManagerUpdatedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -116,7 +130,9 @@ func (merged *AgentRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Filte
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -129,14 +145,19 @@ func (merged *AgentRegistryFilterer) FilterAccessManagerUpdated(opts *bind.Filte
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryAccessManagerUpdated, newAddressManager []common.Address, sinkAlt1 chan<- *agentregistry016.AgentRegistryAccessManagerUpdated) (retVal event.Subscription, err error) {
@@ -144,6 +165,9 @@ func (merged *AgentRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -171,15 +195,19 @@ func (merged *AgentRegistryFilterer) WatchAccessManagerUpdated(opts *bind.WatchO
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryAccessManagerUpdated is a merged return type.
 type AgentRegistryAccessManagerUpdated struct {
+
 	NewAddressManager common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -189,7 +217,10 @@ func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (r
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryAccessManagerUpdated{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -199,9 +230,11 @@ func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (r
 			return
 		}
 
+
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -214,22 +247,28 @@ func (merged *AgentRegistryFilterer) ParseAccessManagerUpdated(log types.Log) (r
 			return
 		}
 
+
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterAdminChangedOutput is a merged return type.
 type FilterAdminChangedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryAdminChangedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryAdminChangedIterator
+
 }
 
 // FilterAdminChanged multiplexes to different implementations of the method.
@@ -239,7 +278,10 @@ func (merged *AgentRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts) (
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAdminChangedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -249,7 +291,9 @@ func (merged *AgentRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts) (
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -262,14 +306,19 @@ func (merged *AgentRegistryFilterer) FilterAdminChanged(opts *bind.FilterOpts) (
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryAdminChanged, sinkAlt2 chan<- *agentregistry016.AgentRegistryAdminChanged) (retVal event.Subscription, err error) {
@@ -277,6 +326,9 @@ func (merged *AgentRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -304,17 +356,21 @@ func (merged *AgentRegistryFilterer) WatchAdminChanged(opts *bind.WatchOpts, sin
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryAdminChanged is a merged return type.
 type AgentRegistryAdminChanged struct {
+
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -324,7 +380,10 @@ func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *A
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryAdminChanged{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -334,11 +393,13 @@ func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *A
 			return
 		}
 
+
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -351,24 +412,30 @@ func (merged *AgentRegistryFilterer) ParseAdminChanged(log types.Log) (retVal *A
 			return
 		}
 
+
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterAgentCommittedOutput is a merged return type.
 type FilterAgentCommittedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryAgentCommittedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryAgentCommittedIterator
+
 }
 
 // FilterAgentCommitted multiplexes to different implementations of the method.
@@ -378,7 +445,10 @@ func (merged *AgentRegistryFilterer) FilterAgentCommitted(opts *bind.FilterOpts,
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAgentCommittedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAgentCommitted(opts, commit)
@@ -388,7 +458,9 @@ func (merged *AgentRegistryFilterer) FilterAgentCommitted(opts *bind.FilterOpts,
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -401,14 +473,19 @@ func (merged *AgentRegistryFilterer) FilterAgentCommitted(opts *bind.FilterOpts,
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterAgentCommitted not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAgentCommitted multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchAgentCommitted(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryAgentCommitted, commit [][32]byte, sinkAlt3 chan<- *agentregistry016.AgentRegistryAgentCommitted) (retVal event.Subscription, err error) {
@@ -416,6 +493,9 @@ func (merged *AgentRegistryFilterer) WatchAgentCommitted(opts *bind.WatchOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAgentCommitted(opts, sink, commit)
@@ -443,15 +523,19 @@ func (merged *AgentRegistryFilterer) WatchAgentCommitted(opts *bind.WatchOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchAgentCommitted not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryAgentCommitted is a merged return type.
 type AgentRegistryAgentCommitted struct {
+
 	Commit [32]byte
 
 	Raw types.Log
+
 }
 
 // ParseAgentCommitted multiplexes to different implementations of the method.
@@ -461,7 +545,10 @@ func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryAgentCommitted{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAgentCommitted(log)
@@ -471,9 +558,11 @@ func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Commit = val.Commit
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -486,22 +575,28 @@ func (merged *AgentRegistryFilterer) ParseAgentCommitted(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Commit = val.Commit
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseAgentCommitted not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterAgentEnabledOutput is a merged return type.
 type FilterAgentEnabledOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryAgentEnabledIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryAgentEnabledIterator
+
 }
 
 // FilterAgentEnabled multiplexes to different implementations of the method.
@@ -511,7 +606,10 @@ func (merged *AgentRegistryFilterer) FilterAgentEnabled(opts *bind.FilterOpts, a
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAgentEnabledOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAgentEnabled(opts, agentId, enabled)
@@ -521,7 +619,9 @@ func (merged *AgentRegistryFilterer) FilterAgentEnabled(opts *bind.FilterOpts, a
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -534,14 +634,19 @@ func (merged *AgentRegistryFilterer) FilterAgentEnabled(opts *bind.FilterOpts, a
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterAgentEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAgentEnabled multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchAgentEnabled(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryAgentEnabled, agentId []*big.Int, enabled []bool, sinkAlt4 chan<- *agentregistry016.AgentRegistryAgentEnabled) (retVal event.Subscription, err error) {
@@ -549,6 +654,9 @@ func (merged *AgentRegistryFilterer) WatchAgentEnabled(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAgentEnabled(opts, sink, agentId, enabled)
@@ -576,12 +684,15 @@ func (merged *AgentRegistryFilterer) WatchAgentEnabled(opts *bind.WatchOpts, sin
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchAgentEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryAgentEnabled is a merged return type.
 type AgentRegistryAgentEnabled struct {
+
 	AgentId *big.Int
 
 	Enabled bool
@@ -591,6 +702,7 @@ type AgentRegistryAgentEnabled struct {
 	Value bool
 
 	Raw types.Log
+
 }
 
 // ParseAgentEnabled multiplexes to different implementations of the method.
@@ -600,7 +712,10 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryAgentEnabled{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAgentEnabled(log)
@@ -609,6 +724,7 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 			err = methodErr
 			return
 		}
+
 
 		retVal.AgentId = val.AgentId
 
@@ -619,6 +735,7 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 		retVal.Value = val.Value
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -631,6 +748,7 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 			return
 		}
 
+
 		retVal.AgentId = val.AgentId
 
 		retVal.Enabled = val.Enabled
@@ -641,18 +759,23 @@ func (merged *AgentRegistryFilterer) ParseAgentEnabled(log types.Log) (retVal *A
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseAgentEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterAgentUpdatedOutput is a merged return type.
 type FilterAgentUpdatedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryAgentUpdatedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryAgentUpdatedIterator
+
 }
 
 // FilterAgentUpdated multiplexes to different implementations of the method.
@@ -662,7 +785,10 @@ func (merged *AgentRegistryFilterer) FilterAgentUpdated(opts *bind.FilterOpts, a
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterAgentUpdatedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAgentUpdated(opts, agentId, by)
@@ -672,7 +798,9 @@ func (merged *AgentRegistryFilterer) FilterAgentUpdated(opts *bind.FilterOpts, a
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -685,14 +813,19 @@ func (merged *AgentRegistryFilterer) FilterAgentUpdated(opts *bind.FilterOpts, a
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterAgentUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAgentUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchAgentUpdated(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryAgentUpdated, agentId []*big.Int, by []common.Address, sinkAlt5 chan<- *agentregistry016.AgentRegistryAgentUpdated) (retVal event.Subscription, err error) {
@@ -700,6 +833,9 @@ func (merged *AgentRegistryFilterer) WatchAgentUpdated(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAgentUpdated(opts, sink, agentId, by)
@@ -727,12 +863,15 @@ func (merged *AgentRegistryFilterer) WatchAgentUpdated(opts *bind.WatchOpts, sin
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchAgentUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryAgentUpdated is a merged return type.
 type AgentRegistryAgentUpdated struct {
+
 	AgentId *big.Int
 
 	By common.Address
@@ -742,6 +881,7 @@ type AgentRegistryAgentUpdated struct {
 	ChainIds []*big.Int
 
 	Raw types.Log
+
 }
 
 // ParseAgentUpdated multiplexes to different implementations of the method.
@@ -751,7 +891,10 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryAgentUpdated{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAgentUpdated(log)
@@ -760,6 +903,7 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 			err = methodErr
 			return
 		}
+
 
 		retVal.AgentId = val.AgentId
 
@@ -770,6 +914,7 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 		retVal.ChainIds = val.ChainIds
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -782,6 +927,7 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 			return
 		}
 
+
 		retVal.AgentId = val.AgentId
 
 		retVal.By = val.By
@@ -792,18 +938,23 @@ func (merged *AgentRegistryFilterer) ParseAgentUpdated(log types.Log) (retVal *A
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseAgentUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterApprovalOutput is a merged return type.
 type FilterApprovalOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryApprovalIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryApprovalIterator
+
 }
 
 // FilterApproval multiplexes to different implementations of the method.
@@ -813,7 +964,10 @@ func (merged *AgentRegistryFilterer) FilterApproval(opts *bind.FilterOpts, owner
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterApprovalOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterApproval(opts, owner, approved, tokenId)
@@ -823,7 +977,9 @@ func (merged *AgentRegistryFilterer) FilterApproval(opts *bind.FilterOpts, owner
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -836,14 +992,19 @@ func (merged *AgentRegistryFilterer) FilterApproval(opts *bind.FilterOpts, owner
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchApproval multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryApproval, owner []common.Address, approved []common.Address, tokenId []*big.Int, sinkAlt6 chan<- *agentregistry016.AgentRegistryApproval) (retVal event.Subscription, err error) {
@@ -851,6 +1012,9 @@ func (merged *AgentRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink ch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchApproval(opts, sink, owner, approved, tokenId)
@@ -878,12 +1042,15 @@ func (merged *AgentRegistryFilterer) WatchApproval(opts *bind.WatchOpts, sink ch
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryApproval is a merged return type.
 type AgentRegistryApproval struct {
+
 	Owner common.Address
 
 	Approved common.Address
@@ -891,6 +1058,7 @@ type AgentRegistryApproval struct {
 	TokenId *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseApproval multiplexes to different implementations of the method.
@@ -900,7 +1068,10 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryApproval{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseApproval(log)
@@ -910,6 +1081,7 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 			return
 		}
 
+
 		retVal.Owner = val.Owner
 
 		retVal.Approved = val.Approved
@@ -917,6 +1089,7 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 		retVal.TokenId = val.TokenId
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -929,6 +1102,7 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 			return
 		}
 
+
 		retVal.Owner = val.Owner
 
 		retVal.Approved = val.Approved
@@ -937,18 +1111,23 @@ func (merged *AgentRegistryFilterer) ParseApproval(log types.Log) (retVal *Agent
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseApproval not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterApprovalForAllOutput is a merged return type.
 type FilterApprovalForAllOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryApprovalForAllIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryApprovalForAllIterator
+
 }
 
 // FilterApprovalForAll multiplexes to different implementations of the method.
@@ -958,7 +1137,10 @@ func (merged *AgentRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpts,
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterApprovalForAllOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterApprovalForAll(opts, owner, operator)
@@ -968,7 +1150,9 @@ func (merged *AgentRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpts,
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -981,14 +1165,19 @@ func (merged *AgentRegistryFilterer) FilterApprovalForAll(opts *bind.FilterOpts,
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchApprovalForAll multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryApprovalForAll, owner []common.Address, operator []common.Address, sinkAlt7 chan<- *agentregistry016.AgentRegistryApprovalForAll) (retVal event.Subscription, err error) {
@@ -996,6 +1185,9 @@ func (merged *AgentRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchApprovalForAll(opts, sink, owner, operator)
@@ -1023,12 +1215,15 @@ func (merged *AgentRegistryFilterer) WatchApprovalForAll(opts *bind.WatchOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryApprovalForAll is a merged return type.
 type AgentRegistryApprovalForAll struct {
+
 	Owner common.Address
 
 	Operator common.Address
@@ -1036,6 +1231,7 @@ type AgentRegistryApprovalForAll struct {
 	Approved bool
 
 	Raw types.Log
+
 }
 
 // ParseApprovalForAll multiplexes to different implementations of the method.
@@ -1045,7 +1241,10 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryApprovalForAll{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseApprovalForAll(log)
@@ -1055,6 +1254,7 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Owner = val.Owner
 
 		retVal.Operator = val.Operator
@@ -1062,6 +1262,7 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 		retVal.Approved = val.Approved
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1074,6 +1275,7 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Owner = val.Owner
 
 		retVal.Operator = val.Operator
@@ -1082,18 +1284,23 @@ func (merged *AgentRegistryFilterer) ParseApprovalForAll(log types.Log) (retVal 
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseApprovalForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterBeaconUpgradedOutput is a merged return type.
 type FilterBeaconUpgradedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryBeaconUpgradedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryBeaconUpgradedIterator
+
 }
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
@@ -1103,7 +1310,10 @@ func (merged *AgentRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts,
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterBeaconUpgradedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -1113,7 +1323,9 @@ func (merged *AgentRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts,
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -1126,14 +1338,19 @@ func (merged *AgentRegistryFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts,
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryBeaconUpgraded, beacon []common.Address, sinkAlt8 chan<- *agentregistry016.AgentRegistryBeaconUpgraded) (retVal event.Subscription, err error) {
@@ -1141,6 +1358,9 @@ func (merged *AgentRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -1168,15 +1388,19 @@ func (merged *AgentRegistryFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryBeaconUpgraded is a merged return type.
 type AgentRegistryBeaconUpgraded struct {
+
 	Beacon common.Address
 
 	Raw types.Log
+
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -1186,7 +1410,10 @@ func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryBeaconUpgraded{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -1196,9 +1423,11 @@ func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1211,22 +1440,28 @@ func (merged *AgentRegistryFilterer) ParseBeaconUpgraded(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterFrontRunningDelaySetOutput is a merged return type.
 type FilterFrontRunningDelaySetOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryFrontRunningDelaySetIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryFrontRunningDelaySetIterator
+
 }
 
 // FilterFrontRunningDelaySet multiplexes to different implementations of the method.
@@ -1236,7 +1471,10 @@ func (merged *AgentRegistryFilterer) FilterFrontRunningDelaySet(opts *bind.Filte
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterFrontRunningDelaySetOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterFrontRunningDelaySet(opts)
@@ -1246,7 +1484,9 @@ func (merged *AgentRegistryFilterer) FilterFrontRunningDelaySet(opts *bind.Filte
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -1259,14 +1499,19 @@ func (merged *AgentRegistryFilterer) FilterFrontRunningDelaySet(opts *bind.Filte
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterFrontRunningDelaySet not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchFrontRunningDelaySet multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchFrontRunningDelaySet(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryFrontRunningDelaySet, sinkAlt9 chan<- *agentregistry016.AgentRegistryFrontRunningDelaySet) (retVal event.Subscription, err error) {
@@ -1274,6 +1519,9 @@ func (merged *AgentRegistryFilterer) WatchFrontRunningDelaySet(opts *bind.WatchO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchFrontRunningDelaySet(opts, sink)
@@ -1301,15 +1549,19 @@ func (merged *AgentRegistryFilterer) WatchFrontRunningDelaySet(opts *bind.WatchO
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchFrontRunningDelaySet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryFrontRunningDelaySet is a merged return type.
 type AgentRegistryFrontRunningDelaySet struct {
+
 	Delay *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseFrontRunningDelaySet multiplexes to different implementations of the method.
@@ -1319,7 +1571,10 @@ func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (r
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryFrontRunningDelaySet{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseFrontRunningDelaySet(log)
@@ -1329,9 +1584,11 @@ func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (r
 			return
 		}
 
+
 		retVal.Delay = val.Delay
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1344,22 +1601,28 @@ func (merged *AgentRegistryFilterer) ParseFrontRunningDelaySet(log types.Log) (r
 			return
 		}
 
+
 		retVal.Delay = val.Delay
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseFrontRunningDelaySet not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterInitializedOutput is a merged return type.
 type FilterInitializedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryInitializedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryInitializedIterator
+
 }
 
 // FilterInitialized multiplexes to different implementations of the method.
@@ -1369,7 +1632,10 @@ func (merged *AgentRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) (r
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterInitializedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -1379,7 +1645,9 @@ func (merged *AgentRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) (r
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -1392,14 +1660,19 @@ func (merged *AgentRegistryFilterer) FilterInitialized(opts *bind.FilterOpts) (r
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryInitialized, sinkAlt10 chan<- *agentregistry016.AgentRegistryInitialized) (retVal event.Subscription, err error) {
@@ -1407,6 +1680,9 @@ func (merged *AgentRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -1434,15 +1710,19 @@ func (merged *AgentRegistryFilterer) WatchInitialized(opts *bind.WatchOpts, sink
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryInitialized is a merged return type.
 type AgentRegistryInitialized struct {
+
 	Version uint8
 
 	Raw types.Log
+
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -1452,7 +1732,10 @@ func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *Ag
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryInitialized{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -1462,9 +1745,11 @@ func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *Ag
 			return
 		}
 
+
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1477,22 +1762,28 @@ func (merged *AgentRegistryFilterer) ParseInitialized(log types.Log) (retVal *Ag
 			return
 		}
 
+
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterRouterUpdatedOutput is a merged return type.
 type FilterRouterUpdatedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryRouterUpdatedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryRouterUpdatedIterator
+
 }
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
@@ -1502,7 +1793,10 @@ func (merged *AgentRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts, 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterRouterUpdatedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -1512,7 +1806,9 @@ func (merged *AgentRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts, 
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -1525,14 +1821,19 @@ func (merged *AgentRegistryFilterer) FilterRouterUpdated(opts *bind.FilterOpts, 
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryRouterUpdated, router []common.Address, sinkAlt11 chan<- *agentregistry016.AgentRegistryRouterUpdated) (retVal event.Subscription, err error) {
@@ -1540,6 +1841,9 @@ func (merged *AgentRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -1567,15 +1871,19 @@ func (merged *AgentRegistryFilterer) WatchRouterUpdated(opts *bind.WatchOpts, si
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryRouterUpdated is a merged return type.
 type AgentRegistryRouterUpdated struct {
+
 	Router common.Address
 
 	Raw types.Log
+
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -1585,7 +1893,10 @@ func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryRouterUpdated{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -1595,9 +1906,11 @@ func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *
 			return
 		}
 
+
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1610,16 +1923,21 @@ func (merged *AgentRegistryFilterer) ParseRouterUpdated(log types.Log) (retVal *
 			return
 		}
 
+
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterStakeControllerUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) FilterStakeControllerUpdated(opts *bind.FilterOpts, newstakeController []common.Address) (retVal *agentregistry014.AgentRegistryStakeControllerUpdatedIterator, err error) {
@@ -1627,6 +1945,9 @@ func (merged *AgentRegistryFilterer) FilterStakeControllerUpdated(opts *bind.Fil
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterStakeControllerUpdated(opts, newstakeController)
@@ -1641,9 +1962,12 @@ func (merged *AgentRegistryFilterer) FilterStakeControllerUpdated(opts *bind.Fil
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterStakeControllerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchStakeControllerUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchStakeControllerUpdated(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryStakeControllerUpdated, newstakeController []common.Address) (retVal event.Subscription, err error) {
@@ -1651,6 +1975,9 @@ func (merged *AgentRegistryFilterer) WatchStakeControllerUpdated(opts *bind.Watc
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchStakeControllerUpdated(opts, sink, newstakeController)
@@ -1665,15 +1992,19 @@ func (merged *AgentRegistryFilterer) WatchStakeControllerUpdated(opts *bind.Watc
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchStakeControllerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryStakeControllerUpdated is a merged return type.
 type AgentRegistryStakeControllerUpdated struct {
+
 	NewstakeController common.Address
 
 	Raw types.Log
+
 }
 
 // ParseStakeControllerUpdated multiplexes to different implementations of the method.
@@ -1683,7 +2014,10 @@ func (merged *AgentRegistryFilterer) ParseStakeControllerUpdated(log types.Log) 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryStakeControllerUpdated{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseStakeControllerUpdated(log)
@@ -1693,22 +2027,28 @@ func (merged *AgentRegistryFilterer) ParseStakeControllerUpdated(log types.Log) 
 			return
 		}
 
+
 		retVal.NewstakeController = val.NewstakeController
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseStakeControllerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterStakeThresholdChangedOutput is a merged return type.
 type FilterStakeThresholdChangedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryStakeThresholdChangedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryStakeThresholdChangedIterator
+
 }
 
 // FilterStakeThresholdChanged multiplexes to different implementations of the method.
@@ -1718,7 +2058,10 @@ func (merged *AgentRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Filt
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterStakeThresholdChangedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterStakeThresholdChanged(opts)
@@ -1728,7 +2071,9 @@ func (merged *AgentRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Filt
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -1741,14 +2086,19 @@ func (merged *AgentRegistryFilterer) FilterStakeThresholdChanged(opts *bind.Filt
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterStakeThresholdChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchStakeThresholdChanged multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchStakeThresholdChanged(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryStakeThresholdChanged, sinkAlt12 chan<- *agentregistry016.AgentRegistryStakeThresholdChanged) (retVal event.Subscription, err error) {
@@ -1756,6 +2106,9 @@ func (merged *AgentRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchStakeThresholdChanged(opts, sink)
@@ -1783,12 +2136,15 @@ func (merged *AgentRegistryFilterer) WatchStakeThresholdChanged(opts *bind.Watch
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchStakeThresholdChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryStakeThresholdChanged is a merged return type.
 type AgentRegistryStakeThresholdChanged struct {
+
 	Min *big.Int
 
 	Max *big.Int
@@ -1796,6 +2152,7 @@ type AgentRegistryStakeThresholdChanged struct {
 	Activated bool
 
 	Raw types.Log
+
 }
 
 // ParseStakeThresholdChanged multiplexes to different implementations of the method.
@@ -1805,7 +2162,10 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryStakeThresholdChanged{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseStakeThresholdChanged(log)
@@ -1815,6 +2175,7 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 			return
 		}
 
+
 		retVal.Min = val.Min
 
 		retVal.Max = val.Max
@@ -1822,6 +2183,7 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 		retVal.Activated = val.Activated
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1834,6 +2196,7 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 			return
 		}
 
+
 		retVal.Min = val.Min
 
 		retVal.Max = val.Max
@@ -1842,18 +2205,23 @@ func (merged *AgentRegistryFilterer) ParseStakeThresholdChanged(log types.Log) (
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseStakeThresholdChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterTransferOutput is a merged return type.
 type FilterTransferOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryTransferIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryTransferIterator
+
 }
 
 // FilterTransfer multiplexes to different implementations of the method.
@@ -1863,7 +2231,10 @@ func (merged *AgentRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, from 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterTransferOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterTransfer(opts, from, to, tokenId)
@@ -1873,7 +2244,9 @@ func (merged *AgentRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, from 
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -1886,14 +2259,19 @@ func (merged *AgentRegistryFilterer) FilterTransfer(opts *bind.FilterOpts, from 
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchTransfer multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryTransfer, from []common.Address, to []common.Address, tokenId []*big.Int, sinkAlt13 chan<- *agentregistry016.AgentRegistryTransfer) (retVal event.Subscription, err error) {
@@ -1901,6 +2279,9 @@ func (merged *AgentRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink ch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchTransfer(opts, sink, from, to, tokenId)
@@ -1928,12 +2309,15 @@ func (merged *AgentRegistryFilterer) WatchTransfer(opts *bind.WatchOpts, sink ch
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryTransfer is a merged return type.
 type AgentRegistryTransfer struct {
+
 	From common.Address
 
 	To common.Address
@@ -1941,6 +2325,7 @@ type AgentRegistryTransfer struct {
 	TokenId *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseTransfer multiplexes to different implementations of the method.
@@ -1950,7 +2335,10 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryTransfer{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseTransfer(log)
@@ -1960,6 +2348,7 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 			return
 		}
 
+
 		retVal.From = val.From
 
 		retVal.To = val.To
@@ -1967,6 +2356,7 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 		retVal.TokenId = val.TokenId
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -1979,6 +2369,7 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 			return
 		}
 
+
 		retVal.From = val.From
 
 		retVal.To = val.To
@@ -1987,18 +2378,23 @@ func (merged *AgentRegistryFilterer) ParseTransfer(log types.Log) (retVal *Agent
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseTransfer not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // FilterUpgradedOutput is a merged return type.
 type FilterUpgradedOutput struct {
+
 	Agentregistry014Result *agentregistry014.AgentRegistryUpgradedIterator
 
 	Agentregistry016Result *agentregistry016.AgentRegistryUpgradedIterator
+
 }
 
 // FilterUpgraded multiplexes to different implementations of the method.
@@ -2008,7 +2404,10 @@ func (merged *AgentRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imple
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &FilterUpgradedOutput{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -2018,7 +2417,9 @@ func (merged *AgentRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imple
 			return
 		}
 
+
 		retVal.Agentregistry014Result = val
+
 
 		return
 	}
@@ -2031,14 +2432,19 @@ func (merged *AgentRegistryFilterer) FilterUpgraded(opts *bind.FilterOpts, imple
 			return
 		}
 
+
 		retVal.Agentregistry016Result = val
+
 
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *agentregistry014.AgentRegistryUpgraded, implementation []common.Address, sinkAlt14 chan<- *agentregistry016.AgentRegistryUpgraded) (retVal event.Subscription, err error) {
@@ -2046,6 +2452,9 @@ func (merged *AgentRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink ch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -2073,15 +2482,19 @@ func (merged *AgentRegistryFilterer) WatchUpgraded(opts *bind.WatchOpts, sink ch
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistryUpgraded is a merged return type.
 type AgentRegistryUpgraded struct {
+
 	Implementation common.Address
 
 	Raw types.Log
+
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -2091,7 +2504,10 @@ func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Agent
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistryUpgraded{}
+
+
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -2101,9 +2517,11 @@ func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Agent
 			return
 		}
 
+
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
+
 
 		return
 	}
@@ -2116,16 +2534,21 @@ func (merged *AgentRegistryFilterer) ParseUpgraded(log types.Log) (retVal *Agent
 			return
 		}
 
+
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterSubjectHandlerUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.FilterOpts, newHandler []common.Address) (retVal *agentregistry016.AgentRegistrySubjectHandlerUpdatedIterator, err error) {
@@ -2133,6 +2556,9 @@ func (merged *AgentRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.Filt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.FilterSubjectHandlerUpdated(opts, newHandler)
@@ -2147,9 +2573,12 @@ func (merged *AgentRegistryFilterer) FilterSubjectHandlerUpdated(opts *bind.Filt
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.FilterSubjectHandlerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchSubjectHandlerUpdated multiplexes to different implementations of the method.
 func (merged *AgentRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.WatchOpts, sink chan<- *agentregistry016.AgentRegistrySubjectHandlerUpdated, newHandler []common.Address) (retVal event.Subscription, err error) {
@@ -2157,6 +2586,9 @@ func (merged *AgentRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.WatchSubjectHandlerUpdated(opts, sink, newHandler)
@@ -2171,15 +2603,19 @@ func (merged *AgentRegistryFilterer) WatchSubjectHandlerUpdated(opts *bind.Watch
 		return
 	}
 
+
 	err = import_fmt.Errorf("AgentRegistryFilterer.WatchSubjectHandlerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // AgentRegistrySubjectHandlerUpdated is a merged return type.
 type AgentRegistrySubjectHandlerUpdated struct {
+
 	NewHandler common.Address
 
 	Raw types.Log
+
 }
 
 // ParseSubjectHandlerUpdated multiplexes to different implementations of the method.
@@ -2189,7 +2625,10 @@ func (merged *AgentRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &AgentRegistrySubjectHandlerUpdated{}
+
+
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.ParseSubjectHandlerUpdated(log)
@@ -2199,12 +2638,15 @@ func (merged *AgentRegistryFilterer) ParseSubjectHandlerUpdated(log types.Log) (
 			return
 		}
 
+
 		retVal.NewHandler = val.NewHandler
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("AgentRegistryFilterer.ParseSubjectHandlerUpdated not implemented (tag=%s)", merged.currTag)
 	return

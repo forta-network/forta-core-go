@@ -14,7 +14,7 @@ sources:
 
 output:
   type: DispatchFilterer
-  defaultTag: '0.1.4'
+  defaultTag: '0.1.5'
   package: contract_dispatch
   file: filterer.go
   rewrite:

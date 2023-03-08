@@ -142,7 +142,7 @@ abigen: pull-contracts
 
 .PHONY: pull-contracts
 pull-contracts:
-	./scripts/pull-contracts.sh forta-contracts caner/include-old-in-generated-abis
+	./scripts/pull-contracts.sh forta-contracts 9d8e7c3
 
 .PHONY: swagger
 swagger: require-tools

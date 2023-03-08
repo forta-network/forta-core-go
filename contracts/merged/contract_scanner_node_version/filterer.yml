@@ -14,7 +14,7 @@ sources:
 
 output:
   type: ScannerNodeVersionFilterer
-  defaultTag: '0.1.0'
+  defaultTag: '0.1.1'
   package: contract_scanner_node_version
   file: filterer.go
   rewrite:

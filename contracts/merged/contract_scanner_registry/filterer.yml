@@ -14,7 +14,7 @@ sources:
 
 output:
   type: ScannerRegistryFilterer
-  defaultTag: '0.1.3'
+  defaultTag: '0.1.4'
   package: contract_scanner_registry
   file: filterer.go
   rewrite:
