@@ -40,18 +40,21 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 }
 
 func testMumbaiListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
-	l, err := NewListener(ctx, ListenerConfig{
-		Name:           "listener",
-		JsonRpcURL:     "https://rpc.ankr.com/polygon_mumbai",
-		ENSAddress:     devConfig.ENSAddress,
-		ContractFilter: filter,
-		Topics:         []string{topic},
-		Handlers:       handlers,
-		NoRefresh:      true,
-	})
+	l, err := NewListener(
+		ctx, ListenerConfig{
+			Name:           "listener",
+			JsonRpcURL:     "https://rpc.ankr.com/polygon_mumbai",
+			ENSAddress:     devConfig.ENSAddress,
+			ContractFilter: filter,
+			Topics:         []string{topic},
+			Handlers:       handlers,
+			NoRefresh:      true,
+		},
+	)
 	if err != nil {
 		panic(err)
 	}
+
 	return l
 }
 
@@ -158,15 +161,15 @@ func TestListener_Listen(t *testing.T) {
 				Handlers{
 					SaveScannerHandlers: regmsg.Handlers(
 						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerSaveMessage) error {
-							assert.Equal(t, int64(32041109), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, int64(32910234), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.SaveScanner, msg.Action)
-							assert.Equal(t, strings.ToLower("0x1bDB17526EAd91E9c855bCBFF3154300083e16f2"), msg.ScannerID)
+							assert.Equal(t, strings.ToLower("0x3f88c2b3e267e6b8e9de017cdb47a59ac9ecb284"), msg.ScannerID)
 							return handledEvent
 						},
 					),
 				},
 			),
-			block: 32041109,
+			block: 32910234,
 		},
 		{
 			name: "agent-save",
@@ -228,16 +231,16 @@ func TestListener_Listen(t *testing.T) {
 				Handlers{
 					ScannerStakeThresholdHandlers: regmsg.Handlers(
 						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error {
-							assert.Equal(t, int64(32015173), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, int64(32901311), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ScannerStakeThreshold, msg.Action)
-							assert.Equal(t, "500000000000000000000", msg.Min)
+							assert.Equal(t, "2500000000000000000000", msg.Min)
 							assert.Equal(t, "15000000000000000000000", msg.Max)
 							return handledEvent
 						},
 					),
 				},
 			),
-			block: 32015173,
+			block: 32901311,
 		},
 		{
 			name: "scanner-stake",
