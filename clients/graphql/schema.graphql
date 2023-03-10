@@ -455,6 +455,9 @@ type Label {
 
     "Label's status"
     remove: Boolean
+
+    "Extra label information"
+    metadata: JSONObject
 }
 
 """Block range"""
