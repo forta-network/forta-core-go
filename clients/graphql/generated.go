@@ -377,6 +377,8 @@ type getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel struct {
 	EntityType string `json:"entityType"`
 	// Label's status
 	Remove bool `json:"remove"`
+	// Extra label information
+	Metadata map[string]string `json:"metadata"`
 }
 
 // GetLabel returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Label, and is useful for accessing the field via an interface.
@@ -397,6 +399,11 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetEntityType() st
 
 // GetRemove returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Remove, and is useful for accessing the field via an interface.
 func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetRemove() bool { return v.Remove }
+
+// GetMetadata returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Metadata, and is useful for accessing the field via an interface.
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetMetadata() map[string]string {
+	return v.Metadata
+}
 
 // getAlertsAlertsAlertsResponseAlertsAlertProjectsProject includes the requested fields of the GraphQL type Project.
 // The GraphQL type's documentation follows.
@@ -699,6 +706,7 @@ query getAlerts ($input: AlertsInput) {
 				entity
 				entityType
 				remove
+				metadata
 			}
 		}
 	}
