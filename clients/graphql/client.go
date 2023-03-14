@@ -115,7 +115,6 @@ func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.Ale
 			Entity:     label.Entity,
 			EntityType: label.EntityType,
 			Remove:     label.Remove,
-			Metadata: label.Metadata,
 		}
 	}
 

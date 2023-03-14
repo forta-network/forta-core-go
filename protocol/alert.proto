@@ -88,7 +88,6 @@ message Label {
   reserved 5;
   bool remove = 6;
   string label = 7;
-  map<string, string> metadata = 8;
 }
 
 message Finding {
