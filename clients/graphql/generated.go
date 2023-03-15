@@ -10,15 +10,15 @@ import (
 
 // Search after specified block number and alertId
 type AlertEndCursorInput struct {
-	BlockNumber uint   `json:"blockNumber"`
 	AlertId     string `json:"alertId"`
+	BlockNumber uint   `json:"blockNumber"`
 }
-
-// GetBlockNumber returns AlertEndCursorInput.BlockNumber, and is useful for accessing the field via an interface.
-func (v *AlertEndCursorInput) GetBlockNumber() uint { return v.BlockNumber }
 
 // GetAlertId returns AlertEndCursorInput.AlertId, and is useful for accessing the field via an interface.
 func (v *AlertEndCursorInput) GetAlertId() string { return v.AlertId }
+
+// GetBlockNumber returns AlertEndCursorInput.BlockNumber, and is useful for accessing the field via an interface.
+func (v *AlertEndCursorInput) GetBlockNumber() uint { return v.BlockNumber }
 
 // Alert list input
 type AlertsInput struct {
@@ -27,10 +27,12 @@ type AlertsInput struct {
 	Addresses []string `json:"addresses"`
 	// Search results after the specified cursor
 	After *AlertEndCursorInput `json:"after,omitempty"`
-	// Filter alerts by alert-id.
-	AlertId string `json:"alertId"`
 	// Get a specific alert by alert hash.
 	AlertHash string `json:"alertHash"`
+	// Filter alerts by alert-id.
+	AlertId string `json:"alertId"`
+	// Filter alerts by multiple alert-ids.
+	AlertIds []string `json:"alertIds"`
 	// Filter alerts by alert name.
 	AlertName string `json:"alertName"`
 	// Block Date range
@@ -40,13 +42,13 @@ type AlertsInput struct {
 	// Block number range
 	// Alerts for the block number range will be returned.
 	BlockNumberRange *BlockRange `json:"blockNumberRange,omitempty"`
-	// Block Timestamp range
-	// Alerts returned will be between the specified start and end block timestamp when the threats were detected.
-	BlockTimestampRange *TimestampRange `json:"blockTimestampRange,omitempty"`
 	// Indicate sorting order by block number,
 	// 'desc' or 'asc'.
 	// Default is 'desc'.
 	BlockSortDirection Sort `json:"blockSortDirection"`
+	// Block Timestamp range
+	// Alerts returned will be between the specified start and end block timestamp when the threats were detected.
+	BlockTimestampRange *TimestampRange `json:"blockTimestampRange,omitempty"`
 	// Indicate a list of bot hashes.
 	// Alerts returned will only be from any of those bots.
 	Bots []string `json:"bots"`
@@ -55,13 +57,16 @@ type AlertsInput struct {
 	// Default is 1 = Ethereum Mainnet.
 	ChainId uint `json:"chainId"`
 	// Indicate number of milliseconds
-	// Alerts returned will be alerts created since the number of milliseconds indicated ago.
-	CreatedSince uint `json:"createdSince"`
-	// Indicate number of milliseconds
 	// Alerts returned will be alerts created before the number of milliseconds indicated ago.
 	CreatedBefore uint `json:"createdBefore"`
+	// Indicate number of milliseconds
+	// Alerts returned will be alerts created since the number of milliseconds indicated ago.
+	CreatedSince uint `json:"createdSince"`
 	// Indicate max number of results.
 	First uint `json:"first"`
+	// Indicate a project Id.
+	// Alerts returned will only be from that project.
+	ProjectId string `json:"projectId"`
 	// Filter alerts by number of scan nodes confirming the alert.
 	ScanNodeConfirmations *ScanNodeFilters `json:"scanNodeConfirmations,omitempty"`
 	// Filter alerts by severity levels.
@@ -69,8 +74,6 @@ type AlertsInput struct {
 	// Indicate a transaction hash
 	// Alerts returned will only be from that transaction.
 	TransactionHash string `json:"transactionHash"`
-	// Filter alerts by multiple alert-ids.
-	AlertIds []string `json:"alertIds"`
 }
 
 // GetAddresses returns AlertsInput.Addresses, and is useful for accessing the field via an interface.
@@ -79,11 +82,14 @@ func (v *AlertsInput) GetAddresses() []string { return v.Addresses }
 // GetAfter returns AlertsInput.After, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetAfter() *AlertEndCursorInput { return v.After }
 
+// GetAlertHash returns AlertsInput.AlertHash, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetAlertHash() string { return v.AlertHash }
+
 // GetAlertId returns AlertsInput.AlertId, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetAlertId() string { return v.AlertId }
 
-// GetAlertHash returns AlertsInput.AlertHash, and is useful for accessing the field via an interface.
-func (v *AlertsInput) GetAlertHash() string { return v.AlertHash }
+// GetAlertIds returns AlertsInput.AlertIds, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetAlertIds() []string { return v.AlertIds }
 
 // GetAlertName returns AlertsInput.AlertName, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetAlertName() string { return v.AlertName }
@@ -94,11 +100,11 @@ func (v *AlertsInput) GetBlockDateRange() *DateRange { return v.BlockDateRange }
 // GetBlockNumberRange returns AlertsInput.BlockNumberRange, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetBlockNumberRange() *BlockRange { return v.BlockNumberRange }
 
-// GetBlockTimestampRange returns AlertsInput.BlockTimestampRange, and is useful for accessing the field via an interface.
-func (v *AlertsInput) GetBlockTimestampRange() *TimestampRange { return v.BlockTimestampRange }
-
 // GetBlockSortDirection returns AlertsInput.BlockSortDirection, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetBlockSortDirection() Sort { return v.BlockSortDirection }
+
+// GetBlockTimestampRange returns AlertsInput.BlockTimestampRange, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetBlockTimestampRange() *TimestampRange { return v.BlockTimestampRange }
 
 // GetBots returns AlertsInput.Bots, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetBots() []string { return v.Bots }
@@ -106,14 +112,17 @@ func (v *AlertsInput) GetBots() []string { return v.Bots }
 // GetChainId returns AlertsInput.ChainId, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetChainId() uint { return v.ChainId }
 
-// GetCreatedSince returns AlertsInput.CreatedSince, and is useful for accessing the field via an interface.
-func (v *AlertsInput) GetCreatedSince() uint { return v.CreatedSince }
-
 // GetCreatedBefore returns AlertsInput.CreatedBefore, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetCreatedBefore() uint { return v.CreatedBefore }
 
+// GetCreatedSince returns AlertsInput.CreatedSince, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetCreatedSince() uint { return v.CreatedSince }
+
 // GetFirst returns AlertsInput.First, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetFirst() uint { return v.First }
+
+// GetProjectId returns AlertsInput.ProjectId, and is useful for accessing the field via an interface.
+func (v *AlertsInput) GetProjectId() string { return v.ProjectId }
 
 // GetScanNodeConfirmations returns AlertsInput.ScanNodeConfirmations, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetScanNodeConfirmations() *ScanNodeFilters { return v.ScanNodeConfirmations }
@@ -124,33 +133,30 @@ func (v *AlertsInput) GetSeverities() []string { return v.Severities }
 // GetTransactionHash returns AlertsInput.TransactionHash, and is useful for accessing the field via an interface.
 func (v *AlertsInput) GetTransactionHash() string { return v.TransactionHash }
 
-// GetAlertIds returns AlertsInput.AlertIds, and is useful for accessing the field via an interface.
-func (v *AlertsInput) GetAlertIds() []string { return v.AlertIds }
-
 // Block range
 type BlockRange struct {
-	StartBlockNumber uint `json:"startBlockNumber"`
 	EndBlockNumber   uint `json:"endBlockNumber"`
+	StartBlockNumber uint `json:"startBlockNumber"`
 }
-
-// GetStartBlockNumber returns BlockRange.StartBlockNumber, and is useful for accessing the field via an interface.
-func (v *BlockRange) GetStartBlockNumber() uint { return v.StartBlockNumber }
 
 // GetEndBlockNumber returns BlockRange.EndBlockNumber, and is useful for accessing the field via an interface.
 func (v *BlockRange) GetEndBlockNumber() uint { return v.EndBlockNumber }
 
+// GetStartBlockNumber returns BlockRange.StartBlockNumber, and is useful for accessing the field via an interface.
+func (v *BlockRange) GetStartBlockNumber() uint { return v.StartBlockNumber }
+
 // Date range
 // Date format: YYYY-MM-DD
 type DateRange struct {
-	StartDate string `json:"startDate"`
 	EndDate   string `json:"endDate"`
+	StartDate string `json:"startDate"`
 }
-
-// GetStartDate returns DateRange.StartDate, and is useful for accessing the field via an interface.
-func (v *DateRange) GetStartDate() string { return v.StartDate }
 
 // GetEndDate returns DateRange.EndDate, and is useful for accessing the field via an interface.
 func (v *DateRange) GetEndDate() string { return v.EndDate }
+
+// GetStartDate returns DateRange.StartDate, and is useful for accessing the field via an interface.
+func (v *DateRange) GetStartDate() string { return v.StartDate }
 
 // Filter by number of scan nodes confirming the alert.
 type ScanNodeFilters struct {
@@ -174,15 +180,15 @@ const (
 // Timestamp range
 // Timestamp format: number of milliseconds from start of UNIX epoch
 type TimestampRange struct {
-	StartTimestamp uint `json:"startTimestamp"`
 	EndTimestamp   uint `json:"endTimestamp"`
+	StartTimestamp uint `json:"startTimestamp"`
 }
-
-// GetStartTimestamp returns TimestampRange.StartTimestamp, and is useful for accessing the field via an interface.
-func (v *TimestampRange) GetStartTimestamp() uint { return v.StartTimestamp }
 
 // GetEndTimestamp returns TimestampRange.EndTimestamp, and is useful for accessing the field via an interface.
 func (v *TimestampRange) GetEndTimestamp() uint { return v.EndTimestamp }
+
+// GetStartTimestamp returns TimestampRange.StartTimestamp, and is useful for accessing the field via an interface.
+func (v *TimestampRange) GetStartTimestamp() uint { return v.StartTimestamp }
 
 // __getAlertsInput is used internally by genqlient
 type __getAlertsInput struct {
@@ -271,7 +277,7 @@ type getAlertsAlertsAlertsResponseAlertsAlert struct {
 	FindingType string `json:"findingType"`
 	// List of alerts involved in the alert
 	RelatedAlerts []string `json:"relatedAlerts"`
-	// Alert chain id
+	// Chain id
 	ChainId uint `json:"chainId"`
 	// List of labels related to the alert
 	Labels []*getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel `json:"labels"`
@@ -378,7 +384,7 @@ type getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel struct {
 	// Label's status
 	Remove bool `json:"remove"`
 	// Extra label information
-	Metadata map[string]string `json:"metadata"`
+	Metadata []string `json:"metadata"`
 }
 
 // GetLabel returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Label, and is useful for accessing the field via an interface.
@@ -401,7 +407,7 @@ func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetEntityType() st
 func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetRemove() bool { return v.Remove }
 
 // GetMetadata returns getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel.Metadata, and is useful for accessing the field via an interface.
-func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetMetadata() map[string]string {
+func (v *getAlertsAlertsAlertsResponseAlertsAlertLabelsLabel) GetMetadata() []string {
 	return v.Metadata
 }
 
@@ -571,7 +577,7 @@ type getAlertsAlertsAlertsResponseAlertsAlertSourceSourceAlertSourceAlertEvent s
 	BotId string `json:"botId"`
 	// Alert timestamp
 	Timestamp string `json:"timestamp"`
-	// Source chain id
+	// Chain id
 	ChainId uint `json:"chainId"`
 }
 
