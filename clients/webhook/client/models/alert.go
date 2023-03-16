@@ -24,6 +24,8 @@ type Alert struct {
 	// Example: ["0x98883145049dec03c00cb7708cbc938058802520","0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3"]
 	Addresses []string `json:"addresses"`
 
+	AddressBloomFilter interface{} `json:"addressBloomFilter,omitempty"`
+
 	// alert Id
 	// Example: OZ-GNOSIS-EVENTS
 	AlertID string `json:"alertId,omitempty"`
