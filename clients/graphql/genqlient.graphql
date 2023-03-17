@@ -65,7 +65,8 @@ query getAlerts($input: AlertsInput) {
                 confidence,
                 entity,
                 entityType,
-                remove
+                remove,
+                metadata
             }
         }
     }
