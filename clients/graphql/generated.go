@@ -712,6 +712,7 @@ query getAlerts ($input: AlertsInput) {
 				entity
 				entityType
 				remove
+				metadata
 			}
 		}
 	}
