@@ -88,6 +88,7 @@ message Label {
   reserved 5;
   bool remove = 6;
   string label = 7;
+  repeated string metadata = 8;
 }
 
 message Finding {
