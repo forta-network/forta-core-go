@@ -241,7 +241,6 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 				Feed:        time.Now().UTC(),
 				SourceAlert: alertCA,
 			},
-			SubscriberBotID: subscription.Subscriber.BotID,
 		}
 
 		for _, alertHandler := range alertHandlers {

@@ -39,7 +39,7 @@ func TestAlertClient_GetAlerts(t *testing.T) {
 				ac := NewClient(tt.fields.url)
 
 				ctx := context.Background()
-				got, err := ac.GetAlerts(ctx, tt.args.input)
+				got, err := ac.GetAlerts(ctx, tt.args.input, nil)
 				if !tt.wantErr(t, err, "GetAlerts()") {
 					return
 				}
