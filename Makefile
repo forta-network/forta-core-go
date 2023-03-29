@@ -11,7 +11,7 @@ GOMERGETYPES = $(GOBIN)/gomergetypes
 PROTOC = ./toolbin/protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GO_GRPC)
 
 .PHONY: require-tools
-require-tools: tools
+require-tools: tools ## Check installed tools.
 	@echo 'Checking installed tools...'
 	@file $(LINT) > /dev/null
 	@file $(FORMAT) > /dev/null
@@ -26,7 +26,7 @@ require-tools: tools
 	@echo "All tools found in $(GOBIN)!"
 
 .PHONY: tools
-tools:
+tools: ## Install tools.
 	@echo 'Installing tools...'
 	@rm -rf toolbin
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.0
@@ -45,16 +45,16 @@ tools:
 	@mv toolbin/protoc-bin/bin/protoc toolbin
 
 .PHONY: fmt
-fmt: require-tools
+fmt: require-tools ## Run go fmt.
 	@go mod tidy
 	@$(FORMAT) -w $$(go list -f {{.Dir}} ./...)
 
 .PHONY: lint
-lint: require-tools fmt
+lint: require-tools fmt ## Install tools, if needed, fmt then lint.
 	@$(LINT) run ./...
 
 .PHONY: proto
-proto: protogen fmt
+proto: protogen fmt ## Generate protocols.
 
 .PHONY: protogen
 protogen: require-tools
@@ -66,7 +66,7 @@ protogen: require-tools
 	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/storage.proto
 
 .PHONY: mocks
-mocks:
+mocks: ## Generate mocks.
 	mockgen -source ethereum/client.go -destination ethereum/mocks/mock_client.go
 	mockgen -source feeds/interfaces.go -destination feeds/mocks/mock_feeds.go
 	mockgen -source ethereum/contract_backend.go -destination ethereum/mocks/mock_ethclient.go
@@ -79,23 +79,23 @@ mocks:
 	mockgen -source manifest/client.go -destination manifest/mocks/mock_client.go
 
 .PHONY: test
-test:
+test: ## Run tests.
 	go test -v -count=1 -coverprofile=coverage.out ./...
 
 .PHONY: coverage
-coverage:
+coverage: ## Run coverage total.
 	go tool cover -func=coverage.out | grep total | awk '{print substr($$3, 1, length($$3)-1)}'
 
 .PHONY: coverage-func
-coverage-func:
+coverage-func: ## Run coverage.
 	go tool cover -func=coverage.out
 
 .PHONY: coverage-html
-coverage-html:
+coverage-html: ## Generate coverage html.
 	go tool cover -html=coverage.out -o=coverage.html
 
 .PHONY: abigen
-abigen: pull-contracts
+abigen: pull-contracts ## Run contracts.
 	rm -rf contracts/generated
 	./scripts/abigen.sh forta-contracts components/staking/FortaStaking.sol FortaStaking FortaStaking forta_staking_0_1_2
 	./scripts/abigen.sh forta-contracts components/_old/staking/FortaStaking_0_1_1.sol FortaStaking_0_1_1 FortaStaking forta_staking_0_1_1
@@ -141,13 +141,17 @@ abigen: pull-contracts
 
 
 .PHONY: pull-contracts
-pull-contracts:
+pull-contracts: ## Pull contracts.
 	./scripts/pull-contracts.sh forta-contracts 9d8e7c3
 
 .PHONY: swagger
-swagger: require-tools
+swagger: require-tools ## Generate swagger.
 	@rm -rf clients/webhook/swagger
 	@$(SWAGGER) generate client \
 		-f protocol/webhook/swagger.yml \
 		-c clients/webhook/client \
 		-m clients/webhook/client/models
+
+.PHONY: help
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
