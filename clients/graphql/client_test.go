@@ -32,6 +32,18 @@ func TestAlertClient_GetAlerts(t *testing.T) {
 				return err == nil
 			},
 		},
+		{
+			name: "invalid graphql api",
+			args: args{
+				input: &AlertsInput{
+					Bots: []string{"0x5e13c2f3a97c292695b598090056ba5d52f9dcc7790bcdaa8b6cd87c1a1ebc0f"},
+				},
+			},
+			fields: fields{url: "https://api.forta.network"},
+			wantErr: func(t assert.TestingT, err error, _ ...interface{}) bool {
+				return err == nil
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(
@@ -39,7 +51,7 @@ func TestAlertClient_GetAlerts(t *testing.T) {
 				ac := NewClient(tt.fields.url)
 
 				ctx := context.Background()
-				got, err := ac.GetAlerts(ctx, tt.args.input)
+				got, err := ac.GetAlerts(ctx, tt.args.input, nil)
 				if !tt.wantErr(t, err, "GetAlerts()") {
 					return
 				}

@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,10 +16,19 @@ import (
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
-	"github.com/forta-network/forta-core-go/protocol/transform"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
+
+type Subscriber struct {
+	BotID    string `json:"bot_id"`
+	BotOwner string `json:"bot_owner"`
+}
+
+type CombinerBotSubscription struct {
+	Subscription *protocol.CombinerBotSubscription `json:"subscription"`
+	Subscriber   Subscriber                        `json:"subscriber"`
+}
 
 var (
 	ErrCombinerStopReached   = fmt.Errorf("combiner stop reached")
@@ -39,7 +50,7 @@ type combinerFeed struct {
 	alertCh chan *domain.AlertEvent
 	client  *graphql.Client
 
-	botSubscriptions []*protocol.CombinerBotSubscription
+	botSubscriptions []*CombinerBotSubscription
 	botsMu           sync.RWMutex
 	// bloom filter could be a better choice but the miss rate was too high
 	// and we don't know the expected item count
@@ -51,29 +62,32 @@ type combinerFeed struct {
 	maxAlertAge time.Duration
 }
 
-func (cf *combinerFeed) Subscriptions() []*protocol.CombinerBotSubscription {
+func (cf *combinerFeed) Subscriptions() []*CombinerBotSubscription {
 	cf.botsMu.RLock()
 	defer cf.botsMu.RUnlock()
+
 	return cf.botSubscriptions
 }
-func (cf *combinerFeed) AddSubscription(subscription *protocol.CombinerBotSubscription) {
+
+func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
 	for _, s := range cf.botSubscriptions {
-		if transform.Equal(s, subscription) {
+		if isSameSubscription(s, subscription) {
 			return
 		}
 	}
 
 	cf.botSubscriptions = append(cf.botSubscriptions, subscription)
 }
-func (cf *combinerFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription) {
+
+func (cf *combinerFeed) RemoveSubscription(subscription *CombinerBotSubscription) {
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
 	for i, s := range cf.botSubscriptions {
-		if transform.Equal(s, subscription) {
+		if isSameSubscription(s, subscription) {
 			cf.botSubscriptions = append(
 				cf.botSubscriptions[:i], cf.botSubscriptions[i+1:]...,
 			)
@@ -103,10 +117,6 @@ type CombinerFeedConfig struct {
 	CombinerCachePath string
 }
 
-func (cf *combinerFeed) IsStarted() bool {
-	return cf.started
-}
-
 func (cf *combinerFeed) Start() {
 	if !cf.started {
 		go cf.loop()
@@ -118,10 +128,6 @@ func (cf *combinerFeed) initialize() error {
 		cf.rateLimit = time.NewTicker(DefaultRatelimitDuration)
 	}
 	return nil
-}
-
-func (cf *combinerFeed) ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error {
-	return cf.forEachAlert([]cfHandler{{Handler: alertHandler}})
 }
 
 func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
@@ -172,7 +178,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 }
 
 func (cf *combinerFeed) fetchAlertsAndHandle(
-	ctx context.Context, alertHandlers []cfHandler, subscription *protocol.CombinerBotSubscription, createdSince int64,
+	ctx context.Context, alertHandlers []cfHandler, subscription *CombinerBotSubscription, createdSince int64,
 	createdBefore int64,
 ) error {
 	var alerts []*protocol.AlertEvent
@@ -185,13 +191,14 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 			alerts, cErr = cf.client.GetAlerts(
 				cf.ctx,
 				&graphql.AlertsInput{
-					Bots:          []string{subscription.BotId},
+					Bots:          []string{subscription.Subscription.BotId},
 					CreatedSince:  uint(createdSince),
 					CreatedBefore: uint(createdBefore),
-					AlertIds:      subscription.AlertIds,
-					AlertId:       subscription.AlertId,
-					ChainId:       uint(subscription.ChainId),
+					AlertIds:      subscription.Subscription.AlertIds,
+					AlertId:       subscription.Subscription.AlertId,
+					ChainId:       uint(subscription.Subscription.ChainId),
 				},
+				subscriberInfoToHeaders(subscription.Subscriber),
 			)
 			if cErr != nil && errors.Is(cErr, context.DeadlineExceeded) {
 				log.WithError(cErr).Warn("error retrieving alerts")
@@ -205,6 +212,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 		return err
 	}
 
+	// alert post processing
 	for _, alert := range alerts {
 		if tooOld, age := alertIsTooOld(alert, cf.maxAlertAge); tooOld {
 			log.WithField("age", age).Warnf(
@@ -245,18 +253,6 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 	return nil
 }
 
-// Name returns the name of this implementation.
-func (cf *combinerFeed) Name() string {
-	return "alert-feed"
-}
-
-// Health implements the health.Reporter interface.
-func (cf *combinerFeed) Health() health.Reports {
-	return health.Reports{
-		cf.lastAlert.GetReport("last-alert"),
-	}
-}
-
 func (cf *combinerFeed) loop() {
 	if err := cf.initialize(); err != nil {
 		log.WithError(err).Panic("failed to initialize")
@@ -280,6 +276,41 @@ func (cf *combinerFeed) loop() {
 	}
 }
 
+//
+// Helper Methods
+//
+
+// subscriberInfoToHeaders converts subscriber information to map[string]string
+func subscriberInfoToHeaders(subscriber Subscriber) map[string]string {
+	return map[string]string{
+		"bot-id":    subscriber.BotID,
+		"bot-owner": subscriber.BotOwner,
+	}
+}
+
+// isSameSubscription checks for field-for-field equality for subscriptions.
+func isSameSubscription(a, b *CombinerBotSubscription) bool {
+	if a == nil || b == nil {
+		return false
+	}
+
+	if a.Subscription.BotId != b.Subscription.BotId {
+		return false
+	}
+
+	if a.Subscription.AlertId != b.Subscription.AlertId {
+		return false
+	}
+
+	if a.Subscription.ChainId != b.Subscription.ChainId {
+		return false
+	}
+
+	sort.Strings(a.Subscription.AlertIds)
+	sort.Strings(b.Subscription.AlertIds)
+
+	return strings.EqualFold(strings.Join(a.Subscription.AlertIds, ","), strings.Join(b.Subscription.AlertIds, ","))
+}
 func alertIsTooOld(alert *protocol.AlertEvent, maxAge time.Duration) (bool, *time.Duration) {
 	if maxAge == 0 {
 		return false, nil
@@ -297,6 +328,18 @@ func alertIsTooOld(alert *protocol.AlertEvent, maxAge time.Duration) (bool, *tim
 	}
 
 	return age > maxAge, &age
+}
+
+// Name returns the name of this implementation.
+func (cf *combinerFeed) Name() string {
+	return "alert-feed"
+}
+
+// Health implements the health.Reporter interface.
+func (cf *combinerFeed) Health() health.Reports {
+	return health.Reports{
+		cf.lastAlert.GetReport("last-alert"),
+	}
 }
 
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
@@ -328,7 +371,7 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 		client:           ac,
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
-		botSubscriptions: []*protocol.CombinerBotSubscription{},
+		botSubscriptions: []*CombinerBotSubscription{},
 		cfg:              cfg,
 		alertCache:       alertCache,
 	}

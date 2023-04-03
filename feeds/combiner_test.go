@@ -46,9 +46,11 @@ func Test_combinerFeed_Start(t *testing.T) {
 				)
 				r.NoError(err)
 				cf.AddSubscription(
-					&protocol.CombinerBotSubscription{
-						BotId:   "0x2bee737433c0c8cdbd924bbb68306cfd8abcf0e46a6ce8994fa7d474361bb186",
-						AlertId: "FORTA_1",
+					&CombinerBotSubscription{
+						Subscription: &protocol.CombinerBotSubscription{
+							BotId:   "0x2bee737433c0c8cdbd924bbb68306cfd8abcf0e46a6ce8994fa7d474361bb186",
+							AlertId: "FORTA_1",
+						},
 					},
 				)
 				errCh := cf.RegisterHandler(
