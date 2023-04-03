@@ -14,7 +14,7 @@ const (
 )
 
 var testProxyEnv struct {
-	ProxyAPI string `envconfig:"proxy_api" default:"https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"`
+	ProxyAPI string `envconfig:"proxy_api" default:"https://rpc.ankr.com/eth_goerli"`
 }
 
 func init() {
