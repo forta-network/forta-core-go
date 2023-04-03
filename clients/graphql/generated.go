@@ -274,6 +274,8 @@ type getAlertsAlertsAlertsResponseAlertsAlert struct {
 	// DEGRADED
 	//
 	// INFO
+	//
+	// SCAM
 	FindingType string `json:"findingType"`
 	// List of alerts involved in the alert
 	RelatedAlerts []string `json:"relatedAlerts"`
