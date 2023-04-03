@@ -49,6 +49,8 @@ type Alert {
     DEGRADED
 
     INFO
+
+    SCAM
     """
     findingType: String
     "Alert hash identifier"

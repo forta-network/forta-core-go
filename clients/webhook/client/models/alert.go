@@ -41,7 +41,7 @@ type Alert struct {
 	Description string `json:"description,omitempty"`
 
 	// finding type
-	// Enum: [UNKNOWN_TYPE EXPLOIT SUSPICIOUS DEGRADED INFORMATION]
+	// Enum: [UNKNOWN_TYPE EXPLOIT SUSPICIOUS DEGRADED INFORMATION SCAM]
 	FindingType string `json:"findingType,omitempty"`
 
 	// Deterministic alert hash
@@ -102,7 +102,7 @@ var alertTypeFindingTypePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["UNKNOWN_TYPE","EXPLOIT","SUSPICIOUS","DEGRADED","INFORMATION"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["UNKNOWN_TYPE","EXPLOIT","SUSPICIOUS","DEGRADED","INFORMATION","SCAM"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -126,6 +126,9 @@ const (
 
 	// AlertFindingTypeINFORMATION captures enum value "INFORMATION"
 	AlertFindingTypeINFORMATION string = "INFORMATION"
+
+	// AlertFindingTypeSCAM captures enum value "SCAM"
+	AlertFindingTypeSCAM string = "SCAM"
 )
 
 // prop value enum
