@@ -152,14 +152,17 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		lowerBound := time.Minute * 10
 		upperBound := int64(0)
+
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
+			logger := log.WithField("bot-id", subscription.Subscriber.BotID)
 			err := cf.fetchAlertsAndHandle(
 				cf.ctx,
 				alertHandlers, subscription, lowerBound.Milliseconds(), upperBound,
 			)
 			if err != nil {
-				return err
+				logger.WithError(err).Warn("failed to fetch alerts")
+				continue
 			}
 		}
 
