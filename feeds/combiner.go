@@ -361,7 +361,8 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 
 		err = json.Unmarshal(d, &m)
 		if err != nil {
-			return nil, err
+			_ = os.RemoveAll(cfg.CombinerCachePath)
+			return nil, fmt.Errorf("malformed combiner cache: %v", err)
 		}
 
 		alertCache = cache.NewFrom(graphql.DefaultLastNMinutes*2, time.Minute, m)
