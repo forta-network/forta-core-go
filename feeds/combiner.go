@@ -346,7 +346,8 @@ func (cf *combinerFeed) Health() health.Reports {
 }
 
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
-	ac := graphql.NewClient(cfg.APIUrl)
+	url := fmt.Sprintf("%s/graphql", cfg.APIUrl)
+	ac := graphql.NewClient(url)
 	alerts := make(chan *domain.AlertEvent, 10)
 
 	var alertCache *cache.Cache
