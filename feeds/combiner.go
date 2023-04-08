@@ -212,7 +212,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 				},
 				subscriberInfoToHeaders(subscription.Subscriber),
 			)
-			if cErr != nil && errors.Is(cErr, context.DeadlineExceeded) {
+			if cErr != nil && !errors.Is(cErr, context.DeadlineExceeded) {
 				log.WithError(cErr).Warn("error retrieving alerts")
 				return cErr
 			}
