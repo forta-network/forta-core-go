@@ -69,17 +69,26 @@ func (cf *combinerFeed) Subscriptions() []*CombinerBotSubscription {
 	return cf.botSubscriptions
 }
 
-func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) {
+func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) error {
+	if subscription == nil || subscription.Subscription == nil {
+		return fmt.Errorf("nil subscription data")
+	}
+	// subscriptions should be bot <-> bot
+	if subscription.Subscription.BotId == "" {
+		return fmt.Errorf("subscription must have valid bot id")
+	}
+
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
 	for _, s := range cf.botSubscriptions {
 		if isSameSubscription(s, subscription) {
-			return
+			return fmt.Errorf("incoming subscription already exists")
 		}
 	}
 
 	cf.botSubscriptions = append(cf.botSubscriptions, subscription)
+	return nil
 }
 
 func (cf *combinerFeed) RemoveSubscription(subscription *CombinerBotSubscription) {
@@ -152,14 +161,17 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		lowerBound := time.Minute * 10
 		upperBound := int64(0)
+
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
+			logger := log.WithField("bot-id", subscription.Subscriber.BotID)
 			err := cf.fetchAlertsAndHandle(
 				cf.ctx,
 				alertHandlers, subscription, lowerBound.Milliseconds(), upperBound,
 			)
 			if err != nil {
-				return err
+				logger.WithError(err).Warn("failed to fetch alerts")
+				continue
 			}
 		}
 
@@ -200,7 +212,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 				},
 				subscriberInfoToHeaders(subscription.Subscriber),
 			)
-			if cErr != nil && errors.Is(cErr, context.DeadlineExceeded) {
+			if cErr != nil && !errors.Is(cErr, context.DeadlineExceeded) {
 				log.WithError(cErr).Warn("error retrieving alerts")
 				return cErr
 			}
@@ -343,7 +355,8 @@ func (cf *combinerFeed) Health() health.Reports {
 }
 
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
-	ac := graphql.NewClient(cfg.APIUrl)
+	url := fmt.Sprintf("%s/graphql", cfg.APIUrl)
+	ac := graphql.NewClient(url)
 	alerts := make(chan *domain.AlertEvent, 10)
 
 	var alertCache *cache.Cache
@@ -357,7 +370,8 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 
 		err = json.Unmarshal(d, &m)
 		if err != nil {
-			return nil, err
+			_ = os.RemoveAll(cfg.CombinerCachePath)
+			return nil, fmt.Errorf("malformed combiner cache: %v", err)
 		}
 
 		alertCache = cache.NewFrom(graphql.DefaultLastNMinutes*2, time.Minute, m)
