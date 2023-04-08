@@ -70,6 +70,11 @@ func (cf *combinerFeed) Subscriptions() []*CombinerBotSubscription {
 }
 
 func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) {
+	// subscriptions should be bot <-> bot
+	if subscription.Subscription.BotId == "" {
+		return
+	}
+	
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
