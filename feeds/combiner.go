@@ -69,22 +69,26 @@ func (cf *combinerFeed) Subscriptions() []*CombinerBotSubscription {
 	return cf.botSubscriptions
 }
 
-func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) {
+func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) error {
+	if subscription == nil || subscription.Subscription == nil {
+		return fmt.Errorf("nil subscription data")
+	}
 	// subscriptions should be bot <-> bot
 	if subscription.Subscription.BotId == "" {
-		return
+		return fmt.Errorf("subscription must have valid bot id")
 	}
-	
+
 	cf.botsMu.Lock()
 	defer cf.botsMu.Unlock()
 
 	for _, s := range cf.botSubscriptions {
 		if isSameSubscription(s, subscription) {
-			return
+			return fmt.Errorf("incoming subscription already exists")
 		}
 	}
 
 	cf.botSubscriptions = append(cf.botSubscriptions, subscription)
+	return nil
 }
 
 func (cf *combinerFeed) RemoveSubscription(subscription *CombinerBotSubscription) {
