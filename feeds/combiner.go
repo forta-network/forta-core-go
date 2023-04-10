@@ -164,7 +164,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
-			logger := log.WithField("bot-id", subscription.Subscriber.BotID)
+			logger := log.WithField("botId", subscription.Subscriber.BotID)
 			err := cf.fetchAlertsAndHandle(
 				cf.ctx,
 				alertHandlers, subscription, lowerBound.Milliseconds(), upperBound,
