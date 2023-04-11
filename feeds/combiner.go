@@ -27,7 +27,7 @@ type Subscriber struct {
 
 type CombinerBotSubscription struct {
 	Subscription *protocol.CombinerBotSubscription `json:"subscription"`
-	Subscriber   Subscriber                        `json:"subscriber"`
+	Subscriber   *Subscriber                       `json:"subscriber"`
 }
 
 var (
@@ -70,9 +70,10 @@ func (cf *combinerFeed) Subscriptions() []*CombinerBotSubscription {
 }
 
 func (cf *combinerFeed) AddSubscription(subscription *CombinerBotSubscription) error {
-	if subscription == nil || subscription.Subscription == nil {
+	if subscription == nil || subscription.Subscription == nil || subscription.Subscriber == nil {
 		return fmt.Errorf("nil subscription data")
 	}
+
 	// subscriptions should be bot <-> bot
 	if subscription.Subscription.BotId == "" {
 		return fmt.Errorf("subscription must have valid bot id")
@@ -164,7 +165,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
-			logger := log.WithField("bot-id", subscription.Subscriber.BotID)
+			logger := log.WithField("botId", subscription.Subscriber.BotID)
 			err := cf.fetchAlertsAndHandle(
 				cf.ctx,
 				alertHandlers, subscription, lowerBound.Milliseconds(), upperBound,
@@ -293,7 +294,7 @@ func (cf *combinerFeed) loop() {
 //
 
 // subscriberInfoToHeaders converts subscriber information to map[string]string
-func subscriberInfoToHeaders(subscriber Subscriber) map[string]string {
+func subscriberInfoToHeaders(subscriber *Subscriber) map[string]string {
 	return map[string]string{
 		"bot-id":    subscriber.BotID,
 		"bot-owner": subscriber.BotOwner,
