@@ -299,6 +299,7 @@ type AlertEvent struct {
 	Event      *protocol.AlertEvent
 	Logs       []LogEntry
 	Timestamps *TrackingTimestamps
+	Subscriber *Subscriber
 }
 
 // ToMessage converts the AlertEvent to the protocol.TransactionEvent message
@@ -307,4 +308,14 @@ func (t *AlertEvent) ToMessage() (*protocol.AlertEvent, error) {
 		Alert:      t.Event.Alert,
 		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
+}
+
+type Subscriber struct {
+	BotID    string `json:"bot_id"`
+	BotOwner string `json:"bot_owner"`
+}
+
+type CombinerBotSubscription struct {
+	Subscription *protocol.CombinerBotSubscription `json:"subscription"`
+	Subscriber   *Subscriber                       `json:"subscriber"`
 }

@@ -36,7 +36,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				r := require.New(t)
 
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 				defer cancel()
 
 				rate := time.NewTicker(time.Duration(tt.args.rate))
@@ -48,7 +48,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 				)
 				r.NoError(err)
 				_ = cf.AddSubscription(
-					&CombinerBotSubscription{
+					&domain.CombinerBotSubscription{
 						Subscription: &protocol.CombinerBotSubscription{
 							BotId:   "0x77281ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049",
 							ChainId: 250,
@@ -72,10 +72,10 @@ func Test_combinerFeed_Start(t *testing.T) {
 
 func Test_combinerFeed_AddSubscription(t *testing.T) {
 	type fields struct {
-		botSubscriptions []*CombinerBotSubscription
+		botSubscriptions []*domain.CombinerBotSubscription
 	}
 	type args struct {
-		subscription *CombinerBotSubscription
+		subscription *domain.CombinerBotSubscription
 	}
 	tests := []struct {
 		name    string
@@ -85,18 +85,17 @@ func Test_combinerFeed_AddSubscription(t *testing.T) {
 	}{
 		{
 			name:    "can handle nil subscriptions",
-			fields:  fields{botSubscriptions: []*CombinerBotSubscription{}},
+			fields:  fields{botSubscriptions: []*domain.CombinerBotSubscription{}},
 			args:    args{subscription: nil},
 			wantErr: true,
 		},
 		{
 			name: "can handle bad subscriptions",
 			fields: fields{
-				botSubscriptions: []*CombinerBotSubscription{
-				},
+				botSubscriptions: []*domain.CombinerBotSubscription{},
 			},
 			args: args{
-				subscription: &CombinerBotSubscription{
+				subscription: &domain.CombinerBotSubscription{
 					Subscription: &protocol.CombinerBotSubscription{BotId: ""},
 				},
 			},
@@ -105,14 +104,14 @@ func Test_combinerFeed_AddSubscription(t *testing.T) {
 		{
 			name: "can handle adding same subscription",
 			fields: fields{
-				botSubscriptions: []*CombinerBotSubscription{
+				botSubscriptions: []*domain.CombinerBotSubscription{
 					{
 						Subscription: &protocol.CombinerBotSubscription{BotId: "0xexists"},
 					},
 				},
 			},
 			args: args{
-				subscription: &CombinerBotSubscription{
+				subscription: &domain.CombinerBotSubscription{
 					Subscription: &protocol.CombinerBotSubscription{BotId: "0xexists"},
 				},
 			},
