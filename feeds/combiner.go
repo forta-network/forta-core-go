@@ -23,6 +23,7 @@ import (
 var (
 	ErrCombinerStopReached   = fmt.Errorf("combiner stop reached")
 	DefaultRatelimitDuration = time.Minute
+	ErrAccessControlDenied   = fmt.Errorf("query was not granted by the access control service")
 )
 
 type cfHandler struct {
@@ -212,7 +213,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 				lg.WithError(cErr).Warn("error retrieving alerts")
 
 				// don't retry unauthorized errors
-				if strings.Contains(cErr.Error(), "401") {
+				if strings.Contains(cErr.Error(), ErrAccessControlDenied.Error()) {
 					return backoff.Permanent(cErr)
 				}
 
@@ -334,7 +335,7 @@ func isSameSubscription(a, b *domain.CombinerBotSubscription) bool {
 		return false
 	}
 
-	// Since the protocol enforces subscription fees, subscriptions from 2 different bots orbot owners can not
+	// Since the protocol enforces subscription fees, subscriptions from 2 different bots or bot owners can not
 	// be treated as same, because one can fail while the other succeeds.
 	if a.Subscriber.BotID != b.Subscriber.BotID {
 		return false
