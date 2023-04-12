@@ -64,7 +64,7 @@ func (cf *combinerFeed) AddSubscription(subscription *domain.CombinerBotSubscrip
 	if subscription == nil || subscription.Subscription == nil || subscription.Subscriber == nil {
 		return fmt.Errorf("nil subscription data")
 	}
-
+	
 	// subscriptions should be bot <-> bot
 	if subscription.Subscription.BotId == "" {
 		return fmt.Errorf("subscription must have valid bot id")
@@ -132,6 +132,7 @@ func (cf *combinerFeed) initialize() error {
 }
 
 func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
+	logger := log.WithField("component", "combinerFeed")
 	firstRun := true
 	for {
 		if cf.ctx.Err() != nil {
@@ -156,7 +157,12 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		// query all subscriptions and push
 		for _, subscription := range cf.Subscriptions() {
-			logger := log.WithField("botId", subscription.Subscriber.BotID)
+			logger = logger.WithFields(
+				log.Fields{
+					"subscriberBotId": subscription.Subscriber.BotID,
+					"subscribedBotId": subscription.Subscription.BotId,
+				},
+			)
 			err := cf.fetchAlertsAndHandle(
 				cf.ctx,
 				alertHandlers, subscription, lowerBound.Milliseconds(), upperBound,
@@ -185,17 +191,20 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 	ctx context.Context, alertHandlers []cfHandler, subscription *domain.CombinerBotSubscription, createdSince int64,
 	createdBefore int64,
 ) error {
+	lg := log.WithFields(
+		log.Fields{
+			"subscriberBotId":    subscription.Subscriber.BotID,
+			"subscriberBotOwner": subscription.Subscriber.BotOwner,
+			"subscribedTo":       subscription.Subscription.BotId,
+		},
+	)
+
 	var alerts []*protocol.AlertEvent
 
 	bo := backoff.WithContext(backoff.NewExponentialBackOff(), ctx)
 
 	err := backoff.Retry(
 		func() error {
-			lg := log.WithFields(log.Fields{
-				"subscriberBotId":    subscription.Subscriber.BotID,
-				"subscriberBotOwner": subscription.Subscriber.BotOwner,
-				"subscribedTo":       subscription.Subscription.BotId,
-			})
 			var cErr error
 			alerts, cErr = cf.client.GetAlerts(
 				cf.ctx,
@@ -239,12 +248,12 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 			continue
 		}
 
-		if _, exists := cf.alertCache.Get(alert.Alert.Hash); exists {
+		if _, exists := cf.alertCache.Get(alertCacheEncode(subscription.Subscriber.BotID, alert.Alert.Hash)); exists {
 			continue
 		}
 
 		cf.alertCache.Set(
-			alert.Alert.Hash, struct{}{}, cache.DefaultExpiration,
+			alertCacheEncode(subscription.Subscriber.BotID, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration,
 		)
 
 		alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
@@ -415,4 +424,8 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 	}
 
 	return bf, nil
+}
+
+func alertCacheEncode(subscriberBotID, alertHash string) string {
+	return fmt.Sprintf("%s|%s", subscriberBotID, alertHash)
 }
