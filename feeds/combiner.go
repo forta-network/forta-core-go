@@ -74,6 +74,7 @@ func (cf *combinerFeed) AddSubscription(subscription *domain.CombinerBotSubscrip
 	defer cf.botsMu.Unlock()
 
 	for _, s := range cf.botSubscriptions {
+		// existing subscriptions must not be added to prevent duplicate graphql queries, the error however is usually safe to ignore.
 		if isSameSubscription(s, subscription) {
 			return fmt.Errorf("incoming subscription already exists")
 		}
@@ -206,6 +207,10 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 	err := backoff.Retry(
 		func() error {
 			var cErr error
+			// subscriber information must be passed as headers to the public-api, to comply with fee subscriptions.
+			authHeaders := subscriberInfoToHeaders(subscription.Subscriber)
+
+			// convert subscription to graphql input and fetch alerts
 			alerts, cErr = cf.client.GetAlerts(
 				cf.ctx,
 				&graphql.AlertsInput{
@@ -216,7 +221,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 					AlertId:       subscription.Subscription.AlertId,
 					ChainId:       uint(subscription.Subscription.ChainId),
 				},
-				subscriberInfoToHeaders(subscription.Subscriber),
+				authHeaders,
 			)
 			if cErr != nil {
 				lg.WithError(cErr).Warn("error retrieving alerts")
@@ -226,6 +231,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 					return backoff.Permanent(cErr)
 				}
 
+				// it is safe to return nil on context deadlines, no need for error handling.
 				if !errors.Is(cErr, context.DeadlineExceeded) {
 					return cErr
 				}
@@ -248,10 +254,12 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 			continue
 		}
 
+		// to prevent duplicate results, processed alerts must be checked/cached.
 		if _, exists := cf.alertCache.Get(alertCacheEncode(subscription.Subscriber.BotID, alert.Alert.Hash)); exists {
 			continue
 		}
 
+		// set incoming alert/subscriber pair to cache
 		cf.alertCache.Set(
 			alertCacheEncode(subscription.Subscriber.BotID, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration,
 		)
@@ -303,10 +311,6 @@ func (cf *combinerFeed) loop() {
 	}
 }
 
-//
-// Helper Methods
-//
-
 // subscriberInfoToHeaders converts subscriber information to map[string]string
 func subscriberInfoToHeaders(subscriber *domain.Subscriber) map[string]string {
 	return map[string]string{
@@ -356,6 +360,7 @@ func isSameSubscription(a, b *domain.CombinerBotSubscription) bool {
 
 	return true
 }
+
 func alertIsTooOld(alert *protocol.AlertEvent, maxAge time.Duration) (bool, *time.Duration) {
 	if maxAge == 0 {
 		return false, nil
@@ -426,6 +431,8 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 	return bf, nil
 }
 
+// alertCacheEncode must encode alerts to prevent missing subscriptions to the same target bot
+// from several deployed bots
 func alertCacheEncode(subscriberBotID, alertHash string) string {
 	return fmt.Sprintf("%s|%s", subscriberBotID, alertHash)
 }
