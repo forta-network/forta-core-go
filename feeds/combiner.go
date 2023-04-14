@@ -39,7 +39,7 @@ type combinerFeed struct {
 	lastAlert health.MessageTracker
 
 	alertCh chan *domain.AlertEvent
-	client  *graphql.Client
+	client  graphql.Client
 
 	botSubscriptions []*domain.CombinerBotSubscription
 	botsMu           sync.RWMutex
@@ -395,6 +395,11 @@ func (cf *combinerFeed) Health() health.Reports {
 func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, error) {
 	url := fmt.Sprintf("%s/graphql", cfg.APIUrl)
 	ac := graphql.NewClient(url)
+
+	return NewCombinerFeedWithClient(ctx, cfg, ac)
+}
+
+func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, client graphql.Client) (AlertFeed, error) {
 	alerts := make(chan *domain.AlertEvent, 10)
 
 	var alertCache *cache.Cache
@@ -420,7 +425,7 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 	bf := &combinerFeed{
 		maxAlertAge:      time.Minute * 20,
 		ctx:              ctx,
-		client:           ac,
+		client:           client,
 		rateLimit:        cfg.RateLimit,
 		alertCh:          alerts,
 		botSubscriptions: []*domain.CombinerBotSubscription{},
