@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 	"math/big"
 	"sync"
 
@@ -58,6 +59,7 @@ type ContractFilter struct {
 	FortaStaking        bool
 	ScannerVersion      bool
 	StakeAllocator      bool
+	RewardDistributor   bool
 }
 
 type ListenerConfig struct {
@@ -309,6 +311,25 @@ func (l *listener) handleDispatchEvent(contracts *Contracts, le types.Log, blk *
 	return nil
 }
 
+func (l *listener) handleRewardDistributorEvent(contracts *Contracts, le types.Log, blk *domain.Block, logger *log.Entry) error {
+	switch getTopic(le) {
+	case contract_rewards_distributor_0_1_0.RewardedTopic:
+		link, err := contracts.RewardsDistributorFil.ParseRewarded(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(l.ctx, logger, registry.NewRewardedMessage(link, blk))
+
+	case contract_rewards_distributor_0_1_0.ClaimedRewardsTopic:
+		link, err := contracts.RewardsDistributorFil.ParseClaimedRewards(le)
+		if err != nil {
+			return err
+		}
+		return l.handler(l.ctx, logger, registry.NewClaimedRewardsMessage(link, blk))
+	}
+	return nil
+}
+
 func isUpgradeOrMigration(le types.Log) bool {
 	switch getTopic(le) {
 	case UpgradedTopic,
@@ -385,6 +406,9 @@ func (l *listener) handleLog(blk *domain.Block, le types.Log) error {
 	if equalsAddress(le.Address, contracts.Addresses.StakeAllocator.Hex()) {
 		return l.handleStakeAllocatorEvent(contracts, le, blk, logger)
 	}
+	if equalsAddress(le.Address, contracts.Addresses.Rewards.Hex()) {
+		return l.handleRewardDistributorEvent(contracts, le, blk, logger)
+	}
 	return nil
 }
 
@@ -406,7 +430,7 @@ type page struct {
 // ProcessBlockRange pages over a range of blocks, 10k blocks per page
 func (l *listener) ProcessBlockRange(startBlock *big.Int, endBlock *big.Int) error {
 	start := startBlock
-	pageSize := big.NewInt(10000)
+	pageSize := big.NewInt(2000)
 	if endBlock == nil {
 		bn, err := l.eth.BlockNumber(context.Background())
 		if err != nil {
@@ -552,6 +576,9 @@ func (l *listener) setLogFilterAddrs() {
 		}
 		if filter.StakeAllocator {
 			addrs = append(addrs, regContracts.StakeAllocator.Hex())
+		}
+		if filter.RewardDistributor {
+			addrs = append(addrs, regContracts.Rewards.Hex())
 		}
 	} else {
 		// include all contracts

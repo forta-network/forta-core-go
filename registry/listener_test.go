@@ -3,8 +3,10 @@ package registry
 import (
 	"context"
 	"errors"
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 	"math/big"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
@@ -67,6 +69,8 @@ type listenerTest struct {
 func TestListener_Listen(t *testing.T) {
 	ctx := context.Background()
 	handledEvent := errors.New("handled event")
+	mux := sync.Mutex{}
+	found := make(map[string]bool)
 	tests := []listenerTest{
 		{
 			name: "upgrade",
@@ -295,6 +299,69 @@ func TestListener_Listen(t *testing.T) {
 				},
 			),
 			block: 31739343,
+		}, {
+			name: "rewarded",
+			listener: testListener(ctx, &ContractFilter{RewardDistributor: true},
+				contract_rewards_distributor_0_1_0.RewardedTopic,
+				Handlers{
+					RewardedHandlers: regmsg.Handlers(
+						func(ctx context.Context, logger *log.Entry, msg *registry.RewardedMessage) error {
+							mux.Lock()
+							defer mux.Unlock()
+							// if matching event already found, skip
+							if _, ok := found["rewarded"]; ok {
+								// should not fire twice for same pool
+								assert.NotEqual(t, "820", msg.Subject)
+								return handledEvent
+							}
+							// if not the right payment, skip it
+							if msg.Subject != "820" {
+								return nil
+							}
+							assert.Equal(t, int64(41447648), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.Rewarded, msg.Action)
+							assert.Equal(t, "1765787550499999989760", msg.Amount)
+							assert.Equal(t, "820", msg.Subject)
+							found["rewarded"] = true
+							return handledEvent
+						},
+					),
+				},
+			),
+			block: 41447648,
+		}, {
+			name: "claimed-rewards",
+			listener: testListener(ctx, &ContractFilter{RewardDistributor: true},
+				contract_rewards_distributor_0_1_0.ClaimedRewardsTopic,
+				Handlers{
+					ClaimedRewardsHandlers: regmsg.Handlers(
+						func(ctx context.Context, logger *log.Entry, msg *registry.ClaimedRewardsMessage) error {
+							mux.Lock()
+							defer mux.Unlock()
+
+							// if matching found, just skip the next items
+							if _, ok := found["claimed-rewards"]; ok {
+								// should not fire twice for same pool/payee
+								assert.False(t, msg.To == "0x7ecd70a3b139499c531ad6c84b772483fddff8f7" && msg.Subject == "229")
+								return handledEvent
+							}
+							// if not the right claim, skip it
+							if !(msg.To == "0x7ecd70a3b139499c531ad6c84b772483fddff8f7" && msg.Subject == "229") {
+								return nil
+							}
+							assert.Equal(t, int64(41112688), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.ClaimedRewards, msg.Action)
+							assert.Equal(t, "140913039600000000000", msg.Amount)
+							assert.Equal(t, "0x7ecd70a3b139499c531ad6c84b772483fddff8f7", msg.To)
+							assert.Equal(t, "229", msg.Subject)
+							assert.Equal(t, 2, msg.SubjectType)
+							found["claimed-rewards"] = true
+							return handledEvent
+						},
+					),
+				},
+			),
+			block: 41112688,
 		},
 	}
 
