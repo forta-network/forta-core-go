@@ -39,6 +39,7 @@ func getAllContractAddrs(regContracts registry.RegistryContracts) []string {
 		regContracts.ScannerNodeVersion.Hex(),
 		regContracts.ScannerPoolRegistry.Hex(),
 		regContracts.StakeAllocator.Hex(),
+		regContracts.Rewards.Hex(),
 	}
 	return addrs
 }

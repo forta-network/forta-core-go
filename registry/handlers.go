@@ -36,6 +36,8 @@ type Handlers struct {
 	ScannerStakeHandlers     regmsg.HandlerFuncs[*registry.ScannerStakeMessage]
 	TransferSharesHandlers   regmsg.HandlerFuncs[*registry.TransferSharesMessage]
 	ScannerPoolStakeHandlers regmsg.HandlerFuncs[*registry.ScannerPoolStakeMessage]
+	RewardedHandlers         regmsg.HandlerFuncs[*registry.RewardedMessage]
+	ClaimedRewardsHandlers   regmsg.HandlerFuncs[*registry.ClaimedRewardsMessage]
 
 	AgentStakeThresholdHandlers   regmsg.HandlerFuncs[*registry.AgentStakeThresholdMessage]
 	ScannerStakeThresholdHandlers regmsg.HandlerFuncs[*registry.ScannerStakeThresholdMessage]
