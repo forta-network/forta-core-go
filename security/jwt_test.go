@@ -15,6 +15,7 @@ func TestCreateJWT(t *testing.T) {
 
 	token, err := CreateScannerJWT(key, map[string]interface{}{
 		"batch": "QmNvoaBmvjaVukfSyZtnHYYzN3iBHV4V3WyKHNwTnoubNf",
+		"bot-id": "0x31c000ee3e2e1e8de1743a3a4c6b9f87196b6d805fc426b02b658da70e1571a5",
 	})
 	assert.NoError(t, err)
 	t.Log(token)

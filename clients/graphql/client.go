@@ -22,18 +22,22 @@ const (
 
 type GetAlertsResponse getAlertsResponse
 
-type Client struct {
+type client struct {
 	url    string
 	client graphql.Client
 }
 
-func NewClient(url string) *Client {
-	client := graphql.NewClient(url, nil)
-
-	return &Client{url: url, client: client}
+type Client interface {
+	GetAlerts(ctx context.Context, input *AlertsInput, headers map[string]string) ([]*protocol.AlertEvent, error)
 }
 
-func (ac *Client) GetAlerts(
+func NewClient(url string) Client {
+	c := graphql.NewClient(url, nil)
+
+	return &client{url: url, client: c}
+}
+
+func (ac *client) GetAlerts(
 	ctx context.Context, input *AlertsInput, headers map[string]string,
 ) ([]*protocol.AlertEvent, error) {
 	if input.BlockSortDirection == "" {
@@ -115,6 +119,8 @@ func fetchAlerts(
 	for key, val := range headers {
 		httpReq.Header.Set(key, val)
 	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
 
 	// execute query
 	httpResp, err := http.DefaultClient.Do(httpReq)

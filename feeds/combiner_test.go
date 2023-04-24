@@ -6,8 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/forta-network/forta-core-go/clients/graphql"
+	mock_graphql "github.com/forta-network/forta-core-go/clients/mocks"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -18,17 +21,39 @@ func Test_combinerFeed_Start(t *testing.T) {
 		stopAfterFirstAlert bool
 		expectErr           error
 	}
+
+	subscriberBot := "0xsubscriber"
+	subscribeeBot := "0xsubscribee"
+
+	ctrl := gomock.NewController(t)
+	successfulMockClient := mock_graphql.NewMockClient(ctrl)
+	successfulMockClient.EXPECT().GetAlerts(gomock.Any(), gomock.Any(), gomock.Any()).Return(
+		[]*protocol.AlertEvent{
+			{
+				Alert: &protocol.AlertEvent_Alert{
+					Hash:      "0xaaaaa",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					Source: &protocol.AlertEvent_Alert_Source{
+						Bot: &protocol.AlertEvent_Alert_Bot{Id: subscribeeBot},
+					},
+				},
+			},
+		}, nil,
+	)
+
 	tests := []struct {
-		name string
-		args args
+		name   string
+		args   args
+		client graphql.Client
 	}{
 		{
 			name: "successfully feeds alerts",
 			args: args{
 				rate:                int64(time.Nanosecond),
-				stopAfterFirstAlert: false,
-				expectErr:           context.DeadlineExceeded,
+				stopAfterFirstAlert: true,
+				expectErr:           context.Canceled,
 			},
+			client: successfulMockClient,
 		},
 	}
 	for _, tt := range tests {
@@ -36,25 +61,28 @@ func Test_combinerFeed_Start(t *testing.T) {
 			tt.name, func(t *testing.T) {
 				r := require.New(t)
 
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 				defer cancel()
 
 				rate := time.NewTicker(time.Duration(tt.args.rate))
-				cf, err := NewCombinerFeed(
+				cf, err := NewCombinerFeedWithClient(
 					ctx, CombinerFeedConfig{
 						RateLimit: rate,
-						APIUrl:    "https://api.forta.network",
+					}, tt.client,
+				)
+
+				r.NoError(err)
+
+				err = cf.AddSubscription(
+					&domain.CombinerBotSubscription{
+						Subscription: &protocol.CombinerBotSubscription{
+							BotId: subscribeeBot,
+						},
+						Subscriber: &domain.Subscriber{BotID: subscriberBot, BotOwner: "0x"},
 					},
 				)
 				r.NoError(err)
-				_ = cf.AddSubscription(
-					&CombinerBotSubscription{
-						Subscription: &protocol.CombinerBotSubscription{
-							BotId:   "0x77281ae942ee1fe141d0652e9dad7d001761552f906fb1684b2812603de31049",
-							ChainId: 250,
-						},
-					},
-				)
+
 				errCh := cf.RegisterHandler(
 					func(evt *domain.AlertEvent) error {
 						if tt.args.stopAfterFirstAlert {
@@ -64,7 +92,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 					},
 				)
 				cf.Start()
-				r.Equal(tt.args.expectErr, <-errCh)
+				r.Error(tt.args.expectErr, <-errCh)
 			},
 		)
 	}
@@ -72,10 +100,10 @@ func Test_combinerFeed_Start(t *testing.T) {
 
 func Test_combinerFeed_AddSubscription(t *testing.T) {
 	type fields struct {
-		botSubscriptions []*CombinerBotSubscription
+		botSubscriptions []*domain.CombinerBotSubscription
 	}
 	type args struct {
-		subscription *CombinerBotSubscription
+		subscription *domain.CombinerBotSubscription
 	}
 	tests := []struct {
 		name    string
@@ -85,18 +113,17 @@ func Test_combinerFeed_AddSubscription(t *testing.T) {
 	}{
 		{
 			name:    "can handle nil subscriptions",
-			fields:  fields{botSubscriptions: []*CombinerBotSubscription{}},
+			fields:  fields{botSubscriptions: []*domain.CombinerBotSubscription{}},
 			args:    args{subscription: nil},
 			wantErr: true,
 		},
 		{
 			name: "can handle bad subscriptions",
 			fields: fields{
-				botSubscriptions: []*CombinerBotSubscription{
-				},
+				botSubscriptions: []*domain.CombinerBotSubscription{},
 			},
 			args: args{
-				subscription: &CombinerBotSubscription{
+				subscription: &domain.CombinerBotSubscription{
 					Subscription: &protocol.CombinerBotSubscription{BotId: ""},
 				},
 			},
@@ -105,14 +132,14 @@ func Test_combinerFeed_AddSubscription(t *testing.T) {
 		{
 			name: "can handle adding same subscription",
 			fields: fields{
-				botSubscriptions: []*CombinerBotSubscription{
+				botSubscriptions: []*domain.CombinerBotSubscription{
 					{
 						Subscription: &protocol.CombinerBotSubscription{BotId: "0xexists"},
 					},
 				},
 			},
 			args: args{
-				subscription: &CombinerBotSubscription{
+				subscription: &domain.CombinerBotSubscription{
 					Subscription: &protocol.CombinerBotSubscription{BotId: "0xexists"},
 				},
 			},
