@@ -120,6 +120,8 @@ func fetchAlerts(
 		httpReq.Header.Set(key, val)
 	}
 
+	httpReq.Header.Set("Content-Type", "application/json")
+
 	// execute query
 	httpResp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {

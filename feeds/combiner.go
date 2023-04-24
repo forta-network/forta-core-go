@@ -18,12 +18,14 @@ import (
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 var (
 	ErrCombinerStopReached   = fmt.Errorf("combiner stop reached")
 	DefaultRatelimitDuration = time.Minute
-	ErrAccessControlDenied   = fmt.Errorf("query was not granted by the access control service")
+	ErrUnauthorized          = fmt.Errorf("query was not granted")
+	ErrBadRequest            = fmt.Errorf("bad public api request")
 )
 
 type cfHandler struct {
@@ -226,9 +228,25 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 			if cErr != nil {
 				lg.WithError(cErr).Warn("error retrieving alerts")
 
-				// don't retry unauthorized errors
-				if strings.Contains(cErr.Error(), ErrAccessControlDenied.Error()) {
-					return backoff.Permanent(cErr)
+				errList, ok := cErr.(gqlerror.List)
+				if ok {
+					for _, gqlErr := range errList {
+						if gqlErr.Extensions == nil {
+							continue
+						}
+						exCode := gqlErr.Extensions["code"]
+
+						// don't retry unauthorized errors
+						if exCode == "UNAUTHENTICATED" {
+							return backoff.Permanent(ErrUnauthorized)
+
+						}
+					}
+				}
+
+				// don't retry bad request errors
+				if strings.Contains(cErr.Error(), "400") {
+					return backoff.Permanent(ErrBadRequest)
 				}
 
 				// it is safe to return nil on context deadlines, no need for error handling.
