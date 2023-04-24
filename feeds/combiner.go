@@ -273,13 +273,13 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 		}
 
 		// to prevent duplicate results, processed alerts must be checked/cached.
-		if _, exists := cf.alertCache.Get(alertCacheEncode(subscription.Subscriber.BotID, alert.Alert.Hash)); exists {
+		if _, exists := cf.alertCache.Get(encodeAlertCacheKey(subscription.Subscriber.BotID, alert.Alert.Hash)); exists {
 			continue
 		}
 
 		// set incoming alert/subscriber pair to cache
 		cf.alertCache.Set(
-			alertCacheEncode(subscription.Subscriber.BotID, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration,
+			encodeAlertCacheKey(subscription.Subscriber.BotID, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration,
 		)
 
 		alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
@@ -454,8 +454,8 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 	return bf, nil
 }
 
-// alertCacheEncode must encode alerts to prevent missing subscriptions to the same target bot
+// encodeAlertCacheKey must encode alerts to prevent missing subscriptions to the same target bot
 // from several deployed bots
-func alertCacheEncode(subscriberBotID, alertHash string) string {
+func encodeAlertCacheKey(subscriberBotID, alertHash string) string {
 	return fmt.Sprintf("%s|%s", subscriberBotID, alertHash)
 }
