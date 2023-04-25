@@ -77,6 +77,7 @@ mocks:
 	mockgen -source release/client.go -destination release/mocks/mock_client.go
 	mockgen -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go
 	mockgen -source manifest/client.go -destination manifest/mocks/mock_client.go
+	mockgen -source clients/graphql/client.go -destination clients/mocks/mock_graphql_client.go
 
 .PHONY: test
 test:

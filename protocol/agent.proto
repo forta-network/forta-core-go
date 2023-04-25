@@ -60,6 +60,7 @@ message EvaluateBlockRequest {
 message EvaluateAlertRequest {
   string requestId = 1;
   AlertEvent event = 2;
+  string targetBotId = 3;
 }
 
 message EvaluateTxResponse {

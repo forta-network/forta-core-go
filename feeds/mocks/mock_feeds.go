@@ -11,7 +11,6 @@ import (
 	types "github.com/ethereum/go-ethereum/core/types"
 	health "github.com/forta-network/forta-core-go/clients/health"
 	domain "github.com/forta-network/forta-core-go/domain"
-	protocol "github.com/forta-network/forta-core-go/protocol"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -179,29 +178,17 @@ func (m *MockAlertFeed) EXPECT() *MockAlertFeedMockRecorder {
 }
 
 // AddSubscription mocks base method.
-func (m *MockAlertFeed) AddSubscription(subscription *protocol.CombinerBotSubscription) {
+func (m *MockAlertFeed) AddSubscription(subscription *domain.CombinerBotSubscription) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "AddSubscription", subscription)
+	ret := m.ctrl.Call(m, "AddSubscription", subscription)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // AddSubscription indicates an expected call of AddSubscription.
 func (mr *MockAlertFeedMockRecorder) AddSubscription(subscription interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSubscription", reflect.TypeOf((*MockAlertFeed)(nil).AddSubscription), subscription)
-}
-
-// ForEachAlert mocks base method.
-func (m *MockAlertFeed) ForEachAlert(alertHandler func(*domain.AlertEvent) error) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ForEachAlert", alertHandler)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// ForEachAlert indicates an expected call of ForEachAlert.
-func (mr *MockAlertFeedMockRecorder) ForEachAlert(alertHandler interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForEachAlert", reflect.TypeOf((*MockAlertFeed)(nil).ForEachAlert), alertHandler)
 }
 
 // Health mocks base method.
@@ -247,7 +234,7 @@ func (mr *MockAlertFeedMockRecorder) RegisterHandler(alertHandler interface{}) *
 }
 
 // RemoveSubscription mocks base method.
-func (m *MockAlertFeed) RemoveSubscription(subscription *protocol.CombinerBotSubscription) {
+func (m *MockAlertFeed) RemoveSubscription(subscription *domain.CombinerBotSubscription) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "RemoveSubscription", subscription)
 }
@@ -271,10 +258,10 @@ func (mr *MockAlertFeedMockRecorder) Start() *gomock.Call {
 }
 
 // Subscriptions mocks base method.
-func (m *MockAlertFeed) Subscriptions() []*protocol.CombinerBotSubscription {
+func (m *MockAlertFeed) Subscriptions() []*domain.CombinerBotSubscription {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Subscriptions")
-	ret0, _ := ret[0].([]*protocol.CombinerBotSubscription)
+	ret0, _ := ret[0].([]*domain.CombinerBotSubscription)
 	return ret0
 }
 
