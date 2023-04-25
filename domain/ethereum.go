@@ -12,6 +12,7 @@ import (
 
 // Block is the intersection between parity and go-ethereum block
 type Block struct {
+	BaseFeePerGas    *string       `json:"baseFeePerGas"`
 	Difficulty       *string       `json:"difficulty"`
 	ExtraData        *string       `json:"extraData"`
 	GasLimit         *string       `json:"gasLimit"`
@@ -55,20 +56,22 @@ func (b *Block) GetTimestamp() (*time.Time, error) {
 
 // Transaction is the intersection between parity and go-ethereum transactions
 type Transaction struct {
-	BlockHash        string  `json:"blockHash"`
-	BlockNumber      string  `json:"blockNumber"`
-	From             string  `json:"from"`
-	Gas              string  `json:"gas"`
-	GasPrice         string  `json:"gasPrice"`
-	Hash             string  `json:"hash"`
-	Input            *string `json:"input"`
-	Nonce            string  `json:"nonce"`
-	To               *string `json:"to"`
-	TransactionIndex string  `json:"transactionIndex"`
-	Value            *string `json:"value"`
-	V                string  `json:"v"`
-	R                string  `json:"r"`
-	S                string  `json:"s"`
+	BlockHash            string  `json:"blockHash"`
+	BlockNumber          string  `json:"blockNumber"`
+	From                 string  `json:"from"`
+	Gas                  string  `json:"gas"`
+	GasPrice             string  `json:"gasPrice"`
+	Hash                 string  `json:"hash"`
+	Input                *string `json:"input"`
+	Nonce                string  `json:"nonce"`
+	To                   *string `json:"to"`
+	TransactionIndex     string  `json:"transactionIndex"`
+	Value                *string `json:"value"`
+	V                    string  `json:"v"`
+	R                    string  `json:"r"`
+	S                    string  `json:"s"`
+	MaxFeePerGas         *string `json:"maxFeePerGas"`
+	MaxPriorityFeePerGas *string `json:"maxPriorityFeePerGas"`
 }
 
 // LogEntry is a log item inside a receipt
