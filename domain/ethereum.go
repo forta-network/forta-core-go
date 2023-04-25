@@ -12,7 +12,7 @@ import (
 
 // Block is the intersection between parity and go-ethereum block
 type Block struct {
-	BaseFeePerGas    string        `json:"baseFeePerGas"`
+	BaseFeePerGas    *string       `json:"baseFeePerGas"`
 	Difficulty       *string       `json:"difficulty"`
 	ExtraData        *string       `json:"extraData"`
 	GasLimit         *string       `json:"gasLimit"`
@@ -70,8 +70,8 @@ type Transaction struct {
 	V                    string  `json:"v"`
 	R                    string  `json:"r"`
 	S                    string  `json:"s"`
-	MaxFeePerGas         string  `json:"maxFeePerGas"`
-	MaxPriorityFeePerGas string  `json:"maxPriorityFeePerGas"`
+	MaxFeePerGas         *string `json:"maxFeePerGas"`
+	MaxPriorityFeePerGas *string `json:"maxPriorityFeePerGas"`
 }
 
 // LogEntry is a log item inside a receipt

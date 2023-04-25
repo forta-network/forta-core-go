@@ -108,7 +108,7 @@ func (t *BlockEvent) ToMessage() (*protocol.BlockEvent, error) {
 			ChainId: utils.BigIntToHex(t.ChainID),
 		},
 		Block: &protocol.BlockEvent_EthBlock{
-			BaseFeePerGas:    t.Block.BaseFeePerGas,
+			BaseFeePerGas:    str(t.Block.BaseFeePerGas),
 			Difficulty:       str(t.Block.Difficulty),
 			Hash:             t.Block.Hash,
 			Number:           t.Block.Number,
@@ -290,7 +290,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			BlockHash:      t.BlockEvt.Block.Hash,
 			BlockNumber:    t.BlockEvt.Block.Number,
 			BlockTimestamp: t.BlockEvt.Block.Timestamp,
-			BaseFeePerGas:  t.BlockEvt.Block.BaseFeePerGas,
+			BaseFeePerGas:  str(t.BlockEvt.Block.BaseFeePerGas),
 		},
 		Timestamps: t.Timestamps.ToMessage(),
 	}, nil

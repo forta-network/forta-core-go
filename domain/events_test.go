@@ -38,7 +38,7 @@ func TestTransactionEvent_ToMessage(t *testing.T) {
 			EventType: "block",
 			ChainID:   big.NewInt(1),
 			Block: &Block{
-				BaseFeePerGas:    "0x1",
+				BaseFeePerGas:    strPtr("0x1"),
 				Difficulty:       strPtr("0x1"),
 				ExtraData:        strPtr("0x1"),
 				GasLimit:         strPtr("0x1"),
@@ -99,8 +99,8 @@ func TestTransactionEvent_ToMessage(t *testing.T) {
 			Hash:                 txHash,
 			Nonce:                "0x5",
 			To:                   &to,
-			MaxFeePerGas:         "0x3",
-			MaxPriorityFeePerGas: "0x4",
+			MaxFeePerGas:         strPtr("0x3"),
+			MaxPriorityFeePerGas: strPtr("0x4"),
 		},
 		Timestamps: tt,
 	}
@@ -137,7 +137,7 @@ func TestTransactionEvent_ToMessage_ContractDeploy(t *testing.T) {
 			EventType: "block",
 			ChainID:   big.NewInt(1),
 			Block: &Block{
-				BaseFeePerGas:    "0x2",
+				BaseFeePerGas:    strPtr("0x2"),
 				Difficulty:       strPtr("0x1"),
 				ExtraData:        strPtr("0x1"),
 				GasLimit:         strPtr("0x1"),
@@ -171,8 +171,8 @@ func TestTransactionEvent_ToMessage_ContractDeploy(t *testing.T) {
 			GasPrice:             "0x3",
 			Hash:                 txHash,
 			Nonce:                "0x8",
-			MaxFeePerGas:         "0x4",
-			MaxPriorityFeePerGas: "0x5",
+			MaxFeePerGas:         strPtr("0x4"),
+			MaxPriorityFeePerGas: strPtr("0x5"),
 		},
 		Timestamps: tt,
 	}
