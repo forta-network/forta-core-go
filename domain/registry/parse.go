@@ -84,6 +84,9 @@ func MessageTypeForAction(action string) (regmsg.Interface, bool) {
 
 	case Upgrade, ConfigurationChange:
 		return &UpgradeMessage{}, true
+
+	case UpdatePaymentSubscription:
+		return &UpdatePaymentSubscriptionMessage{}, true
 	}
 	return nil, false
 }
