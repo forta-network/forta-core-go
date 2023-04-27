@@ -19,7 +19,7 @@ type PaymentSubscription struct {
 	UserAddress     string `json:"userAddress"`
 	Type            string `json:"type"`
 	ContractAddress string `json:"contractAddress"`
-	TokenID         string `json:"tokenId"`
+	TokenID         uint64 `json:"tokenId"`
 	Active          bool   `json:"active"`
 }
 
