@@ -2,10 +2,8 @@ package feeds
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -15,7 +13,6 @@ import (
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
-	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
@@ -45,7 +42,7 @@ type combinerFeed struct {
 	botSubscriptions []*domain.CombinerBotSubscription
 	botsMu           sync.RWMutex
 
-	alertCache *cache.Cache
+	combinerCache *combinerCache
 
 	handlers    []cfHandler
 	handlersMu  sync.Mutex
@@ -147,7 +144,7 @@ func (cf *combinerFeed) initialize() error {
 // forEachAlert retrieves alerts for each subscription, and processes them by calling the alert handlers passed in as an argument.
 // It waits for the rate limit, if any, and saves the alert cache to a persistent file, if configured.
 // This method is thread-safe, as it acquires a lock on the subscriptions mutex before accessing or modifying them,
-// and on the alertCache mutex before accessing or modifying it.
+// and on the combinerCache mutex before accessing or modifying it.
 func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 	// Set up logger and firstRun flag
 	logger := log.WithField("component", "combinerFeed")
@@ -194,31 +191,17 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		// Save alert cache to persistent file, if configured
 		if cf.cfg.CombinerCachePath != "" {
-			if err := cf.dumpCacheToFile(cf.cfg.CombinerCachePath); err != nil {
+			if err := cf.combinerCache.DumpToFile(cf.cfg.CombinerCachePath); err != nil {
 				log.Panic(err)
 			}
 		}
 	}
 }
 
-func (cf *combinerFeed) dumpCacheToFile(filePath string) error {
-	d, err := json.Marshal(cf.alertCache.Items())
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(filePath, d, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // fetchAlertsAndHandle retrieves alerts from the public API using the given subscription details, filters them by creation date,
 // and processes each alert by calling the alert handlers passed in as an argument.
 // Returns an error if there was an issue fetching or processing alerts.
-// This method is thread-safe, as it acquires a lock on the client and alertCache mutexes before accessing or modifying them.
+// This method is thread-safe, as it acquires a lock on the client and combinerCache mutexes before accessing or modifying them.
 func (cf *combinerFeed) fetchAlertsAndHandle(
 	ctx context.Context, alertHandlers []cfHandler, subscription *domain.CombinerBotSubscription, createdSince int64,
 	createdBefore int64,
@@ -311,7 +294,7 @@ func (cf *combinerFeed) fetchAlerts(ctx context.Context, logger *log.Entry, subs
 // processAlerts processes a slice of alerts by filtering out those that are too old or have already been processed and then passing
 // the remaining alerts to the alert handlers passed in as an argument.
 // It uses a cache to prevent duplicate processing of alerts and creates an AlertEvent object to pass to each alert handler.
-// It is thread-safe as it acquires a lock on the alertCache mutex before accessing or modifying it.
+// It is thread-safe as it acquires a lock on the combinerCache mutex before accessing or modifying it.
 func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, alerts []*protocol.AlertEvent, subscription *domain.CombinerBotSubscription, alertHandlers []cfHandler) {
 	for _, alert := range alerts {
 		// check if the alert is too old to process
@@ -323,12 +306,12 @@ func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, aler
 		}
 
 		// check if the alert has already been processed
-		if _, exists := cf.alertCache.Get(encodeAlertCacheKey(subscription.Subscriber.BotID, alert.Alert.Hash)); exists {
+		if cf.combinerCache.Exists(subscription, alert) {
 			continue
 		}
 
 		// add the alert to the cache to prevent duplicate processing
-		cf.alertCache.Set(encodeAlertCacheKey(subscription.Subscriber.BotID, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration)
+		cf.combinerCache.Set(subscription, alert)
 
 		// create an AlertEvent object to pass to each alert handler
 		alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
@@ -445,27 +428,9 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, client graphql.Client) (AlertFeed, error) {
 	alerts := make(chan *domain.AlertEvent, 10)
 
-	var alertCache *cache.Cache
-	if cfg.CombinerCachePath != "" {
-		d, err := os.ReadFile(cfg.CombinerCachePath)
-		if err != nil {
-			return nil, fmt.Errorf("can not read combiner cache file: %v", err)
-		}
-
-		var m map[string]cache.Item
-
-		err = json.Unmarshal(d, &m)
-		if err != nil {
-			removalErr := os.RemoveAll(cfg.CombinerCachePath)
-			if removalErr != nil {
-				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", removalErr)
-			}
-			return nil, fmt.Errorf("malformed combiner cache: %v", err)
-		}
-
-		alertCache = cache.NewFrom(graphql.DefaultLastNMinutes*2, time.Minute, m)
-	} else {
-		alertCache = cache.New(graphql.DefaultLastNMinutes*2, time.Minute)
+	combinerCache, err := newCombinerCache(cfg.CombinerCachePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize combiner cache: %v", err)
 	}
 
 	bf := &combinerFeed{
@@ -476,14 +441,8 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		alertCh:          alerts,
 		botSubscriptions: []*domain.CombinerBotSubscription{},
 		cfg:              cfg,
-		alertCache:       alertCache,
+		combinerCache:    combinerCache,
 	}
 
 	return bf, nil
-}
-
-// encodeAlertCacheKey must encode alerts to prevent missing subscriptions to the same target bot
-// from several deployed bots
-func encodeAlertCacheKey(subscriberBotID, alertHash string) string {
-	return fmt.Sprintf("%s|%s", subscriberBotID, alertHash)
 }
