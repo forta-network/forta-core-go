@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -81,7 +80,7 @@ func (cf *combinerFeed) AddSubscription(subscription *domain.CombinerBotSubscrip
 
 	for _, s := range cf.botSubscriptions {
 		// existing subscriptions must not be added to prevent duplicate graphql queries, the error however is usually safe to ignore.
-		if subscriptionsEqual(s, subscription) {
+		if s.Equal(subscription) {
 			return fmt.Errorf("incoming subscription already exists")
 		}
 	}
@@ -98,7 +97,7 @@ func (cf *combinerFeed) RemoveSubscription(subscription *domain.CombinerBotSubsc
 	defer cf.botsMu.Unlock()
 
 	for i, s := range cf.botSubscriptions {
-		if subscriptionsEqual(s, subscription) {
+		if s.Equal(subscription) {
 			cf.botSubscriptions = append(
 				cf.botSubscriptions[:i], cf.botSubscriptions[i+1:]...,
 			)
@@ -404,49 +403,6 @@ func subscriberInfoToHeaders(subscriber *domain.Subscriber) map[string]string {
 	}
 }
 
-// subscriptionsEqual returns true if two subscriptions are equal and false otherwise.
-func subscriptionsEqual(a, b *domain.CombinerBotSubscription) bool {
-	if a == nil || b == nil {
-		return false
-	}
-
-	if a.Subscription.BotId != b.Subscription.BotId ||
-		a.Subscription.AlertId != b.Subscription.AlertId ||
-		a.Subscription.ChainId != b.Subscription.ChainId ||
-		!stringSlicesEqual(a.Subscription.AlertIds, b.Subscription.AlertIds) {
-		return false
-	}
-
-	// Subscriber-specific uniqueness checks. Since the protocol enforces subscription fees, subscriptions from 2 different bots or bot owners can not
-	// be treated as same, because one can fail while the other succeeds.
-	if a.Subscriber.BotID != b.Subscriber.BotID || a.Subscriber.BotOwner != b.Subscriber.BotOwner {
-		return false
-	}
-
-	return true
-}
-
-// stringSlicesEqual returns true if two slices of strings are equal and false otherwise.
-func stringSlicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	aCopy := make([]string, len(a))
-	bCopy := make([]string, len(b))
-	copy(aCopy, a)
-	copy(bCopy, b)
-	sort.Strings(aCopy)
-	sort.Strings(bCopy)
-
-	for i := range aCopy {
-		if aCopy[i] != bCopy[i] {
-			return false
-		}
-	}
-
-	return true
-}
 
 func alertIsTooOld(alert *protocol.AlertEvent, maxAge time.Duration) (bool, *time.Duration) {
 	if maxAge == 0 {
