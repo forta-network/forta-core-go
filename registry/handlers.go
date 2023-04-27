@@ -43,6 +43,9 @@ type Handlers struct {
 	ScannerStakeThresholdHandlers regmsg.HandlerFuncs[*registry.ScannerStakeThresholdMessage]
 
 	ScannerPoolAllocationHandlers regmsg.HandlerFuncs[*registry.ScannerPoolAllocationMessage]
+
+	// payments
+	UpdatePaymentSubscriptionMessageHandlers regmsg.HandlerFuncs[*registry.UpdatePaymentSubscriptionMessage]
 }
 
 type HandlerRegistry struct {
