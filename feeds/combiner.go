@@ -284,7 +284,9 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 
 		alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
 		if err != nil {
-			return err
+			// safe to continue processing rest of alerts - alert specific problem
+			log.WithError(err).Warn("failed to process alert")
+			continue
 		}
 
 		evt := &domain.AlertEvent{
@@ -298,7 +300,9 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 
 		for _, alertHandler := range alertHandlers {
 			if err := alertHandler.Handler(evt); err != nil {
-				return err
+				// safe to continue processing rest of alerts - alert specific problem
+				log.WithError(err).Warn("error executing alert handler")
+				continue
 			}
 		}
 	}
@@ -424,14 +428,17 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 	if cfg.CombinerCachePath != "" {
 		d, err := os.ReadFile(cfg.CombinerCachePath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("can not read combiner cache file: %v", err)
 		}
 
 		var m map[string]cache.Item
 
 		err = json.Unmarshal(d, &m)
 		if err != nil {
-			_ = os.RemoveAll(cfg.CombinerCachePath)
+			removalErr := os.RemoveAll(cfg.CombinerCachePath)
+			if removalErr != nil {
+				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", removalErr)
+			}
 			return nil, fmt.Errorf("malformed combiner cache: %v", err)
 		}
 

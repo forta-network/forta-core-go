@@ -53,10 +53,11 @@ func (ac *client) GetAlerts(
 
 	var alerts []*protocol.AlertEvent
 
+	// iterate until there are no more alerts to retrieve
 	for {
 		response, err := fetchAlerts(ctx, ac.url, input, headers)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to fetch alerts: %v", err)
 		}
 
 		alerts = append(alerts, response.ToProto()...)
