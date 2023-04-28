@@ -19,15 +19,15 @@ type Source struct {
 }
 
 // SourceFromBlock creates message source from given block.
-func SourceFromBlock(txHash string, blk *domain.Block) *Source {
+func SourceFromBlock(txHash string, blk *domain.Block) Source {
 	if blk == nil {
-		return &Source{
+		return Source{
 			TxHash: txHash,
 		}
 	}
 
 	ts := utils.HexToInt64(blk.Timestamp)
-	return &Source{
+	return Source{
 		BlockNumberDecimal: utils.HexToInt64(blk.Number),
 		BlockNumber:        blk.Number,
 		BlockHash:          blk.Hash,
@@ -50,7 +50,7 @@ func From(txHash string, blk *domain.Block, action string) Message {
 type Message struct {
 	Action    string    `json:"action"`
 	Timestamp time.Time `json:"timestamp"`
-	Source    *Source   `json:"source,omitempty"`
+	Source    Source    `json:"source"`
 }
 
 // ActionName implements the message interface.
