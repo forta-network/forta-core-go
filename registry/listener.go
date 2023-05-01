@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 	"math/big"
 	"sync"
+
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -108,7 +109,11 @@ func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types
 		if err != nil {
 			return err
 		}
-		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromTransfer(evt, blk))
+		chainID, err := l.client.Contracts().ScannerPoolReg.MonitoredChainId(nil, evt.TokenId)
+		if err != nil {
+			return fmt.Errorf("failed to get the monitored chain id for the pool: %v", err)
+		}
+		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromTransfer(evt, chainID, blk))
 
 	case contract_scanner_pool_registry_0_1_0.ScannerPoolRegisteredTopic:
 		evt, err := contracts.ScannerPoolRegFil.ParseScannerPoolRegistered(le)
@@ -126,7 +131,15 @@ func (l *listener) handleScannerPoolRegistryEvent(contracts *Contracts, le types
 		if err != nil {
 			return err
 		}
-		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromEnablement(evt, blk))
+		chainID, err := l.client.Contracts().ScannerPoolReg.MonitoredChainId(nil, evt.ScannerPoolId)
+		if err != nil {
+			return fmt.Errorf("failed to get the monitored chain id for the pool: %v", err)
+		}
+		owner, err := l.client.GetScannerPoolOwner(evt.ScannerPoolId)
+		if err != nil {
+			return fmt.Errorf("failed to get scanner pool owner: %v", err)
+		}
+		return l.handler(l.ctx, logger, registry.NewScannerPoolMessageFromEnablement(evt, owner, chainID, blk))
 	}
 	return nil
 }
