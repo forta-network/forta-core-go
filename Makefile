@@ -140,6 +140,11 @@ abigen: pull-contracts
 	$(GOMERGETYPES) --config contracts/merged/contract_dispatch/caller.yml
 	$(GOMERGETYPES) --config contracts/merged/contract_dispatch/filterer.yml
 
+	abigen --out "contracts/external/contract_public_lock/public_lock.go" \
+		--pkg "contract_public_lock" \
+		--type "PublicLock" \
+		--abi "contracts/external/contract_public_lock/PublicLock.json"
+
 
 .PHONY: pull-contracts
 pull-contracts:
