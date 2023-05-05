@@ -10,6 +10,7 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/patrickmn/go-cache"
+	log "github.com/sirupsen/logrus"
 )
 
 type combinerCache struct {
@@ -33,7 +34,7 @@ func newCombinerCache(path string) (*combinerCache, error) {
 			if removalErr != nil {
 				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", removalErr)
 			}
-			return nil, fmt.Errorf("malformed combiner cache: %v", err)
+			log.WithError(err).Warn("removed malformed combiner cache")
 		}
 
 		alertCache = cache.NewFrom(graphql.DefaultLastNMinutes*2, time.Minute, m)

@@ -121,7 +121,7 @@ func (cf *combinerFeed) RegisterHandler(alertHandler func(evt *domain.AlertEvent
 }
 
 type CombinerFeedConfig struct {
-	RateLimit         *time.Ticker
+	QueryInterval     uint64 // query interval in milliseconds
 	APIUrl            string
 	Start             uint64
 	End               uint64
@@ -433,11 +433,16 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		return nil, fmt.Errorf("failed to initialize combiner cache: %v", err)
 	}
 
+	rateLimit := time.NewTicker(DefaultRatelimitDuration)
+	// Use configured query interval if exists, max interval is set to the default interval to prevent protocol-wide delays.
+	if cfg.QueryInterval > 0 && cfg.QueryInterval < uint64(DefaultRatelimitDuration.Milliseconds()) {
+		rateLimit = time.NewTicker(time.Millisecond * time.Duration(cfg.QueryInterval))
+	}
 	bf := &combinerFeed{
 		maxAlertAge:      time.Minute * 20,
 		ctx:              ctx,
 		client:           client,
-		rateLimit:        cfg.RateLimit,
+		rateLimit:        rateLimit,
 		alertCh:          alerts,
 		botSubscriptions: []*domain.CombinerBotSubscription{},
 		cfg:              cfg,
