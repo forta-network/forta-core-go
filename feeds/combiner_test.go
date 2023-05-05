@@ -17,7 +17,7 @@ import (
 
 func Test_combinerFeed_Start(t *testing.T) {
 	type args struct {
-		rate                int64
+		rate                uint64
 		stopAfterFirstAlert bool
 		expectErr           error
 	}
@@ -49,7 +49,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 		{
 			name: "successfully feeds alerts",
 			args: args{
-				rate:                int64(time.Nanosecond),
+				rate:                uint64(time.Second.Milliseconds()),
 				stopAfterFirstAlert: true,
 				expectErr:           context.Canceled,
 			},
@@ -64,10 +64,9 @@ func Test_combinerFeed_Start(t *testing.T) {
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 				defer cancel()
 
-				rate := time.NewTicker(time.Duration(tt.args.rate))
 				cf, err := NewCombinerFeedWithClient(
 					ctx, CombinerFeedConfig{
-						RateLimit: rate,
+						QueryInterval: tt.args.rate,
 					}, tt.client,
 				)
 
