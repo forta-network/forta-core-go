@@ -434,7 +434,8 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 	}
 
 	rateLimit := time.NewTicker(DefaultRatelimitDuration)
-	if cfg.QueryInterval > 0 {
+	// Use configured query interval if exists, max interval is set to the default interval to prevent protocol-wide delays.
+	if cfg.QueryInterval > 0 && cfg.QueryInterval < uint64(DefaultRatelimitDuration.Milliseconds()) {
 		rateLimit = time.NewTicker(time.Millisecond * time.Duration(cfg.QueryInterval))
 	}
 	bf := &combinerFeed{
