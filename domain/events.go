@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"math/big"
+	"sort"
 	"strings"
 	"time"
 
@@ -320,4 +321,49 @@ type Subscriber struct {
 type CombinerBotSubscription struct {
 	Subscription *protocol.CombinerBotSubscription `json:"subscription"`
 	Subscriber   *Subscriber                       `json:"subscriber"`
+}
+
+// Equal returns true if two subscriptions are equal and false otherwise.
+func (c *CombinerBotSubscription) Equal(b *CombinerBotSubscription) bool {
+	if c == nil || b == nil {
+		return false
+	}
+
+	if c.Subscription.BotId != b.Subscription.BotId ||
+		c.Subscription.AlertId != b.Subscription.AlertId ||
+		c.Subscription.ChainId != b.Subscription.ChainId ||
+		!stringSlicesEqual(c.Subscription.AlertIds, b.Subscription.AlertIds) {
+		return false
+	}
+
+	// Subscriber-specific uniqueness checks. Since the protocol enforces subscription fees, subscriptions from 2 different bots or bot owners can not
+	// be treated as same, because one can fail while the other succeeds.
+	if c.Subscriber.BotID != b.Subscriber.BotID || c.Subscriber.BotOwner != b.Subscriber.BotOwner {
+		return false
+	}
+
+	return true
+}
+
+
+// stringSlicesEqual returns true if two slices of strings are equal and false otherwise.
+func stringSlicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	aCopy := make([]string, len(a))
+	bCopy := make([]string, len(b))
+	copy(aCopy, a)
+	copy(bCopy, b)
+	sort.Strings(aCopy)
+	sort.Strings(bCopy)
+
+	for i := range aCopy {
+		if aCopy[i] != bCopy[i] {
+			return false
+		}
+	}
+
+	return true
 }
