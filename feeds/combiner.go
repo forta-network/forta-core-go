@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -210,6 +209,7 @@ func (cf *combinerFeed) fetchAlertsAndHandle(
 		log.Fields{
 			"subscriberBotId":    subscription.Subscriber.BotID,
 			"subscriberBotOwner": subscription.Subscriber.BotOwner,
+			"subscriberBotImage": subscription.Subscriber.BotImage,
 			"subscribedTo":       subscription.Subscription.BotId,
 		},
 	)
@@ -252,26 +252,10 @@ func (cf *combinerFeed) fetchAlerts(ctx context.Context, logger *log.Entry, subs
 			if cErr != nil {
 				logger.WithError(cErr).Warn("error retrieving alerts")
 
-				// iterate the list of graphql errors
+				// any graphql error is non-retryable
 				errList, ok := cErr.(gqlerror.List)
 				if ok {
-					for _, gqlErr := range errList {
-						if gqlErr.Extensions == nil {
-							continue
-						}
-						exCode := gqlErr.Extensions["code"]
-
-						// stop retrying if there are authorization errors
-						if exCode == "UNAUTHENTICATED" {
-							return backoff.Permanent(ErrUnauthorized)
-
-						}
-					}
-				}
-
-				// stop retrying if there are bad request errors
-				if strings.Contains(cErr.Error(), "400") {
-					return backoff.Permanent(ErrBadRequest)
+					return backoff.Permanent(errList)
 				}
 
 				// it is safe to return nil on context deadlines, no need for error handling.
