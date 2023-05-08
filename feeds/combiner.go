@@ -182,7 +182,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 			err := cf.fetchAlertsAndHandle(cf.ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
 			if err != nil {
-				logger.WithError(err).Warn("failed to fetch alerts")
+				logger.WithError(err).Warn("failed to fetch alerts and handle")
 			}
 		}
 
