@@ -412,7 +412,7 @@ func NewCombinerFeed(ctx context.Context, cfg CombinerFeedConfig) (AlertFeed, er
 func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, client graphql.Client) (AlertFeed, error) {
 	alerts := make(chan *domain.AlertEvent, 10)
 
-	combinerCache, err := newCombinerCache(cfg.CombinerCachePath)
+	c, err := newCombinerCache(cfg.CombinerCachePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize combiner cache: %v", err)
 	}
@@ -430,7 +430,7 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		alertCh:          alerts,
 		botSubscriptions: []*domain.CombinerBotSubscription{},
 		cfg:              cfg,
-		combinerCache:    combinerCache,
+		combinerCache:    c,
 	}
 
 	return bf, nil
