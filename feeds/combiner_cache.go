@@ -2,6 +2,7 @@ package feeds
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -30,9 +31,14 @@ func newCombinerCache(path string) (*combinerCache, error) {
 
 		err = json.Unmarshal(d, &m)
 		if err != nil {
-			removalErr := os.RemoveAll(path)
-			if removalErr != nil {
-				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", removalErr)
+			tErr := os.RemoveAll(path)
+			if tErr != nil {
+				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", tErr)
+			}
+
+			_, tErr = os.Create(path)
+			if tErr != nil {
+				return nil, fmt.Errorf("can not create new combiner cache file :%v", tErr)
 			}
 			log.WithError(err).Warn("removed malformed combiner cache")
 		}
@@ -60,6 +66,10 @@ func (c *combinerCache) DumpToFile(filePath string) error {
 	d, err := json.Marshal(c.cache.Items())
 	if err != nil {
 		return err
+	}
+
+	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+		_, _ = os.Create(filePath)
 	}
 
 	// Write the JSON data to the specified file
