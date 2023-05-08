@@ -31,6 +31,8 @@ func newCombinerCache(path string) (*combinerCache, error) {
 
 		err = json.Unmarshal(d, &m)
 		if err != nil {
+			m = make(map[string]cache.Item)
+
 			tErr := os.RemoveAll(path)
 			if tErr != nil {
 				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", tErr)
