@@ -77,7 +77,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 						Subscription: &protocol.CombinerBotSubscription{
 							BotId: subscribeeBot,
 						},
-						Subscriber: &domain.Subscriber{BotID: subscriberBot, BotOwner: "0x"},
+						Subscriber: &domain.Subscriber{BotID: subscriberBot, BotOwner: "0x", BotImage: "0x123"},
 					},
 				)
 				r.NoError(err)

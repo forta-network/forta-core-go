@@ -2,6 +2,7 @@ package feeds
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -30,9 +31,16 @@ func newCombinerCache(path string) (*combinerCache, error) {
 
 		err = json.Unmarshal(d, &m)
 		if err != nil {
-			removalErr := os.RemoveAll(path)
-			if removalErr != nil {
-				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", removalErr)
+			m = make(map[string]cache.Item)
+
+			tErr := os.RemoveAll(path)
+			if tErr != nil {
+				return nil, fmt.Errorf("can not remove malformed combiner cache, :%v", tErr)
+			}
+
+			_, tErr = os.Create(path)
+			if tErr != nil {
+				return nil, fmt.Errorf("can not create new combiner cache file :%v", tErr)
 			}
 			log.WithError(err).Warn("removed malformed combiner cache")
 		}
@@ -46,12 +54,12 @@ func newCombinerCache(path string) (*combinerCache, error) {
 }
 
 func (c *combinerCache) Exists(subscription *domain.CombinerBotSubscription, alert *protocol.AlertEvent) bool {
-	_, exists := c.cache.Get(encodeAlertCacheKey(subscription.Subscriber.BotID, alert.Alert.Hash))
+	_, exists := c.cache.Get(encodeAlertCacheKey(subscription.Subscriber.BotID, subscription.Subscriber.BotImage, alert.Alert.Hash))
 	return exists
 }
 
 func (c *combinerCache) Set(subscription *domain.CombinerBotSubscription, alert *protocol.AlertEvent) {
-	c.cache.Set(encodeAlertCacheKey(subscription.Subscriber.BotID, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration)
+	c.cache.Set(encodeAlertCacheKey(subscription.Subscriber.BotID, subscription.Subscriber.BotImage, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration)
 }
 
 // DumpToFile dumps the current cache into a file in JSON format, so that the cache can be used in a persistent way.
@@ -60,6 +68,10 @@ func (c *combinerCache) DumpToFile(filePath string) error {
 	d, err := json.Marshal(c.cache.Items())
 	if err != nil {
 		return err
+	}
+
+	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+		_, _ = os.Create(filePath)
 	}
 
 	// Write the JSON data to the specified file
@@ -73,6 +85,6 @@ func (c *combinerCache) DumpToFile(filePath string) error {
 
 // encodeAlertCacheKey must encode alerts to prevent missing subscriptions to the same target bot
 // from several deployed bots
-func encodeAlertCacheKey(subscriberBotID, alertHash string) string {
-	return fmt.Sprintf("%s|%s", subscriberBotID, alertHash)
+func encodeAlertCacheKey(subscriberBotID, image, alertHash string) string {
+	return fmt.Sprintf("%s|%s|%s", subscriberBotID, image, alertHash)
 }

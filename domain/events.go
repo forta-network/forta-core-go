@@ -314,8 +314,9 @@ func (t *AlertEvent) ToMessage() (*protocol.AlertEvent, error) {
 }
 
 type Subscriber struct {
-	BotID    string `json:"bot_id"`
+	BotID        string `json:"bot_id"`
 	BotOwner string `json:"bot_owner"`
+	BotImage string `json:"bot_image_hash"`
 }
 
 type CombinerBotSubscription struct {
@@ -338,7 +339,7 @@ func (c *CombinerBotSubscription) Equal(b *CombinerBotSubscription) bool {
 
 	// Subscriber-specific uniqueness checks. Since the protocol enforces subscription fees, subscriptions from 2 different bots or bot owners can not
 	// be treated as same, because one can fail while the other succeeds.
-	if c.Subscriber.BotID != b.Subscriber.BotID || c.Subscriber.BotOwner != b.Subscriber.BotOwner {
+	if c.Subscriber.BotID != b.Subscriber.BotID || c.Subscriber.BotOwner != b.Subscriber.BotOwner || c.Subscriber.BotImage != b.Subscriber.BotImage {
 		return false
 	}
 
