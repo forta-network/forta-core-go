@@ -2,7 +2,6 @@ package feeds
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -13,7 +12,6 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
 	log "github.com/sirupsen/logrus"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 var (
@@ -252,18 +250,8 @@ func (cf *combinerFeed) fetchAlerts(ctx context.Context, logger *log.Entry, subs
 			if cErr != nil {
 				logger.WithError(cErr).Warn("error retrieving alerts")
 
-				// any graphql error is non-retryable
-				errList, ok := cErr.(gqlerror.List)
-				if ok {
-					return backoff.Permanent(errList)
-				}
-
-				// it is safe to return nil on context deadlines, no need for error handling.
-				if errors.Is(cErr, context.DeadlineExceeded) {
-					return nil
-				}
-
-				return cErr
+				// make any error is non-retryable
+				return backoff.Permanent(cErr)
 			}
 			return nil
 		},
