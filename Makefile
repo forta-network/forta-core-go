@@ -78,6 +78,7 @@ mocks:
 	mockgen -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go
 	mockgen -source manifest/client.go -destination manifest/mocks/mock_client.go
 	mockgen -source clients/graphql/client.go -destination clients/mocks/mock_graphql_client.go
+	mockgen -source utils/ethutils/iterator.go -destination utils/ethutils/mocks/mock_iterator.go
 
 .PHONY: test
 test:
@@ -139,6 +140,11 @@ abigen: pull-contracts
 	./scripts/abigen.sh forta-contracts components/_old/dispatch/Dispatch_0_1_4.sol Dispatch_0_1_4 Dispatch dispatch_0_1_4
 	$(GOMERGETYPES) --config contracts/merged/contract_dispatch/caller.yml
 	$(GOMERGETYPES) --config contracts/merged/contract_dispatch/filterer.yml
+
+	abigen --out "contracts/external/contract_public_lock/public_lock.go" \
+		--pkg "contract_public_lock" \
+		--type "PublicLock" \
+		--abi "contracts/external/contract_public_lock/PublicLock.json"
 
 
 .PHONY: pull-contracts
