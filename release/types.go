@@ -78,15 +78,22 @@ type ReleaseManifest struct {
 
 // Release contains release data.
 type Release struct {
-	Timestamp  string          `json:"timestamp"`
-	Repository string          `json:"repository"`
-	Version    string          `json:"version"`
-	Commit     string          `json:"commit"`
-	Services   ReleaseServices `json:"services"`
+	Timestamp         string             `json:"timestamp"`
+	Repository        string             `json:"repository"`
+	Version           string             `json:"version"`
+	Commit            string             `json:"commit"`
+	Services          ReleaseServices    `json:"services"`
+	DeprecationPolicy *DeprecationPolicy `json:"deprecationPolicy,omitempty"`
 }
 
 // ReleaseServices are the services to run for scanner node.
 type ReleaseServices struct {
 	Updater    string `json:"updater"`
 	Supervisor string `json:"supervisor"`
+}
+
+// DeprecationPolicy defines the deprecation policy of this release.
+type DeprecationPolicy struct {
+	SupportedVersions []string `json:"supportedVersions"`
+	ActivatedInHours  int      `json:"activatedInHours"`
 }
