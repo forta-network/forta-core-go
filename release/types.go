@@ -100,5 +100,5 @@ type ReleaseServices struct {
 // DeprecationPolicy defines the deprecation policy of this release.
 type DeprecationPolicy struct {
 	SupportedVersions []string `json:"supportedVersions"`
-	ActivatedInHours  int      `json:"activatedInHours"`
+	ActivatesInHours  int      `json:"activatesInHours"`
 }
