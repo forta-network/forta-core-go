@@ -6,6 +6,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Release defaults
+const (
+	DefaultDeprecationHours = 168 // 1 week
+)
+
 // ReleaseSummary contains concise release info.
 type ReleaseSummary struct {
 	Commit  string `json:"commit,omitempty"`
