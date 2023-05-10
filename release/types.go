@@ -9,6 +9,7 @@ import (
 // Release defaults
 const (
 	DefaultDeprecationHours = 168 // 1 week
+	DefaultAutoUpdateHours  = 24
 )
 
 // ReleaseSummary contains concise release info.
@@ -78,27 +79,33 @@ func MakeSummaryFromReleaseInfo(releaseInfo *ReleaseInfo) *ReleaseSummary {
 
 // ReleaseManifest contains the latest info about the latest scanner version.
 type ReleaseManifest struct {
-	Release Release `json:"release"`
+	Release Release `json:"release" yaml:"release"`
 }
 
 // Release contains release data.
 type Release struct {
-	Timestamp         string             `json:"timestamp"`
-	Repository        string             `json:"repository"`
-	Version           string             `json:"version"`
-	Commit            string             `json:"commit"`
-	Services          ReleaseServices    `json:"services"`
-	DeprecationPolicy *DeprecationPolicy `json:"deprecationPolicy,omitempty"`
+	Timestamp  string          `json:"timestamp" yaml:"timestamp"`
+	Repository string          `json:"repository" yaml:"repository"`
+	Version    string          `json:"version" yaml:"version"`
+	Commit     string          `json:"commit" yaml:"commit"`
+	Services   ReleaseServices `json:"services" yaml:"services"`
+	Config     ReleaseConfig   `json:"config" yaml:"config"`
 }
 
 // ReleaseServices are the services to run for scanner node.
 type ReleaseServices struct {
-	Updater    string `json:"updater"`
-	Supervisor string `json:"supervisor"`
+	Updater    string `json:"updater" yaml:"updater"`
+	Supervisor string `json:"supervisor" yaml:"supervisor"`
+}
+
+// ReleaseConfig contains release config information.
+type ReleaseConfig struct {
+	AutoUpdateInHours int                `json:"autoUpdateInHours" yaml:"autoUpdateInHours"`
+	DeprecationPolicy *DeprecationPolicy `json:"deprecationPolicy" yaml:"deprecationPolicy"`
 }
 
 // DeprecationPolicy defines the deprecation policy of this release.
 type DeprecationPolicy struct {
-	SupportedVersions []string `json:"supportedVersions"`
-	ActivatesInHours  int      `json:"activatesInHours"`
+	SupportedVersions []string `json:"supportedVersions" yaml:"supportedVersions"`
+	ActivatesInHours  int      `json:"activatesInHours" yaml:"activatesInHours"`
 }
