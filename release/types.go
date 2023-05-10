@@ -100,8 +100,8 @@ type ReleaseServices struct {
 
 // ReleaseConfig contains release config information.
 type ReleaseConfig struct {
-	AutoUpdateInHours int                `json:"autoUpdateInHours" yaml:"autoUpdateInHours"`
-	DeprecationPolicy *DeprecationPolicy `json:"deprecationPolicy" yaml:"deprecationPolicy"`
+	AutoUpdateInHours int               `json:"autoUpdateInHours" yaml:"autoUpdateInHours"`
+	DeprecationPolicy DeprecationPolicy `json:"deprecationPolicy" yaml:"deprecationPolicy"`
 }
 
 // DeprecationPolicy defines the deprecation policy of this release.
