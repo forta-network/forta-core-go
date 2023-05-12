@@ -25,3 +25,11 @@ func TestClient_GetReleaseManifestFromDist(t *testing.T) {
 
 	assert.Equal(t, "6c63eeee87cc99819899008ffc5db3165636bfe3", rm.Release.Commit)
 }
+
+func TestClient_GetReleaseManifestFromErr(t *testing.T) {
+	c, err := NewClient("https://ipfs.forta.network", []string{"https://dist-dev.forta.network/manifests/releases"})
+	assert.NoError(t, err)
+
+	_, err = c.GetReleaseManifest("invalid")
+	assert.Error(t, err, "error")
+}
