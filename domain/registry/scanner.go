@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"math/big"
 	"strings"
 
 	"github.com/forta-network/forta-core-go/domain"
@@ -102,11 +103,12 @@ func NewScannerSaveMessageFromPool(evt *contract_scanner_pool_registry.ScannerPo
 	}
 }
 
-func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.ScannerPoolRegistryTransfer, blk *domain.Block) *UpdateScannerPoolMessage {
+func NewScannerPoolMessageFromTransfer(evt *contract_scanner_pool_registry.ScannerPoolRegistryTransfer, chainID *big.Int, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: regmsg.From(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
 		PoolID:  utils.PoolIDToString(evt.TokenId),
 		Owner:   utils.StringPtr(evt.To.Hex()),
+		ChainID: utils.Int64Ptr(chainID.Int64()),
 	}
 }
 
@@ -119,9 +121,11 @@ func NewScannerPoolMessageFromRegistration(evt *contract_scanner_pool_registry.S
 	}
 }
 
-func NewScannerPoolMessageFromEnablement(evt *contract_scanner_pool_registry.ScannerPoolRegistryEnabledScannersChanged, blk *domain.Block) *UpdateScannerPoolMessage {
+func NewScannerPoolMessageFromEnablement(evt *contract_scanner_pool_registry.ScannerPoolRegistryEnabledScannersChanged, owner string, chainID *big.Int, blk *domain.Block) *UpdateScannerPoolMessage {
 	return &UpdateScannerPoolMessage{
 		Message: regmsg.From(evt.Raw.TxHash.Hex(), blk, UpdateScannerPool),
 		PoolID:  utils.PoolIDToString(evt.ScannerPoolId),
+		Owner:   utils.StringPtr(owner),
+		ChainID: utils.Int64Ptr(chainID.Int64()),
 	}
 }
