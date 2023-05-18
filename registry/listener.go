@@ -167,7 +167,28 @@ func (l *listener) handleAgentRegistryEvent(contracts *Contracts, le types.Log, 
 		if err != nil {
 			return err
 		}
-		return l.handler(l.ctx, logger, registry.NewAgentSaveMessage(au, agt.Enabled, blk))
+		return l.handler(l.ctx, logger, registry.NewAgentSaveMessageFromUpdate(au, agt.Enabled, blk))
+
+	case contract_agent_registry_0_1_6.TransferTopic:
+		at, err := contracts.AgentRegFil.ParseTransfer(le)
+		if err != nil {
+			return err
+		}
+		// only record user wallet-to-wallet transfer
+		if at.From.Hex() == utils.ZeroAddress || at.To.Hex() == utils.ZeroAddress {
+			return nil
+		}
+		agt, err := l.client.GetAgent(utils.AgentBigIntToHex(at.TokenId))
+		if err != nil {
+			return err
+		}
+		return l.handler(l.ctx, logger, registry.NewAgentSaveMessageFromTransfer(at, registry.AgentProperties{
+			Enabled:  agt.Enabled,
+			Name:     agt.Manifest,
+			ChainIDs: agt.ChainIDs,
+			Metadata: agt.Manifest,
+			Owner:    agt.Owner,
+		}, blk))
 
 	case contract_agent_registry_0_1_6.AgentEnabledTopic: // same with prev version
 		ae, err := contracts.AgentRegFil.ParseAgentEnabled(le)

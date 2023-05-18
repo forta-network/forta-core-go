@@ -31,6 +31,10 @@ func (am *AgentMessage) LogFields() logrus.Fields {
 
 type AgentSaveMessage struct {
 	AgentMessage
+	AgentProperties
+}
+
+type AgentProperties struct {
 	Enabled  bool    `json:"enabled"`
 	Name     string  `json:"name"`
 	ChainIDs []int64 `json:"chainIds"`
@@ -56,7 +60,7 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 	}
 }
 
-func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated, enabled bool, blk *domain.Block) *AgentSaveMessage {
+func NewAgentSaveMessageFromUpdate(evt *contract_agent_registry.AgentRegistryAgentUpdated, enabled bool, blk *domain.Block) *AgentSaveMessage {
 	agentID := utils.Hex(evt.AgentId)
 	return &AgentSaveMessage{
 		AgentMessage: AgentMessage{
@@ -68,10 +72,28 @@ func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated,
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},
-		Enabled:  enabled,
-		Name:     evt.Metadata,
-		ChainIDs: utils.IntArray(evt.ChainIds),
-		Metadata: evt.Metadata,
-		Owner:    evt.By.Hex(),
+		AgentProperties: AgentProperties{
+			Enabled:  enabled,
+			Name:     evt.Metadata,
+			ChainIDs: utils.IntArray(evt.ChainIds),
+			Metadata: evt.Metadata,
+			Owner:    evt.By.Hex(),
+		},
+	}
+}
+
+func NewAgentSaveMessageFromTransfer(evt *contract_agent_registry.AgentRegistryTransfer, props AgentProperties, blk *domain.Block) *AgentSaveMessage {
+	agentID := utils.Hex(evt.TokenId)
+	return &AgentSaveMessage{
+		AgentMessage: AgentMessage{
+			AgentID: agentID,
+			Message: regmsg.Message{
+				Action:    SaveAgent,
+				Timestamp: time.Now().UTC(),
+				Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			},
+			TxHash: evt.Raw.TxHash.Hex(),
+		},
+		AgentProperties: props,
 	}
 }

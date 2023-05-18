@@ -3,11 +3,12 @@ package registry
 import (
 	"context"
 	"errors"
-	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 	"math/big"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
@@ -176,7 +177,7 @@ func TestListener_Listen(t *testing.T) {
 			block: 32910234,
 		},
 		{
-			name: "agent-save",
+			name: "agent-save-from-update",
 			listener: testListener(ctx, &ContractFilter{AgentRegistry: true},
 				contract_agent_registry_0_1_4.AgentUpdatedTopic,
 				Handlers{
@@ -191,6 +192,23 @@ func TestListener_Listen(t *testing.T) {
 				},
 			),
 			block: 25730681,
+		},
+		{
+			name: "agent-save-from-owner-transfer",
+			listener: testListener(ctx, &ContractFilter{AgentRegistry: true},
+				contract_agent_registry_0_1_4.TransferTopic,
+				Handlers{
+					SaveAgentHandlers: regmsg.Handlers(
+						func(ctx context.Context, logger *log.Entry, msg *registry.AgentSaveMessage) error {
+							assert.Equal(t, int64(39058880), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, registry.SaveAgent, msg.Action)
+							assert.Equal(t, "0x6f022d4a65f397dffd059e269e1c2b5004d822f905674dbf518d968f744c2ede", msg.AgentID)
+							return handledEvent
+						},
+					),
+				},
+			),
+			block: 39058880,
 		},
 		{
 			name: "dispatch-link",
