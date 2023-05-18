@@ -19,12 +19,11 @@ type PaymentSubscription struct {
 	UserAddress     string `json:"userAddress"`
 	Type            string `json:"type"`
 	ContractAddress string `json:"contractAddress"`
-	TokenID         uint64 `json:"tokenId"`
 	Active          bool   `json:"active"`
 }
 
 func (m *UpdatePaymentSubscriptionMessage) LogFields() logrus.Fields {
-	return logrus.Fields{"type": m.Type, "tokenId": m.TokenID, "userAddress": m.UserAddress}
+	return logrus.Fields{"type": m.Type, "contractAddress": m.ContractAddress, "userAddress": m.UserAddress}
 }
 
 func NewUpdatePaymentSubscriptionMessage(paymentSub *PaymentSubscription) *UpdatePaymentSubscriptionMessage {

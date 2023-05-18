@@ -1,0 +1,133 @@
+package graphql
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/sirupsen/logrus"
+)
+
+func (v *getAlertsResponse) ToProto() []*protocol.AlertEvent {
+	return ToProto(v)
+}
+
+func ToProto(response *getAlertsResponse) []*protocol.AlertEvent {
+	var resp []*protocol.AlertEvent
+	for _, alert := range response.Alerts.Alerts {
+		resp = append(resp, AlertToProto(alert))
+	}
+
+	return resp
+}
+
+func AlertToProto(alert *getAlertsAlertsAlertsResponseAlertsAlert) *protocol.AlertEvent {
+	contracts := make([]*protocol.AlertEvent_Alert_Contract, len(alert.Contracts))
+	projects := make([]*protocol.AlertEvent_Alert_Project, len(alert.Projects))
+	labels := make([]*protocol.AlertEvent_Alert_Label, len(alert.Labels))
+
+	for i, contract := range alert.Contracts {
+		contracts[i] = &protocol.AlertEvent_Alert_Contract{
+			Name:      contract.Name,
+			ProjectId: contract.ProjectId,
+		}
+	}
+	for i, project := range alert.Projects {
+		projects[i] = &protocol.AlertEvent_Alert_Project{
+			Id: project.Id,
+		}
+	}
+
+	for i, label := range alert.Labels {
+		if label == nil {
+			logrus.WithField("alert-id", alert.AlertId).Warn("malformed alert label")
+			continue
+		}
+
+		labels[i] = &protocol.AlertEvent_Alert_Label{
+			Label:      label.Label,
+			Confidence: float32(label.Confidence),
+			Entity:     label.Entity,
+			EntityType: label.EntityType,
+			Remove:     label.Remove,
+			Metadata:   label.Metadata,
+		}
+	}
+
+	t, _ := time.Parse(time.RFC3339, alert.Source.Block.Timestamp)
+	blockTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
+	t, _ = time.Parse(time.RFC3339, alert.CreatedAt)
+	alertTimestamp := hexutil.EncodeUint64(uint64(t.Unix()))
+
+	a := &protocol.AlertEvent{
+		Alert: &protocol.AlertEvent_Alert{
+			AlertId:       alert.AlertId,
+			Addresses:     alert.Addresses,
+			Contracts:     contracts,
+			CreatedAt:     alert.CreatedAt,
+			Description:   alert.Description,
+			Hash:          alert.Hash,
+			Metadata:      alert.Metadata,
+			Name:          alert.Name,
+			Projects:      projects,
+			ScanNodeCount: int32(alert.ScanNodeCount),
+			Severity:      alert.Severity,
+			FindingType:   alert.FindingType,
+			RelatedAlerts: alert.RelatedAlerts,
+			ChainId:       uint64(alert.ChainId),
+			Labels:        labels,
+		},
+		Timestamps: &protocol.TrackingTimestamps{SourceAlert: alertTimestamp},
+	}
+
+	a.Alert.Source = &protocol.AlertEvent_Alert_Source{
+		TransactionHash: alert.Source.TransactionHash,
+	}
+
+	if alert.Source == nil {
+		return a
+	}
+
+	// fill source bot
+	if alert.Source.Bot != nil {
+		a.Alert.Source.Bot = &protocol.AlertEvent_Alert_Bot{
+			ChainIds:     alert.Source.Bot.ChainIds,
+			CreatedAt:    alert.Source.Bot.CreatedAt,
+			Description:  alert.Source.Bot.Description,
+			Developer:    alert.Source.Bot.Developer,
+			DocReference: alert.Source.Bot.DocReference,
+			Enabled:      alert.Source.Bot.Enabled,
+			Id:           alert.Source.Bot.Id,
+			Image:        alert.Source.Bot.Image,
+			Name:         alert.Source.Bot.Name,
+			Reference:    alert.Source.Bot.Reference,
+			Repository:   alert.Source.Bot.Repository,
+			Projects:     alert.Source.Bot.Projects,
+			ScanNodes:    alert.Source.Bot.ScanNodes,
+			Version:      alert.Source.Bot.Version,
+		}
+	}
+
+	// fill source block
+	if alert.Source.Block != nil {
+		a.Alert.Source.Block = &protocol.AlertEvent_Alert_Block{
+			Number:    uint64(alert.Source.Block.Number),
+			Hash:      alert.Source.Block.Hash,
+			Timestamp: blockTimestamp,
+			ChainId:   uint64(alert.Source.Block.ChainId),
+		}
+	}
+
+	// fill source alert
+	if alert.Source.SourceAlert != nil {
+		a.Alert.Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
+			BotId:     alert.Source.SourceAlert.BotId,
+			AlertHash: alert.Source.SourceAlert.Hash,
+			Timestamp: alert.Source.SourceAlert.Timestamp,
+			ChainId:   fmt.Sprintf("%d", alert.Source.SourceAlert.ChainId),
+		}
+	}
+
+	return a
+}
