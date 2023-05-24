@@ -154,28 +154,11 @@ func safeAddStrToMap(addresses map[string]bool, addr *string) {
 	}
 }
 
-func safeString(ptr *string) string {
-	if ptr == nil {
-		return ""
-	}
-	return *ptr
-}
-
 func safeBool(b *bool) bool {
 	if b == nil {
 		return false
 	}
 	return *b
-}
-
-func safeStringArr(arr []*string) []string {
-	res := make([]string, 0, len(arr))
-	for _, a := range arr {
-		if a != nil {
-			res = append(res, *a)
-		}
-	}
-	return res
 }
 
 // ToMessage converts the TransactionEvent to the protocol.TransactionEvent message
@@ -248,14 +231,14 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 	for _, l := range t.BlockEvt.Logs {
 		if l.TransactionHash != nil && *l.TransactionHash == t.Transaction.Hash {
 			txLog := &protocol.TransactionEvent_Log{
-				Address:          safeString(l.Address),
-				Topics:           safeStringArr(l.Topics),
-				Data:             safeString(l.Data),
-				BlockNumber:      safeString(l.BlockNumber),
-				TransactionHash:  safeString(l.TransactionHash),
-				TransactionIndex: safeString(l.TransactionIndex),
-				BlockHash:        safeString(l.BlockHash),
-				LogIndex:         safeString(l.LogIndex),
+				Address:          str(l.Address),
+				Topics:           strArr(l.Topics),
+				Data:             str(l.Data),
+				BlockNumber:      str(l.BlockNumber),
+				TransactionHash:  str(l.TransactionHash),
+				TransactionIndex: str(l.TransactionIndex),
+				BlockHash:        str(l.BlockHash),
+				LogIndex:         str(l.LogIndex),
 				Removed:          safeBool(l.Removed),
 			}
 
