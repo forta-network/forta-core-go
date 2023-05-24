@@ -154,6 +154,13 @@ func safeAddStrToMap(addresses map[string]bool, addr *string) {
 	}
 }
 
+func safeBool(b *bool) bool {
+	if b == nil {
+		return false
+	}
+	return *b
+}
+
 // ToMessage converts the TransactionEvent to the protocol.TransactionEvent message
 func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 	evtType := protocol.TransactionEvent_BLOCK
@@ -220,25 +227,28 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		tx.From = strings.ToLower(tx.From)
 	}
 
-	var logs []*protocol.TransactionEvent_Log
-	logJson, err := json.Marshal(t.BlockEvt.Logs)
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(logJson, &logs); err != nil {
-		return nil, err
-	}
-
 	var txLogs []*protocol.TransactionEvent_Log
-	for _, l := range logs {
-		if l.TransactionHash == t.Transaction.Hash {
-			txLogs = append(txLogs, l)
-			l.Address = strings.ToLower(l.Address)
-			safeAddStrValueToMap(addresses, l.Address)
-			safeAddStrValueToMap(txAddresses, l.Address)
+	for _, l := range t.BlockEvt.Logs {
+		if l.TransactionHash != nil && *l.TransactionHash == t.Transaction.Hash {
+			txLog := &protocol.TransactionEvent_Log{
+				Address:          str(l.Address),
+				Topics:           strArr(l.Topics),
+				Data:             str(l.Data),
+				BlockNumber:      str(l.BlockNumber),
+				TransactionHash:  str(l.TransactionHash),
+				TransactionIndex: str(l.TransactionIndex),
+				BlockHash:        str(l.BlockHash),
+				LogIndex:         str(l.LogIndex),
+				Removed:          safeBool(l.Removed),
+			}
+
+			txLogs = append(txLogs, txLog)
+			txLog.Address = strings.ToLower(txLog.Address)
+			safeAddStrValueToMap(addresses, txLog.Address)
+			safeAddStrValueToMap(txAddresses, txLog.Address)
 
 			// add addresses from topics
-			for _, topic := range l.Topics {
+			for _, topic := range txLog.Topics {
 				if strings.HasPrefix(topic, "0x000000000000000000000000") {
 					safeAddStrValueToMap(addresses, common.HexToAddress(topic).Hex())
 					safeAddStrValueToMap(txAddresses, common.HexToAddress(topic).Hex())
@@ -314,7 +324,7 @@ func (t *AlertEvent) ToMessage() (*protocol.AlertEvent, error) {
 }
 
 type Subscriber struct {
-	BotID        string `json:"bot_id"`
+	BotID    string `json:"bot_id"`
 	BotOwner string `json:"bot_owner"`
 	BotImage string `json:"bot_image_hash"`
 }
@@ -345,7 +355,6 @@ func (c *CombinerBotSubscription) Equal(b *CombinerBotSubscription) bool {
 
 	return true
 }
-
 
 // stringSlicesEqual returns true if two slices of strings are equal and false otherwise.
 func stringSlicesEqual(a, b []string) bool {
