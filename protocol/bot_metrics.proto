@@ -24,6 +24,7 @@ message AgentMetric {
   string timestamp = 2;
   string name = 3;
   double value = 4;
+  string details = 5;
 }
 
 message AgentMetricList {
