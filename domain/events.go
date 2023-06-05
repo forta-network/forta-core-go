@@ -183,14 +183,14 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 				pTrace.Action.Address = strings.ToLower(pTrace.Action.Address)
 			}
 
-			traces = append(traces, &pTrace)
+			traces = append(traces, pTrace)
 		}
 	}
 
 	txAddresses := make(map[string]bool)
 
 	// convert tx domain model to proto
-	var tx protocol.TransactionEvent_EthTransaction
+	var tx *protocol.TransactionEvent_EthTransaction
 	if t.Transaction != nil {
 		safeAddStrToMap(addresses, t.Transaction.To)
 		safeAddStrToMap(addresses, &t.Transaction.From)
@@ -265,7 +265,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 
 	return &protocol.TransactionEvent{
 		Type:                 evtType,
-		Transaction:          &tx,
+		Transaction:          tx,
 		Network:              nw,
 		Traces:               traces,
 		Addresses:            addresses,

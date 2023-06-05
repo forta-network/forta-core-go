@@ -75,8 +75,8 @@ type Transaction struct {
 	MaxPriorityFeePerGas *string `json:"maxPriorityFeePerGas"`
 }
 
-func (t *Transaction) ToProto() protocol.TransactionEvent_EthTransaction {
-	return protocol.TransactionEvent_EthTransaction{
+func (t *Transaction) ToProto() *protocol.TransactionEvent_EthTransaction {
+	return &protocol.TransactionEvent_EthTransaction{
 		Type:                 "",
 		Nonce:                t.Nonce,
 		GasPrice:             t.GasPrice,
@@ -203,12 +203,12 @@ type Trace struct {
 	Error               *string      `json:"error"`
 }
 
-func (t Trace) ToProto() protocol.TransactionEvent_Trace {
+func (t Trace) ToProto() *protocol.TransactionEvent_Trace {
 	traceAddress := make([]int64, len(t.TraceAddress))
 	for i, address := range t.TraceAddress {
 		traceAddress[i] = int64(address)
 	}
-	return protocol.TransactionEvent_Trace{
+	return &protocol.TransactionEvent_Trace{
 		Action: &protocol.TransactionEvent_TraceAction{
 			CallType:      safeValueToPointer(t.Action.CallType),
 			To:            safeValueToPointer(t.Action.To),
