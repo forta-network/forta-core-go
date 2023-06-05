@@ -208,6 +208,15 @@ func (t Trace) ToProto() *protocol.TransactionEvent_Trace {
 	for i, address := range t.TraceAddress {
 		traceAddress[i] = int64(address)
 	}
+	var traceResult *protocol.TransactionEvent_TraceResult
+	if t.Result != nil{
+		traceResult = &protocol.TransactionEvent_TraceResult{
+			GasUsed: safeValueToPointer(t.Result.GasUsed),
+			Address: safeValueToPointer(t.Result.Address),
+			Code:    safeValueToPointer(t.Result.Code),
+			Output:  safeValueToPointer(t.Result.Output),
+		}
+	}
 	return &protocol.TransactionEvent_Trace{
 		Action: &protocol.TransactionEvent_TraceAction{
 			CallType:      safeValueToPointer(t.Action.CallType),
@@ -222,12 +231,7 @@ func (t Trace) ToProto() *protocol.TransactionEvent_Trace {
 		},
 		BlockHash:   safeValueToPointer(t.BlockHash),
 		BlockNumber: int64(safeValueToPointer(t.BlockNumber)),
-		Result: &protocol.TransactionEvent_TraceResult{
-			GasUsed: safeValueToPointer(t.Result.GasUsed),
-			Address: safeValueToPointer(t.Result.Address),
-			Code:    safeValueToPointer(t.Result.Code),
-			Output:  safeValueToPointer(t.Result.Output),
-		},
+		Result: traceResult,
 		Subtraces:           int64(t.Subtraces),
 		TraceAddress:        traceAddress,
 		TransactionHash:     safeValueToPointer(t.TransactionHash),
