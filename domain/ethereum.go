@@ -203,6 +203,40 @@ type Trace struct {
 	Error               *string      `json:"error"`
 }
 
+func (t Trace) ToProto() protocol.TransactionEvent_Trace {
+	traceAddress := make([]int64, len(t.TraceAddress))
+	for i, address := range t.TraceAddress {
+		traceAddress[i] = int64(address)
+	}
+	return protocol.TransactionEvent_Trace{
+		Action: &protocol.TransactionEvent_TraceAction{
+			CallType:      safeValueToPointer(t.Action.CallType),
+			To:            safeValueToPointer(t.Action.To),
+			Input:         safeValueToPointer(t.Action.Input),
+			From:          safeValueToPointer(t.Action.From),
+			Value:         safeValueToPointer(t.Action.Value),
+			Init:          safeValueToPointer(t.Action.Init),
+			Address:       safeValueToPointer(t.Action.Address),
+			Balance:       safeValueToPointer(t.Action.Balance),
+			RefundAddress: safeValueToPointer(t.Action.RefundAddress),
+		},
+		BlockHash:   safeValueToPointer(t.BlockHash),
+		BlockNumber: int64(safeValueToPointer(t.BlockNumber)),
+		Result: &protocol.TransactionEvent_TraceResult{
+			GasUsed: safeValueToPointer(t.Result.GasUsed),
+			Address: safeValueToPointer(t.Result.Address),
+			Code:    safeValueToPointer(t.Result.Code),
+			Output:  safeValueToPointer(t.Result.Output),
+		},
+		Subtraces:           int64(t.Subtraces),
+		TraceAddress:        traceAddress,
+		TransactionHash:     safeValueToPointer(t.TransactionHash),
+		TransactionPosition: int64(safeValueToPointer(t.TransactionPosition)),
+		Type:                t.Type,
+		Error:               safeValueToPointer(t.Error),
+	}
+}
+
 // HeaderCh provides new block headers.
 type HeaderCh <-chan *types.Header
 
