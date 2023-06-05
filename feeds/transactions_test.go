@@ -68,24 +68,30 @@ func TestTransactionFeed_ForEachTransaction(t *testing.T) {
 }
 
 func TestTransactionFeed_ToMessage(t *testing.T) {
-	bf := NewMockBlockFeed([]*domain.BlockEvent{
-		{
-			EventType:  domain.EventTypeBlock,
-			Block:      testutils.TestBlock(1),
-			Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
-		},
-	})
+	var blockEvents []*domain.BlockEvent
+	for i := 0; i < 1000; i++ {
+		blockEvents = append(
+			blockEvents, &domain.BlockEvent{
+				EventType:  domain.EventTypeBlock,
+				Block:      testutils.TestBlock(i),
+				Timestamps: &domain.TrackingTimestamps{Block: time.Now().UTC()},
+			},
+		)
+	}
+	bf := NewMockBlockFeed(blockEvents)
 
 	txFeed, _ := getTestTransactionFeed(t, bf)
 
 	var result *domain.TransactionEvent
-	err := txFeed.ForEachTransaction(func(evt *domain.BlockEvent) error { return nil }, func(evt *domain.TransactionEvent) error {
-		result = evt
-		return nil
-	})
+	err := txFeed.ForEachTransaction(
+		func(evt *domain.BlockEvent) error { return nil }, func(evt *domain.TransactionEvent) error {
+			result = evt
+			msg, err := result.ToMessage()
+			assert.NoError(t, err)
+			assert.Equal(t, result.Transaction.Hash, msg.Transaction.Hash)
+			return nil
+		},
+	)
+	assert.Error(t, err, endOfBlocks)
 	assert.Equal(t, endOfBlocks, err)
-
-	msg, err := result.ToMessage()
-	assert.NoError(t, err)
-	assert.Equal(t, result.Transaction.Hash, msg.Transaction.Hash)
 }

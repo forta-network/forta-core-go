@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -72,6 +73,34 @@ type Transaction struct {
 	S                    string  `json:"s"`
 	MaxFeePerGas         *string `json:"maxFeePerGas"`
 	MaxPriorityFeePerGas *string `json:"maxPriorityFeePerGas"`
+}
+
+func (t *Transaction) ToProto() *protocol.TransactionEvent_EthTransaction {
+	return &protocol.TransactionEvent_EthTransaction{
+		Type:                 "",
+		Nonce:                t.Nonce,
+		GasPrice:             t.GasPrice,
+		Gas:                  t.Gas,
+		Value:                safeValueToPointer(t.Value),
+		Input:                safeValueToPointer(t.Input),
+		V:                    t.V,
+		R:                    t.R,
+		S:                    t.S,
+		To:                   safeValueToPointer(t.To),
+		Hash:                 t.Hash,
+		From:                 t.From,
+		MaxFeePerGas:         safeValueToPointer(t.MaxFeePerGas),
+		MaxPriorityFeePerGas: safeValueToPointer(t.MaxPriorityFeePerGas),
+	}
+}
+
+func safeValueToPointer[T any](pointer *T) T {
+	var result T
+	if pointer == nil {
+		return result
+	}
+
+	return *pointer
 }
 
 // LogEntry is a log item inside a receipt
@@ -172,6 +201,44 @@ type Trace struct {
 	TransactionPosition *int         `json:"transactionPosition"`
 	Type                string       `json:"type"`
 	Error               *string      `json:"error"`
+}
+
+func (t Trace) ToProto() *protocol.TransactionEvent_Trace {
+	traceAddress := make([]int64, len(t.TraceAddress))
+	for i, address := range t.TraceAddress {
+		traceAddress[i] = int64(address)
+	}
+	var traceResult *protocol.TransactionEvent_TraceResult
+	if t.Result != nil{
+		traceResult = &protocol.TransactionEvent_TraceResult{
+			GasUsed: safeValueToPointer(t.Result.GasUsed),
+			Address: safeValueToPointer(t.Result.Address),
+			Code:    safeValueToPointer(t.Result.Code),
+			Output:  safeValueToPointer(t.Result.Output),
+		}
+	}
+	return &protocol.TransactionEvent_Trace{
+		Action: &protocol.TransactionEvent_TraceAction{
+			CallType:      safeValueToPointer(t.Action.CallType),
+			To:            safeValueToPointer(t.Action.To),
+			Input:         safeValueToPointer(t.Action.Input),
+			From:          safeValueToPointer(t.Action.From),
+			Value:         safeValueToPointer(t.Action.Value),
+			Init:          safeValueToPointer(t.Action.Init),
+			Address:       safeValueToPointer(t.Action.Address),
+			Balance:       safeValueToPointer(t.Action.Balance),
+			RefundAddress: safeValueToPointer(t.Action.RefundAddress),
+		},
+		BlockHash:   safeValueToPointer(t.BlockHash),
+		BlockNumber: int64(safeValueToPointer(t.BlockNumber)),
+		Result: traceResult,
+		Subtraces:           int64(t.Subtraces),
+		TraceAddress:        traceAddress,
+		TransactionHash:     safeValueToPointer(t.TransactionHash),
+		TransactionPosition: int64(safeValueToPointer(t.TransactionPosition)),
+		Type:                t.Type,
+		Error:               safeValueToPointer(t.Error),
+	}
 }
 
 // HeaderCh provides new block headers.

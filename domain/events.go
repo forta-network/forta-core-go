@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"bytes"
 	"math/big"
 	"sort"
 	"strings"
@@ -9,8 +8,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/goccy/go-json"
-	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/protocol"
@@ -167,10 +164,6 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 
 	addresses := make(map[string]bool)
 
-	um := jsonpb.Unmarshaler{
-		AllowUnknownFields: true,
-	}
-
 	// convert trace domain model to proto (filter traces)
 	var traces []*protocol.TransactionEvent_Trace
 	for _, trace := range t.BlockEvt.Traces {
@@ -180,16 +173,8 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			safeAddStrToMap(addresses, trace.Action.To)
 			safeAddStrToMap(addresses, trace.Action.From)
 
-			var pTrace protocol.TransactionEvent_Trace
-			traceJson, err := json.Marshal(trace)
-			if err != nil {
-				return nil, err
-			}
-			if err := um.Unmarshal(bytes.NewReader(traceJson), &pTrace); err != nil {
-				log.Errorf("cannot unmarshal traceJson: %s", err.Error())
-				log.Errorf("JSON: %s", string(traceJson))
-				return nil, err
-			}
+			pTrace := trace.ToProto()
+
 			// lowercase addresses
 			if pTrace.Action != nil {
 				pTrace.Action.To = strings.ToLower(pTrace.Action.To)
@@ -198,29 +183,21 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 				pTrace.Action.Address = strings.ToLower(pTrace.Action.Address)
 			}
 
-			traces = append(traces, &pTrace)
+			traces = append(traces, pTrace)
 		}
 	}
 
 	txAddresses := make(map[string]bool)
 
 	// convert tx domain model to proto
-	var tx protocol.TransactionEvent_EthTransaction
+	var tx *protocol.TransactionEvent_EthTransaction
 	if t.Transaction != nil {
 		safeAddStrToMap(addresses, t.Transaction.To)
 		safeAddStrToMap(addresses, &t.Transaction.From)
 		safeAddStrToMap(txAddresses, t.Transaction.To)
 		safeAddStrToMap(txAddresses, &t.Transaction.From)
 
-		txJson, err := json.Marshal(t.Transaction)
-		if err != nil {
-			return nil, err
-		}
-		if err := um.Unmarshal(bytes.NewReader(txJson), &tx); err != nil {
-			log.Errorf("cannot unmarshal txJson: %s", err.Error())
-			log.Errorf("JSON: %s", string(txJson))
-			return nil, err
-		}
+		tx = t.Transaction.ToProto()
 
 		// lowercase to/from
 		tx.To = strings.ToLower(tx.To)
@@ -288,7 +265,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 
 	return &protocol.TransactionEvent{
 		Type:                 evtType,
-		Transaction:          &tx,
+		Transaction:          tx,
 		Network:              nw,
 		Traces:               traces,
 		Addresses:            addresses,
