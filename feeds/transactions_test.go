@@ -92,7 +92,6 @@ func TestTransactionFeed_ToMessage(t *testing.T) {
 			return nil
 		},
 	)
+	assert.Error(t, err, endOfBlocks)
 	assert.Equal(t, endOfBlocks, err)
-
-
 }
