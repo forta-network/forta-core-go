@@ -212,15 +212,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 		safeAddStrToMap(txAddresses, t.Transaction.To)
 		safeAddStrToMap(txAddresses, &t.Transaction.From)
 
-		txJson, err := json.Marshal(t.Transaction)
-		if err != nil {
-			return nil, err
-		}
-		if err := um.Unmarshal(bytes.NewReader(txJson), &tx); err != nil {
-			log.Errorf("cannot unmarshal txJson: %s", err.Error())
-			log.Errorf("JSON: %s", string(txJson))
-			return nil, err
-		}
+		tx = t.Transaction.ToProto()
 
 		// lowercase to/from
 		tx.To = strings.ToLower(tx.To)

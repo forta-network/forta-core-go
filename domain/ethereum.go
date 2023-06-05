@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -72,6 +73,34 @@ type Transaction struct {
 	S                    string  `json:"s"`
 	MaxFeePerGas         *string `json:"maxFeePerGas"`
 	MaxPriorityFeePerGas *string `json:"maxPriorityFeePerGas"`
+}
+
+func (t *Transaction) ToProto() protocol.TransactionEvent_EthTransaction {
+	return protocol.TransactionEvent_EthTransaction{
+		Type:                 "",
+		Nonce:                t.Nonce,
+		GasPrice:             t.GasPrice,
+		Gas:                  t.Gas,
+		Value:                safeValueToPointer(t.Value),
+		Input:                safeValueToPointer(t.Input),
+		V:                    t.V,
+		R:                    t.R,
+		S:                    t.S,
+		To:                   safeValueToPointer(t.To),
+		Hash:                 t.Hash,
+		From:                 t.From,
+		MaxFeePerGas:         safeValueToPointer(t.MaxFeePerGas),
+		MaxPriorityFeePerGas: safeValueToPointer(t.MaxPriorityFeePerGas),
+	}
+}
+
+func safeValueToPointer[T any](pointer *T) T {
+	var result T
+	if pointer == nil {
+		return result
+	}
+
+	return *pointer
 }
 
 // LogEntry is a log item inside a receipt
