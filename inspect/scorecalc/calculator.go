@@ -13,7 +13,7 @@ const (
 	DefaultMinUploadSpeedInMbps   = 3  // 3 mbps
 	DefaultEarliestBlock          = inspect.VeryOldBlockNumber
 	DefaultMinTotalMemory         = 8e9 // 8 gigabytes
-	DefaultMinAvailableMemory     = 5e7 // 50 megabytes
+	DefaultMinAvailableMemory     = 2e9 // 2 gigabytes
 )
 
 // Errors
