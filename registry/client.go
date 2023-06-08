@@ -896,6 +896,12 @@ func (c *client) getBlockOpts(blockNumber *big.Int) *bind.CallOpts {
 	}
 }
 
+func (c *client) GetActiveAgentStake(blockNumber *big.Int, botID string) (*big.Int, error) {
+	opts := c.getBlockOpts(blockNumber)
+	bID := utils.AgentHexToBigInt(botID)
+	return c.contracts.FortaStaking.ActiveStakeFor(opts, SubjectTypeAgent, bID)
+}
+
 func (c *client) GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error) {
 
 	opts := c.getBlockOpts(blockNumber)
