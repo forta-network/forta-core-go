@@ -140,6 +140,9 @@ type Client interface {
 	// NumScannersForByChain gets total number of assignments for bot for a given chain.
 	NumScannersForByChain(agentID string, chainID *big.Int) (*big.Int, error)
 
+	// GetActiveAgentStake returns the active stake for an agent
+	GetActiveAgentStake(blockNumber *big.Int, botID string) (*big.Int, error)
+
 	// GetActiveScannerStake returns the active stake for a scanner
 	GetActiveScannerStake(blockNumber *big.Int, scannerID string) (*big.Int, error)
 
