@@ -195,6 +195,21 @@ func (mr *MockClientMockRecorder) GenerateScannerRegistrationSignature(reg inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateScannerRegistrationSignature", reflect.TypeOf((*MockClient)(nil).GenerateScannerRegistrationSignature), reg)
 }
 
+// GetActiveAgentStake mocks base method.
+func (m *MockClient) GetActiveAgentStake(blockNumber *big.Int, botID string) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActiveAgentStake", blockNumber, botID)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetActiveAgentStake indicates an expected call of GetActiveAgentStake.
+func (mr *MockClientMockRecorder) GetActiveAgentStake(blockNumber, botID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveAgentStake", reflect.TypeOf((*MockClient)(nil).GetActiveAgentStake), blockNumber, botID)
+}
+
 // GetActivePoolStake mocks base method.
 func (m *MockClient) GetActivePoolStake(blockNumber, poolID *big.Int) (*big.Int, error) {
 	m.ctrl.T.Helper()
