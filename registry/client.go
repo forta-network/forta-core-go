@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_5"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_rewards_distributor"
+	"github.com/forta-network/go-multicall"
 
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_dispatch"
@@ -170,8 +172,9 @@ type Contracts struct {
 	ScannerReg    *contract_scanner_registry.ScannerRegistryCaller
 	ScannerRegFil *contract_scanner_registry.ScannerRegistryFilterer
 
-	Dispatch    *contract_dispatch.DispatchCaller
-	DispatchFil *contract_dispatch.DispatchFilterer
+	Dispatch      *contract_dispatch.DispatchCaller
+	DispatchFil   *contract_dispatch.DispatchFilterer
+	DispatchMulti *multicall.Contract
 
 	ScannerVersion    *contract_scanner_node_version.ScannerNodeVersionCaller
 	ScannerVersionFil *contract_scanner_node_version.ScannerNodeVersionFilterer
@@ -192,11 +195,12 @@ type Contracts struct {
 }
 
 type client struct {
-	ctx     context.Context
-	cfg     ClientConfig
-	eth     ethereum.Client
-	ec      *ethclient.Client
-	chainID *big.Int
+	ctx         context.Context
+	cfg         ClientConfig
+	eth         ethereum.Client
+	ec          *ethclient.Client
+	multiCaller *multicall.Caller
+	chainID     *big.Int
 
 	// call PegLatestBlock to peg the context to the latest block
 	opts       *bind.CallOpts
@@ -276,6 +280,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	}
 	cl.contracts.Addresses = *regContracts
 
+	cl.multiCaller, err = multicall.New(cl.ec)
+	if err != nil {
+		return nil, err
+	}
+
 	cl.contracts.AgentReg, err = contract_agent_registry.NewAgentRegistryCaller(regContracts.AgentRegistry, ec)
 	if err != nil {
 		return nil, err
@@ -319,6 +328,10 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 		return nil, err
 	}
 	cl.versionManager.SetUpdateRule("Dispatch", cl.contracts.Dispatch, cl.contracts.Dispatch, cl.contracts.DispatchFil)
+	cl.contracts.DispatchMulti, err = multicall.NewContract(contract_dispatch_0_1_5.DispatchMetaData.ABI, regContracts.Dispatch.Hex())
+	if err != nil {
+		return nil, err
+	}
 
 	cl.contracts.ScannerVersion, err = contract_scanner_node_version.NewScannerNodeVersionCaller(regContracts.ScannerNodeVersion, ec)
 	if err != nil {

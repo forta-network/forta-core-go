@@ -38,6 +38,13 @@ type AssignmentHash struct {
 	Hash        string `json:"hash"`
 }
 
+type Assignment struct {
+	AgentID          string
+	AgentManifest    string
+	AssignedScanners int
+	ScannerIndex     int
+}
+
 type StakingThreshold contract_scanner_registry.GetStakeThresholdOutput
 
 const UpgradedTopic = "0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b"
@@ -64,4 +71,23 @@ func MakeScannerRegistrationInfo(reg *eip712.ScannerNodeRegistration, sig []byte
 		return nil, err
 	}
 	return &scannerRegInfo, nil
+}
+
+type numOutput struct {
+	Num *big.Int
+}
+
+type scannerRefAtOutput struct {
+	Registered bool
+	ScannerId  *big.Int
+	Owner      common.Address
+	ChainId    *big.Int
+}
+
+type agentRefAtOutput struct {
+	Registered   bool
+	Owner        common.Address
+	AgentId      *big.Int
+	AgentVersion *big.Int
+	Metadata     string
 }
