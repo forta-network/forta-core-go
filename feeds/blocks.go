@@ -73,8 +73,8 @@ func (bf *blockFeed) initialize() error {
 			return nil
 		}
 
-		// should be a positive number
-		if bf.start.Sign() <= 0 {
+		// should be a non-negative number
+		if bf.start.Sign() < 0 {
 			return fmt.Errorf("got invalid block number during initialization: %d", bf.start.Uint64())
 		}
 	}
