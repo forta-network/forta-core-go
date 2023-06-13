@@ -43,6 +43,7 @@ type Assignment struct {
 	AgentManifest    string
 	AssignedScanners int
 	ScannerIndex     int
+	AgentOwner       string
 }
 
 type StakingThreshold contract_scanner_registry.GetStakeThresholdOutput
