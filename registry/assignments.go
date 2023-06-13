@@ -115,6 +115,7 @@ func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scanne
 		assignments = append(assignments, &Assignment{
 			AgentID:          utils.AgentBigIntToHex(agent.AgentId),
 			AgentManifest:    agent.Metadata,
+			AgentOwner:       agent.Owner.Hex(),
 			AssignedScanners: assignedScanners,
 			ScannerIndex:     scannerIndex,
 		})
