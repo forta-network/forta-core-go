@@ -231,6 +231,9 @@ type ClientConfig struct {
 
 	// NoRefresh tells if the contracts should not be refreshed and multiplexed to different versions.
 	NoRefresh bool
+
+	// MulticallAddress is the contract address used for the multicalls
+	MulticallAddress string
 }
 
 var defaultConfig = ClientConfig{
@@ -283,7 +286,11 @@ func NewClientWithENSStore(ctx context.Context, cfg ClientConfig, ensStore ens.E
 	}
 	cl.contracts.Addresses = *regContracts
 
-	cl.multiCaller, err = multicall.New(cl.ec)
+	if len(cfg.MulticallAddress) > 0 {
+		cl.multiCaller, err = multicall.New(cl.ec, cfg.MulticallAddress)
+	} else {
+		cl.multiCaller, err = multicall.New(cl.ec)
+	}
 	if err != nil {
 		return nil, err
 	}
