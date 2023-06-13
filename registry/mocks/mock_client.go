@@ -285,6 +285,21 @@ func (mr *MockClientMockRecorder) GetAssignmentHash(scannerID interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignmentHash", reflect.TypeOf((*MockClient)(nil).GetAssignmentHash), scannerID)
 }
 
+// GetAssignmentList mocks base method.
+func (m *MockClient) GetAssignmentList(blockNumber, chainId *big.Int, scannerAddress string) ([]*registry.Assignment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssignmentList", blockNumber, chainId, scannerAddress)
+	ret0, _ := ret[0].([]*registry.Assignment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssignmentList indicates an expected call of GetAssignmentList.
+func (mr *MockClientMockRecorder) GetAssignmentList(blockNumber, chainId, scannerAddress interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignmentList", reflect.TypeOf((*MockClient)(nil).GetAssignmentList), blockNumber, chainId, scannerAddress)
+}
+
 // GetPoolScanner mocks base method.
 func (m *MockClient) GetPoolScanner(scannerID string) (*registry.Scanner, error) {
 	m.ctrl.T.Helper()

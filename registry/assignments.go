@@ -4,12 +4,26 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/forta-network/forta-core-go/utils"
 	"github.com/forta-network/go-multicall"
 )
 
 func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scannerAddress string) ([]*Assignment, error) {
-	opts := c.getBlockOpts(blockNumber)
+	var (
+		opts *bind.CallOpts
+		err  error
+	)
+
+	// set fallback call options
+	if blockNumber == nil {
+		opts, err = c.getOpts()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		opts = c.getBlockOpts(blockNumber)
+	}
 
 	dispatch := c.Contracts().Dispatch
 	dispatchMulti := c.Contracts().DispatchMulti

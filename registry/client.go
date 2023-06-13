@@ -154,6 +154,9 @@ type Client interface {
 	// GetAllocatedStakePerManaged Returns allocatedManagedStake (own + delegator's) in DELEGATED / total managed subjects, or 0 if not DELEGATED
 	GetAllocatedStakePerManaged(blockNumber, poolID *big.Int) (*big.Int, error)
 
+	// GetAssignmentList returns the indexed bot assignment list for a given node.
+	GetAssignmentList(blockNumber, chainId *big.Int, scannerAddress string) ([]*Assignment, error)
+
 	// GetScannerPoolOwner finds out the owner of the scanner pool.
 	GetScannerPoolOwner(poolID *big.Int) (owner string, err error)
 
