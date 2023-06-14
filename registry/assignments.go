@@ -42,7 +42,8 @@ func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scanne
 			agentCalls, dispatchMulti.NewCall(new(agentRefAtOutput), "agentRefAt", scannerID, big.NewInt(i)),
 		)
 	}
-	_, err = c.multiCaller.Call(opts, agentCalls...)
+
+	_, err = c.multiCaller.CallChunked(opts, 100, agentCalls...)
 	if err != nil {
 		return nil, fmt.Errorf("agentRefAt calls failed: %v", err)
 	}
@@ -74,7 +75,7 @@ func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scanne
 	}
 	// the amount of scanners can scale up unexpectedly sometimes so this
 	// chunking is a protection against that
-	_, err = c.multiCaller.CallChunked(opts, 3000, scannerCalls...)
+	_, err = c.multiCaller.CallChunked(opts, 100, scannerCalls...)
 	if err != nil {
 		return nil, fmt.Errorf("scannerRefAt calls failed: %v", err)
 	}
