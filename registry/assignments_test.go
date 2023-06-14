@@ -11,81 +11,123 @@ import (
 
 var testExpectedAssignmentList = []*Assignment{
 	{
-		AgentID:          "0x441d3228a68bbbcf04e6813f52306efcaf1e66f275d682e62499f44905215250",
-		AgentManifest:    "Qmagb2oHhcRD9orpCz1xbnUCC53QKK33UgkjZaA7Vdsxfx",
+		AgentID:          "0x492c05269cbefe3a1686b999912db1fb5a39ce2e4578ac3951b0542440f435d9",
+		AgentManifest:    "QmaveKpceDCaersFd5C24DFzAB2UQuHGcz1dJZhqkQiMBn",
+		AssignedScanners: 4,
+		ScannerIndex:     1,
 		AgentOwner:       "0x88dC3a2284FA62e0027d6D6B1fCfDd2141a143b8",
-		AssignedScanners: 36,
-		ScannerIndex:     11,
 	},
 	{
-		AgentID:          "0x47c45816807d2eac30ba88745bf2778b61bc106bc76411b520a5289495c76db8",
-		AgentManifest:    "QmZRnE2uBavyaD8BdARhQ32C2x3VbXLfCqiVY9p3jpJYyA",
-		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
-		AssignedScanners: 47,
-		ScannerIndex:     3,
+		AgentID:          "0x98b87a29ecb6c8c0f8e6ea83598817ec91e01c15d379f03c7ff781fd1141e502",
+		AgentManifest:    "QmaToWbUsVKXGpiqcxEBS5aQYAiXXPtWDqKZ798WJAftYE",
+		AssignedScanners: 45,
+		ScannerIndex:     39,
+		AgentOwner:       "0x1D179DE1E32Cf7aE63d208EE6201222E299298c9",
 	},
 	{
-		AgentID:          "0x1d5aa6e0085208814ac479fb389fe1295a35ef698c2543eaf93ca27e2e5a84a1",
-		AgentManifest:    "QmbVUJjFm4VpwyEYAGRwmDXVJKDFa3tX4mdi2wwtNTxioR",
-		AgentOwner:       "0x88dC3a2284FA62e0027d6D6B1fCfDd2141a143b8",
+		AgentID:          "0x0b241032ca430d9c02eaa6a52d217bbff046f0d1b3f3d2aa928e42a97150ec91",
+		AgentManifest:    "QmVzykcTd5u73HCn8CwikzboTveoCHTgciCa9whwXSmZx9",
 		AssignedScanners: 3,
-		ScannerIndex:     2,
+		ScannerIndex:     0,
+		AgentOwner:       "0xB7EC4b33a3228f46901506De71673906646aE678",
 	},
 	{
-		AgentID:          "0x60cfaeedd7561f2f2cb6f4a508be32598b877c715646c3f175b6a3eac46f94e9",
-		AgentManifest:    "QmYwybxFG8rrLzkPXUtpNPcneh5tu31sTHNEvvL2cFbSMV",
-		AgentOwner:       "0x81813Bd41459c0Bb757308C855c0521A4e308E36",
-		AssignedScanners: 3,
-		ScannerIndex:     2,
-	},
-	{
-		AgentID:          "0xe52aecd3413346bb4950f5798e304b76d697c7782bb312eab451a097c78163b9",
-		AgentManifest:    "bafkreie57puqop2cgpns6v5ycb65xakkm3fk6kdcmaxtmkphntwtxwug2i",
+		AgentID:          "0x0f21668ebd017888e7ee7dd46e9119bdd2bc7f48dbabc375d96c9b415267534c",
+		AgentManifest:    "QmS6wdfta6Z4toqCxisqiVUgUvM8W38h2V5a2qLpreQedi",
+		AssignedScanners: 1,
+		ScannerIndex:     0,
 		AgentOwner:       "0x70358461af09dCb10B003e8e0a6033de34387A2a",
-		AssignedScanners: 3,
-		ScannerIndex:     2,
 	},
 	{
-		AgentID:          "0xe97dd4bb604c044fe0eed9dc3a3450da7907aae63f20378ca5cf1a96750bed76",
-		AgentManifest:    "bafkreieh2c456fmkaumagkrl6tqn6hqo4dajgxfqemcrnaedh4cjjjwzse",
-		AgentOwner:       "0x0E860F44d73F9FDbaF5E9B19aFC554Bf3C8E8A57",
-		AssignedScanners: 3,
+		AgentID:          "0x59413fe6f6be7eb100e40f607fb448ef2a5bb838a5d19e6246fe70e3269ffd56",
+		AgentManifest:    "QmaCD22UohViRyYPPh3oZnN8pJZinycbNM7zUHPY9WFPFt",
+		AssignedScanners: 5,
 		ScannerIndex:     2,
-	},
-	{
-		AgentID:          "0x92cec8bacc8436cc59becf2abc094047a150224a626fd506fa8d64c0925bdd61",
-		AgentManifest:    "Qmey7vqiDDtygSoDNf26ZLH6wXgbhVBTjZ7gU5MQrb4JoL",
-		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
-		AssignedScanners: 3,
-		ScannerIndex:     2,
-	},
-	{
-		AgentID:          "0x34c27c43e0a45bced8f8a941b3d552f5e6feae62afd7e2e88b5024f7de5a8ba0",
-		AgentManifest:    "QmeX3TJ2nk6g5SiVFVc3oCiv38WcfzXWejEkwNDH98NBpL",
-		AgentOwner:       "0x51F3B9d02e0C2EAB8f4EbC0Ee2E571233083bAec",
-		AssignedScanners: 3,
-		ScannerIndex:     2,
+		AgentOwner:       "0x6aea36C4a9Cf8AC053c07E662fa27e8BDF047121",
 	},
 	{
 		AgentID:          "0x1d646c4045189991fdfd24a66b192a294158b839a6ec121d740474bdacb3ab23",
 		AgentManifest:    "QmUTNe9vVAUvmLaAfwffesbwCmWB8DigTUgcr8jFnHa5S4",
-		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
 		AssignedScanners: 48,
-		ScannerIndex:     37,
+		ScannerIndex:     3,
+		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
 	},
 	{
-		AgentID:          "0xa17bd7957d25bc4508e390921a4e54c6475d5271f824ae19734d376db2699556",
-		AgentManifest:    "QmWE4fdfPzn7kMbgHZZnsDKzUSPd9Jf2XZ7MLXCh3unhEL",
-		AgentOwner:       "0x8bCCFd42Afd3CA58c9c705b368a1Df8Dc7f86E4E",
+		AgentID:          "0x47c45816807d2eac30ba88745bf2778b61bc106bc76411b520a5289495c76db8",
+		AgentManifest:    "QmPWyYJpNTSx2GU33ict4VjPc8tojbdAoRHtgHvo3Zdgtj",
+		AssignedScanners: 48,
+		ScannerIndex:     20,
+		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
+	},
+	{
+		AgentID:          "0xbb34c89f51bba941ef7ad54daccbc82eadb6177ffd2183d0939561499e295424",
+		AgentManifest:    "QmPPDrFo1ZpGaRjjKq8tZ6XZCSHPoYbSUuLh1E5jTqWYK5",
+		AssignedScanners: 3,
+		ScannerIndex:     0,
+		AgentOwner:       "0xBc9ebd3d23Fd48b521b03343a12e31F3D6093F70",
+	},
+	{
+		AgentID:          "0x1a69f5ec8ef436e4093f9ec4ce1a55252b7a9a2d2c386e3f950b79d164bc99e0",
+		AgentManifest:    "Qmev376tngMcjs2qg6PNUqNbjh7FUXkGQcnQsod56R8WL9",
+		AssignedScanners: 12,
+		ScannerIndex:     6,
+		AgentOwner:       "0x88dC3a2284FA62e0027d6D6B1fCfDd2141a143b8",
+	},
+	{
+		AgentID:          "0x8fe07f1a4d33b30be2387293f052c273660c829e9a6965cf7e8d485bcb871083",
+		AgentManifest:    "bafkreihxf27on2447l42fowryq6qvvy4gtdqeh3dsnygbbobcyajpp3qrm",
+		AssignedScanners: 3,
+		ScannerIndex:     0,
+		AgentOwner:       "0x40e98Fe8BCc8c0fF48A585bc6f28d504fF17A927",
+	},
+	{
+		AgentID:          "0xabc0bb6fe5e0d0b981dec4aa2337ce91676358c6e8bf1fec06cc558f58c3694e",
+		AgentManifest:    "QmUPptyURyfvNWwx5CqJP6iKjVD6LCBBSP5sHLiYaNY4vb",
 		AssignedScanners: 3,
 		ScannerIndex:     2,
+		AgentOwner:       "0xF08021332fec194Ff140eF8d5b91868EdFD1A879",
 	},
 	{
-		AgentID:          "0xfb3c0aa7c428c7d4e791b756910a29f6e99e3d8ba4fbf01eb0c8bcfc704937e0",
-		AgentManifest:    "QmemMMJmHxU91SxxjWj52LT9TdYpR4aJgtE6cq9bmUBY8L",
-		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
+		AgentID:          "0xe7662cdcf453a8bf1f88955d6ce7a585ca107f7174b73efb92be6cfdac6a8f6a",
+		AgentManifest:    "QmemAGdw4zv2nzH6zwjwpuJz1oDauJS5LYUPjHAJxXq7Dc",
+		AssignedScanners: 3,
+		ScannerIndex:     1,
+		AgentOwner:       "0x88dC3a2284FA62e0027d6D6B1fCfDd2141a143b8",
+	},
+	{
+		AgentID:          "0x6f022d4a65f397dffd059e269e1c2b5004d822f905674dbf518d968f744c2ede",
+		AgentManifest:    "QmQKZeH8Jfb3emicac7dThZBrd9ZiqiYEVFcL74ae4bPw9",
+		AssignedScanners: 40,
+		ScannerIndex:     34,
+		AgentOwner:       "0xAF1Bb3e4A1F8401fE044B51d0eAB41E917b36803",
+	},
+	{
+		AgentID:          "0xb4e4c2584edab51f0c8ed56501d8974d1ba3bb798007a20ebf8a55d5f1410907",
+		AgentManifest:    "QmQKqEoxnc4gUhPiVsZ4CJLamshAxCLrBRSKk9ZDB5uxGt",
+		AssignedScanners: 3,
+		ScannerIndex:     1,
+		AgentOwner:       "0xc074A2949112218767B631449957626Ca3a3ff45",
+	},
+	{
+		AgentID:          "0x7cfeb792e705a82e984194e1e8d0e9ac3aa48ad8f6530d3017b1e2114d3519ac",
+		AgentManifest:    "QmezfraHfiAwzkt6FKsSn1ZU6st2v8nrcmSwGLgDMQ3ure",
+		AssignedScanners: 36,
+		ScannerIndex:     10,
+		AgentOwner:       "0x88dC3a2284FA62e0027d6D6B1fCfDd2141a143b8",
+	},
+	{
+		AgentID:          "0x36c962b41bdc05788994a24a485e1438ea1a106822fc7fb785c5079128daf3a8",
+		AgentManifest:    "bafkreieumpoiosco5etxseuthnfqlnnn6qgajzdxrrxetujwo7epkgwrai",
+		AssignedScanners: 3,
+		ScannerIndex:     0,
+		AgentOwner:       "0x137D5E3D0e6fDD02d5944468C09d9A6FE2D9ef1d",
+	},
+	{
+		AgentID:          "0xb27524b92bf27e6aa499a3a7239232ad425219b400d3c844269f4a657a4adf03",
+		AgentManifest:    "QmYhi8pYKZr8D2gDuUGVYYW5u7c9iuJJJJrxZmo1XekfRS",
 		AssignedScanners: 48,
-		ScannerIndex:     47,
+		ScannerIndex:     14,
+		AgentOwner:       "0x2835a787d8d74724181F97ec97d9882dD7b3F2be",
 	},
 }
 
@@ -97,12 +139,11 @@ func TestGetAssignmentList(t *testing.T) {
 	client, err := NewClient(context.Background(), cfg)
 	r.NoError(err)
 
-	scannerAddress := "0x5fc518115f29cf5a2424bc9efb9a02acfd77f0a8"
+	scannerAddress := "0x03c80fe4a7ff15aff625d1e25d4969012b6ca8cc"
 	assignedChainID := big.NewInt(1)
-	blockNumber := big.NewInt(43643503)
-
+	blockNumber := big.NewInt(43896826)
 	var assignments []*Assignment
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 11; i++ {
 		start := time.Now()
 		assignments, err = client.GetAssignmentList(blockNumber, assignedChainID, scannerAddress)
 		t.Log("took", time.Since(start))
