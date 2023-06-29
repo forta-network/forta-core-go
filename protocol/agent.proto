@@ -27,6 +27,7 @@ enum ResponseStatus {
 
 message HealthCheckRequest {
   string agentId = 1;
+  int32 shardId = 2;
 }
 
 message HealthCheckResponse {
