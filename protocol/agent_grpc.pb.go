@@ -27,6 +27,7 @@ type AgentClient interface {
 	EvaluateTx(ctx context.Context, in *EvaluateTxRequest, opts ...grpc.CallOption) (*EvaluateTxResponse, error)
 	EvaluateBlock(ctx context.Context, in *EvaluateBlockRequest, opts ...grpc.CallOption) (*EvaluateBlockResponse, error)
 	EvaluateAlert(ctx context.Context, in *EvaluateAlertRequest, opts ...grpc.CallOption) (*EvaluateAlertResponse, error)
+	HealthRequest(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 }
 
 type agentClient struct {
@@ -73,6 +74,15 @@ func (c *agentClient) EvaluateAlert(ctx context.Context, in *EvaluateAlertReques
 	return out, nil
 }
 
+func (c *agentClient) HealthRequest(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, "/network.forta.Agent/HealthRequest", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServer is the server API for Agent service.
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility
@@ -81,6 +91,7 @@ type AgentServer interface {
 	EvaluateTx(context.Context, *EvaluateTxRequest) (*EvaluateTxResponse, error)
 	EvaluateBlock(context.Context, *EvaluateBlockRequest) (*EvaluateBlockResponse, error)
 	EvaluateAlert(context.Context, *EvaluateAlertRequest) (*EvaluateAlertResponse, error)
+	HealthRequest(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -99,6 +110,9 @@ func (UnimplementedAgentServer) EvaluateBlock(context.Context, *EvaluateBlockReq
 }
 func (UnimplementedAgentServer) EvaluateAlert(context.Context, *EvaluateAlertRequest) (*EvaluateAlertResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EvaluateAlert not implemented")
+}
+func (UnimplementedAgentServer) HealthRequest(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthRequest not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 
@@ -185,6 +199,24 @@ func _Agent_EvaluateAlert_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_HealthRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).HealthRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/network.forta.Agent/HealthRequest",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).HealthRequest(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Agent_ServiceDesc is the grpc.ServiceDesc for Agent service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -207,6 +239,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EvaluateAlert",
 			Handler:    _Agent_EvaluateAlert_Handler,
+		},
+		{
+			MethodName: "HealthRequest",
+			Handler:    _Agent_HealthRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -12,6 +12,7 @@ service Agent {
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
   rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
+  rpc HealthRequest (HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Error {
@@ -24,9 +25,19 @@ enum ResponseStatus {
   SUCCESS = 2;
 }
 
+message HealthCheckRequest {
+  string agentId = 1;
+}
+
+message HealthCheckResponse {
+  ResponseStatus status = 1;
+  repeated Error errors = 2;
+}
+
 message InitializeRequest {
   string agentId = 1;
   string proxyHost = 2;
+  int32 shardId = 3;
 }
 
 message InitializeResponse {
@@ -50,17 +61,20 @@ message CombinerBotSubscription {
 message EvaluateTxRequest {
   string requestId = 1;
   TransactionEvent event = 2;
+  int32 shardId = 3;
 }
 
 message EvaluateBlockRequest {
   string requestId = 1;
   BlockEvent event = 2;
+  int32 shardId = 3;
 }
 
 message EvaluateAlertRequest {
   string requestId = 1;
   AlertEvent event = 2;
   string targetBotId = 3;
+  int32 shardId = 4;
 }
 
 message EvaluateTxResponse {
