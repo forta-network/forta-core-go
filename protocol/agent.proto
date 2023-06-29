@@ -12,7 +12,7 @@ service Agent {
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
   rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
-  rpc HealthRequest (HealthCheckRequest) returns (HealthCheckResponse) {}
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Error {
