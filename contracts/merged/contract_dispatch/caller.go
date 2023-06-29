@@ -6,41 +6,35 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	dispatch014 "github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
 
 	dispatch015 "github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_5"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-
 )
 
 // DispatchCaller is a new type which can multiplex calls to different implementation types.
 type DispatchCaller struct {
-
 	typ0 *dispatch014.DispatchCaller
 
 	typ1 *dispatch015.DispatchCaller
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewDispatchCaller creates a new merged type.
 func NewDispatchCaller(address common.Address, caller bind.ContractCaller) (*DispatchCaller, error) {
 	var (
 		mergedType DispatchCaller
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.5"
-
 
 	mergedType.typ0, err = dispatch014.NewDispatchCaller(address, caller)
 	if err != nil {
@@ -51,7 +45,6 @@ func NewDispatchCaller(address common.Address, caller bind.ContractCaller) (*Dis
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize dispatch015.DispatchCaller: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -95,18 +88,12 @@ func (merged *DispatchCaller) Safe() {
 	merged.unsafe = false
 }
 
-
-
-
 // AgentAt multiplexes to different implementations of the method.
 func (merged *DispatchCaller) AgentAt(opts *bind.CallOpts, scannerId *big.Int, pos *big.Int) (retVal *big.Int, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.AgentAt(opts, scannerId, pos)
@@ -134,19 +121,15 @@ func (merged *DispatchCaller) AgentAt(opts *bind.CallOpts, scannerId *big.Int, p
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.AgentAt not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // AgentHashOutput is a merged return type.
 type AgentHashOutput struct {
-
 	Length *big.Int
 
 	Manifest [32]byte
-
 }
 
 // AgentHash multiplexes to different implementations of the method.
@@ -156,10 +139,7 @@ func (merged *DispatchCaller) AgentHash(opts *bind.CallOpts, agentId *big.Int) (
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &AgentHashOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.AgentHash(opts, agentId)
@@ -169,11 +149,9 @@ func (merged *DispatchCaller) AgentHash(opts *bind.CallOpts, agentId *big.Int) (
 			return
 		}
 
-
 		retVal.Length = val.Length
 
 		retVal.Manifest = val.Manifest
-
 
 		return
 	}
@@ -186,24 +164,19 @@ func (merged *DispatchCaller) AgentHash(opts *bind.CallOpts, agentId *big.Int) (
 			return
 		}
 
-
 		retVal.Length = val.Length
 
 		retVal.Manifest = val.Manifest
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchCaller.AgentHash not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // AgentRefAtOutput is a merged return type.
 type AgentRefAtOutput struct {
-
 	Registered bool
 
 	Owner common.Address
@@ -219,7 +192,6 @@ type AgentRefAtOutput struct {
 	Enabled bool
 
 	DisabledFlags *big.Int
-
 }
 
 // AgentRefAt multiplexes to different implementations of the method.
@@ -229,10 +201,7 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &AgentRefAtOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.AgentRefAt(opts, scannerId, pos)
@@ -241,7 +210,6 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 			err = methodErr
 			return
 		}
-
 
 		retVal.Registered = val.Registered
 
@@ -258,7 +226,6 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 		retVal.Enabled = val.Enabled
 
 		retVal.DisabledFlags = val.DisabledFlags
-
 
 		return
 	}
@@ -271,7 +238,6 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 			return
 		}
 
-
 		retVal.Registered = val.Registered
 
 		retVal.Owner = val.Owner
@@ -288,16 +254,12 @@ func (merged *DispatchCaller) AgentRefAt(opts *bind.CallOpts, scannerId *big.Int
 
 		retVal.DisabledFlags = val.DisabledFlags
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchCaller.AgentRefAt not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // AgentRegistry multiplexes to different implementations of the method.
 func (merged *DispatchCaller) AgentRegistry(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -305,9 +267,6 @@ func (merged *DispatchCaller) AgentRegistry(opts *bind.CallOpts) (retVal common.
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.AgentRegistry(opts)
@@ -335,12 +294,9 @@ func (merged *DispatchCaller) AgentRegistry(opts *bind.CallOpts) (retVal common.
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.AgentRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // AreTheyLinked multiplexes to different implementations of the method.
 func (merged *DispatchCaller) AreTheyLinked(opts *bind.CallOpts, agentId *big.Int, scannerId *big.Int) (retVal bool, err error) {
@@ -348,9 +304,6 @@ func (merged *DispatchCaller) AreTheyLinked(opts *bind.CallOpts, agentId *big.In
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.AreTheyLinked(opts, agentId, scannerId)
@@ -378,12 +331,9 @@ func (merged *DispatchCaller) AreTheyLinked(opts *bind.CallOpts, agentId *big.In
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.AreTheyLinked not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsTrustedForwarder multiplexes to different implementations of the method.
 func (merged *DispatchCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder common.Address) (retVal bool, err error) {
@@ -391,9 +341,6 @@ func (merged *DispatchCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
@@ -421,12 +368,9 @@ func (merged *DispatchCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.IsTrustedForwarder not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // NumAgentsFor multiplexes to different implementations of the method.
 func (merged *DispatchCaller) NumAgentsFor(opts *bind.CallOpts, scannerId *big.Int) (retVal *big.Int, err error) {
@@ -434,9 +378,6 @@ func (merged *DispatchCaller) NumAgentsFor(opts *bind.CallOpts, scannerId *big.I
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.NumAgentsFor(opts, scannerId)
@@ -464,12 +405,9 @@ func (merged *DispatchCaller) NumAgentsFor(opts *bind.CallOpts, scannerId *big.I
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.NumAgentsFor not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // NumScannersFor multiplexes to different implementations of the method.
 func (merged *DispatchCaller) NumScannersFor(opts *bind.CallOpts, agentId *big.Int) (retVal *big.Int, err error) {
@@ -477,9 +415,6 @@ func (merged *DispatchCaller) NumScannersFor(opts *bind.CallOpts, agentId *big.I
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.NumScannersFor(opts, agentId)
@@ -507,12 +442,9 @@ func (merged *DispatchCaller) NumScannersFor(opts *bind.CallOpts, agentId *big.I
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.NumScannersFor not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *DispatchCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -520,9 +452,6 @@ func (merged *DispatchCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -550,12 +479,9 @@ func (merged *DispatchCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byt
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // ScannerAt multiplexes to different implementations of the method.
 func (merged *DispatchCaller) ScannerAt(opts *bind.CallOpts, agentId *big.Int, pos *big.Int) (retVal *big.Int, err error) {
@@ -563,9 +489,6 @@ func (merged *DispatchCaller) ScannerAt(opts *bind.CallOpts, agentId *big.Int, p
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ScannerAt(opts, agentId, pos)
@@ -593,19 +516,15 @@ func (merged *DispatchCaller) ScannerAt(opts *bind.CallOpts, agentId *big.Int, p
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.ScannerAt not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerHashOutput is a merged return type.
 type ScannerHashOutput struct {
-
 	Length *big.Int
 
 	Manifest [32]byte
-
 }
 
 // ScannerHash multiplexes to different implementations of the method.
@@ -615,10 +534,7 @@ func (merged *DispatchCaller) ScannerHash(opts *bind.CallOpts, scannerId *big.In
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerHashOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ScannerHash(opts, scannerId)
@@ -628,11 +544,9 @@ func (merged *DispatchCaller) ScannerHash(opts *bind.CallOpts, scannerId *big.In
 			return
 		}
 
-
 		retVal.Length = val.Length
 
 		retVal.Manifest = val.Manifest
-
 
 		return
 	}
@@ -645,24 +559,19 @@ func (merged *DispatchCaller) ScannerHash(opts *bind.CallOpts, scannerId *big.In
 			return
 		}
 
-
 		retVal.Length = val.Length
 
 		retVal.Manifest = val.Manifest
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchCaller.ScannerHash not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // ScannerRefAtOutput is a merged return type.
 type ScannerRefAtOutput struct {
-
 	Registered bool
 
 	ScannerId *big.Int
@@ -680,7 +589,6 @@ type ScannerRefAtOutput struct {
 	Operational bool
 
 	Disabled bool
-
 }
 
 // ScannerRefAt multiplexes to different implementations of the method.
@@ -690,10 +598,7 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &ScannerRefAtOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ScannerRefAt(opts, agentId, pos)
@@ -702,7 +607,6 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 			err = methodErr
 			return
 		}
-
 
 		retVal.Registered = val.Registered
 
@@ -718,7 +622,6 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 
 		retVal.DisabledFlags = val.DisabledFlags
 
-
 		return
 	}
 
@@ -729,7 +632,6 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 			err = methodErr
 			return
 		}
-
 
 		retVal.Registered = val.Registered
 
@@ -745,16 +647,12 @@ func (merged *DispatchCaller) ScannerRefAt(opts *bind.CallOpts, agentId *big.Int
 
 		retVal.Disabled = val.Disabled
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchCaller.ScannerRefAt not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // ScannerRegistry multiplexes to different implementations of the method.
 func (merged *DispatchCaller) ScannerRegistry(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -762,9 +660,6 @@ func (merged *DispatchCaller) ScannerRegistry(opts *bind.CallOpts) (retVal commo
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ScannerRegistry(opts)
@@ -792,12 +687,9 @@ func (merged *DispatchCaller) ScannerRegistry(opts *bind.CallOpts) (retVal commo
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.ScannerRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Version multiplexes to different implementations of the method.
 func (merged *DispatchCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -805,9 +697,6 @@ func (merged *DispatchCaller) Version(opts *bind.CallOpts) (retVal string, err e
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -835,12 +724,9 @@ func (merged *DispatchCaller) Version(opts *bind.CallOpts) (retVal string, err e
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchCaller.Version not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // ScannerPoolRegistry multiplexes to different implementations of the method.
 func (merged *DispatchCaller) ScannerPoolRegistry(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -848,9 +734,6 @@ func (merged *DispatchCaller) ScannerPoolRegistry(opts *bind.CallOpts) (retVal c
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.ScannerPoolRegistry(opts)
@@ -864,7 +747,6 @@ func (merged *DispatchCaller) ScannerPoolRegistry(opts *bind.CallOpts) (retVal c
 
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchCaller.ScannerPoolRegistry not implemented (tag=%s)", merged.currTag)
 	return

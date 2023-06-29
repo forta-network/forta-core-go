@@ -6,12 +6,9 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	dispatch014 "github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
 
 	dispatch015 "github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_5"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -22,29 +19,26 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
-
 )
 
 // DispatchFilterer is a new type which can multiplex calls to different implementation types.
 type DispatchFilterer struct {
-
 	typ0 *dispatch014.DispatchFilterer
 
 	typ1 *dispatch015.DispatchFilterer
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewDispatchFilterer creates a new merged type.
 func NewDispatchFilterer(address common.Address, filterer bind.ContractFilterer) (*DispatchFilterer, error) {
 	var (
 		mergedType DispatchFilterer
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.5"
-
 
 	mergedType.typ0, err = dispatch014.NewDispatchFilterer(address, filterer)
 	if err != nil {
@@ -55,7 +49,6 @@ func NewDispatchFilterer(address common.Address, filterer bind.ContractFilterer)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize dispatch015.DispatchFilterer: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -99,15 +92,11 @@ func (merged *DispatchFilterer) Safe() {
 	merged.unsafe = false
 }
 
-
-
 // FilterAccessManagerUpdatedOutput is a merged return type.
 type FilterAccessManagerUpdatedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchAccessManagerUpdatedIterator
 
 	Dispatch015Result *dispatch015.DispatchAccessManagerUpdatedIterator
-
 }
 
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
@@ -117,10 +106,7 @@ func (merged *DispatchFilterer) FilterAccessManagerUpdated(opts *bind.FilterOpts
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAccessManagerUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -130,9 +116,7 @@ func (merged *DispatchFilterer) FilterAccessManagerUpdated(opts *bind.FilterOpts
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -145,19 +129,14 @@ func (merged *DispatchFilterer) FilterAccessManagerUpdated(opts *bind.FilterOpts
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchAccessManagerUpdated, newAddressManager []common.Address, sinkAlt1 chan<- *dispatch015.DispatchAccessManagerUpdated) (retVal event.Subscription, err error) {
@@ -165,9 +144,6 @@ func (merged *DispatchFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -195,19 +171,15 @@ func (merged *DispatchFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchAccessManagerUpdated is a merged return type.
 type DispatchAccessManagerUpdated struct {
-
 	NewAddressManager common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -217,10 +189,7 @@ func (merged *DispatchFilterer) ParseAccessManagerUpdated(log types.Log) (retVal
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchAccessManagerUpdated{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -230,11 +199,9 @@ func (merged *DispatchFilterer) ParseAccessManagerUpdated(log types.Log) (retVal
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -247,28 +214,22 @@ func (merged *DispatchFilterer) ParseAccessManagerUpdated(log types.Log) (retVal
 			return
 		}
 
-
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterAdminChangedOutput is a merged return type.
 type FilterAdminChangedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchAdminChangedIterator
 
 	Dispatch015Result *dispatch015.DispatchAdminChangedIterator
-
 }
 
 // FilterAdminChanged multiplexes to different implementations of the method.
@@ -278,10 +239,7 @@ func (merged *DispatchFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAdminChangedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -291,9 +249,7 @@ func (merged *DispatchFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVa
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -306,19 +262,14 @@ func (merged *DispatchFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVa
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchAdminChanged, sinkAlt2 chan<- *dispatch015.DispatchAdminChanged) (retVal event.Subscription, err error) {
@@ -326,9 +277,6 @@ func (merged *DispatchFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -356,21 +304,17 @@ func (merged *DispatchFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink cha
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchAdminChanged is a merged return type.
 type DispatchAdminChanged struct {
-
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
-
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -380,10 +324,7 @@ func (merged *DispatchFilterer) ParseAdminChanged(log types.Log) (retVal *Dispat
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchAdminChanged{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -393,13 +334,11 @@ func (merged *DispatchFilterer) ParseAdminChanged(log types.Log) (retVal *Dispat
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -412,30 +351,24 @@ func (merged *DispatchFilterer) ParseAdminChanged(log types.Log) (retVal *Dispat
 			return
 		}
 
-
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterAlreadyLinkedOutput is a merged return type.
 type FilterAlreadyLinkedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchAlreadyLinkedIterator
 
 	Dispatch015Result *dispatch015.DispatchAlreadyLinkedIterator
-
 }
 
 // FilterAlreadyLinked multiplexes to different implementations of the method.
@@ -445,10 +378,7 @@ func (merged *DispatchFilterer) FilterAlreadyLinked(opts *bind.FilterOpts) (retV
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterAlreadyLinkedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterAlreadyLinked(opts)
@@ -458,9 +388,7 @@ func (merged *DispatchFilterer) FilterAlreadyLinked(opts *bind.FilterOpts) (retV
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -473,19 +401,14 @@ func (merged *DispatchFilterer) FilterAlreadyLinked(opts *bind.FilterOpts) (retV
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterAlreadyLinked not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchAlreadyLinked multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchAlreadyLinked(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchAlreadyLinked, sinkAlt3 chan<- *dispatch015.DispatchAlreadyLinked) (retVal event.Subscription, err error) {
@@ -493,9 +416,6 @@ func (merged *DispatchFilterer) WatchAlreadyLinked(opts *bind.WatchOpts, sink ch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchAlreadyLinked(opts, sink)
@@ -523,15 +443,12 @@ func (merged *DispatchFilterer) WatchAlreadyLinked(opts *bind.WatchOpts, sink ch
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchAlreadyLinked not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchAlreadyLinked is a merged return type.
 type DispatchAlreadyLinked struct {
-
 	AgentId *big.Int
 
 	ScannerId *big.Int
@@ -539,7 +456,6 @@ type DispatchAlreadyLinked struct {
 	Enable bool
 
 	Raw types.Log
-
 }
 
 // ParseAlreadyLinked multiplexes to different implementations of the method.
@@ -549,10 +465,7 @@ func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *Dispa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchAlreadyLinked{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseAlreadyLinked(log)
@@ -562,7 +475,6 @@ func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *Dispa
 			return
 		}
 
-
 		retVal.AgentId = val.AgentId
 
 		retVal.ScannerId = val.ScannerId
@@ -570,7 +482,6 @@ func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *Dispa
 		retVal.Enable = val.Enable
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -583,7 +494,6 @@ func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *Dispa
 			return
 		}
 
-
 		retVal.AgentId = val.AgentId
 
 		retVal.ScannerId = val.ScannerId
@@ -592,23 +502,18 @@ func (merged *DispatchFilterer) ParseAlreadyLinked(log types.Log) (retVal *Dispa
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseAlreadyLinked not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterBeaconUpgradedOutput is a merged return type.
 type FilterBeaconUpgradedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchBeaconUpgradedIterator
 
 	Dispatch015Result *dispatch015.DispatchBeaconUpgradedIterator
-
 }
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
@@ -618,10 +523,7 @@ func (merged *DispatchFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beac
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterBeaconUpgradedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -631,9 +533,7 @@ func (merged *DispatchFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beac
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -646,19 +546,14 @@ func (merged *DispatchFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beac
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchBeaconUpgraded, beacon []common.Address, sinkAlt4 chan<- *dispatch015.DispatchBeaconUpgraded) (retVal event.Subscription, err error) {
@@ -666,9 +561,6 @@ func (merged *DispatchFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink c
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -696,19 +588,15 @@ func (merged *DispatchFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink c
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchBeaconUpgraded is a merged return type.
 type DispatchBeaconUpgraded struct {
-
 	Beacon common.Address
 
 	Raw types.Log
-
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -718,10 +606,7 @@ func (merged *DispatchFilterer) ParseBeaconUpgraded(log types.Log) (retVal *Disp
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchBeaconUpgraded{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -731,11 +616,9 @@ func (merged *DispatchFilterer) ParseBeaconUpgraded(log types.Log) (retVal *Disp
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -748,28 +631,22 @@ func (merged *DispatchFilterer) ParseBeaconUpgraded(log types.Log) (retVal *Disp
 			return
 		}
 
-
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterInitializedOutput is a merged return type.
 type FilterInitializedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchInitializedIterator
 
 	Dispatch015Result *dispatch015.DispatchInitializedIterator
-
 }
 
 // FilterInitialized multiplexes to different implementations of the method.
@@ -779,10 +656,7 @@ func (merged *DispatchFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterInitializedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -792,9 +666,7 @@ func (merged *DispatchFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -807,19 +679,14 @@ func (merged *DispatchFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchInitialized, sinkAlt5 chan<- *dispatch015.DispatchInitialized) (retVal event.Subscription, err error) {
@@ -827,9 +694,6 @@ func (merged *DispatchFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -857,19 +721,15 @@ func (merged *DispatchFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchInitialized is a merged return type.
 type DispatchInitialized struct {
-
 	Version uint8
 
 	Raw types.Log
-
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -879,10 +739,7 @@ func (merged *DispatchFilterer) ParseInitialized(log types.Log) (retVal *Dispatc
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchInitialized{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -892,11 +749,9 @@ func (merged *DispatchFilterer) ParseInitialized(log types.Log) (retVal *Dispatc
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -909,28 +764,22 @@ func (merged *DispatchFilterer) ParseInitialized(log types.Log) (retVal *Dispatc
 			return
 		}
 
-
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterLinkOutput is a merged return type.
 type FilterLinkOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchLinkIterator
 
 	Dispatch015Result *dispatch015.DispatchLinkIterator
-
 }
 
 // FilterLink multiplexes to different implementations of the method.
@@ -940,10 +789,7 @@ func (merged *DispatchFilterer) FilterLink(opts *bind.FilterOpts) (retVal *Filte
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterLinkOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterLink(opts)
@@ -953,9 +799,7 @@ func (merged *DispatchFilterer) FilterLink(opts *bind.FilterOpts) (retVal *Filte
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -968,19 +812,14 @@ func (merged *DispatchFilterer) FilterLink(opts *bind.FilterOpts) (retVal *Filte
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterLink not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchLink multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchLink(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchLink, sinkAlt6 chan<- *dispatch015.DispatchLink) (retVal event.Subscription, err error) {
@@ -988,9 +827,6 @@ func (merged *DispatchFilterer) WatchLink(opts *bind.WatchOpts, sink chan<- *dis
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchLink(opts, sink)
@@ -1018,15 +854,12 @@ func (merged *DispatchFilterer) WatchLink(opts *bind.WatchOpts, sink chan<- *dis
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchLink not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchLink is a merged return type.
 type DispatchLink struct {
-
 	AgentId *big.Int
 
 	ScannerId *big.Int
@@ -1034,7 +867,6 @@ type DispatchLink struct {
 	Enable bool
 
 	Raw types.Log
-
 }
 
 // ParseLink multiplexes to different implementations of the method.
@@ -1044,10 +876,7 @@ func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *DispatchLink, 
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchLink{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseLink(log)
@@ -1057,7 +886,6 @@ func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *DispatchLink, 
 			return
 		}
 
-
 		retVal.AgentId = val.AgentId
 
 		retVal.ScannerId = val.ScannerId
@@ -1065,7 +893,6 @@ func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *DispatchLink, 
 		retVal.Enable = val.Enable
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1078,7 +905,6 @@ func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *DispatchLink, 
 			return
 		}
 
-
 		retVal.AgentId = val.AgentId
 
 		retVal.ScannerId = val.ScannerId
@@ -1087,23 +913,18 @@ func (merged *DispatchFilterer) ParseLink(log types.Log) (retVal *DispatchLink, 
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseLink not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterRouterUpdatedOutput is a merged return type.
 type FilterRouterUpdatedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchRouterUpdatedIterator
 
 	Dispatch015Result *dispatch015.DispatchRouterUpdatedIterator
-
 }
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
@@ -1113,10 +934,7 @@ func (merged *DispatchFilterer) FilterRouterUpdated(opts *bind.FilterOpts, route
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterRouterUpdatedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -1126,9 +944,7 @@ func (merged *DispatchFilterer) FilterRouterUpdated(opts *bind.FilterOpts, route
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -1141,19 +957,14 @@ func (merged *DispatchFilterer) FilterRouterUpdated(opts *bind.FilterOpts, route
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchRouterUpdated, router []common.Address, sinkAlt7 chan<- *dispatch015.DispatchRouterUpdated) (retVal event.Subscription, err error) {
@@ -1161,9 +972,6 @@ func (merged *DispatchFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink ch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -1191,19 +999,15 @@ func (merged *DispatchFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink ch
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchRouterUpdated is a merged return type.
 type DispatchRouterUpdated struct {
-
 	Router common.Address
 
 	Raw types.Log
-
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -1213,10 +1017,7 @@ func (merged *DispatchFilterer) ParseRouterUpdated(log types.Log) (retVal *Dispa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchRouterUpdated{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -1226,11 +1027,9 @@ func (merged *DispatchFilterer) ParseRouterUpdated(log types.Log) (retVal *Dispa
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1243,28 +1042,22 @@ func (merged *DispatchFilterer) ParseRouterUpdated(log types.Log) (retVal *Dispa
 			return
 		}
 
-
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // FilterUpgradedOutput is a merged return type.
 type FilterUpgradedOutput struct {
-
 	Dispatch014Result *dispatch014.DispatchUpgradedIterator
 
 	Dispatch015Result *dispatch015.DispatchUpgradedIterator
-
 }
 
 // FilterUpgraded multiplexes to different implementations of the method.
@@ -1274,10 +1067,7 @@ func (merged *DispatchFilterer) FilterUpgraded(opts *bind.FilterOpts, implementa
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &FilterUpgradedOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -1287,9 +1077,7 @@ func (merged *DispatchFilterer) FilterUpgraded(opts *bind.FilterOpts, implementa
 			return
 		}
 
-
 		retVal.Dispatch014Result = val
-
 
 		return
 	}
@@ -1302,19 +1090,14 @@ func (merged *DispatchFilterer) FilterUpgraded(opts *bind.FilterOpts, implementa
 			return
 		}
 
-
 		retVal.Dispatch015Result = val
-
 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *dispatch014.DispatchUpgraded, implementation []common.Address, sinkAlt8 chan<- *dispatch015.DispatchUpgraded) (retVal event.Subscription, err error) {
@@ -1322,9 +1105,6 @@ func (merged *DispatchFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -1352,19 +1132,15 @@ func (merged *DispatchFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchUpgraded is a merged return type.
 type DispatchUpgraded struct {
-
 	Implementation common.Address
 
 	Raw types.Log
-
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -1374,10 +1150,7 @@ func (merged *DispatchFilterer) ParseUpgraded(log types.Log) (retVal *DispatchUp
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchUpgraded{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -1387,11 +1160,9 @@ func (merged *DispatchFilterer) ParseUpgraded(log types.Log) (retVal *DispatchUp
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
-
 
 		return
 	}
@@ -1404,21 +1175,16 @@ func (merged *DispatchFilterer) ParseUpgraded(log types.Log) (retVal *DispatchUp
 			return
 		}
 
-
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSetAgentRegistry multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) FilterSetAgentRegistry(opts *bind.FilterOpts) (retVal *dispatch015.DispatchSetAgentRegistryIterator, err error) {
@@ -1426,9 +1192,6 @@ func (merged *DispatchFilterer) FilterSetAgentRegistry(opts *bind.FilterOpts) (r
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.FilterSetAgentRegistry(opts)
@@ -1443,12 +1206,9 @@ func (merged *DispatchFilterer) FilterSetAgentRegistry(opts *bind.FilterOpts) (r
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterSetAgentRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSetAgentRegistry multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchSetAgentRegistry(opts *bind.WatchOpts, sink chan<- *dispatch015.DispatchSetAgentRegistry) (retVal event.Subscription, err error) {
@@ -1456,9 +1216,6 @@ func (merged *DispatchFilterer) WatchSetAgentRegistry(opts *bind.WatchOpts, sink
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.WatchSetAgentRegistry(opts, sink)
@@ -1473,19 +1230,15 @@ func (merged *DispatchFilterer) WatchSetAgentRegistry(opts *bind.WatchOpts, sink
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchSetAgentRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchSetAgentRegistry is a merged return type.
 type DispatchSetAgentRegistry struct {
-
 	Registry common.Address
 
 	Raw types.Log
-
 }
 
 // ParseSetAgentRegistry multiplexes to different implementations of the method.
@@ -1495,10 +1248,7 @@ func (merged *DispatchFilterer) ParseSetAgentRegistry(log types.Log) (retVal *Di
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchSetAgentRegistry{}
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.ParseSetAgentRegistry(log)
@@ -1508,21 +1258,16 @@ func (merged *DispatchFilterer) ParseSetAgentRegistry(log types.Log) (retVal *Di
 			return
 		}
 
-
 		retVal.Registry = val.Registry
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseSetAgentRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSetScannerPoolRegistry multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) FilterSetScannerPoolRegistry(opts *bind.FilterOpts) (retVal *dispatch015.DispatchSetScannerPoolRegistryIterator, err error) {
@@ -1530,9 +1275,6 @@ func (merged *DispatchFilterer) FilterSetScannerPoolRegistry(opts *bind.FilterOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.FilterSetScannerPoolRegistry(opts)
@@ -1547,12 +1289,9 @@ func (merged *DispatchFilterer) FilterSetScannerPoolRegistry(opts *bind.FilterOp
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterSetScannerPoolRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSetScannerPoolRegistry multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchSetScannerPoolRegistry(opts *bind.WatchOpts, sink chan<- *dispatch015.DispatchSetScannerPoolRegistry) (retVal event.Subscription, err error) {
@@ -1560,9 +1299,6 @@ func (merged *DispatchFilterer) WatchSetScannerPoolRegistry(opts *bind.WatchOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.WatchSetScannerPoolRegistry(opts, sink)
@@ -1577,19 +1313,15 @@ func (merged *DispatchFilterer) WatchSetScannerPoolRegistry(opts *bind.WatchOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchSetScannerPoolRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchSetScannerPoolRegistry is a merged return type.
 type DispatchSetScannerPoolRegistry struct {
-
 	Registry common.Address
 
 	Raw types.Log
-
 }
 
 // ParseSetScannerPoolRegistry multiplexes to different implementations of the method.
@@ -1599,10 +1331,7 @@ func (merged *DispatchFilterer) ParseSetScannerPoolRegistry(log types.Log) (retV
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchSetScannerPoolRegistry{}
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.ParseSetScannerPoolRegistry(log)
@@ -1612,21 +1341,16 @@ func (merged *DispatchFilterer) ParseSetScannerPoolRegistry(log types.Log) (retV
 			return
 		}
 
-
 		retVal.Registry = val.Registry
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseSetScannerPoolRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FilterSetScannerRegistry multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) FilterSetScannerRegistry(opts *bind.FilterOpts) (retVal *dispatch015.DispatchSetScannerRegistryIterator, err error) {
@@ -1634,9 +1358,6 @@ func (merged *DispatchFilterer) FilterSetScannerRegistry(opts *bind.FilterOpts) 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.FilterSetScannerRegistry(opts)
@@ -1651,12 +1372,9 @@ func (merged *DispatchFilterer) FilterSetScannerRegistry(opts *bind.FilterOpts) 
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.FilterSetScannerRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // WatchSetScannerRegistry multiplexes to different implementations of the method.
 func (merged *DispatchFilterer) WatchSetScannerRegistry(opts *bind.WatchOpts, sink chan<- *dispatch015.DispatchSetScannerRegistry) (retVal event.Subscription, err error) {
@@ -1664,9 +1382,6 @@ func (merged *DispatchFilterer) WatchSetScannerRegistry(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.WatchSetScannerRegistry(opts, sink)
@@ -1681,19 +1396,15 @@ func (merged *DispatchFilterer) WatchSetScannerRegistry(opts *bind.WatchOpts, si
 		return
 	}
 
-
 	err = import_fmt.Errorf("DispatchFilterer.WatchSetScannerRegistry not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // DispatchSetScannerRegistry is a merged return type.
 type DispatchSetScannerRegistry struct {
-
 	Registry common.Address
 
 	Raw types.Log
-
 }
 
 // ParseSetScannerRegistry multiplexes to different implementations of the method.
@@ -1703,10 +1414,7 @@ func (merged *DispatchFilterer) ParseSetScannerRegistry(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &DispatchSetScannerRegistry{}
-
-
 
 	if merged.currTag == "0.1.5" {
 		val, methodErr := merged.typ1.ParseSetScannerRegistry(log)
@@ -1716,15 +1424,12 @@ func (merged *DispatchFilterer) ParseSetScannerRegistry(log types.Log) (retVal *
 			return
 		}
 
-
 		retVal.Registry = val.Registry
 
 		retVal.Raw = val.Raw
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("DispatchFilterer.ParseSetScannerRegistry not implemented (tag=%s)", merged.currTag)
 	return

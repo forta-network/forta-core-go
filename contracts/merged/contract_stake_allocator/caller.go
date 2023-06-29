@@ -6,43 +6,36 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	stakeallocator010 "github.com/forta-network/forta-core-go/contracts/generated/contract_stake_allocator_0_1_0"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-
 )
 
 // StakeAllocatorCaller is a new type which can multiplex calls to different implementation types.
 type StakeAllocatorCaller struct {
-
 	typ0 *stakeallocator010.StakeAllocatorCaller
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewStakeAllocatorCaller creates a new merged type.
 func NewStakeAllocatorCaller(address common.Address, caller bind.ContractCaller) (*StakeAllocatorCaller, error) {
 	var (
 		mergedType StakeAllocatorCaller
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.0"
-
 
 	mergedType.typ0, err = stakeallocator010.NewStakeAllocatorCaller(address, caller)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize stakeallocator010.StakeAllocatorCaller: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -82,18 +75,12 @@ func (merged *StakeAllocatorCaller) Safe() {
 	merged.unsafe = false
 }
 
-
-
-
 // AllocatedDelegatorsStakePerManaged multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) AllocatedDelegatorsStakePerManaged(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedDelegatorsStakePerManaged(opts, subjectType, subject)
@@ -108,12 +95,9 @@ func (merged *StakeAllocatorCaller) AllocatedDelegatorsStakePerManaged(opts *bin
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.AllocatedDelegatorsStakePerManaged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // AllocatedManagedStake multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) AllocatedManagedStake(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -121,9 +105,6 @@ func (merged *StakeAllocatorCaller) AllocatedManagedStake(opts *bind.CallOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedManagedStake(opts, subjectType, subject)
@@ -138,12 +119,9 @@ func (merged *StakeAllocatorCaller) AllocatedManagedStake(opts *bind.CallOpts, s
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.AllocatedManagedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // AllocatedOwnStakePerManaged multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) AllocatedOwnStakePerManaged(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -151,9 +129,6 @@ func (merged *StakeAllocatorCaller) AllocatedOwnStakePerManaged(opts *bind.CallO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedOwnStakePerManaged(opts, subjectType, subject)
@@ -168,12 +143,9 @@ func (merged *StakeAllocatorCaller) AllocatedOwnStakePerManaged(opts *bind.CallO
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.AllocatedOwnStakePerManaged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // AllocatedStakeFor multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) AllocatedStakeFor(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -181,9 +153,6 @@ func (merged *StakeAllocatorCaller) AllocatedStakeFor(opts *bind.CallOpts, subje
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedStakeFor(opts, subjectType, subject)
@@ -198,12 +167,9 @@ func (merged *StakeAllocatorCaller) AllocatedStakeFor(opts *bind.CallOpts, subje
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.AllocatedStakeFor not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // AllocatedStakePerManaged multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) AllocatedStakePerManaged(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -211,9 +177,6 @@ func (merged *StakeAllocatorCaller) AllocatedStakePerManaged(opts *bind.CallOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AllocatedStakePerManaged(opts, subjectType, subject)
@@ -228,12 +191,9 @@ func (merged *StakeAllocatorCaller) AllocatedStakePerManaged(opts *bind.CallOpts
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.AllocatedStakePerManaged not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetDelegatedSubjectType multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) GetDelegatedSubjectType(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -241,9 +201,6 @@ func (merged *StakeAllocatorCaller) GetDelegatedSubjectType(opts *bind.CallOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatedSubjectType(opts, subjectType)
@@ -258,12 +215,9 @@ func (merged *StakeAllocatorCaller) GetDelegatedSubjectType(opts *bind.CallOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.GetDelegatedSubjectType not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetDelegatorSubjectType multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) GetDelegatorSubjectType(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -271,9 +225,6 @@ func (merged *StakeAllocatorCaller) GetDelegatorSubjectType(opts *bind.CallOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatorSubjectType(opts, subjectType)
@@ -288,12 +239,9 @@ func (merged *StakeAllocatorCaller) GetDelegatorSubjectType(opts *bind.CallOpts,
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.GetDelegatorSubjectType not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetSubjectTypeAgency multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) GetSubjectTypeAgency(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -301,9 +249,6 @@ func (merged *StakeAllocatorCaller) GetSubjectTypeAgency(opts *bind.CallOpts, su
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetSubjectTypeAgency(opts, subjectType)
@@ -318,12 +263,9 @@ func (merged *StakeAllocatorCaller) GetSubjectTypeAgency(opts *bind.CallOpts, su
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.GetSubjectTypeAgency not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsTrustedForwarder multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder common.Address) (retVal bool, err error) {
@@ -331,9 +273,6 @@ func (merged *StakeAllocatorCaller) IsTrustedForwarder(opts *bind.CallOpts, forw
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
@@ -348,12 +287,9 @@ func (merged *StakeAllocatorCaller) IsTrustedForwarder(opts *bind.CallOpts, forw
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.IsTrustedForwarder not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -361,9 +297,6 @@ func (merged *StakeAllocatorCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -378,12 +311,9 @@ func (merged *StakeAllocatorCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // RewardsDistributor multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) RewardsDistributor(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -391,9 +321,6 @@ func (merged *StakeAllocatorCaller) RewardsDistributor(opts *bind.CallOpts) (ret
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardsDistributor(opts)
@@ -408,12 +335,9 @@ func (merged *StakeAllocatorCaller) RewardsDistributor(opts *bind.CallOpts) (ret
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.RewardsDistributor not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // UnallocatedStakeFor multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) UnallocatedStakeFor(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -421,9 +345,6 @@ func (merged *StakeAllocatorCaller) UnallocatedStakeFor(opts *bind.CallOpts, sub
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.UnallocatedStakeFor(opts, subjectType, subject)
@@ -438,12 +359,9 @@ func (merged *StakeAllocatorCaller) UnallocatedStakeFor(opts *bind.CallOpts, sub
 		return
 	}
 
-
 	err = import_fmt.Errorf("StakeAllocatorCaller.UnallocatedStakeFor not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Version multiplexes to different implementations of the method.
 func (merged *StakeAllocatorCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -451,9 +369,6 @@ func (merged *StakeAllocatorCaller) Version(opts *bind.CallOpts) (retVal string,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -467,7 +382,6 @@ func (merged *StakeAllocatorCaller) Version(opts *bind.CallOpts) (retVal string,
 
 		return
 	}
-
 
 	err = import_fmt.Errorf("StakeAllocatorCaller.Version not implemented (tag=%s)", merged.currTag)
 	return
