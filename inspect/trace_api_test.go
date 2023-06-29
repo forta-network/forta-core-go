@@ -20,31 +20,31 @@ func init() {
 func TestTraceAPIInspection(t *testing.T) {
 	//TODO: this endpoint times out now, so we can't run this test
 	t.SkipNow()
-	r := require.New(t)
-
-	recentBlockNumber := testGetRecentBlockNumber(r, testTraceEnv.TraceAPI)
-
-	inspector := &TraceAPIInspector{}
-	results, err := inspector.Inspect(
-		context.Background(), InspectionConfig{
-			TraceAPIURL: testTraceEnv.TraceAPI,
-			BlockNumber: recentBlockNumber,
-			CheckTrace:  true,
-		},
-	)
-	r.NoError(err)
-
-	r.Equal(
-		map[string]float64{
-			IndicatorTraceAccessible: ResultSuccess,
-			IndicatorTraceSupported:  ResultSuccess,
-			IndicatorTraceAPIChainID: 4002,
-			IndicatorTraceAPIIsETH2:  ResultFailure,
-		}, results.Indicators,
-	)
-
-	r.NotEmpty(results.Metadata[MetadataTraceAPIBlockByNumberHash])
-	r.NotEmpty(results.Metadata[MetadataTraceAPITraceBlockHash])
+	//r := require.New(t)
+	//
+	//recentBlockNumber := testGetRecentBlockNumber(r, testTraceEnv.TraceAPI)
+	//
+	//inspector := &TraceAPIInspector{}
+	//results, err := inspector.Inspect(
+	//	context.Background(), InspectionConfig{
+	//		TraceAPIURL: testTraceEnv.TraceAPI,
+	//		BlockNumber: recentBlockNumber,
+	//		CheckTrace:  true,
+	//	},
+	//)
+	//r.NoError(err)
+	//
+	//r.Equal(
+	//	map[string]float64{
+	//		IndicatorTraceAccessible: ResultSuccess,
+	//		IndicatorTraceSupported:  ResultSuccess,
+	//		IndicatorTraceAPIChainID: 4002,
+	//		IndicatorTraceAPIIsETH2:  ResultFailure,
+	//	}, results.Indicators,
+	//)
+	//
+	//r.NotEmpty(results.Metadata[MetadataTraceAPIBlockByNumberHash])
+	//r.NotEmpty(results.Metadata[MetadataTraceAPITraceBlockHash])
 }
 
 func testGetRecentBlockNumber(r *require.Assertions, apiURL string) uint64 {
