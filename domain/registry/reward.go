@@ -1,12 +1,13 @@
 package registry
 
 import (
+	"strings"
+	"time"
+
 	"github.com/forta-network/forta-core-go/contracts/merged/contract_rewards_distributor"
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/sirupsen/logrus"
-	"strings"
-	"time"
 )
 
 type RewardedMessage struct {

@@ -3,6 +3,7 @@ package release
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/forta-network/forta-core-go/utils/httpclient"
 	log "github.com/sirupsen/logrus"
 )

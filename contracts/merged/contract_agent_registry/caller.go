@@ -6,41 +6,35 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
-
 	agentregistry014 "github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
 
 	agentregistry016 "github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_6"
-
-
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
-
 )
 
 // AgentRegistryCaller is a new type which can multiplex calls to different implementation types.
 type AgentRegistryCaller struct {
-
 	typ0 *agentregistry014.AgentRegistryCaller
 
 	typ1 *agentregistry016.AgentRegistryCaller
 
 	currTag string
-	mu import_sync.RWMutex
-	unsafe bool // default: false
+	mu      import_sync.RWMutex
+	unsafe  bool // default: false
 }
 
 // NewAgentRegistryCaller creates a new merged type.
 func NewAgentRegistryCaller(address common.Address, caller bind.ContractCaller) (*AgentRegistryCaller, error) {
 	var (
 		mergedType AgentRegistryCaller
-		err error
+		err        error
 	)
 	mergedType.currTag = "0.1.6"
-
 
 	mergedType.typ0, err = agentregistry014.NewAgentRegistryCaller(address, caller)
 	if err != nil {
@@ -51,7 +45,6 @@ func NewAgentRegistryCaller(address common.Address, caller bind.ContractCaller) 
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize agentregistry016.AgentRegistryCaller: %v", err)
 	}
-
 
 	return &mergedType, nil
 }
@@ -95,18 +88,12 @@ func (merged *AgentRegistryCaller) Safe() {
 	merged.unsafe = false
 }
 
-
-
-
 // BalanceOf multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common.Address) (retVal *big.Int, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.BalanceOf(opts, owner)
@@ -134,12 +121,9 @@ func (merged *AgentRegistryCaller) BalanceOf(opts *bind.CallOpts, owner common.A
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.BalanceOf not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // FrontRunningDelay multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) FrontRunningDelay(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -147,9 +131,6 @@ func (merged *AgentRegistryCaller) FrontRunningDelay(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.FrontRunningDelay(opts)
@@ -177,15 +158,12 @@ func (merged *AgentRegistryCaller) FrontRunningDelay(opts *bind.CallOpts) (retVa
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.FrontRunningDelay not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // GetAgentOutput is a merged return type.
 type GetAgentOutput struct {
-
 	Registered bool
 
 	Owner common.Address
@@ -195,7 +173,6 @@ type GetAgentOutput struct {
 	Metadata string
 
 	ChainIds []*big.Int
-
 }
 
 // GetAgent multiplexes to different implementations of the method.
@@ -205,10 +182,7 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &GetAgentOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetAgent(opts, agentId)
@@ -217,7 +191,6 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 			err = methodErr
 			return
 		}
-
 
 		retVal.Registered = val.Registered
 
@@ -228,7 +201,6 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 		retVal.Metadata = val.Metadata
 
 		retVal.ChainIds = val.ChainIds
-
 
 		return
 	}
@@ -241,7 +213,6 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 			return
 		}
 
-
 		retVal.Registered = val.Registered
 
 		retVal.Owner = val.Owner
@@ -252,16 +223,12 @@ func (merged *AgentRegistryCaller) GetAgent(opts *bind.CallOpts, agentId *big.In
 
 		retVal.ChainIds = val.ChainIds
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("AgentRegistryCaller.GetAgent not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetAgentByChainAndIndex multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetAgentByChainAndIndex(opts *bind.CallOpts, chainId *big.Int, index *big.Int) (retVal *big.Int, err error) {
@@ -269,9 +236,6 @@ func (merged *AgentRegistryCaller) GetAgentByChainAndIndex(opts *bind.CallOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetAgentByChainAndIndex(opts, chainId, index)
@@ -299,12 +263,9 @@ func (merged *AgentRegistryCaller) GetAgentByChainAndIndex(opts *bind.CallOpts, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetAgentByChainAndIndex not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetAgentByIndex multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetAgentByIndex(opts *bind.CallOpts, index *big.Int) (retVal *big.Int, err error) {
@@ -312,9 +273,6 @@ func (merged *AgentRegistryCaller) GetAgentByIndex(opts *bind.CallOpts, index *b
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetAgentByIndex(opts, index)
@@ -342,12 +300,9 @@ func (merged *AgentRegistryCaller) GetAgentByIndex(opts *bind.CallOpts, index *b
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetAgentByIndex not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetAgentCount multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetAgentCount(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -355,9 +310,6 @@ func (merged *AgentRegistryCaller) GetAgentCount(opts *bind.CallOpts) (retVal *b
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetAgentCount(opts)
@@ -385,12 +337,9 @@ func (merged *AgentRegistryCaller) GetAgentCount(opts *bind.CallOpts) (retVal *b
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetAgentCount not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetAgentCountByChain multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetAgentCountByChain(opts *bind.CallOpts, chainId *big.Int) (retVal *big.Int, err error) {
@@ -398,9 +347,6 @@ func (merged *AgentRegistryCaller) GetAgentCountByChain(opts *bind.CallOpts, cha
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetAgentCountByChain(opts, chainId)
@@ -428,15 +374,12 @@ func (merged *AgentRegistryCaller) GetAgentCountByChain(opts *bind.CallOpts, cha
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetAgentCountByChain not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // GetAgentStateOutput is a merged return type.
 type GetAgentStateOutput struct {
-
 	Registered bool
 
 	Owner common.Address
@@ -450,7 +393,6 @@ type GetAgentStateOutput struct {
 	Enabled bool
 
 	DisabledFlags *big.Int
-
 }
 
 // GetAgentState multiplexes to different implementations of the method.
@@ -460,10 +402,7 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &GetAgentStateOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetAgentState(opts, agentId)
@@ -472,7 +411,6 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 			err = methodErr
 			return
 		}
-
 
 		retVal.Registered = val.Registered
 
@@ -487,7 +425,6 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 		retVal.Enabled = val.Enabled
 
 		retVal.DisabledFlags = val.DisabledFlags
-
 
 		return
 	}
@@ -500,7 +437,6 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 			return
 		}
 
-
 		retVal.Registered = val.Registered
 
 		retVal.Owner = val.Owner
@@ -515,16 +451,12 @@ func (merged *AgentRegistryCaller) GetAgentState(opts *bind.CallOpts, agentId *b
 
 		retVal.DisabledFlags = val.DisabledFlags
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("AgentRegistryCaller.GetAgentState not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetApproved multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *big.Int) (retVal common.Address, err error) {
@@ -532,9 +464,6 @@ func (merged *AgentRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *big
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetApproved(opts, tokenId)
@@ -562,12 +491,9 @@ func (merged *AgentRegistryCaller) GetApproved(opts *bind.CallOpts, tokenId *big
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetApproved not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetCommitTimestamp multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetCommitTimestamp(opts *bind.CallOpts, commit [32]byte) (retVal *big.Int, err error) {
@@ -575,9 +501,6 @@ func (merged *AgentRegistryCaller) GetCommitTimestamp(opts *bind.CallOpts, commi
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetCommitTimestamp(opts, commit)
@@ -605,12 +528,9 @@ func (merged *AgentRegistryCaller) GetCommitTimestamp(opts *bind.CallOpts, commi
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetCommitTimestamp not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetDisableFlags multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetDisableFlags(opts *bind.CallOpts, agentId *big.Int) (retVal *big.Int, err error) {
@@ -618,9 +538,6 @@ func (merged *AgentRegistryCaller) GetDisableFlags(opts *bind.CallOpts, agentId 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetDisableFlags(opts, agentId)
@@ -648,12 +565,9 @@ func (merged *AgentRegistryCaller) GetDisableFlags(opts *bind.CallOpts, agentId 
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetDisableFlags not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetStakeController multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetStakeController(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -661,9 +575,6 @@ func (merged *AgentRegistryCaller) GetStakeController(opts *bind.CallOpts) (retV
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetStakeController(opts)
@@ -678,21 +589,17 @@ func (merged *AgentRegistryCaller) GetStakeController(opts *bind.CallOpts) (retV
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.GetStakeController not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-
 // GetStakeThresholdOutput is a merged return type.
 type GetStakeThresholdOutput struct {
-
 	Min *big.Int
 
 	Max *big.Int
 
 	Activated bool
-
 }
 
 // GetStakeThreshold multiplexes to different implementations of the method.
@@ -702,10 +609,7 @@ func (merged *AgentRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, arg0 *
 		defer merged.mu.RUnlock()
 	}
 
-
 	retVal = &GetStakeThresholdOutput{}
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.GetStakeThreshold(opts, arg0)
@@ -715,13 +619,11 @@ func (merged *AgentRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, arg0 *
 			return
 		}
 
-
 		retVal.Min = val.Min
 
 		retVal.Max = val.Max
 
 		retVal.Activated = val.Activated
-
 
 		return
 	}
@@ -734,23 +636,18 @@ func (merged *AgentRegistryCaller) GetStakeThreshold(opts *bind.CallOpts, arg0 *
 			return
 		}
 
-
 		retVal.Min = val.Min
 
 		retVal.Max = val.Max
 
 		retVal.Activated = val.Activated
 
-
 		return
 	}
-
 
 	err = import_fmt.Errorf("AgentRegistryCaller.GetStakeThreshold not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsApprovedForAll multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner common.Address, operator common.Address) (retVal bool, err error) {
@@ -758,9 +655,6 @@ func (merged *AgentRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner c
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.IsApprovedForAll(opts, owner, operator)
@@ -788,12 +682,9 @@ func (merged *AgentRegistryCaller) IsApprovedForAll(opts *bind.CallOpts, owner c
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.IsApprovedForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsEnabled multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) IsEnabled(opts *bind.CallOpts, agentId *big.Int) (retVal bool, err error) {
@@ -801,9 +692,6 @@ func (merged *AgentRegistryCaller) IsEnabled(opts *bind.CallOpts, agentId *big.I
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.IsEnabled(opts, agentId)
@@ -831,12 +719,9 @@ func (merged *AgentRegistryCaller) IsEnabled(opts *bind.CallOpts, agentId *big.I
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.IsEnabled not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsRegistered multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) IsRegistered(opts *bind.CallOpts, agentId *big.Int) (retVal bool, err error) {
@@ -844,9 +729,6 @@ func (merged *AgentRegistryCaller) IsRegistered(opts *bind.CallOpts, agentId *bi
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.IsRegistered(opts, agentId)
@@ -874,12 +756,9 @@ func (merged *AgentRegistryCaller) IsRegistered(opts *bind.CallOpts, agentId *bi
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.IsRegistered not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsStakedOverMin multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subject *big.Int) (retVal bool, err error) {
@@ -887,9 +766,6 @@ func (merged *AgentRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subject 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.IsStakedOverMin(opts, subject)
@@ -917,12 +793,9 @@ func (merged *AgentRegistryCaller) IsStakedOverMin(opts *bind.CallOpts, subject 
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.IsStakedOverMin not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // IsTrustedForwarder multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder common.Address) (retVal bool, err error) {
@@ -930,9 +803,6 @@ func (merged *AgentRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, forwa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
@@ -960,12 +830,9 @@ func (merged *AgentRegistryCaller) IsTrustedForwarder(opts *bind.CallOpts, forwa
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.IsTrustedForwarder not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Name multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) Name(opts *bind.CallOpts) (retVal string, err error) {
@@ -973,9 +840,6 @@ func (merged *AgentRegistryCaller) Name(opts *bind.CallOpts) (retVal string, err
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Name(opts)
@@ -1003,12 +867,9 @@ func (merged *AgentRegistryCaller) Name(opts *bind.CallOpts) (retVal string, err
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.Name not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // OwnerOf multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.Int, subject *big.Int) (retVal common.Address, err error) {
@@ -1016,9 +877,6 @@ func (merged *AgentRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.Int
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.OwnerOf(opts, tokenId)
@@ -1046,12 +904,9 @@ func (merged *AgentRegistryCaller) OwnerOf(opts *bind.CallOpts, tokenId *big.Int
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.OwnerOf not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -1059,9 +914,6 @@ func (merged *AgentRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [3
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -1089,12 +941,9 @@ func (merged *AgentRegistryCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [3
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // SupportsInterface multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4]byte) (retVal bool, err error) {
@@ -1102,9 +951,6 @@ func (merged *AgentRegistryCaller) SupportsInterface(opts *bind.CallOpts, interf
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
@@ -1132,12 +978,9 @@ func (merged *AgentRegistryCaller) SupportsInterface(opts *bind.CallOpts, interf
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.SupportsInterface not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Symbol multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string, err error) {
@@ -1145,9 +988,6 @@ func (merged *AgentRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string, e
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Symbol(opts)
@@ -1175,12 +1015,9 @@ func (merged *AgentRegistryCaller) Symbol(opts *bind.CallOpts) (retVal string, e
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.Symbol not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // TokenURI multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.Int) (retVal string, err error) {
@@ -1188,9 +1025,6 @@ func (merged *AgentRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.In
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.TokenURI(opts, tokenId)
@@ -1218,12 +1052,9 @@ func (merged *AgentRegistryCaller) TokenURI(opts *bind.CallOpts, tokenId *big.In
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.TokenURI not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // Version multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -1231,9 +1062,6 @@ func (merged *AgentRegistryCaller) Version(opts *bind.CallOpts) (retVal string, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.4" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -1261,12 +1089,9 @@ func (merged *AgentRegistryCaller) Version(opts *bind.CallOpts) (retVal string, 
 		return
 	}
 
-
 	err = import_fmt.Errorf("AgentRegistryCaller.Version not implemented (tag=%s)", merged.currTag)
 	return
 }
-
-
 
 // GetSubjectHandler multiplexes to different implementations of the method.
 func (merged *AgentRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -1274,9 +1099,6 @@ func (merged *AgentRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
-
-
-
 
 	if merged.currTag == "0.1.6" {
 		val, methodErr := merged.typ1.GetSubjectHandler(opts)
@@ -1290,7 +1112,6 @@ func (merged *AgentRegistryCaller) GetSubjectHandler(opts *bind.CallOpts) (retVa
 
 		return
 	}
-
 
 	err = import_fmt.Errorf("AgentRegistryCaller.GetSubjectHandler not implemented (tag=%s)", merged.currTag)
 	return

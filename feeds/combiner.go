@@ -358,7 +358,6 @@ func subscriberInfoToHeaders(subscriber *domain.Subscriber) map[string]string {
 	}
 }
 
-
 func alertIsTooOld(alert *protocol.AlertEvent, maxAge time.Duration) (bool, *time.Duration) {
 	if maxAge == 0 {
 		return false, nil
