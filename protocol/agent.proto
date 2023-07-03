@@ -12,7 +12,6 @@ service Agent {
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
   rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
-  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Error {
@@ -23,16 +22,6 @@ enum ResponseStatus {
   UNKNOWN = 0;
   ERROR = 1;
   SUCCESS = 2;
-}
-
-message HealthCheckRequest {
-  string agentId = 1;
-  int32 shardId = 2;
-}
-
-message HealthCheckResponse {
-  ResponseStatus status = 1;
-  repeated Error errors = 2;
 }
 
 message InitializeRequest {
