@@ -28,6 +28,12 @@ enum ResponseStatus {
 message HealthCheckRequest {}
 
 message HealthCheckResponse {
+  enum ResponseStatus {
+    UNKNOWN = 0;
+    ERROR = 1;
+    SUCCESS = 2;
+  }
+
   ResponseStatus status = 1;
   repeated Error errors = 2;
 }
