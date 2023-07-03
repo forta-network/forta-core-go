@@ -25,10 +25,7 @@ enum ResponseStatus {
   SUCCESS = 2;
 }
 
-message HealthCheckRequest {
-  string agentId = 1;
-  int32 shardId = 2;
-}
+message HealthCheckRequest {}
 
 message HealthCheckResponse {
   ResponseStatus status = 1;
