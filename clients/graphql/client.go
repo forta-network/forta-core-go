@@ -142,7 +142,7 @@ func fetchAlerts(
 
 
 	// Check if the response is compressed with gzip
-	var respBodyReader *gzip.Reader
+	var respBodyReader = httpResp.Body
 	if strings.Contains(httpResp.Header.Get("Content-Encoding"), "gzip") {
 		respBodyReader, err = gzip.NewReader(httpResp.Body)
 		if err != nil {
