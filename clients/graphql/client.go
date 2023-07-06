@@ -2,11 +2,13 @@ package graphql
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
@@ -120,6 +122,7 @@ func fetchAlerts(
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Accept-Encoding", "gzip")
 
 	// execute query
 	httpResp, err := http.DefaultClient.Do(httpReq)
@@ -137,11 +140,23 @@ func fetchAlerts(
 		return nil, fmt.Errorf("returned error %v: %s", httpResp.Status, respBody)
 	}
 
-	// parse response
-	err = json.NewDecoder(httpResp.Body).Decode(resp)
+
+	// Check if the response is compressed with gzip
+	var respBodyReader = httpResp.Body
+	if strings.Contains(httpResp.Header.Get("Content-Encoding"), "gzip") {
+		respBodyReader, err = gzip.NewReader(httpResp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer respBodyReader.Close()
+	}
+
+	// Parse response
+	err = json.NewDecoder(respBodyReader).Decode(resp)
 	if err != nil {
 		return nil, err
 	}
+
 	if len(resp.Errors) > 0 {
 		return nil, resp.Errors
 	}
