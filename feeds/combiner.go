@@ -16,7 +16,8 @@ import (
 
 var (
 	ErrCombinerStopReached   = fmt.Errorf("combiner stop reached")
-	DefaultRatelimitDuration = time.Minute
+	DefaultRatelimitDuration = time.Minute * 2
+	DefaultLookbackPeriod    = time.Minute * 5
 	ErrUnauthorized          = fmt.Errorf("query was not granted")
 	ErrBadRequest            = fmt.Errorf("bad public api request")
 )
@@ -168,7 +169,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		}
 
 		// Set lower and upper bounds for alert creation date
-		lowerBound := time.Minute * 10
+		lowerBound := DefaultLookbackPeriod
 		upperBound := int64(0)
 
 		// Query all subscriptions and process alerts
