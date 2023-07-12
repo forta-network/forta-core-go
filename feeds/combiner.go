@@ -177,7 +177,8 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 
 		subscriptions := cf.Subscriptions()
 		// Query all subscriptions and process alerts
-		for _, subscription := range subscriptions {
+		for i := range subscriptions {
+			subscription := subscriptions[i]
 			errGrp.Go(
 				func() error {
 					return cf.fetchAlertsAndHandle(ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
