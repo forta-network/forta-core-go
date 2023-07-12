@@ -12,6 +12,7 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/protocol"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -172,19 +173,21 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		lowerBound := DefaultLookbackPeriod
 		upperBound := int64(0)
 
+		errGrp, ctx := errgroup.WithContext(cf.ctx)
+
+		subscriptions := cf.Subscriptions()
 		// Query all subscriptions and process alerts
-		for _, subscription := range cf.Subscriptions() {
-			logger = logger.WithFields(
-				log.Fields{
-					"subscriberBotId": subscription.Subscriber.BotID,
-					"subscribedBotId": subscription.Subscription.BotId,
+		for _, subscription := range subscriptions {
+			errGrp.Go(
+				func() error {
+					return cf.fetchAlertsAndHandle(ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
 				},
 			)
+		}
 
-			err := cf.fetchAlertsAndHandle(cf.ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
-			if err != nil {
-				logger.WithError(err).Warn("failed to fetch alerts and handle")
-			}
+		err := errGrp.Wait()
+		if err != nil{
+			logger.WithError(err).Warn("failed to process combiner subscriptions")
 		}
 
 		// Save alert cache to persistent file, if configured
