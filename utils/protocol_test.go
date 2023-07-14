@@ -37,9 +37,9 @@ func TestGetChainIDsForAlert(t *testing.T) {
 				Alert: &protocol.Alert{
 					Finding: &protocol.Finding{
 						Source: &protocol.Source{
-							Chains:       []*protocol.Source_ChainSource{{ChainId: 1}, {ChainId: 2}, {ChainId: 0}},
-							Transactions: []*protocol.Source_TransactionSource{{ChainId: 3}, {ChainId: 0}},
-							Blocks:       []*protocol.Source_BlockSource{{ChainId: 4}, {ChainId: 0}},
+							Chains:       []*protocol.Source_ChainSource{{ChainId: 1}, {ChainId: 2}, {ChainId: 0}, nil},
+							Transactions: []*protocol.Source_TransactionSource{{ChainId: 3}, {ChainId: 0}, nil},
+							Blocks:       []*protocol.Source_BlockSource{{ChainId: 4}, {ChainId: 0}, nil},
 						},
 					},
 				},

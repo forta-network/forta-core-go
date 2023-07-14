@@ -11,17 +11,17 @@ func GetChainIDsForAlert(f *protocol.SignedAlert) ([]uint64, error) {
 	// avoid crashes for bad data
 	if f.Alert != nil && f.Alert.Finding != nil && f.Alert.Finding.Source != nil {
 		for _, c := range f.Alert.Finding.Source.Chains {
-			if c.ChainId > 0 {
+			if c != nil && c.ChainId > 0 {
 				result = append(result, c.ChainId)
 			}
 		}
 		for _, t := range f.Alert.Finding.Source.Transactions {
-			if t.ChainId > 0 {
+			if t != nil && t.ChainId > 0 {
 				result = append(result, t.ChainId)
 			}
 		}
 		for _, b := range f.Alert.Finding.Source.Blocks {
-			if b.ChainId > 0 {
+			if b != nil && b.ChainId > 0 {
 				result = append(result, b.ChainId)
 			}
 		}
