@@ -1,9 +1,10 @@
 package alerthash
 
 import (
+	"testing"
+
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestForBlockAlert(t *testing.T) {

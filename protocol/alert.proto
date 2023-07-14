@@ -100,7 +100,7 @@ message Source {
   message BlockSource {
     uint64 chainId = 1;
     string hash = 2;
-    uint64 blockNumber = 3;
+    uint64 number = 3;
   }
 
   message URLSource {
