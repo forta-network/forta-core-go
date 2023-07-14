@@ -45,6 +45,18 @@ func MapKeys(m map[string]bool) []string {
 	return res
 }
 
+func UniqUInt64(list []uint64) []uint64 {
+	var result []uint64
+	u := make(map[uint64]bool)
+	for _, l := range list {
+		if _, ok := u[l]; !ok {
+			result = append(result, l)
+			u[l] = true
+		}
+	}
+	return result
+}
+
 // MapToList returns a deterministic list from a map
 func MapToList(m map[string]string) []string {
 	result := make([]string, 0, len(m))

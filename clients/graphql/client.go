@@ -140,7 +140,6 @@ func fetchAlerts(
 		return nil, fmt.Errorf("returned error %v: %s", httpResp.Status, respBody)
 	}
 
-
 	// Check if the response is compressed with gzip
 	var respBodyReader = httpResp.Body
 	if strings.Contains(httpResp.Header.Get("Content-Encoding"), "gzip") {

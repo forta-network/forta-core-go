@@ -27,8 +27,23 @@ type BotInfo struct {
 	BotID    string
 }
 
+func calculateIDWithUniqueKey(inputs *Inputs) string {
+	idStr := strings.Join(
+		[]string{
+			Version, "|",
+			inputs.BotID,
+			inputs.Finding.UniqueKey,
+		}, "",
+	)
+	return crypto.Keccak256Hash([]byte(idStr)).Hex()
+}
+
 // ForBlockAlert calculates the hash for the block alert.
 func ForBlockAlert(inputs *Inputs) string {
+	if inputs.Finding.UniqueKey != "" {
+		return calculateIDWithUniqueKey(inputs)
+	}
+
 	sort.Strings(inputs.Finding.Addresses)
 	idStr := strings.Join(
 		[]string{
@@ -51,6 +66,10 @@ func ForBlockAlert(inputs *Inputs) string {
 
 // ForTransactionAlert calculates the hash for the transaction alert.
 func ForTransactionAlert(inputs *Inputs) string {
+	if inputs.Finding.UniqueKey != "" {
+		return calculateIDWithUniqueKey(inputs)
+	}
+
 	sort.Strings(inputs.Finding.Addresses)
 	txAddrs := utils.MapKeys(inputs.TransactionEvent.TxAddresses)
 	sort.Strings(txAddrs)
@@ -76,6 +95,10 @@ func ForTransactionAlert(inputs *Inputs) string {
 
 // ForCombinationAlert calculates the hash for the alert handler alert.
 func ForCombinationAlert(inputs *Inputs) string {
+	if inputs.Finding.UniqueKey != "" {
+		return calculateIDWithUniqueKey(inputs)
+	}
+
 	sort.Strings(inputs.Finding.Addresses)
 	sort.Strings(inputs.Finding.RelatedAlerts)
 
