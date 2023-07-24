@@ -6,7 +6,6 @@ import "github.com/forta-network/forta-core-go/utils"
 type AgentManifest struct {
 	From            *string                       `json:"from"`
 	Name            *string                       `json:"name"`
-	DisplayName     *string                       `json:"displayName"`
 	Description     *string                       `json:"description"`
 	LongDescription *string                       `json:"longDescription"`
 	AgentID         *string                       `json:"agentId"`
