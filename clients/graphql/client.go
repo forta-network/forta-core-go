@@ -124,6 +124,9 @@ func fetchAlerts(
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Accept-Encoding", "gzip")
 
+	queryTime := time.Now().Truncate(time.Minute).UnixMilli()
+	httpReq.Header.Set("Forta-Query-Timestamp", fmt.Sprintf("%d", queryTime))
+
 	// execute query
 	httpResp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
