@@ -57,12 +57,7 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < c.config.MinTotalMemory {
 		return 0, nil
 	}
-
-	// available memory should be at least DefaultMinAvailableMemory
-	if results.Indicators[inspect.IndicatorResourcesMemoryAvailable] < c.config.MinAvailableMemory {
-		return 0, nil
-	}
-
+	
 	if results.Inputs.IsETH2 && results.Indicators[inspect.IndicatorScanAPIIsETH2] == inspect.ResultFailure {
 		return 0, nil
 	}
