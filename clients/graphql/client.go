@@ -20,8 +20,6 @@ const (
 	DefaultPageSize     = 1e3
 )
 
-type GetAlertsResponse getAlertsResponse
-
 type client struct {
 	url    string
 	client graphql.Client
@@ -62,7 +60,7 @@ func (ac *client) GetAlerts(
 			return nil, fmt.Errorf("failed to fetch alerts: %v", err)
 		}
 
-		alerts = append(alerts, response.ToProto()...)
+		alerts = append(alerts, response.ToAlertEvents()...)
 
 		// check if there are more alerts
 		if !response.Alerts.PageInfo.HasNextPage {
@@ -87,17 +85,15 @@ func fetchAlerts(
 	client string,
 	input *AlertsInput,
 	headers map[string]string,
-) (*getAlertsResponse, error) {
+) (*GetAlertsResponse, error) {
 	req := &graphql.Request{
-		OpName: "getAlerts",
-		Query:  getAlerts_Operation,
-		Variables: &__getAlertsInput{
-			Input: input,
-		},
+		OpName:    "getAlerts",
+		Query:     getAlertsOperation,
+		Variables: __getAlertsInput{Input: input},
 	}
 	var err error
 
-	var data getAlertsResponse
+	var data GetAlertsResponse
 	resp := &graphql.Response{Data: &data}
 
 	body, err := json.Marshal(req)
