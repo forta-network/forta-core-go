@@ -21,6 +21,9 @@ import (
 // swagger:model Alert
 type Alert struct {
 
+	// address bloom filter
+	AddressBloomFilter *AddressBloomFilter `json:"addressBloomFilter,omitempty"`
+
 	// Addresses involved in the source of this alert
 	// Example: ["0x98883145049dec03c00cb7708cbc938058802520","0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3"]
 	Addresses []string `json:"addresses"`
@@ -83,6 +86,10 @@ type Alert struct {
 func (m *Alert) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAddressBloomFilter(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateFindingType(formats); err != nil {
 		res = append(res, err)
 	}
@@ -106,6 +113,25 @@ func (m *Alert) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Alert) validateAddressBloomFilter(formats strfmt.Registry) error {
+	if swag.IsZero(m.AddressBloomFilter) { // not required
+		return nil
+	}
+
+	if m.AddressBloomFilter != nil {
+		if err := m.AddressBloomFilter.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("addressBloomFilter")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("addressBloomFilter")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -285,6 +311,10 @@ func (m *Alert) validateSources(formats strfmt.Registry) error {
 func (m *Alert) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateAddressBloomFilter(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateLabels(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -300,6 +330,22 @@ func (m *Alert) ContextValidate(ctx context.Context, formats strfmt.Registry) er
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Alert) contextValidateAddressBloomFilter(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.AddressBloomFilter != nil {
+		if err := m.AddressBloomFilter.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("addressBloomFilter")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("addressBloomFilter")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

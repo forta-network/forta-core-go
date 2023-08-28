@@ -125,6 +125,8 @@ definitions:
         example:
           - '0x98883145049dec03c00cb7708cbc938058802520'
           - '0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3'
+      addressBloomFilter:
+        $ref: '#/definitions/AddressBloomFilter'
       relatedAlerts:
         type: array
         items:
@@ -294,6 +296,23 @@ definitions:
         type: string
       value:
         type: string
+
+  AddressBloomFilter:
+    type: object
+    properties:
+      k:
+        type: integer
+        example: 11
+      m:
+        type: integer
+        example: 44
+      bitset:
+        type: string
+        example: 'AAAAAAAAACwAAAAAAAAACwAAAAAAAAAsAAALo5gpbbc='
+      item_count:
+        type: integer
+        description: Snake case due to compatibility reasons
+        example: 1
 
   BotMetricsList:
     type: array
