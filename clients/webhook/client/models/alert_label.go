@@ -33,9 +33,9 @@ type AlertLabel struct {
 	// Example: scammer-eoa
 	Label string `json:"label,omitempty"`
 
-	// An associative array of string values
-	// Example: {"contractAddress":"0x98883145049dec03c00cb7708cbc938058802520","operator":"0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3"}
-	Metadata interface{} `json:"metadata,omitempty"`
+	// An array of string values
+	// Example: ["foo=42","bar=123"]
+	Metadata []string `json:"metadata"`
 
 	// remove
 	Remove bool `json:"remove,omitempty"`

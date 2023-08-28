@@ -217,11 +217,11 @@ definitions:
       remove:
         type: boolean
       metadata:
-        type: object
-        description: An associative array of string values
-        example:
-          contractAddress: '0x98883145049dec03c00cb7708cbc938058802520'
-          operator: '0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3'
+        type: array
+        items:
+          type: string
+        description: An array of string values
+        example: [ foo=42, bar=123 ]
   
   AlertSources:
     type: object
