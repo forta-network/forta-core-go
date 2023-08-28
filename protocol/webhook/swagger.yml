@@ -301,11 +301,11 @@ definitions:
     type: object
     properties:
       k:
-        type: integer
-        example: 11
+        type: string
+        example: '0x12'
       m:
-        type: integer
-        example: 44
+        type: string
+        example: '0x34'
       bitset:
         type: string
         example: 'AAAAAAAAACwAAAAAAAAACwAAAAAAAAAsAAALo5gpbbc='

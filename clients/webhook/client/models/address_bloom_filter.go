@@ -26,12 +26,12 @@ type AddressBloomFilter struct {
 	ItemCount int64 `json:"item_count,omitempty"`
 
 	// k
-	// Example: 11
-	K int64 `json:"k,omitempty"`
+	// Example: 0x12
+	K string `json:"k,omitempty"`
 
 	// m
-	// Example: 44
-	M int64 `json:"m,omitempty"`
+	// Example: 0x34
+	M string `json:"m,omitempty"`
 }
 
 // Validate validates this address bloom filter
