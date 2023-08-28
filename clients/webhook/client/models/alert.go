@@ -8,6 +8,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -23,10 +24,6 @@ type Alert struct {
 	// Addresses involved in the source of this alert
 	// Example: ["0x98883145049dec03c00cb7708cbc938058802520","0x1fFa3471A45C22B1284fE5a251eD74F40580a1E3"]
 	Addresses []string `json:"addresses"`
-
-	// AddressBloomFilter contains **all** addresses in the alert
-	// Example: "addressBloomFilter": {"k": 11,"m": 44,"bitset": "AAAAAAAAACwAAAAAAAAACwAAAAAAAAAsAAALo5gpbbc=", item_count: 1}
-	AddressBloomFilter interface{} `json:"addressBloomFilter,omitempty"`
 
 	// alert Id
 	// Example: OZ-GNOSIS-EVENTS
@@ -47,6 +44,9 @@ type Alert struct {
 	// Deterministic alert hash
 	// Example: 0xe9cfda18f167de5cdd63c101e38ec0d4cb0a1c2dea80921ecc4405c2b010855f
 	Hash string `json:"hash,omitempty"`
+
+	// labels
+	Labels []*AlertLabel `json:"labels"`
 
 	// An associative array of extra links values
 	// Example: {"blockUrl":"https://etherscan.io/block/18646150","explorerUrl":"https://explorer.forta.network/alert/0xd795c365931762afeccf4a440ecee2f7e89820c59136aa46310a8eec54ba96d8"}
@@ -74,6 +74,9 @@ type Alert struct {
 
 	// source
 	Source *AlertSource `json:"source,omitempty"`
+
+	// sources
+	Sources *AlertSources `json:"sources,omitempty"`
 }
 
 // Validate validates this alert
@@ -84,11 +87,19 @@ func (m *Alert) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateLabels(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSeverity(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateSource(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSources(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -147,6 +158,32 @@ func (m *Alert) validateFindingType(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateFindingTypeEnum("findingType", "body", m.FindingType); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *Alert) validateLabels(formats strfmt.Registry) error {
+	if swag.IsZero(m.Labels) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Labels); i++ {
+		if swag.IsZero(m.Labels[i]) { // not required
+			continue
+		}
+
+		if m.Labels[i] != nil {
+			if err := m.Labels[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("labels" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("labels" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -225,17 +262,64 @@ func (m *Alert) validateSource(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Alert) validateSources(formats strfmt.Registry) error {
+	if swag.IsZero(m.Sources) { // not required
+		return nil
+	}
+
+	if m.Sources != nil {
+		if err := m.Sources.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("sources")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("sources")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ContextValidate validate this alert based on the context it is used
 func (m *Alert) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateLabels(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateSource(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSources(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Alert) contextValidateLabels(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Labels); i++ {
+
+		if m.Labels[i] != nil {
+			if err := m.Labels[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("labels" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("labels" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -247,6 +331,22 @@ func (m *Alert) contextValidateSource(ctx context.Context, formats strfmt.Regist
 				return ve.ValidateName("source")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
 				return ce.ValidateName("source")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Alert) contextValidateSources(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Sources != nil {
+		if err := m.Sources.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("sources")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("sources")
 			}
 			return err
 		}
