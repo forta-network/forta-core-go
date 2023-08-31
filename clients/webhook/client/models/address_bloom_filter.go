@@ -21,9 +21,9 @@ type AddressBloomFilter struct {
 	// Example: AAAAAAAAACwAAAAAAAAACwAAAAAAAAAsAAALo5gpbbc=
 	Bitset string `json:"bitset,omitempty"`
 
-	// Snake case due to compatibility reasons
+	// item count
 	// Example: 1
-	ItemCount int64 `json:"item_count,omitempty"`
+	ItemCount int64 `json:"itemCount,omitempty"`
 
 	// k
 	// Example: 0x12

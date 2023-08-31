@@ -309,9 +309,8 @@ definitions:
       bitset:
         type: string
         example: 'AAAAAAAAACwAAAAAAAAACwAAAAAAAAAsAAALo5gpbbc='
-      item_count:
+      itemCount:
         type: integer
-        description: Snake case due to compatibility reasons
         example: 1
 
   BotMetricsList:
