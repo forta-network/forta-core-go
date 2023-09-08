@@ -19,6 +19,7 @@ type AgentManifest struct {
 	Documentation   *string                       `json:"documentation"`
 	ChainIDs        []int64                       `json:"chainIds"`
 	ChainSettings   map[string]AgentChainSettings `json:"chainSettings"`
+	External        bool                          `json:"external"`
 }
 
 // AgentChainSettings is the per-chain configuration of a bot.
@@ -49,11 +50,14 @@ func (sm *SignedAgentManifest) Validate() error {
 	if sm.Manifest == nil {
 		return validationErr("manifest is not present")
 	}
-	if sm.Manifest.ImageReference == nil {
-		return validationErr("manifest.imageReference is not present")
-	}
-	if _, ok := utils.ValidateImageRef("", *sm.Manifest.ImageReference); !ok {
-		return validationErr("manifest.imageReference is not valid")
+	// validate images of non-external bots
+	if !sm.Manifest.External {
+		if sm.Manifest.ImageReference == nil {
+			return validationErr("manifest.imageReference is not present")
+		}
+		if _, ok := utils.ValidateImageRef("", *sm.Manifest.ImageReference); !ok {
+			return validationErr("manifest.imageReference is not valid")
+		}
 	}
 	return nil
 }
