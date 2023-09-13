@@ -162,4 +162,5 @@ message Finding {
   repeated string relatedAlerts = 13;
   string uniqueKey = 14;
   Source source = 15;
+  string timestamp = 16;
 }
