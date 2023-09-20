@@ -18,6 +18,7 @@ enum AlertType {
   BLOCK = 2;
   PRIVATE = 3;
   COMBINATION = 4;
+  API = 5;
 }
 
 message AgentInfo {
