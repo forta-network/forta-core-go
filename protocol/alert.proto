@@ -174,4 +174,5 @@ message APIAlert {
   AlertType type = 2;
   Finding finding = 3;
   APIAlertAgent agent = 4;
+  string timestamp = 5;
 }
