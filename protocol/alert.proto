@@ -162,4 +162,15 @@ message Finding {
   repeated string relatedAlerts = 13;
   string uniqueKey = 14;
   Source source = 15;
+  string timestamp = 16;
+}
+
+message APIAlert {
+  message APIAlertAgent {
+    string id = 1;
+  }
+  string id = 1;
+  AlertType type = 2;
+  Finding finding = 3;
+  APIAlertAgent agent = 4;
 }
