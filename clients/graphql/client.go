@@ -13,11 +13,16 @@ import (
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/pkg/errors"
 )
 
 const (
 	DefaultLastNMinutes = time.Minute * 10
 	DefaultPageSize     = 1e3
+)
+
+var (
+	ErrRetryable = fmt.Errorf("encountered retryable error")
 )
 
 type client struct {
@@ -86,6 +91,45 @@ func fetchAlerts(
 	input *AlertsInput,
 	headers map[string]string,
 ) (*GetAlertsResponse, error) {
+	resp, err := fetchAlertsFn(ctx, client, input, headers)
+	if err == nil || !errors.Is(err, ErrRetryable) {
+		// Cache the response before returning it
+		return resp, err
+	}
+
+	cs := input.CreatedSince
+	cb := input.CreatedBefore
+	mid := (cs + cb) / 2
+
+	// Query left chunk
+	input.CreatedSince = cs
+	input.CreatedBefore = mid
+	leftResponse, err := fetchAlertsFn(ctx, client, input, headers)
+	if err != nil {
+		return nil, err
+	}
+
+	// Query right chunk
+	input.CreatedSince = mid
+	input.CreatedBefore = cb
+	rightResponse, err := fetchAlertsFn(ctx, client, input, headers)
+	if err != nil {
+		return nil, err
+	}
+
+	// Merge results
+	resp.Alerts.Alerts = append(leftResponse.Alerts.Alerts, rightResponse.Alerts.Alerts...)
+	resp.Alerts.PageInfo = rightResponse.Alerts.PageInfo
+
+	return resp, nil
+}
+
+func fetchAlertsFn(
+	ctx context.Context,
+	client string,
+	input *AlertsInput,
+	headers map[string]string,
+) (*GetAlertsResponse, error) {
 	req := &graphql.Request{
 		OpName:    "getAlerts",
 		Query:     getAlertsOperation,
@@ -129,6 +173,10 @@ func fetchAlerts(
 		return nil, err
 	}
 	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode == http.StatusInternalServerError {
+		return nil, ErrRetryable
+	}
 
 	if httpResp.StatusCode != http.StatusOK {
 		var respBody []byte
