@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,6 +19,10 @@ import (
 const (
 	DefaultLastNMinutes = time.Minute * 10
 	DefaultPageSize     = 1e3
+)
+
+var (
+	ErrRetryable = fmt.Errorf("encountered retryable error")
 )
 
 type client struct {
@@ -56,6 +61,10 @@ func (ac *client) GetAlerts(
 	// iterate until there are no more alerts to retrieve
 	for {
 		response, err := fetchAlerts(ctx, ac.url, input, headers)
+		if errors.Is(err, ErrRetryable) && input.First > 0 {
+			input.First /= 2
+		}
+
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch alerts: %v", err)
 		}
@@ -130,6 +139,9 @@ func fetchAlerts(
 	}
 	defer httpResp.Body.Close()
 
+	if httpResp.StatusCode == http.StatusInternalServerError {
+		return nil, ErrRetryable
+	}
 	if httpResp.StatusCode != http.StatusOK {
 		var respBody []byte
 		respBody, err = io.ReadAll(httpResp.Body)
