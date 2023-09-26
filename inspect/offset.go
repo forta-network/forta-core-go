@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/montanaflynn/stats"
 	"golang.org/x/sync/errgroup"
 )
@@ -19,8 +18,8 @@ type offsetStats struct {
 }
 
 func calculateOffsetStats(
-	ctx context.Context, primaryClient *ethclient.Client,
-	secondaryClient *ethclient.Client,
+	ctx context.Context, primaryClient,
+	secondaryClient ProxyAPIClient,
 ) (offsetStats, error) {
 	ds, err := collectOffsetData(ctx, primaryClient, secondaryClient)
 	if err != nil {
@@ -32,7 +31,7 @@ func calculateOffsetStats(
 
 // collectOffsetData measures how long does it take to receive a recently created block and compares given eth clients.
 // The idea is to mimic the behavior of Scanner feed and Bot proxy query.
-func collectOffsetData(ctx context.Context, primaryClient *ethclient.Client, secondaryClient *ethclient.Client) (
+func collectOffsetData(ctx context.Context, primaryClient, secondaryClient ProxyAPIClient) (
 	[]float64, error,
 ) {
 	maxDuration := time.Second * 20
@@ -56,6 +55,11 @@ func collectOffsetData(ctx context.Context, primaryClient *ethclient.Client, sec
 		case <-ctx.Done():
 			return dataPoints, nil
 		case <-t.C:
+			// circuit breaker for easier testing
+			if len(dataPoints) == 10 {
+				return dataPoints, nil
+			}
+
 			g, ctx := errgroup.WithContext(ctx)
 
 			var (
@@ -98,7 +102,7 @@ func collectOffsetData(ctx context.Context, primaryClient *ethclient.Client, sec
 		}
 	}
 }
-func measureBlockDelay(ctx context.Context, client *ethclient.Client, blockNum uint64) (int64, error) {
+func measureBlockDelay(ctx context.Context, client ProxyAPIClient, blockNum uint64) (int64, error) {
 	t := time.Millisecond * 200
 
 	start := time.Now()
