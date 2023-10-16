@@ -1,11 +1,17 @@
 package timeline
 
 import (
+	"context"
+	"fmt"
+	"math/big"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/feeds"
 	"github.com/stretchr/testify/require"
 )
 
@@ -79,5 +85,43 @@ func blockForTimestamp(ts, blockNumber string) *domain.BlockEvent {
 			Timestamp: ts,
 			Number:    blockNumber,
 		},
+	}
+}
+
+func TestRealTimeLag(t *testing.T) {
+	if os.Getenv("TIMELINE_EXPERIMENT") != "1" {
+		return
+	}
+	r := require.New(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	ethClient, err := ethereum.NewStreamEthClient(ctx, "", os.Getenv("JSON_RPC_API"))
+	ethClient.SetRetryInterval(time.Second * 2)
+	r.NoError(err)
+	blockFeed, err := feeds.NewBlockFeed(ctx, ethClient, ethClient, feeds.BlockFeedConfig{
+		ChainID:     big.NewInt(137),
+		DisableLogs: true,
+	})
+	r.NoError(err)
+
+	blockTimeline := &BlockTimeline{}
+	errCh := blockFeed.Subscribe(func(evt *domain.BlockEvent) error {
+		return blockTimeline.HandleBlock(evt)
+	})
+
+	go blockFeed.Start()
+
+	go func() {
+		<-time.After(time.Minute * 4)
+		cancel()
+	}()
+
+	<-errCh
+
+	for _, minute := range blockTimeline.blockMinutes {
+		lag, ok := blockTimeline.CalculateLag(minute.Timestamp)
+		if !ok {
+			continue
+		}
+		fmt.Println(minute.Timestamp.Format(time.RFC3339), ":", lag)
 	}
 }
