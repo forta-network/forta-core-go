@@ -1,0 +1,13 @@
+sources:
+  - type: StakeAllocatorCaller
+    tag: '0.1.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_stake_allocator_0_1_0
+      alias: stakeallocator010
+      sourceDir: ../../generated/contract_stake_allocator_0_1_0
+
+output:
+  type: StakeAllocatorCaller
+  defaultTag: '0.1.0'
+  package: contract_stake_allocator
+  file: caller.go

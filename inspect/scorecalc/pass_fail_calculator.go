@@ -6,11 +6,6 @@ import (
 	"github.com/forta-network/forta-core-go/inspect"
 )
 
-// constants
-const (
-	MinTotalMemoryRequired = 8e9 // 8 gigabytes
-)
-
 type chainPassFailCalculator struct {
 	config ScoreCalculatorConfig
 }
@@ -59,10 +54,10 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	}
 
 	// at least 50% of the required memory limit is required
-	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < MinTotalMemoryRequired {
+	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < c.config.MinTotalMemory {
 		return 0, nil
 	}
-
+	
 	if results.Inputs.IsETH2 && results.Indicators[inspect.IndicatorScanAPIIsETH2] == inspect.ResultFailure {
 		return 0, nil
 	}
@@ -74,6 +69,13 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	if results.Indicators[inspect.IndicatorValidAPIReferences] == inspect.ResultFailure {
 		return 0, nil
 	}
+
+	// TODO: Enable this after delegated staking.
+	// if results.Indicators[inspect.IndicatorRegistryAPIAccessible] == inspect.ResultFailure ||
+	// 	results.Indicators[inspect.IndicatorRegistryAPIENS] == inspect.ResultFailure ||
+	// 	results.Indicators[inspect.IndicatorRegistryAPIAssignments] == inspect.ResultFailure {
+	// 	return 0, nil
+	// }
 
 	return 1, nil
 }

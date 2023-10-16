@@ -3,7 +3,9 @@ package inspect
 import (
 	"context"
 	"fmt"
+	"net/url"
 
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -13,12 +15,15 @@ const (
 
 // InspectionConfig contains the parameters for all inspections.
 type InspectionConfig struct {
-	BlockNumber uint64 `json:"blockNumber"`
-	ScanAPIURL  string `json:"scanApiUrl"`
-	ProxyAPIURL string `json:"proxyApiUrl"` // JSON-RPC API for bots
-	TraceAPIURL string `json:"traceApiUrl"`
-	CheckTrace  bool   `json:"checkTrace"`
-	IsETH2      bool   `json:"isETH2"`
+	BlockNumber        uint64 `json:"blockNumber"`
+	ScanAPIURL         string `json:"scanApiUrl"`
+	ProxyAPIURL        string `json:"proxyApiUrl"` // JSON-RPC API to let bots make calls
+	TraceAPIURL        string `json:"traceApiUrl"`
+	CheckTrace         bool   `json:"checkTrace"`
+	IsETH2             bool   `json:"isETH2"`
+	RegistryAPIURL     string `json:"registryApiUrl"` // JSON-RPC API for loading the bots
+	ENSContractAddress string `json:"ensContractAddress"`
+	ScannerAddress     string `json:"scannerAddress"`
 }
 
 // InspectionResults contains inspection results.
@@ -26,6 +31,35 @@ type InspectionResults struct {
 	Inputs     InspectionConfig   `json:"inputs"`
 	Metadata   map[string]string  `json:"metadata"`
 	Indicators map[string]float64 `json:"indicators"`
+}
+
+// ToProtoInspectionResults transforms inspection results to protobuf inspection results model.
+func ToProtoInspectionResults(results *InspectionResults) *protocol.InspectionResults {
+	return &protocol.InspectionResults{
+		Inputs: &protocol.InspectionInputs{
+			BlockNumber:        results.Inputs.BlockNumber,
+			ScanApiHost:        getHost(results.Inputs.ScanAPIURL),
+			ProxyApiHost:       getHost(results.Inputs.ProxyAPIURL),
+			TraceApiHost:       getHost(results.Inputs.TraceAPIURL),
+			CheckTrace:         results.Inputs.CheckTrace,
+			RegistryApiHost:    getHost(results.Inputs.RegistryAPIURL),
+			EnsContractAddress: results.Inputs.ENSContractAddress,
+			ScannerAddress:     results.Inputs.ScannerAddress,
+		},
+		Metadata:   results.Metadata,
+		Indicators: results.Indicators,
+	}
+}
+
+func getHost(apiURL string) string {
+	if len(apiURL) == 0 {
+		return "null"
+	}
+	u, err := url.Parse(apiURL)
+	if err != nil {
+		return "invalid"
+	}
+	return u.Host
 }
 
 // NewInspectionResults creates new InspectionResults.
@@ -62,6 +96,7 @@ func Inspect(ctx context.Context, inspectionCfg InspectionConfig) (*InspectionRe
 			&ScanAPIInspector{},
 			&ProxyAPIInspector{},
 			&TraceAPIInspector{},
+			&RegistryAPIInspector{},
 		}, inspectionCfg,
 	)
 }

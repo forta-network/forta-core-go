@@ -1,0 +1,22 @@
+sources:
+  - type: AgentRegistryTransactor
+    tag: '0.1.4'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4
+      alias: agentregistry014
+      sourceDir: ../../generated/contract_agent_registry_0_1_4
+  - type: AgentRegistryTransactor
+    tag: '0.1.6'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_6
+      alias: agentregistry016
+      sourceDir: ../../generated/contract_agent_registry_0_1_6
+
+output:
+  type: AgentRegistryTransactor
+  defaultTag: '0.1.6'
+  package: contract_agent_registry
+  file: transactor.go
+
+errors:
+  hide: true

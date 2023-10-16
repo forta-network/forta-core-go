@@ -12,6 +12,7 @@ service Agent {
   rpc EvaluateTx (EvaluateTxRequest) returns (EvaluateTxResponse) {}
   rpc EvaluateBlock (EvaluateBlockRequest) returns (EvaluateBlockResponse) {}
   rpc EvaluateAlert (EvaluateAlertRequest) returns (EvaluateAlertResponse) {}
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {}
 }
 
 message Error {
@@ -24,9 +25,23 @@ enum ResponseStatus {
   SUCCESS = 2;
 }
 
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  enum ResponseStatus {
+    UNKNOWN = 0;
+    ERROR = 1;
+    SUCCESS = 2;
+  }
+
+  ResponseStatus status = 1;
+  repeated Error errors = 2;
+}
+
 message InitializeRequest {
   string agentId = 1;
   string proxyHost = 2;
+  int32 shardId = 3;
 }
 
 message InitializeResponse {
@@ -43,21 +58,27 @@ message AlertConfig {
 message CombinerBotSubscription {
   string botId = 1;
   string alertId = 2;
+  repeated string alertIds = 3;
+  uint64 chainId = 4;
 }
 
 message EvaluateTxRequest {
   string requestId = 1;
   TransactionEvent event = 2;
+  int32 shardId = 3;
 }
 
 message EvaluateBlockRequest {
   string requestId = 1;
   BlockEvent event = 2;
+  int32 shardId = 3;
 }
 
 message EvaluateAlertRequest {
   string requestId = 1;
   AlertEvent event = 2;
+  string targetBotId = 3;
+  int32 shardId = 4;
 }
 
 message EvaluateTxResponse {
@@ -120,6 +141,7 @@ message BlockEvent {
     repeated string transactions = 18;
     string transactionsRoot = 19;
     repeated string uncles = 20;
+    string baseFeePerGas = 21;
   }
 
   EventType type = 1;
@@ -145,6 +167,7 @@ message TransactionEvent {
     string blockHash = 1;
     string blockNumber = 2;
     string blockTimestamp = 3;
+    string baseFeePerGas = 4;
   }
 
   message EthTransaction {
@@ -160,6 +183,8 @@ message TransactionEvent {
     string to = 10;
     string hash = 11;
     string from = 12;
+    string maxFeePerGas = 13;
+    string maxPriorityFeePerGas = 14;
   }
 
   message Log {
@@ -273,6 +298,7 @@ message AlertEvent {
       string botId = 1;
       string alertHash = 2;
       string timestamp = 3;
+      string chainId = 4;
     }
 
     message Source {
@@ -280,6 +306,15 @@ message AlertEvent {
       Bot bot = 2;
       Block block = 3;
       SourceAlertEvent sourceEvent = 4;
+    }
+
+    message Label {
+      string label = 1;
+      float confidence = 2;
+      string entity = 3;
+      string entityType = 4;
+      bool remove = 5;
+      repeated string metadata = 6;
     }
 
     // Unique string to identify this class of finding,
@@ -301,6 +336,10 @@ message AlertEvent {
     Source source = 12;
     string findingType = 13;
     repeated string relatedAlerts = 14;
+    uint64 chainId = 15;
+    repeated Label labels = 16;
+    bool truncated = 17;
+    BloomFilter addressBloomFilter = 18;
   }
 
   Alert alert = 1;

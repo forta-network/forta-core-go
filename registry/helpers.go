@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/forta-network/forta-core-go/domain/registry"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -12,11 +13,11 @@ func equalsAddress(address common.Address, addr string) bool {
 	return strings.EqualFold(address.Hex(), addr)
 }
 
-func isEvent(le types.Log, topic string) bool {
-	if len(le.Topics) == 0 {
-		return false
+func getTopic(log types.Log) string {
+	if len(log.Topics) == 0 {
+		return ""
 	}
-	return strings.EqualFold(le.Topics[0].Hex(), topic)
+	return strings.ToLower(log.Topics[0].Hex())
 }
 
 func getLoggerForLog(le types.Log) *log.Entry {
@@ -25,5 +26,29 @@ func getLoggerForLog(le types.Log) *log.Entry {
 		"txHash":      le.TxHash.Hex(),
 		"blockNumber": le.BlockNumber,
 		"blockHash":   le.BlockHash.Hex(),
+		"topic":       getTopic(le),
 	})
+}
+
+func getAllContractAddrs(regContracts registry.RegistryContracts) []string {
+	addrs := []string{
+		regContracts.AgentRegistry.Hex(),
+		regContracts.ScannerRegistry.Hex(),
+		regContracts.Dispatch.Hex(),
+		regContracts.FortaStaking.Hex(),
+		regContracts.ScannerNodeVersion.Hex(),
+		regContracts.ScannerPoolRegistry.Hex(),
+		regContracts.StakeAllocator.Hex(),
+		regContracts.Rewards.Hex(),
+	}
+	return addrs
+}
+
+func isAddrIn(addrs []string, ethAddr common.Address) bool {
+	for _, addr := range addrs {
+		if equalsAddress(ethAddr, addr) {
+			return true
+		}
+	}
+	return false
 }

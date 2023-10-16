@@ -18,6 +18,11 @@ func Int32Ptr(n int32) *int32 {
 	return &n
 }
 
+// Int64Ptr returns a pointer.
+func Int64Ptr(n int64) *int64 {
+	return &n
+}
+
 // BoolPtr returns a pointer.
 func BoolPtr(v bool) *bool {
 	return &v

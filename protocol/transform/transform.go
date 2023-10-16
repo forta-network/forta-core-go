@@ -1,10 +1,7 @@
 package transform
 
 import (
-	"net/url"
-
 	"github.com/forta-network/forta-core-go/clients/webhook/client/models"
-	"github.com/forta-network/forta-core-go/inspect"
 	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/forta-network/forta-core-go/utils"
 )
@@ -133,30 +130,4 @@ func ToWebhookAlert(
 	}
 
 	return webhookAlert
-}
-
-// ToProtoInspectionResults transforms inspection results to protobuf inspection results model.
-func ToProtoInspectionResults(results *inspect.InspectionResults) *protocol.InspectionResults {
-	return &protocol.InspectionResults{
-		Inputs: &protocol.InspectionInputs{
-			BlockNumber:  results.Inputs.BlockNumber,
-			ScanApiHost:  getHost(results.Inputs.ScanAPIURL),
-			ProxyApiHost: getHost(results.Inputs.ProxyAPIURL),
-			TraceApiHost: getHost(results.Inputs.TraceAPIURL),
-			CheckTrace:   results.Inputs.CheckTrace,
-		},
-		Metadata:   results.Metadata,
-		Indicators: results.Indicators,
-	}
-}
-
-func getHost(apiURL string) string {
-	if len(apiURL) == 0 {
-		return "null"
-	}
-	u, err := url.Parse(apiURL)
-	if err != nil {
-		return "invalid"
-	}
-	return u.Host
 }

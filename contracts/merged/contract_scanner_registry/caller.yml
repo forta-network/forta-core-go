@@ -1,0 +1,19 @@
+sources:
+  - type: ScannerRegistryCaller
+    tag: '0.1.3'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_3
+      alias: scannerregistry013
+      sourceDir: ../../generated/contract_scanner_registry_0_1_3
+  - type: ScannerRegistryCaller
+    tag: '0.1.4'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_registry_0_1_4
+      alias: scannerregistry014
+      sourceDir: ../../generated/contract_scanner_registry_0_1_4
+
+output:
+  type: ScannerRegistryCaller
+  defaultTag: '0.1.4'
+  package: contract_scanner_registry
+  file: caller.go

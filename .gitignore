@@ -2,3 +2,5 @@
 forta-token
 forta-contracts
 toolbin
+run.sh
+*coverage.*

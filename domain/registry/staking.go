@@ -1,34 +1,41 @@
 package registry
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/big"
 	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
-	"github.com/forta-network/forta-core-go/contracts/contract_forta_staking"
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_forta_staking"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_pool_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_registry"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
 const AgentStake = "AgentStake"
 const ScannerStake = "ScannerStake"
+const ScannerPoolStake = "ScannerPoolStake"
+const ScannerPoolDelegatorStake = "ScannerPoolDelegatorStake"
 const AgentStakeThreshold = "AgentStakeThreshold"
 const ScannerStakeThreshold = "ScannerStakeThreshold"
 const TransferShares = "TransferShares"
-
+const Rewarded = "Rewarded"
+const ClaimedRewards = "ClaimedRewards"
 const ChangeTypeDeposit = "deposit"
 const ChangeTypeWithdrawal = "withdrawal"
+const ChangeTypeFroze = "froze"
+const ChangeTypeUnfroze = "unfroze"
 const ChangeTypeSlash = "slash"
 
 type ThresholdMessage struct {
-	Message
+	regmsg.Message
 	Min       string `json:"min"`
 	Max       string `json:"max"`
 	Activated bool   `json:"activated"`
@@ -38,14 +45,22 @@ type AgentStakeThresholdMessage struct {
 	ThresholdMessage
 }
 
+func (astm *AgentStakeThresholdMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
+}
+
 type TransferSharesMessage struct {
-	Message
+	regmsg.Message
 	ShareID   string `json:"shareId"`
 	StakeType string `json:"stakeType"`
 	Active    bool   `json:"active"`
 	To        string `json:"to"`
 	From      string `json:"from"`
 	Amount    string `json:"amount"`
+}
+
+func (tsm *TransferSharesMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
 }
 
 func (t TransferSharesMessage) IsBurn() bool {
@@ -61,8 +76,12 @@ type ScannerStakeThresholdMessage struct {
 	ChainID int64 `json:"chainId"`
 }
 
+func (sstm *ScannerStakeThresholdMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
+}
+
 type StakeMessage struct {
-	Message
+	regmsg.Message
 	ChangeType string `json:"changeType"`
 	Amount     string `json:"amount"`
 	Account    string `json:"account"`
@@ -73,9 +92,35 @@ type AgentStakeMessage struct {
 	AgentID string `json:"agentId"`
 }
 
+func (asm *AgentStakeMessage) LogFields() logrus.Fields {
+	return logrus.Fields{
+		"agentId":    asm.AgentID,
+		"changeType": asm.ChangeType,
+	}
+}
+
 type ScannerStakeMessage struct {
 	StakeMessage
 	ScannerID string `json:"scannerId"`
+}
+
+func (ssm *ScannerStakeMessage) LogFields() logrus.Fields {
+	return logrus.Fields{
+		"scannerId":  ssm.ScannerID,
+		"changeType": ssm.ChangeType,
+	}
+}
+
+type ScannerPoolStakeMessage struct {
+	StakeMessage
+	PoolID string `json:"poolId"`
+}
+
+func (spsm *ScannerPoolStakeMessage) LogFields() logrus.Fields {
+	return logrus.Fields{
+		"poolId":     spsm.PoolID,
+		"changeType": spsm.ChangeType,
+	}
 }
 
 func valueString(v *big.Int) string {
@@ -93,8 +138,12 @@ func extractStakeType(id *big.Int) (string, error) {
 		return ScannerStake, nil
 	case 1:
 		return AgentStake, nil
+	case 2:
+		return ScannerPoolStake, nil
+	case 3:
+		return ScannerPoolDelegatorStake, nil
 	default:
-		return "", fmt.Errorf("invalid stake type: %s", id.String())
+		return "", fmt.Errorf("invalid stake type '%d': %s", lastByte, id.String())
 	}
 }
 
@@ -109,10 +158,10 @@ func TransferSharesMessageFromSingle(l types.Log, evt *contract_forta_staking.Fo
 		return nil, err
 	}
 	return &TransferSharesMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Action:    TransferShares,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 		},
 		StakeType: st,
 		ShareID:   evt.Id.String(),
@@ -131,10 +180,10 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 			return nil, err
 		}
 		res = append(res, &TransferSharesMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    TransferShares,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			StakeType: st,
 			ShareID:   id.String(),
@@ -150,11 +199,7 @@ func TransferSharesMessagesFromBatch(l types.Log, evt *contract_forta_staking.Fo
 func NewScannerStakeMessage(l types.Log, changeType string, account common.Address, scannerID string, value *big.Int, blk *domain.Block) *ScannerStakeMessage {
 	return &ScannerStakeMessage{
 		StakeMessage: StakeMessage{
-			Message: Message{
-				Action:    ScannerStake,
-				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
-			},
+			Message:    regmsg.From(l.TxHash.Hex(), blk, ScannerStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -166,11 +211,7 @@ func NewScannerStakeMessage(l types.Log, changeType string, account common.Addre
 func NewAgentStakeMessage(l types.Log, changeType string, account common.Address, agentID string, value *big.Int, blk *domain.Block) *AgentStakeMessage {
 	return &AgentStakeMessage{
 		StakeMessage: StakeMessage{
-			Message: Message{
-				Action:    AgentStake,
-				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
-			},
+			Message:    regmsg.From(l.TxHash.Hex(), blk, AgentStake),
 			ChangeType: changeType,
 			Amount:     valueString(value),
 			Account:    strings.ToLower(account.Hex()),
@@ -179,13 +220,25 @@ func NewAgentStakeMessage(l types.Log, changeType string, account common.Address
 	}
 }
 
+func NewScannerPoolStakeMessage(l types.Log, changeType string, account common.Address, poolID string, value *big.Int, blk *domain.Block) *ScannerPoolStakeMessage {
+	return &ScannerPoolStakeMessage{
+		StakeMessage: StakeMessage{
+			Message:    regmsg.From(l.TxHash.Hex(), blk, ScannerPoolStake),
+			ChangeType: changeType,
+			Amount:     valueString(value),
+			Account:    strings.ToLower(account.Hex()),
+		},
+		PoolID: strings.ToLower(poolID),
+	}
+}
+
 func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *AgentStakeThresholdMessage {
 	return &AgentStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    AgentStakeThreshold,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			Min:       valueString(evt.Min),
 			Max:       valueString(evt.Max),
@@ -197,10 +250,10 @@ func NewAgentStakeThresholdMessage(evt *contract_agent_registry.AgentRegistrySta
 func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegistryStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
 	return &ScannerStakeThresholdMessage{
 		ThresholdMessage: ThresholdMessage{
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    ScannerStakeThreshold,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(l.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
 			},
 			Min:       valueString(evt.Min),
 			Max:       valueString(evt.Max),
@@ -210,47 +263,18 @@ func NewScannerStakeThresholdMessage(evt *contract_scanner_registry.ScannerRegis
 	}
 }
 
-func ParseAgentStakeThresholdMessage(msg string) (*AgentStakeThresholdMessage, error) {
-	var m AgentStakeThresholdMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
+func NewScannerManagedStakeThresholdMessage(evt *contract_scanner_pool_registry.ScannerPoolRegistryManagedStakeThresholdChanged, l types.Log, blk *domain.Block) *ScannerStakeThresholdMessage {
+	return &ScannerStakeThresholdMessage{
+		ThresholdMessage: ThresholdMessage{
+			Message: regmsg.Message{
+				Action:    ScannerStakeThreshold,
+				Timestamp: time.Now().UTC(),
+				Source:    regmsg.SourceFromBlock(l.TxHash.Hex(), blk),
+			},
+			Min:       valueString(evt.Min),
+			Max:       valueString(evt.Max),
+			Activated: evt.Activated,
+		},
+		ChainID: evt.ChainId.Int64(),
 	}
-	return &m, nil
-}
-
-func ParseScannerStakeThresholdMessage(msg string) (*ScannerStakeThresholdMessage, error) {
-	var m ScannerStakeThresholdMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseAgentStakeMessage(msg string) (*AgentStakeMessage, error) {
-	var m AgentStakeMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseScannerStakeMessage(msg string) (*ScannerStakeMessage, error) {
-	var m ScannerStakeMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
-
-func ParseTransferSharesMessage(msg string) (*TransferSharesMessage, error) {
-	var m TransferSharesMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
 }

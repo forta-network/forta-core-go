@@ -1,0 +1,13 @@
+sources:
+  - type: RewardsDistributorCaller
+    tag: '0.1.0'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0
+      alias: rewardsdistributor010
+      sourceDir: ../../generated/contract_rewards_distributor_0_1_0
+
+output:
+  type: RewardsDistributorCaller
+  defaultTag: '0.1.0'
+  package: contract_rewards_distributor
+  file: caller.go

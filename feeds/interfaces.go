@@ -6,7 +6,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
-	"github.com/forta-network/forta-core-go/protocol"
 )
 
 // BlockFeed is a subscribable feed of blocks.
@@ -26,11 +25,9 @@ type TransactionFeed interface {
 // AlertFeed is a subscribable feed of alerts.
 type AlertFeed interface {
 	Start()
-	StartRange(start uint64, end uint64, rate int64)
-	AddSubscription(subscription *protocol.CombinerBotSubscription)
-	RemoveSubscription(subscription *protocol.CombinerBotSubscription)
-	SubscribedBots() []string
-	ForEachAlert(alertHandler func(evt *domain.AlertEvent) error) error
+	AddSubscription(subscription *domain.CombinerBotSubscription) error
+	RemoveSubscription(subscription *domain.CombinerBotSubscription)
+	Subscriptions() []*domain.CombinerBotSubscription
 	RegisterHandler(alertHandler func(evt *domain.AlertEvent) error) <-chan error
 	health.Reporter
 }
@@ -40,4 +37,5 @@ type LogFeed interface {
 	ForEachLog(handler func(blk *domain.Block, logEntry types.Log) error, finishBlockHandler func(blk *domain.Block) error) error
 	GetLogsForLastBlocks(blocksAgo int64) ([]types.Log, error)
 	GetLogsForRange(blockStart *big.Int, blockEnd *big.Int) ([]types.Log, error)
+	AddAddress(newAddr string)
 }

@@ -12,8 +12,8 @@ const (
 	DefaultMinDownloadSpeedInMbps = 10 // 10 mbps
 	DefaultMinUploadSpeedInMbps   = 3  // 3 mbps
 	DefaultEarliestBlock          = inspect.VeryOldBlockNumber
-	DefaultMinTotalMemory         = 3e9 // 3 gigabytes
-	DefaultMinAvailableMemory     = 5e7 // 50 megabytes
+	DefaultMinTotalMemory         = 15e9 // ~16 gigabytes
+	DefaultMinAvailableMemory     = 2e9  // 2 gigabytes
 )
 
 // Errors
@@ -96,8 +96,10 @@ func (s *scoreCalculator) getChainScoreCalculator(chainID uint64) (*chainPassFai
 }
 
 // DefaultScoreCalculatorConfig returns a ScoreCalculatorConfig with the chain id and all default limits.
-func DefaultScoreCalculatorConfig(chainID uint64) ScoreCalculatorConfig {
-	return ScoreCalculatorConfig{
+func DefaultScoreCalculatorConfig(
+	chainID uint64, modifiers ...func(config *ScoreCalculatorConfig),
+) ScoreCalculatorConfig {
+	s := ScoreCalculatorConfig{
 		ChainID:                chainID,
 		MinDownloadSpeedInMbps: DefaultMinDownloadSpeedInMbps,
 		MinUploadSpeedInMbps:   DefaultMinUploadSpeedInMbps,
@@ -105,4 +107,10 @@ func DefaultScoreCalculatorConfig(chainID uint64) ScoreCalculatorConfig {
 		MinTotalMemory:         DefaultMinTotalMemory,
 		MinAvailableMemory:     DefaultMinAvailableMemory,
 	}
+
+	for _, modifier := range modifiers {
+		modifier(&s)
+	}
+
+	return s
 }

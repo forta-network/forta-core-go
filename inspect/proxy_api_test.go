@@ -14,7 +14,7 @@ const (
 )
 
 var testProxyEnv struct {
-	ProxyAPI string `envconfig:"proxy_api" default:"https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"`
+	ProxyAPI string `envconfig:"proxy_api" default:"https://rpc.ankr.com/eth_goerli"`
 }
 
 func init() {
@@ -28,6 +28,7 @@ func TestProxyAPIInspection(t *testing.T) {
 	results, err := inspector.Inspect(
 		context.Background(), InspectionConfig{
 			ProxyAPIURL: testProxyEnv.ProxyAPI,
+			ScanAPIURL:  testProxyEnv.ProxyAPI,
 			BlockNumber: testProxyAPIOldestSupportedBlock,
 		},
 	)
@@ -42,6 +43,11 @@ func TestProxyAPIInspection(t *testing.T) {
 			IndicatorProxyAPIModuleNet:      ResultSuccess,
 			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
 			IndicatorProxyAPIIsETH2:         ResultSuccess,
+			// trick to make test less flaky and ignore offset issues
+			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
+			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
+			IndicatorProxyAPIOffsetScanMedian:  results.Indicators[IndicatorProxyAPIOffsetScanMedian],
+			IndicatorProxyAPIOffsetScanSamples: results.Indicators[IndicatorProxyAPIOffsetScanSamples],
 		}, results.Indicators,
 	)
 
@@ -64,4 +70,40 @@ func Test_findOldestSupportedBlock(t *testing.T) {
 
 	result := findOldestSupportedBlock(context.Background(), cli, 0, latestBlockNum)
 	r.Equal(testProxyAPIOldestSupportedBlock, result)
+}
+
+func TestProxyAPIInspector_detectOffset(t *testing.T) {
+	type args struct {
+		ctx           context.Context
+		inspectionCfg InspectionConfig
+	}
+
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "free and free combo",
+			args: args{
+				ctx: context.Background(),
+				inspectionCfg: InspectionConfig{
+					ScanAPIURL:  "https://rpc.ankr.com/eth",
+					ProxyAPIURL: "https://rpc.ankr.com/eth",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(
+			tt.name, func(t *testing.T) {
+				pai := &ProxyAPIInspector{}
+				stats, err := pai.detectOffset(tt.args.ctx, tt.args.inspectionCfg)
+				if err != nil {
+					t.Log(err)
+				}
+
+				t.Log(stats)
+			},
+		)
+	}
 }

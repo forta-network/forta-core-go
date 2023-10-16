@@ -1,0 +1,25 @@
+sources:
+  - type: FortaStakingFilterer
+    tag: '0.1.1'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1
+      alias: fortastaking011
+      sourceDir: ../../generated/contract_forta_staking_0_1_1
+  - type: FortaStakingFilterer
+    tag: '0.1.2'
+    package:
+      importPath: github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2
+      alias: fortastaking012
+      sourceDir: ../../generated/contract_forta_staking_0_1_2
+
+output:
+  type: FortaStakingFilterer
+  defaultTag: '0.1.2'
+  package: contract_forta_staking
+  file: filterer.go
+  rewrite:
+  - match: ^Parse([a-zA-Z]+)Output$
+    transform: FortaStaking$
+
+errors:
+  hide: true

@@ -61,7 +61,7 @@ func (sri *SystemResourcesInspector) Inspect(ctx context.Context, inspectionCfg 
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't read cpu info: %w", err))
 	} else {
 		// cpu.Percent should return average result in a slice with a single item
-		if len(ci) != 1 {
+		if len(ci) == 1 {
 			results.Indicators[IndicatorResourcesCPUUsage] = ci[0]
 		}
 	}

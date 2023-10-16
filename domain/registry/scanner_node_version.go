@@ -1,41 +1,32 @@
 package registry
 
 import (
-	"encoding/json"
-	"fmt"
 	"time"
 
-	"github.com/forta-network/forta-core-go/contracts/contract_scanner_node_version"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_scanner_node_version"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
+	"github.com/sirupsen/logrus"
 )
 
 const ScannerNodeVersionUpdated = "ScannerNodeVersionUpdated"
 
 type ScannerNodeVersionMessage struct {
-	Message
+	regmsg.Message
 	NewVersion string `json:"newVersion"`
 	OldVersion string `json:"oldVersion"`
 }
 
-func ParseScannerNodeVersionUpdated(msg string) (*ScannerNodeVersionMessage, error) {
-	var nodeVersionUpdated ScannerNodeVersionMessage
-	err := json.Unmarshal([]byte(msg), &nodeVersionUpdated)
-	if err != nil {
-		return nil, err
-	}
-	if nodeVersionUpdated.Action != ScannerNodeVersionUpdated {
-		return nil, fmt.Errorf("invalid action for ScannerNodeVersion: %s", nodeVersionUpdated.Action)
-	}
-	return &nodeVersionUpdated, nil
+func (snvm *ScannerNodeVersionMessage) LogFields() logrus.Fields {
+	return logrus.Fields{}
 }
 
 func NewScannerNodeVersionUpdated(evt *contract_scanner_node_version.ScannerNodeVersionScannerNodeVersionUpdated, blk *domain.Block) *ScannerNodeVersionMessage {
-
 	return &ScannerNodeVersionMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Timestamp: time.Now().UTC(),
 			Action:    ScannerNodeVersionUpdated,
-			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 
 		NewVersion: evt.NewVersion,

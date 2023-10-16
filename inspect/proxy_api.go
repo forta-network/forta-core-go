@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -25,6 +26,13 @@ const (
 	IndicatorProxyAPIHistorySupport = "proxy-api.history-support"
 	// IndicatorProxyAPIIsETH2 is upgraded to Ethereum 2.0.
 	IndicatorProxyAPIIsETH2 = "proxy-api.is-eth2"
+
+	// IndicatorProxyAPIOffsetScanMean offset information between scan and proxy
+	IndicatorProxyAPIOffsetScanMean    = "proxy-api.offset.scan.mean"
+	IndicatorProxyAPIOffsetScanMax     = "proxy-api.offset.scan.max"
+	IndicatorProxyAPIOffsetScanMedian  = "proxy-api.offset.scan.median"
+	IndicatorProxyAPIOffsetScanSamples = "proxy-api.offset.scan.samples"
+
 	// MetadataProxyAPIBlockByNumberHash is the hash of the block data retrieved from the scan API.
 	MetadataProxyAPIBlockByNumberHash = "proxy-api.block-by-number.hash"
 )
@@ -62,7 +70,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	results = NewInspectionResults()
 	results.Indicators = defaultIndicators(proxyAPIIndicators)
 
-	rpcClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
+	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
 
@@ -78,16 +86,16 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 	}
 
-	client := ethclient.NewClient(rpcClient)
+	proxyClient := ethclient.NewClient(proxyRPCClient)
 
-	if id, err := GetChainOrNetworkID(ctx, rpcClient); err != nil {
+	if id, err := GetChainOrNetworkID(ctx, proxyRPCClient); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
 	} else {
 		results.Indicators[IndicatorProxyAPIChainID] = float64(id.Uint64())
 	}
 
-	currentHeight, err := client.BlockNumber(ctx)
+	currentHeight, err := proxyClient.BlockNumber(ctx)
 	if err != nil {
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
 		results.Indicators[IndicatorProxyAPIHistorySupport] = ResultFailure
@@ -95,29 +103,66 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	} else {
 		// check history support
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
-		results.Indicators[IndicatorProxyAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, client)
+		results.Indicators[IndicatorProxyAPIHistorySupport] = checkHistorySupport(ctx, currentHeight, proxyClient)
 	}
 
-	err = checkSupportedModules(ctx, rpcClient, results)
+	err = checkSupportedModules(ctx, proxyRPCClient, results)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("error checking module functionality %w", err))
 	}
 
 	// get configured block and include hash of the returned as metadata
-	hash, err := GetBlockResponseHash(ctx, rpcClient, inspectionCfg.BlockNumber)
+	hash, err := GetBlockResponseHash(ctx, proxyRPCClient, inspectionCfg.BlockNumber)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to get configured block %d: %v", inspectionCfg.BlockNumber, err))
 	} else {
 		results.Metadata[MetadataProxyAPIBlockByNumberHash] = hash
 	}
 
-	if SupportsETH2(ctx, rpcClient) {
+	if SupportsETH2(ctx, proxyRPCClient) {
 		results.Indicators[IndicatorProxyAPIIsETH2] = ResultSuccess
 	} else {
 		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
 	}
 
+	stats, err := pai.detectOffset(ctx, inspectionCfg)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
+		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
+	} else {
+		results.Indicators[IndicatorProxyAPIOffsetScanMean] = stats.Mean
+		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = stats.Median
+		results.Indicators[IndicatorProxyAPIOffsetScanMax] = stats.Max
+		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = stats.SampleCount
+	}
+
 	return
+}
+
+func (pai *ProxyAPIInspector) detectOffset(
+	ctx context.Context,
+	inspectionCfg InspectionConfig,
+) (os offsetStats, resultErr error) {
+	proxyCtx, cancel := context.WithTimeout(ctx, time.Second*30)
+	defer cancel()
+
+	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
+	if err != nil {
+		return offsetStats{}, err
+	}
+
+	proxyClient := ethclient.NewClient(proxyRPCClient)
+	scanRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
+	if err != nil {
+		return offsetStats{}, err
+	}
+
+	scanClient := ethclient.NewClient(scanRPCClient)
+
+	return calculateOffsetStats(proxyCtx, scanClient, proxyClient)
 }
 
 // checkSupportedModules double-checks the functionality of modules that were declared as supported by

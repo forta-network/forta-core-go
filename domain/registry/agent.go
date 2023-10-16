@@ -1,14 +1,13 @@
 package registry
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/domain/registry/regmsg"
+	"github.com/sirupsen/logrus"
 
-	"github.com/goccy/go-json"
-
-	"github.com/forta-network/forta-core-go/contracts/contract_agent_registry"
+	"github.com/forta-network/forta-core-go/contracts/merged/contract_agent_registry"
 	"github.com/forta-network/forta-core-go/utils"
 )
 
@@ -20,40 +19,27 @@ const AgentPermissionAdmin = 0
 const AgentPermissionOwner = 1
 
 type AgentMessage struct {
-	Message
+	regmsg.Message
 	AgentID    string `json:"agentId"`
 	TxHash     string `json:"txHash"`
 	Permission int    `json:"permission"`
 }
 
+func (am *AgentMessage) LogFields() logrus.Fields {
+	return logrus.Fields{"agentId": am.AgentID}
+}
+
 type AgentSaveMessage struct {
 	AgentMessage
+	AgentProperties
+}
+
+type AgentProperties struct {
 	Enabled  bool    `json:"enabled"`
 	Name     string  `json:"name"`
 	ChainIDs []int64 `json:"chainIds"`
 	Metadata string  `json:"metadata"`
 	Owner    string  `json:"owner"`
-}
-
-func ParseAgentSave(msg string) (*AgentSaveMessage, error) {
-	var save AgentSaveMessage
-	err := json.Unmarshal([]byte(msg), &save)
-	if err != nil {
-		return nil, err
-	}
-	if save.Action != SaveAgent {
-		return nil, fmt.Errorf("invalid action for AgentSave: %s", save.Action)
-	}
-	return &save, nil
-}
-
-func ParseAgentMessage(msg string) (*AgentMessage, error) {
-	var m AgentMessage
-	err := json.Unmarshal([]byte(msg), &m)
-	if err != nil {
-		return nil, err
-	}
-	return &m, nil
 }
 
 func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk *domain.Block) *AgentMessage {
@@ -63,10 +49,10 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 		evtName = EnableAgent
 	}
 	return &AgentMessage{
-		Message: Message{
+		Message: regmsg.Message{
 			Action:    evtName,
 			Timestamp: time.Now().UTC(),
-			Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 		},
 		AgentID:    agentID,
 		Permission: int(evt.Permission),
@@ -74,22 +60,40 @@ func NewAgentMessage(evt *contract_agent_registry.AgentRegistryAgentEnabled, blk
 	}
 }
 
-func NewAgentSaveMessage(evt *contract_agent_registry.AgentRegistryAgentUpdated, enabled bool, blk *domain.Block) *AgentSaveMessage {
+func NewAgentSaveMessageFromUpdate(evt *contract_agent_registry.AgentRegistryAgentUpdated, enabled bool, blk *domain.Block) *AgentSaveMessage {
 	agentID := utils.Hex(evt.AgentId)
 	return &AgentSaveMessage{
 		AgentMessage: AgentMessage{
 			AgentID: agentID,
-			Message: Message{
+			Message: regmsg.Message{
 				Action:    SaveAgent,
 				Timestamp: time.Now().UTC(),
-				Source:    SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+				Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
 			},
 			TxHash: evt.Raw.TxHash.Hex(),
 		},
-		Enabled:  enabled,
-		Name:     evt.Metadata,
-		ChainIDs: utils.IntArray(evt.ChainIds),
-		Metadata: evt.Metadata,
-		Owner:    evt.By.Hex(),
+		AgentProperties: AgentProperties{
+			Enabled:  enabled,
+			Name:     evt.Metadata,
+			ChainIDs: utils.IntArray(evt.ChainIds),
+			Metadata: evt.Metadata,
+			Owner:    evt.By.Hex(),
+		},
+	}
+}
+
+func NewAgentSaveMessageFromTransfer(evt *contract_agent_registry.AgentRegistryTransfer, props AgentProperties, blk *domain.Block) *AgentSaveMessage {
+	agentID := utils.Hex(evt.TokenId)
+	return &AgentSaveMessage{
+		AgentMessage: AgentMessage{
+			AgentID: agentID,
+			Message: regmsg.Message{
+				Action:    SaveAgent,
+				Timestamp: time.Now().UTC(),
+				Source:    regmsg.SourceFromBlock(evt.Raw.TxHash.Hex(), blk),
+			},
+			TxHash: evt.Raw.TxHash.Hex(),
+		},
+		AgentProperties: props,
 	}
 }

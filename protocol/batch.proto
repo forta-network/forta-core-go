@@ -100,6 +100,7 @@ message ScannerVersion {
   string commit = 1;
   string ipfs = 2;
   string version = 3;
+  bool autoUpdates = 4;
 }
 
 message InspectionResults {
@@ -114,4 +115,7 @@ message InspectionInputs {
   string proxyApiHost = 3;
   string traceApiHost = 4;
   bool checkTrace = 5;
+  string registryApiHost = 6;
+  string ensContractAddress = 7;
+  string scannerAddress = 8;
 }

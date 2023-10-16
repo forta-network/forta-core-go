@@ -1,15 +1,13 @@
 package domain
 
 import (
-	"bytes"
 	"math/big"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/goccy/go-json"
-	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/forta-network/forta-core-go/protocol"
@@ -108,6 +106,7 @@ func (t *BlockEvent) ToMessage() (*protocol.BlockEvent, error) {
 			ChainId: utils.BigIntToHex(t.ChainID),
 		},
 		Block: &protocol.BlockEvent_EthBlock{
+			BaseFeePerGas:    str(t.Block.BaseFeePerGas),
 			Difficulty:       str(t.Block.Difficulty),
 			Hash:             t.Block.Hash,
 			Number:           t.Block.Number,
@@ -152,15 +151,18 @@ func safeAddStrToMap(addresses map[string]bool, addr *string) {
 	}
 }
 
+func safeBool(b *bool) bool {
+	if b == nil {
+		return false
+	}
+	return *b
+}
+
 // ToMessage converts the TransactionEvent to the protocol.TransactionEvent message
 func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 	evtType := protocol.TransactionEvent_BLOCK
 
 	addresses := make(map[string]bool)
-
-	um := jsonpb.Unmarshaler{
-		AllowUnknownFields: true,
-	}
 
 	// convert trace domain model to proto (filter traces)
 	var traces []*protocol.TransactionEvent_Trace
@@ -171,16 +173,8 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			safeAddStrToMap(addresses, trace.Action.To)
 			safeAddStrToMap(addresses, trace.Action.From)
 
-			var pTrace protocol.TransactionEvent_Trace
-			traceJson, err := json.Marshal(trace)
-			if err != nil {
-				return nil, err
-			}
-			if err := um.Unmarshal(bytes.NewReader(traceJson), &pTrace); err != nil {
-				log.Errorf("cannot unmarshal traceJson: %s", err.Error())
-				log.Errorf("JSON: %s", string(traceJson))
-				return nil, err
-			}
+			pTrace := trace.ToProto()
+
 			// lowercase addresses
 			if pTrace.Action != nil {
 				pTrace.Action.To = strings.ToLower(pTrace.Action.To)
@@ -189,54 +183,49 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 				pTrace.Action.Address = strings.ToLower(pTrace.Action.Address)
 			}
 
-			traces = append(traces, &pTrace)
+			traces = append(traces, pTrace)
 		}
 	}
 
 	txAddresses := make(map[string]bool)
 
 	// convert tx domain model to proto
-	var tx protocol.TransactionEvent_EthTransaction
+	var tx *protocol.TransactionEvent_EthTransaction
 	if t.Transaction != nil {
 		safeAddStrToMap(addresses, t.Transaction.To)
 		safeAddStrToMap(addresses, &t.Transaction.From)
 		safeAddStrToMap(txAddresses, t.Transaction.To)
 		safeAddStrToMap(txAddresses, &t.Transaction.From)
 
-		txJson, err := json.Marshal(t.Transaction)
-		if err != nil {
-			return nil, err
-		}
-		if err := um.Unmarshal(bytes.NewReader(txJson), &tx); err != nil {
-			log.Errorf("cannot unmarshal txJson: %s", err.Error())
-			log.Errorf("JSON: %s", string(txJson))
-			return nil, err
-		}
+		tx = t.Transaction.ToProto()
 
 		// lowercase to/from
 		tx.To = strings.ToLower(tx.To)
 		tx.From = strings.ToLower(tx.From)
 	}
 
-	var logs []*protocol.TransactionEvent_Log
-	logJson, err := json.Marshal(t.BlockEvt.Logs)
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(logJson, &logs); err != nil {
-		return nil, err
-	}
-
 	var txLogs []*protocol.TransactionEvent_Log
-	for _, l := range logs {
-		if l.TransactionHash == t.Transaction.Hash {
-			txLogs = append(txLogs, l)
-			l.Address = strings.ToLower(l.Address)
-			safeAddStrValueToMap(addresses, l.Address)
-			safeAddStrValueToMap(txAddresses, l.Address)
+	for _, l := range t.BlockEvt.Logs {
+		if l.TransactionHash != nil && *l.TransactionHash == t.Transaction.Hash {
+			txLog := &protocol.TransactionEvent_Log{
+				Address:          str(l.Address),
+				Topics:           strArr(l.Topics),
+				Data:             str(l.Data),
+				BlockNumber:      str(l.BlockNumber),
+				TransactionHash:  str(l.TransactionHash),
+				TransactionIndex: str(l.TransactionIndex),
+				BlockHash:        str(l.BlockHash),
+				LogIndex:         str(l.LogIndex),
+				Removed:          safeBool(l.Removed),
+			}
+
+			txLogs = append(txLogs, txLog)
+			txLog.Address = strings.ToLower(txLog.Address)
+			safeAddStrValueToMap(addresses, txLog.Address)
+			safeAddStrValueToMap(txAddresses, txLog.Address)
 
 			// add addresses from topics
-			for _, topic := range l.Topics {
+			for _, topic := range txLog.Topics {
 				if strings.HasPrefix(topic, "0x000000000000000000000000") {
 					safeAddStrValueToMap(addresses, common.HexToAddress(topic).Hex())
 					safeAddStrValueToMap(txAddresses, common.HexToAddress(topic).Hex())
@@ -276,7 +265,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 
 	return &protocol.TransactionEvent{
 		Type:                 evtType,
-		Transaction:          &tx,
+		Transaction:          tx,
 		Network:              nw,
 		Traces:               traces,
 		Addresses:            addresses,
@@ -289,6 +278,7 @@ func (t *TransactionEvent) ToMessage() (*protocol.TransactionEvent, error) {
 			BlockHash:      t.BlockEvt.Block.Hash,
 			BlockNumber:    t.BlockEvt.Block.Number,
 			BlockTimestamp: t.BlockEvt.Block.Timestamp,
+			BaseFeePerGas:  str(t.BlockEvt.Block.BaseFeePerGas),
 		},
 		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
@@ -299,6 +289,7 @@ type AlertEvent struct {
 	Event      *protocol.AlertEvent
 	Logs       []LogEntry
 	Timestamps *TrackingTimestamps
+	Subscriber *Subscriber
 }
 
 // ToMessage converts the AlertEvent to the protocol.TransactionEvent message
@@ -307,4 +298,59 @@ func (t *AlertEvent) ToMessage() (*protocol.AlertEvent, error) {
 		Alert:      t.Event.Alert,
 		Timestamps: t.Timestamps.ToMessage(),
 	}, nil
+}
+
+type Subscriber struct {
+	BotID    string `json:"bot_id"`
+	BotOwner string `json:"bot_owner"`
+	BotImage string `json:"bot_image_hash"`
+}
+
+type CombinerBotSubscription struct {
+	Subscription *protocol.CombinerBotSubscription `json:"subscription"`
+	Subscriber   *Subscriber                       `json:"subscriber"`
+}
+
+// Equal returns true if two subscriptions are equal and false otherwise.
+func (c *CombinerBotSubscription) Equal(b *CombinerBotSubscription) bool {
+	if c == nil || b == nil {
+		return false
+	}
+
+	if c.Subscription.BotId != b.Subscription.BotId ||
+		c.Subscription.AlertId != b.Subscription.AlertId ||
+		c.Subscription.ChainId != b.Subscription.ChainId ||
+		!stringSlicesEqual(c.Subscription.AlertIds, b.Subscription.AlertIds) {
+		return false
+	}
+
+	// Subscriber-specific uniqueness checks. Since the protocol enforces subscription fees, subscriptions from 2 different bots or bot owners can not
+	// be treated as same, because one can fail while the other succeeds.
+	if c.Subscriber.BotID != b.Subscriber.BotID || c.Subscriber.BotOwner != b.Subscriber.BotOwner || c.Subscriber.BotImage != b.Subscriber.BotImage {
+		return false
+	}
+
+	return true
+}
+
+// stringSlicesEqual returns true if two slices of strings are equal and false otherwise.
+func stringSlicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	aCopy := make([]string, len(a))
+	bCopy := make([]string, len(b))
+	copy(aCopy, a)
+	copy(bCopy, b)
+	sort.Strings(aCopy)
+	sort.Strings(bCopy)
+
+	for i := range aCopy {
+		if aCopy[i] != bCopy[i] {
+			return false
+		}
+	}
+
+	return true
 }

@@ -5,7 +5,6 @@
 package mock_release
 
 import (
-	context "context"
 	reflect "reflect"
 
 	release "github.com/forta-network/forta-core-go/release"
@@ -36,16 +35,16 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // GetReleaseManifest mocks base method.
-func (m *MockClient) GetReleaseManifest(ctx context.Context, reference string) (*release.ReleaseManifest, error) {
+func (m *MockClient) GetReleaseManifest(reference string) (*release.ReleaseManifest, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetReleaseManifest", ctx, reference)
+	ret := m.ctrl.Call(m, "GetReleaseManifest", reference)
 	ret0, _ := ret[0].(*release.ReleaseManifest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetReleaseManifest indicates an expected call of GetReleaseManifest.
-func (mr *MockClientMockRecorder) GetReleaseManifest(ctx, reference interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) GetReleaseManifest(reference interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReleaseManifest", reflect.TypeOf((*MockClient)(nil).GetReleaseManifest), ctx, reference)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReleaseManifest", reflect.TypeOf((*MockClient)(nil).GetReleaseManifest), reference)
 }

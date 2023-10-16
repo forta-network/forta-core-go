@@ -69,3 +69,35 @@ func TestIsValidBotID(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidBotID1(t *testing.T) {
+	type args struct {
+		botID string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "valid bot id",
+			args: args{"0xbe1872858e63b6ed4ef7b84fc453970dc8d89968715797662a4f43c01d598aab"},
+			want: true,
+		}, {
+			name: "invalid bot id (empty)",
+			args: args{""},
+			want: false,
+		}, {
+			name: "invalid bot id (bad length)",
+			args: args{"0xbe1872858e63b6ed4ef7b84fc453970dc8d8996871579766"},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(
+			tt.name, func(t *testing.T) {
+				assert.Equalf(t, tt.want, IsValidBotID(tt.args.botID), "IsValidBotID(%v)", tt.args.botID)
+			},
+		)
+	}
+}
