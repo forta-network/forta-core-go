@@ -51,11 +51,11 @@ var allChainSettings = []ChainSettings{
 		Name:                "Optimism",
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  5000,
+		InspectionInterval:  100,
 
 		DefaultOffset:  0,
-		SafeOffset:     500,
-		BlockThreshold: 10000,
+		SafeOffset:     5,
+		BlockThreshold: 100,
 
 		DistanceToChainHighest: 29,
 	},
