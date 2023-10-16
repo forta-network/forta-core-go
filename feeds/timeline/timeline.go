@@ -12,9 +12,10 @@ import (
 // BlockTimeline implements a block feed subscriber and keeps track of the
 // latest block in every minute.
 type BlockTimeline struct {
-	maxMinutes int
-	minutes    []*Minute
-	mu         sync.RWMutex
+	maxMinutes   int
+	blockMinutes []*Minute // when the block was produced
+	localMinutes []*Minute // when we handled the block
+	mu           sync.RWMutex
 }
 
 // Minute represents a minute in a chain.
@@ -46,10 +47,16 @@ func (bt *BlockTimeline) doCleanup() {
 	bt.mu.Lock()
 	defer bt.mu.Unlock()
 
-	currSize := len(bt.minutes)
+	currSize := len(bt.blockMinutes)
 	if currSize > bt.maxMinutes {
 		extra := currSize - bt.maxMinutes
-		bt.minutes = bt.minutes[extra:] // release oldest
+		bt.blockMinutes = bt.blockMinutes[extra:] // release oldest
+	}
+
+	currSize = len(bt.localMinutes)
+	if currSize > bt.maxMinutes {
+		extra := currSize - bt.maxMinutes
+		bt.localMinutes = bt.localMinutes[extra:] // release oldest
 	}
 }
 
@@ -58,6 +65,7 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 	bt.mu.Lock()
 	defer bt.mu.Unlock()
 
+	localMinuteTs := time.Now().Truncate(time.Minute)
 	blockTs, err := evt.Block.GetTimestamp()
 	if err != nil {
 		log.WithError(err).Error("failed to get block timestamp")
@@ -68,7 +76,7 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 	if err != nil {
 		log.WithError(err).Error("failed to decode block number")
 	}
-	for _, minute := range bt.minutes {
+	for _, minute := range bt.blockMinutes {
 		if minute.Timestamp.Equal(blockMinuteTs) {
 			if blockNum > minute.HighestBlockNumber {
 				minute.HighestBlockNumber = blockNum
@@ -77,23 +85,49 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 		}
 	}
 	// could not find the minute - append it
-	bt.minutes = append(bt.minutes, &Minute{
+	bt.blockMinutes = append(bt.blockMinutes, &Minute{
 		HighestBlockNumber: blockNum,
 		Timestamp:          blockMinuteTs,
+	})
+	bt.localMinutes = append(bt.localMinutes, &Minute{
+		HighestBlockNumber: blockNum,
+		Timestamp:          localMinuteTs,
 	})
 	return nil
 }
 
-// GetHighestBlockNumber returns the highest block number within the same minute of the given timestamp.
-func (bt *BlockTimeline) GetHighestBlockNumber(ts time.Time) (uint64, bool) {
+// GetGlobalHighest returns the global highest block number within the same minute of the given timestamp.
+func (bt *BlockTimeline) GetGlobalHighest(ts time.Time) (uint64, bool) {
+	return bt.getHighest(bt.blockMinutes, ts)
+}
+
+// GetLocalHighest returns the local highest block number within the same minute of the given timestamp.
+func (bt *BlockTimeline) GetLocalHighest(ts time.Time) (uint64, bool) {
+	return bt.getHighest(bt.localMinutes, ts)
+}
+
+func (bt *BlockTimeline) getHighest(minutes []*Minute, ts time.Time) (uint64, bool) {
 	bt.mu.RLock()
 	defer bt.mu.RUnlock()
 
 	ts = ts.Truncate(time.Minute)
-	for _, minute := range bt.minutes {
+	for _, minute := range minutes {
 		if minute.Timestamp.Equal(ts) {
 			return minute.HighestBlockNumber, true
 		}
 	}
 	return 0, false
+}
+
+// CalculateLag calculates the block number lag in a given minute.
+func (bt *BlockTimeline) CalculateLag(ts time.Time) (int64, bool) {
+	highestGlobal, ok := bt.GetGlobalHighest(ts)
+	if !ok {
+		return 0, false
+	}
+	highestLocal, ok := bt.GetLocalHighest(ts)
+	if !ok {
+		return 0, false
+	}
+	return int64(highestGlobal) - int64(highestLocal), true
 }
