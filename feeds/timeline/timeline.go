@@ -131,3 +131,11 @@ func (bt *BlockTimeline) CalculateLag(ts time.Time) (int64, bool) {
 	}
 	return int64(highestGlobal) - int64(highestLocal), true
 }
+
+// Size returns the minute count.
+func (bt *BlockTimeline) Size() int {
+	bt.mu.RLock()
+	defer bt.mu.RUnlock()
+
+	return len(bt.blockMinutes)
+}
