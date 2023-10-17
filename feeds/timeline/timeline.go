@@ -66,38 +66,56 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 	bt.mu.Lock()
 	defer bt.mu.Unlock()
 
-	blockTs, _ := evt.Block.GetTimestamp()
-	delay := time.Since(*blockTs)
-	bt.delay = &delay
-
-	localMinuteTs := time.Now().Truncate(time.Minute)
 	blockTs, err := evt.Block.GetTimestamp()
 	if err != nil {
 		log.WithError(err).Error("failed to get block timestamp")
 		return nil
 	}
+	delay := time.Since(*blockTs)
+	bt.delay = &delay
+
+	localMinuteTs := time.Now().Truncate(time.Minute)
+
 	blockMinuteTs := blockTs.Truncate(time.Minute)
 	blockNum, err := hexutil.DecodeUint64(evt.Block.Number)
 	if err != nil {
 		log.WithError(err).Error("failed to decode block number")
 	}
+
+	var foundBlockMinute bool
 	for _, minute := range bt.blockMinutes {
 		if minute.Timestamp.Equal(blockMinuteTs) {
 			if blockNum > minute.HighestBlockNumber {
 				minute.HighestBlockNumber = blockNum
 			}
-			return nil // we found the minute
+			foundBlockMinute = true
+			break
 		}
 	}
-	// could not find the minute - append it
-	bt.blockMinutes = append(bt.blockMinutes, &Minute{
-		HighestBlockNumber: blockNum,
-		Timestamp:          blockMinuteTs,
-	})
-	bt.localMinutes = append(bt.localMinutes, &Minute{
-		HighestBlockNumber: blockNum,
-		Timestamp:          localMinuteTs,
-	})
+	if !foundBlockMinute {
+		bt.blockMinutes = append(bt.blockMinutes, &Minute{
+			HighestBlockNumber: blockNum,
+			Timestamp:          blockMinuteTs,
+		})
+	}
+
+	var foundLocalMinute bool
+	for _, minute := range bt.localMinutes {
+		if minute.Timestamp.Equal(localMinuteTs) {
+			if blockNum > minute.HighestBlockNumber {
+				minute.HighestBlockNumber = blockNum
+			}
+			foundLocalMinute = true
+			break
+		}
+	}
+	if !foundLocalMinute {
+		bt.localMinutes = append(bt.localMinutes, &Minute{
+			HighestBlockNumber: blockNum,
+			Timestamp:          localMinuteTs,
+		})
+	}
+
 	return nil
 }
 
