@@ -16,10 +16,6 @@ type ChainSettings struct {
 	DefaultOffset  int
 	SafeOffset     int
 	BlockThreshold int
-
-	// the expected lag (in block number difference) between the processed block
-	// and the chain highest at the end of every minute
-	DistanceToChainHighest int
 }
 
 // RateLimit is token bucket algorithm parameters.
@@ -43,8 +39,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     1,
 		BlockThreshold: 20,
-
-		DistanceToChainHighest: 4,
 	},
 	{
 		ChainID:             10,
@@ -56,8 +50,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     5,
 		BlockThreshold: 100,
-
-		DistanceToChainHighest: 29,
 	},
 	{
 		ChainID:             56,
@@ -69,8 +61,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     3,
 		BlockThreshold: 50,
-
-		DistanceToChainHighest: 19,
 	},
 	{
 		ChainID:             137,
@@ -82,8 +72,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     4,
 		BlockThreshold: 70,
-
-		DistanceToChainHighest: 27,
 	},
 	{
 		ChainID:             250,
@@ -95,8 +83,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     5,
 		BlockThreshold: 100,
-
-		DistanceToChainHighest: 21,
 	},
 	{
 		ChainID:             42161,
@@ -108,8 +94,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     60,
 		BlockThreshold: 1200,
-
-		DistanceToChainHighest: 200,
 	},
 	{
 		ChainID:             43114,
@@ -121,8 +105,6 @@ var allChainSettings = []ChainSettings{
 		DefaultOffset:  0,
 		SafeOffset:     4,
 		BlockThreshold: 70,
-
-		DistanceToChainHighest: 26,
 	},
 }
 
