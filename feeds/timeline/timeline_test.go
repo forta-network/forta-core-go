@@ -105,6 +105,9 @@ func TestRealTimeLag(t *testing.T) {
 
 	blockTimeline := &BlockTimeline{}
 	errCh := blockFeed.Subscribe(func(evt *domain.BlockEvent) error {
+		blockTs, _ := evt.Block.GetTimestamp()
+		delay := time.Since(*blockTs)
+		fmt.Println("delay:", delay)
 		return blockTimeline.HandleBlock(evt)
 	})
 
