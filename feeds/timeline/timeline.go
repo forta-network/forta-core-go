@@ -15,6 +15,7 @@ type BlockTimeline struct {
 	maxMinutes   int
 	blockMinutes []*Minute // when the block was produced
 	localMinutes []*Minute // when we handled the block
+	delay        *time.Duration
 	mu           sync.RWMutex
 }
 
@@ -65,6 +66,10 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 	bt.mu.Lock()
 	defer bt.mu.Unlock()
 
+	blockTs, _ := evt.Block.GetTimestamp()
+	delay := time.Since(*blockTs)
+	bt.delay = &delay
+
 	localMinuteTs := time.Now().Truncate(time.Minute)
 	blockTs, err := evt.Block.GetTimestamp()
 	if err != nil {
@@ -94,6 +99,16 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 		Timestamp:          localMinuteTs,
 	})
 	return nil
+}
+
+func (bt *BlockTimeline) GetDelay() (time.Duration, bool) {
+	bt.mu.RLock()
+	defer bt.mu.RUnlock()
+
+	if bt.delay == nil {
+		return 0, false
+	}
+	return *bt.delay, true
 }
 
 // GetGlobalHighest returns the global highest block number within the same minute of the given timestamp.
