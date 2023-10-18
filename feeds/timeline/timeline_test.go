@@ -171,6 +171,12 @@ func TestTimeline_CalculateLag(t *testing.T) {
 	estimate, ok := blockTimeline.EstimateBlockScore()
 	r.True(ok)
 	r.Equal(0.625, estimate)
+
+	testDelay := time.Second
+	blockTimeline.delay = &testDelay
+	delay, ok := blockTimeline.GetDelay()
+	r.True(ok)
+	r.Equal(testDelay, delay)
 }
 
 func blockForTimestamp(ts, blockNumber string) *domain.BlockEvent {

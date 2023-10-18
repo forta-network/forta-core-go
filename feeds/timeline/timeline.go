@@ -140,16 +140,6 @@ func (bt *BlockTimeline) GetDelay() (time.Duration, bool) {
 	return *bt.delay, true
 }
 
-func (bt *BlockTimeline) getHighest(minutes []*Minute, ts time.Time) (uint64, bool) {
-	ts = ts.Truncate(time.Minute)
-	for _, minute := range minutes {
-		if minute.Timestamp.Equal(ts) {
-			return minute.HighestBlockNumber, true
-		}
-	}
-	return 0, false
-}
-
 func (bt *BlockTimeline) getLatestUpTo(minutes []*Minute, ts time.Time) (uint64, bool) {
 	ts = ts.Truncate(time.Minute)
 	var foundMinute *Minute
