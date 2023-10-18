@@ -7,12 +7,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/protocol/settings"
 	log "github.com/sirupsen/logrus"
 )
 
 // BlockTimeline implements a block feed subscriber and keeps track of the
 // latest block in every minute.
 type BlockTimeline struct {
+	threshold    int
 	maxMinutes   int
 	chainMinutes []*Minute // when the block was produced
 	localMinutes []*Minute // when we handled the block
@@ -27,8 +29,9 @@ type Minute struct {
 }
 
 // NewBlockTimeline creates a new block timeline.
-func NewBlockTimeline(maxMinutes int) *BlockTimeline {
+func NewBlockTimeline(chainID, maxMinutes int) *BlockTimeline {
 	bt := &BlockTimeline{
+		threshold:  settings.GetChainSettings(chainID).BlockThreshold,
 		maxMinutes: maxMinutes,
 	}
 
@@ -188,12 +191,4 @@ func (bt *BlockTimeline) CalculateLag() (float64, bool) {
 		return 0, false
 	}
 	return total / count, true
-}
-
-// Size returns the minute count.
-func (bt *BlockTimeline) Size() int {
-	bt.mu.RLock()
-	defer bt.mu.RUnlock()
-
-	return len(bt.chainMinutes)
 }
