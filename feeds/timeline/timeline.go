@@ -192,3 +192,19 @@ func (bt *BlockTimeline) CalculateLag() (float64, bool) {
 	}
 	return total / count, true
 }
+
+// EstimateBlockScore estimates the block score based on the lag and the block threshold.
+func (bt *BlockTimeline) EstimateBlockScore() (float64, bool) {
+	lag, ok := bt.CalculateLag()
+	if !ok {
+		return 0, false
+	}
+	estimate := (float64(bt.threshold) - float64(lag)) / float64(bt.threshold)
+	if estimate < 0 {
+		estimate = 0
+	}
+	if estimate > 1 {
+		estimate = 1
+	}
+	return estimate, true
+}

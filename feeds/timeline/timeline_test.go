@@ -64,7 +64,7 @@ func TestTimeline_GlobalHighest(t *testing.T) {
 func TestTimeline_CalculateLag(t *testing.T) {
 	r := require.New(t)
 
-	blockTimeline := &BlockTimeline{}
+	blockTimeline := NewBlockTimeline(1, 1000000)
 
 	start := time.Now().UTC().Truncate(time.Minute)
 
@@ -168,6 +168,9 @@ func TestTimeline_CalculateLag(t *testing.T) {
 	lag, ok = blockTimeline.CalculateLag()
 	r.True(ok)
 	r.Equal(float64(1+5+9+13+15+2)/float64(6), lag)
+	estimate, ok := blockTimeline.EstimateBlockScore()
+	r.True(ok)
+	r.Equal(0.625, estimate)
 }
 
 func blockForTimestamp(ts, blockNumber string) *domain.BlockEvent {
