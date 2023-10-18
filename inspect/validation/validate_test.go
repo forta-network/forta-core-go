@@ -11,8 +11,8 @@ import (
 )
 
 var testValidateEnv struct {
-	ScanAPI  string `envconfig:"scan_api" default:"https://rpcapi.fantom.network"`
-	TraceAPI string `envconfig:"trace_api" default:"https://rpcapi-tracing.fantom.network"`
+	ScanAPI  string `envconfig:"scan_api" default:"https://fantom-testnet.public.blastapi.io/"`
+	TraceAPI string `envconfig:"trace_api" default:"https://rpcapi-tracing.testnet.fantom.network/"`
 }
 
 func init() {
