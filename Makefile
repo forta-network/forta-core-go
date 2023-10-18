@@ -82,7 +82,7 @@ mocks:
 
 .PHONY: test
 test:
-	go test -v -count=1 -coverprofile=coverage.out ./...
+	go test -v -count=1 -short -coverprofile=coverage.out ./...
 
 .PHONY: coverage
 coverage:

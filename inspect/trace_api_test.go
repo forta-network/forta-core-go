@@ -18,6 +18,10 @@ func init() {
 }
 
 func TestTraceAPIInspection(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping validation test in short mode")
+	}
+
 	r := require.New(t)
 
 	recentBlockNumber := testGetRecentBlockNumber(r, testTraceEnv.TraceAPI)

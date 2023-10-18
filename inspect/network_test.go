@@ -8,6 +8,10 @@ import (
 )
 
 func TestNetworkInspection(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping validation test in short mode")
+	}
+
 	r := require.New(t)
 
 	DownloadTestSavingMode = true

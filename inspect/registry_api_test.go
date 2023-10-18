@@ -17,6 +17,10 @@ func init() {
 }
 
 func TestRegistryAPIInspection(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping validation test in short mode")
+	}
+
 	r := require.New(t)
 
 	inspector := &RegistryAPIInspector{}

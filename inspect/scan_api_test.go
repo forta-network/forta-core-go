@@ -17,6 +17,10 @@ func init() {
 }
 
 func TestScanAPIInspection(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping validation test in short mode")
+	}
+
 	r := require.New(t)
 
 	recentBlockNumber := testGetRecentBlockNumber(r, testScanEnv.ScanAPI)
