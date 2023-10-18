@@ -23,7 +23,7 @@ func init() {
 
 func TestProxyAPIInspection(t *testing.T) {
 	if testing.Short() {
-		t.Skip("skipping validation test in short mode")
+		t.Skip("skipping inspection test in short mode")
 	}
 
 	r := require.New(t)
