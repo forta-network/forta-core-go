@@ -30,19 +30,19 @@ func TestTimeline_GlobalHighest(t *testing.T) {
 	min3Ts := hexutil.EncodeUint64(uint64(min1.Add(time.Minute * 2).Unix()))
 
 	// add first minute block number
-	blockTimeline.HandleBlock(blockForTimestamp(min1Ts, "0x1"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min1Ts, "0x1")))
 	// replace the first minute number
-	blockTimeline.HandleBlock(blockForTimestamp(min1Ts, "0x2"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min1Ts, "0x2")))
 	// add new one for the next minute
-	blockTimeline.HandleBlock(blockForTimestamp(min2Ts, "0x3"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min2Ts, "0x3")))
 	// replace the second minute number
-	blockTimeline.HandleBlock(blockForTimestamp(min2Ts, "0x4"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min2Ts, "0x4")))
 	// replace the first minute number
-	blockTimeline.HandleBlock(blockForTimestamp(min1Ts, "0x5"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min1Ts, "0x5")))
 	// replace the second minute number
-	blockTimeline.HandleBlock(blockForTimestamp(min2Ts, "0x6"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min2Ts, "0x6")))
 	// add a third minute
-	blockTimeline.HandleBlock(blockForTimestamp(min3Ts, "0x7"))
+	r.NoError(blockTimeline.HandleBlock(blockForTimestamp(min3Ts, "0x7")))
 
 	// verify state
 	r.EqualValues(5, blockTimeline.chainMinutes[0].HighestBlockNumber)
@@ -81,7 +81,7 @@ func TestTimeline_CalculateLag(t *testing.T) {
 		Timestamp:          min1,
 		HighestBlockNumber: 2,
 	})
-	lag, ok := blockTimeline.CalculateLag()
+	_, ok := blockTimeline.CalculateLag()
 	r.False(ok)
 
 	// minute: 2
@@ -97,7 +97,7 @@ func TestTimeline_CalculateLag(t *testing.T) {
 		Timestamp:          min2,
 		HighestBlockNumber: 8,
 	})
-	lag, ok = blockTimeline.CalculateLag()
+	lag, ok := blockTimeline.CalculateLag()
 	r.True(ok)
 	r.Equal(float64(1), lag) // because excludes the last minute: (2-1)/1
 
