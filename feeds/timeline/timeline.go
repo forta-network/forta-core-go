@@ -1,6 +1,7 @@
 package timeline
 
 import (
+	"sort"
 	"sync"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 // latest block in every minute.
 type BlockTimeline struct {
 	maxMinutes   int
-	blockMinutes []*Minute // when the block was produced
+	chainMinutes []*Minute // when the block was produced
 	localMinutes []*Minute // when we handled the block
 	delay        *time.Duration
 	mu           sync.RWMutex
@@ -48,10 +49,10 @@ func (bt *BlockTimeline) doCleanup() {
 	bt.mu.Lock()
 	defer bt.mu.Unlock()
 
-	currSize := len(bt.blockMinutes)
+	currSize := len(bt.chainMinutes)
 	if currSize > bt.maxMinutes {
 		extra := currSize - bt.maxMinutes
-		bt.blockMinutes = bt.blockMinutes[extra:] // release oldest
+		bt.chainMinutes = bt.chainMinutes[extra:] // release oldest
 	}
 
 	currSize = len(bt.localMinutes)
@@ -83,7 +84,7 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 	}
 
 	var foundBlockMinute bool
-	for _, minute := range bt.blockMinutes {
+	for _, minute := range bt.chainMinutes {
 		if minute.Timestamp.Equal(blockMinuteTs) {
 			if blockNum > minute.HighestBlockNumber {
 				minute.HighestBlockNumber = blockNum
@@ -93,7 +94,7 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 		}
 	}
 	if !foundBlockMinute {
-		bt.blockMinutes = append(bt.blockMinutes, &Minute{
+		bt.chainMinutes = append(bt.chainMinutes, &Minute{
 			HighestBlockNumber: blockNum,
 			Timestamp:          blockMinuteTs,
 		})
@@ -116,6 +117,13 @@ func (bt *BlockTimeline) HandleBlock(evt *domain.BlockEvent) error {
 		})
 	}
 
+	sort.Slice(bt.chainMinutes, func(i, j int) bool {
+		return bt.chainMinutes[i].Timestamp.Before(bt.chainMinutes[j].Timestamp)
+	})
+	sort.Slice(bt.localMinutes, func(i, j int) bool {
+		return bt.localMinutes[i].Timestamp.Before(bt.localMinutes[j].Timestamp)
+	})
+
 	return nil
 }
 
@@ -129,20 +137,7 @@ func (bt *BlockTimeline) GetDelay() (time.Duration, bool) {
 	return *bt.delay, true
 }
 
-// GetGlobalHighest returns the global highest block number within the same minute of the given timestamp.
-func (bt *BlockTimeline) GetGlobalHighest(ts time.Time) (uint64, bool) {
-	return bt.getHighest(bt.blockMinutes, ts)
-}
-
-// GetLocalHighest returns the local highest block number within the same minute of the given timestamp.
-func (bt *BlockTimeline) GetLocalHighest(ts time.Time) (uint64, bool) {
-	return bt.getHighest(bt.localMinutes, ts)
-}
-
 func (bt *BlockTimeline) getHighest(minutes []*Minute, ts time.Time) (uint64, bool) {
-	bt.mu.RLock()
-	defer bt.mu.RUnlock()
-
 	ts = ts.Truncate(time.Minute)
 	for _, minute := range minutes {
 		if minute.Timestamp.Equal(ts) {
@@ -152,17 +147,47 @@ func (bt *BlockTimeline) getHighest(minutes []*Minute, ts time.Time) (uint64, bo
 	return 0, false
 }
 
-// CalculateLag calculates the block number lag in a given minute.
-func (bt *BlockTimeline) CalculateLag(ts time.Time) (int64, bool) {
-	highestGlobal, ok := bt.GetGlobalHighest(ts)
-	if !ok {
+func (bt *BlockTimeline) getLatestUpTo(minutes []*Minute, ts time.Time) (uint64, bool) {
+	ts = ts.Truncate(time.Minute)
+	var foundMinute *Minute
+	for _, minute := range minutes {
+		if minute.Timestamp.After(ts) {
+			break
+		}
+		foundMinute = minute
+	}
+	if foundMinute != nil {
+		return foundMinute.HighestBlockNumber, true
+	}
+	return 0, false
+}
+
+// CalculateLag calculates the block number lag by taking the average of each minute.
+func (bt *BlockTimeline) CalculateLag() (float64, bool) {
+	bt.mu.RLock()
+	defer bt.mu.RUnlock()
+
+	var (
+		total float64
+		count float64
+	)
+	for i, chainMinute := range bt.chainMinutes {
+		// exclude the last minute
+		if i == len(bt.chainMinutes)-1 {
+			break
+		}
+		// avoid calculation if we can't find a highest
+		localMinuteHighest, ok := bt.getLatestUpTo(bt.localMinutes, chainMinute.Timestamp)
+		if !ok {
+			continue
+		}
+		total += float64(chainMinute.HighestBlockNumber - localMinuteHighest)
+		count++
+	}
+	if count == 0 {
 		return 0, false
 	}
-	highestLocal, ok := bt.GetLocalHighest(ts)
-	if !ok {
-		return 0, false
-	}
-	return int64(highestGlobal) - int64(highestLocal), true
+	return total / count, true
 }
 
 // Size returns the minute count.
@@ -170,5 +195,5 @@ func (bt *BlockTimeline) Size() int {
 	bt.mu.RLock()
 	defer bt.mu.RUnlock()
 
-	return len(bt.blockMinutes)
+	return len(bt.chainMinutes)
 }
