@@ -403,7 +403,7 @@ type rpcClient struct {
 }
 
 func (rc *rpcClient) Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (domain.ClientSubscription, error) {
-	sub, err := rc.Subscribe(ctx, namespace, channel, args...)
+	sub, err := rc.Client.Subscribe(ctx, namespace, channel, args...)
 	return sub, err
 }
 

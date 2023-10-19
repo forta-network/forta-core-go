@@ -32,14 +32,14 @@ func TestValidateInspectionSuccess(t *testing.T) {
 	// trace response hash inspection
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "trace_block", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		})
 
 	// block response hash inspection
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		}).Times(3)
 
@@ -82,14 +82,14 @@ func TestValidateInspectionFail(t *testing.T) {
 	// trace response hash inspection
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "trace_block", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		})
 
 	// block response hash inspection
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		}).Times(3)
 

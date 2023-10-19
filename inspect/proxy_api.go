@@ -68,10 +68,15 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	results = NewInspectionResults()
 	results.Indicators = defaultIndicators(proxyAPIIndicators)
 
-	proxyRPCClient, err := RPCDialContext(ctx, inspectionCfg.ProxyAPIURL)
-	if err != nil {
-		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
-
+	proxyRPCClient, rpcErr := RPCDialContext(ctx, inspectionCfg.ProxyAPIURL)
+	proxyClient, clientErr := EthClientDialContext(ctx, inspectionCfg.ProxyAPIURL)
+	if rpcErr != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api: %v", rpcErr))
+	}
+	if clientErr != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api: %v", clientErr))
+	}
+	if rpcErr != nil || clientErr != nil {
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
 		results.Indicators[IndicatorProxyAPIModuleWeb3] = ResultFailure
 		results.Indicators[IndicatorProxyAPIModuleEth] = ResultFailure
@@ -84,7 +89,6 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 	}
 
-	proxyClient, err := EthClientDialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if id, err := GetChainOrNetworkID(ctx, proxyRPCClient); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
@@ -123,6 +127,15 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	}
 
 	scanClient, err := EthClientDialContext(ctx, inspectionCfg.ScanAPIURL)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset because failed to dial scan api: %w", err))
+		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
+		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
+		return // early return
+	}
+
 	stats, err := calculateOffsetStats(ctx, proxyClient, scanClient)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
