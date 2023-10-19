@@ -189,7 +189,7 @@ func blockForTimestamp(ts, blockNumber string) *domain.BlockEvent {
 
 func TestRealTimeLag(t *testing.T) {
 	if os.Getenv("TIMELINE_EXPERIMENT") != "1" {
-		return
+		t.Skip("skipping timeline experiment")
 	}
 
 	//logrus.SetLevel(logrus.ErrorLevel)
