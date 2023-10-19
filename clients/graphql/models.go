@@ -18,17 +18,17 @@ type GetAlertsResponse struct {
 type AlertsInput struct {
 	// Indicate a list of addresses.
 	// Alerts returned will have those addresses involved.
-	Addresses []string `json:"addresses"`
+	Addresses []string `json:"addresses,omitempty"`
 	// Search results after the specified cursor
 	After *AlertEndCursorInput `json:"after,omitempty"`
 	// Get a specific alert by alert hash.
-	AlertHash string `json:"alertHash"`
+	AlertHash string `json:"alertHash,omitempty"`
 	// Filter alerts by alert-id.
-	AlertId string `json:"alertId"`
+	AlertId string `json:"alertId,omitempty"`
 	// Filter alerts by multiple alert-ids.
-	AlertIds []string `json:"alertIds"`
+	AlertIds []string `json:"alertIds,omitempty"`
 	// Filter alerts by alert name.
-	AlertName string `json:"alertName"`
+	AlertName string `json:"alertName,omitempty"`
 	// Block Date range
 	// Alerts returned will be between the specified start and end block timestamp dates when the threats were detected.
 	// By default, start and end date will be set to local query execution date.
@@ -39,35 +39,35 @@ type AlertsInput struct {
 	// Indicate sorting order by block number,
 	// 'desc' or 'asc'.
 	// Default is 'desc'.
-	BlockSortDirection Sort `json:"blockSortDirection"`
+	BlockSortDirection Sort `json:"blockSortDirection,omitempty"`
 	// Block Timestamp range
 	// Alerts returned will be between the specified start and end block timestamp when the threats were detected.
 	BlockTimestampRange *TimestampRange `json:"blockTimestampRange,omitempty"`
 	// Indicate a list of bot hashes.
 	// Alerts returned will only be from any of those bots.
-	Bots []string `json:"bots"`
+	Bots []string `json:"bots,omitempty"`
 	// Indicate a chain Id: EIP155 identifier of the chain
 	// Alerts returned will only be from the specific chain Id
 	// Default is 1 = Ethereum Mainnet.
-	ChainId uint `json:"chainId"`
+	ChainId uint `json:"chainId,omitempty"`
 	// Indicate number of milliseconds
 	// Alerts returned will be alerts created before the number of milliseconds indicated ago.
-	CreatedBefore uint `json:"createdBefore"`
+	CreatedBefore uint `json:"createdBefore,omitempty"`
 	// Indicate number of milliseconds
 	// Alerts returned will be alerts created since the number of milliseconds indicated ago.
-	CreatedSince uint `json:"createdSince"`
+	CreatedSince uint `json:"createdSince,omitempty"`
 	// Indicate max number of results.
-	First uint `json:"first"`
+	First uint `json:"first,omitempty"`
 	// Indicate a project Id.
 	// Alerts returned will only be from that project.
-	ProjectId string `json:"projectId"`
+	ProjectId string `json:"projectId,omitempty"`
 	// Filter alerts by number of scan nodes confirming the alert.
 	ScanNodeConfirmations *ScanNodeFilters `json:"scanNodeConfirmations,omitempty"`
 	// Filter alerts by severity levels.
-	Severities []string `json:"severities"`
+	Severities []string `json:"severities,omitempty"`
 	// Indicate a transaction hash
 	// Alerts returned will only be from that transaction.
-	TransactionHash string `json:"transactionHash"`
+	TransactionHash string `json:"transactionHash,omitempty"`
 }
 
 // AlertEndCursorInput Search after specified block number and alertId

@@ -26,11 +26,23 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// EthClient is the original interface from go-ethereum.
+type EthClient interface {
+	ethereum.ChainReader
+	ethereum.ChainStateReader
+	ethereum.TransactionReader
+	ethereum.LogFilterer
+	ethereum.ContractCaller
+	BlockNumber(ctx context.Context) (uint64, error)
+	BlockByNumber(ctx context.Context, blockNum *big.Int) (*types.Block, error)
+}
+
 // RPCClient is a wrapper implementation of the RPC client.
 type RPCClient interface {
 	Close()
+	Call(result interface{}, method string, args ...interface{}) error
 	CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error
-	Subscribe(ctx context.Context, channel interface{}, args ...interface{}) (domain.ClientSubscription, error)
+	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (*rpc.ClientSubscription, error)
 }
 
 // Client is an interface encompassing all ethereum actions
@@ -331,7 +343,7 @@ func (e *streamEthClient) SubscribeToHead(ctx context.Context) (domain.HeaderCh,
 	log.Debug("subscribing to blockchain head")
 	recvCh := make(chan *types.Header)
 	sendCh := make(chan *types.Header)
-	sub, err := e.rpcClient.Subscribe(ctx, recvCh, "newHeads")
+	sub, err := e.rpcClient.Subscribe(ctx, "eth", recvCh, "newHeads")
 	if err != nil {
 		return nil, fmt.Errorf("failed to subscribe: %v", err)
 	}
@@ -382,11 +394,6 @@ func (e *streamEthClient) Health() health.Reports {
 
 type rpcClient struct {
 	*rpc.Client
-}
-
-func (rc *rpcClient) Subscribe(ctx context.Context, channel interface{}, args ...interface{}) (domain.ClientSubscription, error) {
-	sub, err := rc.EthSubscribe(ctx, channel, args...)
-	return sub, err
 }
 
 var wsBufferPool = new(sync.Pool)

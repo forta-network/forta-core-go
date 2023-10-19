@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/inspect"
 	"github.com/hashicorp/go-multierror"
 	"github.com/patrickmn/go-cache"
@@ -19,9 +20,9 @@ const (
 // InspectionValidator validates inspection results.
 type InspectionValidator struct {
 	inspectionCfg  *inspect.InspectionConfig
-	scanRpcClient  *rpc.Client
-	traceRpcClient *rpc.Client
-	proxyRpcClient *rpc.Client
+	scanRpcClient  ethereum.RPCClient
+	traceRpcClient ethereum.RPCClient
+	proxyRpcClient ethereum.RPCClient
 
 	cache *cache.Cache
 }

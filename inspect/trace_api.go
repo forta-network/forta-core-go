@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -54,7 +53,7 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	}
 
 	// checking API access
-	rpcClient, err := rpc.DialContext(ctx, inspectionCfg.TraceAPIURL)
+	rpcClient, err := RPCDialContext(ctx, inspectionCfg.TraceAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("failed to dial api: %w", err))
 

@@ -9,8 +9,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/registry"
 )
 
 const (
@@ -18,8 +21,29 @@ const (
 	latestBlock   = "latest"
 )
 
+// RPCDialContextFunc dials the RPC endpoint and creates an RPC client.
+type RPCDialContextFunc func(ctx context.Context, rawurl string) (ethereum.RPCClient, error)
+
+// EthClientDialContextFunc dials the Ethereum client.
+type EthClientDialContextFunc func(ctx context.Context, rawurl string) (ethereum.EthClient, error)
+
+// RegistryNewClientFunc creates a new registry client.
+type RegistryNewClientFunc func(ctx context.Context, cfg registry.ClientConfig) (registry.Client, error)
+
+var (
+	RPCDialContext RPCDialContextFunc = func(ctx context.Context, rawurl string) (ethereum.RPCClient, error) {
+		return rpc.DialContext(ctx, rawurl)
+	}
+	EthClientDialContext EthClientDialContextFunc = func(ctx context.Context, rawurl string) (ethereum.EthClient, error) {
+		return ethclient.DialContext(ctx, rawurl)
+	}
+	RegistryNewClient RegistryNewClientFunc = func(ctx context.Context, cfg registry.ClientConfig) (registry.Client, error) {
+		return registry.NewClient(ctx, cfg)
+	}
+)
+
 // GetBlockResponseHash computes a hash by using some data from the API response.
-func GetBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
+func GetBlockResponseHash(ctx context.Context, rpcClient ethereum.RPCClient, blockNumber uint64) (string, error) {
 	var block domain.Block
 	if err := getRpcResponse(ctx, rpcClient, &block, "eth_getBlockByNumber", hexutil.EncodeUint64(blockNumber), true); err != nil {
 		return "", err
@@ -32,7 +56,7 @@ func GetBlockResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumbe
 }
 
 // GetTraceResponseHash computes a hash by using some data from the API response.
-func GetTraceResponseHash(ctx context.Context, rpcClient *rpc.Client, blockNumber uint64) (string, error) {
+func GetTraceResponseHash(ctx context.Context, rpcClient ethereum.RPCClient, blockNumber uint64) (string, error) {
 	var traces []*domain.Trace
 	if err := getRpcResponse(ctx, rpcClient, &traces, "trace_block", hexutil.EncodeUint64(blockNumber)); err != nil {
 		return "", err
@@ -51,12 +75,12 @@ func hashOf(str string) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func getRpcResponse(ctx context.Context, rpcClient *rpc.Client, respData interface{}, method string, args ...interface{}) error {
+func getRpcResponse(ctx context.Context, rpcClient ethereum.RPCClient, respData interface{}, method string, args ...interface{}) error {
 	return rpcClient.CallContext(ctx, &respData, method, args...)
 }
 
 // GetNetworkID gets the network ID from net_version.
-func GetNetworkID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
+func GetNetworkID(ctx context.Context, rpcClient ethereum.RPCClient) (*big.Int, error) {
 	var resultStr string
 	err := rpcClient.CallContext(ctx, &resultStr, "net_version")
 	if err == nil {
@@ -73,7 +97,7 @@ func GetNetworkID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) 
 }
 
 // GetChainID gets the chain ID from eth_chainId.
-func GetChainID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
+func GetChainID(ctx context.Context, rpcClient ethereum.RPCClient) (*big.Int, error) {
 	var result string
 	err := rpcClient.CallContext(ctx, &result, "eth_chainId")
 	if err != nil {
@@ -83,7 +107,7 @@ func GetChainID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
 }
 
 // GetChainOrNetworkID gets the chain ID from either of eth_chainId or net_version.
-func GetChainOrNetworkID(ctx context.Context, rpcClient *rpc.Client) (*big.Int, error) {
+func GetChainOrNetworkID(ctx context.Context, rpcClient ethereum.RPCClient) (*big.Int, error) {
 	num, err1 := GetChainID(ctx, rpcClient)
 	if err1 == nil {
 		return num, nil
@@ -111,7 +135,7 @@ func decodeChainID(numStr string) (*big.Int, error) {
 func IsETH2Chain(chainId uint64) bool {
 	return chainId == 1 || chainId == 5
 }
-func SupportsETH2(ctx context.Context, rpcClient *rpc.Client) bool {
+func SupportsETH2(ctx context.Context, rpcClient ethereum.RPCClient) bool {
 	chainID, err := GetChainOrNetworkID(ctx, rpcClient)
 	if err != nil {
 		return false
