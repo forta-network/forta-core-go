@@ -20,6 +20,10 @@ func init() {
 }
 
 func TestValidateInspectionSuccess(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping inspection validation test in short mode")
+	}
+
 	ctx := context.Background()
 	r := require.New(t)
 

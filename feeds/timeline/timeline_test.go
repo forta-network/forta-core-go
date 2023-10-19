@@ -12,7 +12,6 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/feeds"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -193,7 +192,7 @@ func TestRealTimeLag(t *testing.T) {
 		return
 	}
 
-	logrus.SetLevel(logrus.ErrorLevel)
+	//logrus.SetLevel(logrus.ErrorLevel)
 
 	r := require.New(t)
 	ctx, cancel := context.WithCancel(context.Background())
