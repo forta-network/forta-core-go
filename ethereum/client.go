@@ -42,7 +42,12 @@ type RPCClient interface {
 	Close()
 	Call(result interface{}, method string, args ...interface{}) error
 	CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error
-	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (*rpc.ClientSubscription, error)
+}
+
+// Subscriber subscribes to Ethereum namespaces.
+type Subscriber interface {
+	RPCClient
+	Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (domain.ClientSubscription, error)
 }
 
 // Client is an interface encompassing all ethereum actions
@@ -94,6 +99,7 @@ var maxBackoff = 1 * time.Minute
 type streamEthClient struct {
 	apiName       string
 	rpcClient     RPCClient
+	subscriber    Subscriber
 	retryInterval time.Duration
 	isWebsocket   bool
 
@@ -343,7 +349,7 @@ func (e *streamEthClient) SubscribeToHead(ctx context.Context) (domain.HeaderCh,
 	log.Debug("subscribing to blockchain head")
 	recvCh := make(chan *types.Header)
 	sendCh := make(chan *types.Header)
-	sub, err := e.rpcClient.Subscribe(ctx, "eth", recvCh, "newHeads")
+	sub, err := e.subscriber.Subscribe(ctx, "eth", recvCh, "newHeads")
 	if err != nil {
 		return nil, fmt.Errorf("failed to subscribe: %v", err)
 	}
@@ -394,6 +400,11 @@ func (e *streamEthClient) Health() health.Reports {
 
 type rpcClient struct {
 	*rpc.Client
+}
+
+func (rc *rpcClient) Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (domain.ClientSubscription, error) {
+	sub, err := rc.Subscribe(ctx, namespace, channel, args...)
+	return sub, err
 }
 
 var wsBufferPool = new(sync.Pool)

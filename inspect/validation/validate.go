@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/forta-network/forta-core-go/inspect"
 	"github.com/hashicorp/go-multierror"
@@ -33,19 +32,19 @@ func NewValidator(ctx context.Context, inspectionCfg inspect.InspectionConfig) (
 		validator InspectionValidator
 		err       error
 	)
-	validator.scanRpcClient, err = rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
+	validator.scanRpcClient, err = inspect.RPCDialContext(ctx, inspectionCfg.ScanAPIURL)
 	if err != nil {
 		log.WithError(err).Error("failed to dial scan api")
 		return nil, inspect.ErrReferenceScanAPI
 	}
 	if inspectionCfg.CheckTrace {
-		validator.traceRpcClient, err = rpc.DialContext(ctx, inspectionCfg.TraceAPIURL)
+		validator.traceRpcClient, err = inspect.RPCDialContext(ctx, inspectionCfg.TraceAPIURL)
 		if err != nil {
 			log.WithError(err).Error("failed to dial trace api")
 			return nil, inspect.ErrReferenceTraceAPI
 		}
 	}
-	validator.proxyRpcClient, err = rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
+	validator.proxyRpcClient, err = inspect.RPCDialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if err != nil {
 		log.WithError(err).Error("failed to dial proxy api")
 		return nil, inspect.ErrReferenceProxyAPI

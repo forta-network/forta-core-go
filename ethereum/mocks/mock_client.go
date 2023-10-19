@@ -13,7 +13,6 @@ import (
 	ethereum "github.com/ethereum/go-ethereum"
 	common "github.com/ethereum/go-ethereum/common"
 	types "github.com/ethereum/go-ethereum/core/types"
-	rpc "github.com/ethereum/go-ethereum/rpc"
 	health "github.com/forta-network/forta-core-go/clients/health"
 	domain "github.com/forta-network/forta-core-go/domain"
 	gomock "github.com/golang/mock/gomock"
@@ -371,24 +370,97 @@ func (mr *MockRPCClientMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRPCClient)(nil).Close))
 }
 
+// MockSubscriber is a mock of Subscriber interface.
+type MockSubscriber struct {
+	ctrl     *gomock.Controller
+	recorder *MockSubscriberMockRecorder
+}
+
+// MockSubscriberMockRecorder is the mock recorder for MockSubscriber.
+type MockSubscriberMockRecorder struct {
+	mock *MockSubscriber
+}
+
+// NewMockSubscriber creates a new mock instance.
+func NewMockSubscriber(ctrl *gomock.Controller) *MockSubscriber {
+	mock := &MockSubscriber{ctrl: ctrl}
+	mock.recorder = &MockSubscriberMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSubscriber) EXPECT() *MockSubscriberMockRecorder {
+	return m.recorder
+}
+
+// Call mocks base method.
+func (m *MockSubscriber) Call(result interface{}, method string, args ...interface{}) error {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{result, method}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Call", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Call indicates an expected call of Call.
+func (mr *MockSubscriberMockRecorder) Call(result, method interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{result, method}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Call", reflect.TypeOf((*MockSubscriber)(nil).Call), varargs...)
+}
+
+// CallContext mocks base method.
+func (m *MockSubscriber) CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, result, method}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CallContext", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CallContext indicates an expected call of CallContext.
+func (mr *MockSubscriberMockRecorder) CallContext(ctx, result, method interface{}, args ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, result, method}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CallContext", reflect.TypeOf((*MockSubscriber)(nil).CallContext), varargs...)
+}
+
+// Close mocks base method.
+func (m *MockSubscriber) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockSubscriberMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockSubscriber)(nil).Close))
+}
+
 // Subscribe mocks base method.
-func (m *MockRPCClient) Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (*rpc.ClientSubscription, error) {
+func (m *MockSubscriber) Subscribe(ctx context.Context, namespace string, channel interface{}, args ...interface{}) (domain.ClientSubscription, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, namespace, channel}
 	for _, a := range args {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Subscribe", varargs...)
-	ret0, _ := ret[0].(*rpc.ClientSubscription)
+	ret0, _ := ret[0].(domain.ClientSubscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Subscribe indicates an expected call of Subscribe.
-func (mr *MockRPCClientMockRecorder) Subscribe(ctx, namespace, channel interface{}, args ...interface{}) *gomock.Call {
+func (mr *MockSubscriberMockRecorder) Subscribe(ctx, namespace, channel interface{}, args ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, namespace, channel}, args...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockRPCClient)(nil).Subscribe), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockSubscriber)(nil).Subscribe), varargs...)
 }
 
 // MockClient is a mock of Client interface.

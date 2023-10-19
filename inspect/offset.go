@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/montanaflynn/stats"
 	"golang.org/x/sync/errgroup"
 )
@@ -19,7 +20,7 @@ type offsetStats struct {
 
 func calculateOffsetStats(
 	ctx context.Context, primaryClient,
-	secondaryClient ProxyAPIClient,
+	secondaryClient ethereum.EthClient,
 ) (offsetStats, error) {
 	ds, err := collectOffsetData(ctx, primaryClient, secondaryClient)
 	if err != nil {
@@ -31,7 +32,7 @@ func calculateOffsetStats(
 
 // collectOffsetData measures how long does it take to receive a recently created block and compares given eth clients.
 // The idea is to mimic the behavior of Scanner feed and Bot proxy query.
-func collectOffsetData(ctx context.Context, primaryClient, secondaryClient ProxyAPIClient) (
+func collectOffsetData(ctx context.Context, primaryClient, secondaryClient ethereum.EthClient) (
 	[]float64, error,
 ) {
 	maxDuration := time.Second * 20
@@ -102,7 +103,7 @@ func collectOffsetData(ctx context.Context, primaryClient, secondaryClient Proxy
 		}
 	}
 }
-func measureBlockDelay(ctx context.Context, client ProxyAPIClient, blockNum uint64) (int64, error) {
+func measureBlockDelay(ctx context.Context, client ethereum.EthClient, blockNum uint64) (int64, error) {
 	t := time.Millisecond * 200
 
 	start := time.Now()

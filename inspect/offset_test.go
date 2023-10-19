@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	mock_inspect "github.com/forta-network/forta-core-go/inspect/mocks"
+	mock_ethereum "github.com/forta-network/forta-core-go/ethereum/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,8 +17,8 @@ func TestCalculateOffsetStats(t *testing.T) {
 	defer cancel()
 
 	ctrl := gomock.NewController(t)
-	primaryClient := mock_inspect.NewMockProxyAPIClient(ctrl)
-	secondaryClient := mock_inspect.NewMockProxyAPIClient(ctrl)
+	primaryClient := mock_ethereum.NewMockEthClient(ctrl)
+	secondaryClient := mock_ethereum.NewMockEthClient(ctrl)
 
 	// Test when everything is successful
 	primaryClient.EXPECT().BlockNumber(gomock.Any()).Return(uint64(5), nil)

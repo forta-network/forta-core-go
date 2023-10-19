@@ -147,28 +147,31 @@ func SupportsETH2(ctx context.Context, rpcClient ethereum.RPCClient) bool {
 
 	var block domain.Block
 	if err := getRpcResponse(ctx, rpcClient, &block, blockByNumber, latestBlock, true); err != nil {
+		fmt.Println("@@@@@ response failed", err)
 		return false
 	}
 	if block.Difficulty == nil {
+		fmt.Println("@@@@@ nil difficulty", block.Difficulty)
 		return false
 	}
 	if block.Nonce == nil {
+		fmt.Println("@@@@@ nil nonce", block.Nonce)
 		return false
 	}
 	difficulty, err := hexutil.DecodeBig(*block.Difficulty)
 	if err != nil {
+		fmt.Println("@@@@@ error parsing difficulty", block.Difficulty, err)
 		return false
 	}
 	var nonce types.BlockNonce
 	if err := (&nonce).UnmarshalText([]byte(*block.Nonce)); err != nil {
-		return false
-	}
-	if err != nil {
+		fmt.Println("@@@@@ error parsing nonce", *block.Nonce)
 		return false
 	}
 
 	if difficulty.Sign() == 0 && nonce.Uint64() == 0 {
 		return true
 	}
+	fmt.Println("@@@@@ one of the numbers is not zero", difficulty, nonce)
 	return false
 }
