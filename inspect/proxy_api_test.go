@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"testing"
 
+	geth "github.com/ethereum/go-ethereum"
 	types "github.com/ethereum/go-ethereum/core/types"
 	"github.com/forta-network/forta-core-go/ethereum"
 	mock_ethereum "github.com/forta-network/forta-core-go/ethereum/mocks"
@@ -57,6 +58,11 @@ func TestProxyAPIInspection(t *testing.T) {
 	// oldest supported block inspection calls
 	ethClient.EXPECT().BlockByNumber(gomock.Any(), big.NewInt(VeryOldBlockNumber)).Return(&types.Block{}, nil)
 
+	ethClient.EXPECT().CallContract(gomock.Any(), geth.CallMsg{
+		To:   &ethCallCheckToAddr,
+		Data: ethCallCheckData,
+	}, nil).Return(nil, errors.New("revert"))
+
 	// eth2 support inspection calls
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", "latest", true).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
@@ -83,6 +89,7 @@ func TestProxyAPIInspection(t *testing.T) {
 			IndicatorProxyAPIModuleNet:      ResultSuccess,
 			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
 			IndicatorProxyAPIIsETH2:         ResultSuccess,
+			IndicatorProxyAPIMethodEthCall:  ResultSuccess,
 			// trick to make test less flaky and ignore offset issues
 			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
 			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
