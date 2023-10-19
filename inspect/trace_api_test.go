@@ -33,26 +33,26 @@ func TestTraceAPIInspection(t *testing.T) {
 
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "net_version").
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"4002"`), result)
+			_ = json.Unmarshal([]byte(`"4002"`), result)
 			return nil
 		}).AnyTimes()
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_chainId").
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"4002"`), result)
+			_ = json.Unmarshal([]byte(`"4002"`), result)
 			return nil
 		}).AnyTimes()
 
 	// trace response hash inspection
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "trace_block", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		})
 
 	// block response hash inspection
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		})
 

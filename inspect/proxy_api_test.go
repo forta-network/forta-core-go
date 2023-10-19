@@ -38,19 +38,19 @@ func TestProxyAPIInspection(t *testing.T) {
 
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "net_version").
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"0x5"`), result)
+			_ = json.Unmarshal([]byte(`"0x5"`), result)
 			return nil
 		}).AnyTimes()
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_chainId").
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"0x5"`), result)
+			_ = json.Unmarshal([]byte(`"0x5"`), result)
 			return nil
 		}).AnyTimes()
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "web3_clientVersion").Return(nil)
 	ethClient.EXPECT().BlockNumber(gomock.Any()).Return(uint64(123), nil)
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`"{}"`), result)
+			_ = json.Unmarshal([]byte(`"{}"`), result)
 			return nil
 		})
 
@@ -60,7 +60,7 @@ func TestProxyAPIInspection(t *testing.T) {
 	// eth2 support inspection calls
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", "latest", true).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
-			json.Unmarshal([]byte(`{"difficulty":"0x0","nonce":"0x0000000000000000"}`), result)
+			_ = json.Unmarshal([]byte(`{"difficulty":"0x0","nonce":"0x0000000000000000"}`), result)
 			return nil
 		})
 
