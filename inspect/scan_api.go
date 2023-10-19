@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -48,7 +48,7 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 	results = NewInspectionResults()
 	results.Indicators = defaultIndicators(scanAPIIndicators)
 
-	rpcClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
+	rpcClient, err := RPCDialContext(ctx, inspectionCfg.ScanAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
 
@@ -94,7 +94,7 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 // checkSupportedModules double-checks the functionality of modules that were declared as supported by
 // the node.
 func checkSupportedScanApiModules(
-	ctx context.Context, rpcClient *rpc.Client, results *InspectionResults,
+	ctx context.Context, rpcClient ethereum.RPCClient, results *InspectionResults,
 ) (resultError error) {
 	// sends net_version under the hood. should prove the node supports net module
 	_, err := GetNetworkID(ctx, rpcClient)

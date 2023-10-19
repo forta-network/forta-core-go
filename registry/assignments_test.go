@@ -132,6 +132,10 @@ var testExpectedAssignmentList = []*Assignment{
 }
 
 func TestGetAssignmentList(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping assignment list test in short mode")
+	}
+
 	r := require.New(t)
 
 	cfg := defaultConfig

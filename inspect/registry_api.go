@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/forta-network/forta-core-go/registry"
 	"github.com/hashicorp/go-multierror"
 )
@@ -40,7 +39,7 @@ func (sai *RegistryAPIInspector) Inspect(ctx context.Context, inspectionCfg Insp
 	results = NewInspectionResults()
 	results.Indicators = defaultIndicators(registryAPIIndicators)
 
-	_, err := rpc.DialContext(ctx, inspectionCfg.RegistryAPIURL)
+	_, err := EthClientDialContext(ctx, inspectionCfg.RegistryAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api: %w", err))
 
@@ -52,7 +51,7 @@ func (sai *RegistryAPIInspector) Inspect(ctx context.Context, inspectionCfg Insp
 		results.Indicators[IndicatorRegistryAPIAccessible] = ResultSuccess
 	}
 
-	regClient, err := registry.NewClient(ctx, registry.ClientConfig{
+	regClient, err := RegistryNewClient(ctx, registry.ClientConfig{
 		JsonRpcUrl: inspectionCfg.RegistryAPIURL,
 		ENSAddress: inspectionCfg.ENSContractAddress,
 		Name:       "inspection-registry-client",

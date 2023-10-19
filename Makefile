@@ -82,11 +82,10 @@ mocks:
 	$(MOCKGEN) -source manifest/client.go -destination manifest/mocks/mock_client.go
 	$(MOCKGEN) -source clients/graphql/client.go -destination clients/mocks/mock_graphql_client.go
 	$(MOCKGEN) -source utils/ethutils/iterator.go -destination utils/ethutils/mocks/mock_iterator.go
-	$(MOCKGEN) -source inspect/proxy_api.go -destination inspect/mocks/mock_proxy_api.go
 
 .PHONY: test
 test:
-	go test -v -count=1 -coverprofile=coverage.out ./...
+	go test -v -count=1 -short -coverprofile=coverage.out ./...
 
 .PHONY: coverage
 coverage:

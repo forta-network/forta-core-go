@@ -81,6 +81,7 @@ func getTestBlockFeed(t *testing.T) (*blockFeed, *mocks.MockClient, *mocks.MockC
 		traceClient: traceClient,
 		cache:       cache,
 		tracing:     true,
+		logs:        true,
 		maxBlockAge: &maxBlockAge,
 	}, client, traceClient, ctx, cancel
 }

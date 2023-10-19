@@ -20,20 +20,21 @@ const testBlockHash = "0x4fc0862e76691f5312964883954d5c2db35e2b8f7a4f191775a4f50
 
 var testErr = errors.New("test err")
 
-func initClient(t *testing.T) (*streamEthClient, *mocks.MockRPCClient, context.Context) {
+func initClient(t *testing.T) (*streamEthClient, *mocks.MockRPCClient, *mocks.MockSubscriber, context.Context) {
 	minBackoff = 1 * time.Millisecond
 	maxBackoff = 1 * time.Millisecond
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	client := mocks.NewMockRPCClient(ctrl)
+	subscriber := mocks.NewMockSubscriber(ctrl)
 
-	return &streamEthClient{rpcClient: client}, client, ctx
+	return &streamEthClient{rpcClient: client, subscriber: subscriber}, client, subscriber, ctx
 }
 
 func TestEthClient_BlockByHash(t *testing.T) {
 	r := require.New(t)
 
-	ethClient, client, ctx := initClient(t)
+	ethClient, client, _, ctx := initClient(t)
 	hash := testBlockHash
 	// verify retry
 	client.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).Return(testErr).Times(1)
@@ -50,10 +51,10 @@ func TestEthClient_BlockByHash(t *testing.T) {
 func TestEthClient_SubscribeToHeader_Err(t *testing.T) {
 	r := require.New(t)
 
-	ethClient, client, ctx := initClient(t)
+	ethClient, _, subscriber, ctx := initClient(t)
 	sub := mock_domain.NewMockClientSubscription(gomock.NewController(t))
 
-	client.EXPECT().Subscribe(gomock.Any(), gomock.Any(), "newHeads").Return(sub, nil).Times(2)
+	subscriber.EXPECT().Subscribe(gomock.Any(), "eth", gomock.Any(), "newHeads").Return(sub, nil).Times(2)
 	errCh := make(chan error, 1)
 	errCh <- errors.New("subscription encountered some error")
 	sub.EXPECT().Err().Return(errCh).Times(2)
@@ -64,9 +65,12 @@ func TestEthClient_SubscribeToHeader_Err(t *testing.T) {
 
 	headerCh, err = ethClient.SubscribeToHead(ctx)
 	r.NoError(err)
+	var blocked bool
 	select {
 	case <-time.After(time.Second):
 		// should continue from here
+		blocked = true
 	case <-headerCh: // should block
 	}
+	r.True(blocked)
 }

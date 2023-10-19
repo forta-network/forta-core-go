@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/forta-network/forta-core-go/ethereum"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -56,11 +54,6 @@ type ProxyAPIInspector struct{}
 // compile time check: it should implement the interface
 var _ Inspector = &ProxyAPIInspector{}
 
-type ProxyAPIClient interface {
-	BlockNumber(ctx context.Context) (uint64, error)
-	BlockByNumber(ctx context.Context, int2 *big.Int) (*types.Block, error)
-}
-
 // Name returns the name of the inspector.
 func (pai *ProxyAPIInspector) Name() string {
 	return "proxy-api"
@@ -75,7 +68,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	results = NewInspectionResults()
 	results.Indicators = defaultIndicators(proxyAPIIndicators)
 
-	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
+	proxyRPCClient, err := RPCDialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
 
@@ -91,8 +84,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultSuccess
 	}
 
-	proxyClient := ethclient.NewClient(proxyRPCClient)
-
+	proxyClient, err := EthClientDialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if id, err := GetChainOrNetworkID(ctx, proxyRPCClient); err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't query chain id: %v", err))
 		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
@@ -130,20 +122,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
 	}
 
-	scanRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
-	if err != nil {
-		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
-
-		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
-		results.Indicators[IndicatorProxyAPIModuleWeb3] = ResultFailure
-		results.Indicators[IndicatorProxyAPIModuleEth] = ResultFailure
-		results.Indicators[IndicatorProxyAPIModuleNet] = ResultFailure
-		results.Indicators[IndicatorProxyAPIHistorySupport] = ResultFailure
-		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
-	}
-
-	scanClient := ethclient.NewClient(scanRPCClient)
-
+	scanClient, err := EthClientDialContext(ctx, inspectionCfg.ScanAPIURL)
 	stats, err := calculateOffsetStats(ctx, proxyClient, scanClient)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
@@ -164,7 +143,7 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 // checkSupportedModules double-checks the functionality of modules that were declared as supported by
 // the node.
 func checkSupportedModules(
-	ctx context.Context, rpcClient *rpc.Client, results *InspectionResults,
+	ctx context.Context, rpcClient ethereum.RPCClient, results *InspectionResults,
 ) (resultError error) {
 	// sends net_version under the hood. should prove the node supports net module
 	_, err := GetNetworkID(ctx, rpcClient)
@@ -197,7 +176,7 @@ func checkSupportedModules(
 }
 
 // checkHistorySupport inspects block history supports. results earliest provided block
-func checkHistorySupport(ctx context.Context, latestBlock uint64, client *ethclient.Client) float64 {
+func checkHistorySupport(ctx context.Context, latestBlock uint64, client ethereum.EthClient) float64 {
 	// check for a very old block
 	_, err := client.BlockByNumber(ctx, big.NewInt(VeryOldBlockNumber))
 	if err == nil {
@@ -209,7 +188,7 @@ func checkHistorySupport(ctx context.Context, latestBlock uint64, client *ethcli
 }
 
 // findOldestSupportedBlock returns the earliest block provided by client
-func findOldestSupportedBlock(ctx context.Context, client ProxyAPIClient, low, high uint64) uint64 {
+func findOldestSupportedBlock(ctx context.Context, client ethereum.EthClient, low, high uint64) uint64 {
 	memo := make(map[uint64]bool)
 
 	// terminating condition, results merged
