@@ -2,108 +2,41 @@ package inspect
 
 import (
 	"context"
+	"errors"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/kelseyhightower/envconfig"
-	"github.com/stretchr/testify/require"
+	types "github.com/ethereum/go-ethereum/core/types"
+	mock_inspect "github.com/forta-network/forta-core-go/inspect/mocks"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testProxyAPIOldestSupportedBlock = uint64(0)
-)
+func TestFindOldestSupportedBlock(t *testing.T) {
+	// Create a new Gomock controller
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-var testProxyEnv struct {
-	ProxyAPI string `envconfig:"proxy_api" default:"https://rpc.ankr.com/eth_goerli"`
-}
+	// Create a mock ethclient.Client
+	mockClient := mock_inspect.NewMockProxyAPIClient(ctrl)
 
-func init() {
-	envconfig.MustProcess("test", &testProxyEnv)
-}
-
-func TestProxyAPIInspection(t *testing.T) {
-	r := require.New(t)
-
-	inspector := &ProxyAPIInspector{}
-	results, err := inspector.Inspect(
-		context.Background(), InspectionConfig{
-			ProxyAPIURL: testProxyEnv.ProxyAPI,
-			ScanAPIURL:  testProxyEnv.ProxyAPI,
-			BlockNumber: testProxyAPIOldestSupportedBlock,
-		},
-	)
-	r.NoError(err)
-
-	r.Equal(
-		map[string]float64{
-			IndicatorProxyAPIAccessible:     ResultSuccess,
-			IndicatorProxyAPIChainID:        float64(5),
-			IndicatorProxyAPIModuleWeb3:     ResultSuccess,
-			IndicatorProxyAPIModuleEth:      ResultSuccess,
-			IndicatorProxyAPIModuleNet:      ResultSuccess,
-			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
-			IndicatorProxyAPIIsETH2:         ResultSuccess,
-			// trick to make test less flaky and ignore offset issues
-			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
-			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
-			IndicatorProxyAPIOffsetScanMedian:  results.Indicators[IndicatorProxyAPIOffsetScanMedian],
-			IndicatorProxyAPIOffsetScanSamples: results.Indicators[IndicatorProxyAPIOffsetScanSamples],
-		}, results.Indicators,
-	)
-
-	r.Equal(
-		map[string]string{
-			MetadataProxyAPIBlockByNumberHash: "7232705dbb71b9d5ef65891c2c6e7020137ffb652ed938a88621b322f09ab4a4",
-		}, results.Metadata,
-	)
-}
-
-func Test_findOldestSupportedBlock(t *testing.T) {
-	r := require.New(t)
-
-	cli, err := ethclient.Dial(testProxyEnv.ProxyAPI)
-	r.NoError(err)
-
+	// Create a test context
 	ctx := context.Background()
-	latestBlockNum, err := cli.BlockNumber(ctx)
-	r.NoError(err)
 
-	result := findOldestSupportedBlock(context.Background(), cli, 0, latestBlockNum)
-	r.Equal(testProxyAPIOldestSupportedBlock, result)
-}
+	// Test when the earliest block is found
+	mockClient.EXPECT().BlockByNumber(ctx, gomock.Any()).Return(&types.Block{}, nil).Times(7)
 
-func TestProxyAPIInspector_detectOffset(t *testing.T) {
-	type args struct {
-		ctx           context.Context
-		inspectionCfg InspectionConfig
-	}
+	oldestBlock := findOldestSupportedBlock(ctx, mockClient, 0, 200)
+	assert.Equal(t, uint64(0), oldestBlock)
 
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "free and free combo",
-			args: args{
-				ctx: context.Background(),
-				inspectionCfg: InspectionConfig{
-					ScanAPIURL:  "https://rpc.ankr.com/eth",
-					ProxyAPIURL: "https://rpc.ankr.com/eth",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(
-			tt.name, func(t *testing.T) {
-				pai := &ProxyAPIInspector{}
-				stats, err := pai.detectOffset(tt.args.ctx, tt.args.inspectionCfg)
-				if err != nil {
-					t.Log(err)
-				}
+	// Test when the earliest block is not found
+	mockClient.EXPECT().BlockByNumber(ctx, gomock.Any()).Return(nil, errors.New("block not found")).Times(2)
+	mockClient.EXPECT().BlockByNumber(ctx, gomock.Any()).Return(&types.Block{}, nil).Times(5)
+	oldestBlock = findOldestSupportedBlock(ctx, mockClient, 0, 200)
+	assert.Equal(t, uint64(151), oldestBlock)
 
-				t.Log(stats)
-			},
-		)
-	}
+	// Test when the client returns an error for all blocks
+	mockClient.EXPECT().BlockByNumber(ctx, gomock.Any()).Return(nil, errors.New("block not found")).AnyTimes()
+
+	oldestBlock = findOldestSupportedBlock(ctx, mockClient, 0, 200)
+	assert.Equal(t, uint64(200), oldestBlock)
 }

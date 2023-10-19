@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	"time"
 
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hashicorp/go-multierror"
@@ -55,6 +55,11 @@ type ProxyAPIInspector struct{}
 
 // compile time check: it should implement the interface
 var _ Inspector = &ProxyAPIInspector{}
+
+type ProxyAPIClient interface {
+	BlockNumber(ctx context.Context) (uint64, error)
+	BlockByNumber(ctx context.Context, int2 *big.Int) (*types.Block, error)
+}
 
 // Name returns the name of the inspector.
 func (pai *ProxyAPIInspector) Name() string {
@@ -125,7 +130,21 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
 	}
 
-	stats, err := pai.detectOffset(ctx, inspectionCfg)
+	scanRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
+	if err != nil {
+		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api %w", err))
+
+		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
+		results.Indicators[IndicatorProxyAPIModuleWeb3] = ResultFailure
+		results.Indicators[IndicatorProxyAPIModuleEth] = ResultFailure
+		results.Indicators[IndicatorProxyAPIModuleNet] = ResultFailure
+		results.Indicators[IndicatorProxyAPIHistorySupport] = ResultFailure
+		results.Indicators[IndicatorProxyAPIChainID] = ResultFailure
+	}
+
+	scanClient := ethclient.NewClient(scanRPCClient)
+
+	stats, err := calculateOffsetStats(ctx, proxyClient, scanClient)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
 		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
@@ -140,29 +159,6 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	}
 
 	return
-}
-
-func (pai *ProxyAPIInspector) detectOffset(
-	ctx context.Context,
-	inspectionCfg InspectionConfig,
-) (os offsetStats, resultErr error) {
-	proxyCtx, cancel := context.WithTimeout(ctx, time.Second*30)
-	defer cancel()
-
-	proxyRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ProxyAPIURL)
-	if err != nil {
-		return offsetStats{}, err
-	}
-
-	proxyClient := ethclient.NewClient(proxyRPCClient)
-	scanRPCClient, err := rpc.DialContext(ctx, inspectionCfg.ScanAPIURL)
-	if err != nil {
-		return offsetStats{}, err
-	}
-
-	scanClient := ethclient.NewClient(scanRPCClient)
-
-	return calculateOffsetStats(proxyCtx, scanClient, proxyClient)
 }
 
 // checkSupportedModules double-checks the functionality of modules that were declared as supported by
@@ -213,7 +209,7 @@ func checkHistorySupport(ctx context.Context, latestBlock uint64, client *ethcli
 }
 
 // findOldestSupportedBlock returns the earliest block provided by client
-func findOldestSupportedBlock(ctx context.Context, client *ethclient.Client, low, high uint64) uint64 {
+func findOldestSupportedBlock(ctx context.Context, client ProxyAPIClient, low, high uint64) uint64 {
 	memo := make(map[uint64]bool)
 
 	// terminating condition, results merged

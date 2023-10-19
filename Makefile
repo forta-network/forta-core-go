@@ -7,6 +7,7 @@ SWAGGER = $(GOBIN)/swagger
 PROTOC_GEN_GO = $(GOBIN)/protoc-gen-go
 PROTOC_GEN_GO_GRPC = $(GOBIN)/protoc-gen-go-grpc
 GOMERGETYPES = $(GOBIN)/gomergetypes
+MOCKGEN = $(GOBIN)/mockgen
 
 PROTOC = ./toolbin/protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GO_GRPC)
 
@@ -31,6 +32,8 @@ tools:
 	@rm -rf toolbin
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.0
 	@go install golang.org/x/tools/cmd/goimports@v0.1.11
+
+	@go install github.com/golang/mock/mockgen@5b455625bd2c8ffbcc0de6a0873f864ba3820904
 
 	@go install github.com/go-swagger/go-swagger/cmd/swagger@v0.29.0
 
@@ -67,18 +70,19 @@ protogen: require-tools
 
 .PHONY: mocks
 mocks:
-	mockgen -source ethereum/client.go -destination ethereum/mocks/mock_client.go
-	mockgen -source feeds/interfaces.go -destination feeds/mocks/mock_feeds.go
-	mockgen -source ethereum/contract_backend.go -destination ethereum/mocks/mock_ethclient.go
-	mockgen -source registry/client.go -destination registry/mocks/mock_client.go
-	mockgen -source registry/version.go -destination registry/mocks/mock_version.go
-	mockgen -source domain/registry/regmsg/regmsg.go -destination domain/registry/regmsg/mocks/mock_regmsg.go
-	mockgen -source ipfs/client.go -destination ipfs/mocks/mock_client.go
-	mockgen -source release/client.go -destination release/mocks/mock_client.go
-	mockgen -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go
-	mockgen -source manifest/client.go -destination manifest/mocks/mock_client.go
-	mockgen -source clients/graphql/client.go -destination clients/mocks/mock_graphql_client.go
-	mockgen -source utils/ethutils/iterator.go -destination utils/ethutils/mocks/mock_iterator.go
+	$(MOCKGEN) -source ethereum/client.go -destination ethereum/mocks/mock_client.go
+	$(MOCKGEN) -source feeds/interfaces.go -destination feeds/mocks/mock_feeds.go
+	$(MOCKGEN) -source ethereum/contract_backend.go -destination ethereum/mocks/mock_ethclient.go
+	$(MOCKGEN) -source registry/client.go -destination registry/mocks/mock_client.go
+	$(MOCKGEN) -source registry/version.go -destination registry/mocks/mock_version.go
+	$(MOCKGEN) -source domain/registry/regmsg/regmsg.go -destination domain/registry/regmsg/mocks/mock_regmsg.go
+	$(MOCKGEN) -source ipfs/client.go -destination ipfs/mocks/mock_client.go
+	$(MOCKGEN) -source release/client.go -destination release/mocks/mock_client.go
+	$(MOCKGEN) -source domain/ethereum.go -destination domain/mocks/mock_ethereum.go
+	$(MOCKGEN) -source manifest/client.go -destination manifest/mocks/mock_client.go
+	$(MOCKGEN) -source clients/graphql/client.go -destination clients/mocks/mock_graphql_client.go
+	$(MOCKGEN) -source utils/ethutils/iterator.go -destination utils/ethutils/mocks/mock_iterator.go
+	$(MOCKGEN) -source inspect/proxy_api.go -destination inspect/mocks/mock_proxy_api.go
 
 .PHONY: test
 test:
