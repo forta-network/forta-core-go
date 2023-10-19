@@ -16,9 +16,9 @@ runs:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: ${{ runner.os }}-go-validate-cache-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-validate-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-go-validate-cache
+          ${{ runner.os }}-go-validate
     - name: Vet
       shell: bash
       run: |
