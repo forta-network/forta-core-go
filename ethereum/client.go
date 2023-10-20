@@ -442,9 +442,11 @@ func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEth
 	}
 	rClient.SetHeader("Content-Type", "application/json")
 
+	client := &rpcClient{Client: rClient}
 	return &streamEthClient{
 		apiName:       apiName,
-		rpcClient:     &rpcClient{Client: rClient},
+		rpcClient:     client,
+		subscriber:    client,
 		retryInterval: defaultRetryInterval,
 		isWebsocket:   isWebsocket(apiURL),
 	}, nil
