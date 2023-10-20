@@ -4,8 +4,13 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"strings"
 
+	geth "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/ethereum"
+	"github.com/forta-network/forta-core-go/utils"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -24,6 +29,8 @@ const (
 	IndicatorProxyAPIHistorySupport = "proxy-api.history-support"
 	// IndicatorProxyAPIIsETH2 is upgraded to Ethereum 2.0.
 	IndicatorProxyAPIIsETH2 = "proxy-api.is-eth2"
+	// IndicatorProxyAPIMethodEthCall indicates whether eth_call works or not.
+	IndicatorProxyAPIMethodEthCall = "proxy-api.method.eth-call"
 
 	// IndicatorProxyAPIOffsetScanMean offset information between scan and proxy
 	IndicatorProxyAPIOffsetScanMean    = "proxy-api.offset.scan.mean"
@@ -40,6 +47,8 @@ var (
 		IndicatorProxyAPIAccessible, IndicatorProxyAPIChainID, IndicatorProxyAPIModuleWeb3, IndicatorProxyAPIModuleEth, IndicatorProxyAPIModuleNet,
 		IndicatorProxyAPIHistorySupport, IndicatorProxyAPIIsETH2,
 	}
+	ethCallCheckToAddr = common.HexToAddress(utils.ZeroAddress)
+	ethCallCheckData   = hexutil.MustDecode("0xdeadbeef")
 )
 
 const (
@@ -110,6 +119,22 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	err = checkSupportedModules(ctx, proxyRPCClient, results)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("error checking module functionality %w", err))
+	}
+
+	_, err = proxyClient.CallContract(ctx, geth.CallMsg{
+		To:   &ethCallCheckToAddr,
+		Data: ethCallCheckData,
+	}, nil)
+	switch {
+	case err != nil && strings.Contains(err.Error(), "revert"):
+		results.Indicators[IndicatorProxyAPIMethodEthCall] = ResultSuccess
+
+	case err != nil:
+		results.Indicators[IndicatorProxyAPIMethodEthCall] = ResultFailure
+		resultErr = multierror.Append(resultErr, fmt.Errorf("eth_call check failed: %v", err))
+
+	default:
+		results.Indicators[IndicatorProxyAPIMethodEthCall] = ResultSuccess
 	}
 
 	// get configured block and include hash of the returned as metadata
