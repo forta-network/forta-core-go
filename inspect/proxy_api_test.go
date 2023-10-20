@@ -27,6 +27,8 @@ func TestProxyAPIInspection(t *testing.T) {
 	ethClient := mock_ethereum.NewMockEthClient(ctrl)
 	regClient := mock_registry.NewMockClient(ctrl)
 
+	currentHeight := uint64(123)
+
 	RPCDialContext = func(ctx context.Context, rawurl string) (ethereum.RPCClient, error) {
 		return rpcClient, nil
 	}
@@ -48,7 +50,7 @@ func TestProxyAPIInspection(t *testing.T) {
 			return nil
 		}).AnyTimes()
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "web3_clientVersion").Return(nil)
-	ethClient.EXPECT().BlockNumber(gomock.Any()).Return(uint64(123), nil)
+	ethClient.EXPECT().BlockNumber(gomock.Any()).Return(currentHeight, nil)
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", gomock.Any()).
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
 			_ = json.Unmarshal([]byte(`"{}"`), result)
@@ -58,10 +60,17 @@ func TestProxyAPIInspection(t *testing.T) {
 	// oldest supported block inspection calls
 	ethClient.EXPECT().BlockByNumber(gomock.Any(), big.NewInt(VeryOldBlockNumber)).Return(&types.Block{}, nil)
 
+	// eth_call inspection
 	ethClient.EXPECT().CallContract(gomock.Any(), geth.CallMsg{
 		To:   &ethCallCheckToAddr,
 		Data: ethCallCheckData,
 	}, nil).Return(nil, errors.New("revert"))
+
+	// eth_logs range inspection
+	ethClient.EXPECT().FilterLogs(gomock.Any(), geth.FilterQuery{
+		FromBlock: big.NewInt(0).SetUint64(currentHeight - uint64(inspectedBlockRange) - 1),
+		ToBlock:   big.NewInt(0).SetUint64(currentHeight - 1),
+	}).Return(nil, nil)
 
 	// eth2 support inspection calls
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", "latest", true).
@@ -82,14 +91,15 @@ func TestProxyAPIInspection(t *testing.T) {
 
 	r.Equal(
 		map[string]float64{
-			IndicatorProxyAPIAccessible:     ResultSuccess,
-			IndicatorProxyAPIChainID:        float64(5),
-			IndicatorProxyAPIModuleWeb3:     ResultSuccess,
-			IndicatorProxyAPIModuleEth:      ResultSuccess,
-			IndicatorProxyAPIModuleNet:      ResultSuccess,
-			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
-			IndicatorProxyAPIIsETH2:         ResultSuccess,
-			IndicatorProxyAPIMethodEthCall:  ResultSuccess,
+			IndicatorProxyAPIAccessible:         ResultSuccess,
+			IndicatorProxyAPIChainID:            float64(5),
+			IndicatorProxyAPIModuleWeb3:         ResultSuccess,
+			IndicatorProxyAPIModuleEth:          ResultSuccess,
+			IndicatorProxyAPIModuleNet:          ResultSuccess,
+			IndicatorProxyAPIHistorySupport:     VeryOldBlockNumber,
+			IndicatorProxyAPIIsETH2:             ResultSuccess,
+			IndicatorProxyAPIMethodEthCall:      ResultSuccess,
+			IndicatorProxyAPIMethodEthLogsRange: ResultSuccess,
 			// trick to make test less flaky and ignore offset issues
 			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
 			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
