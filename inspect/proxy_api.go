@@ -31,6 +31,8 @@ const (
 	IndicatorProxyAPIIsETH2 = "proxy-api.is-eth2"
 	// IndicatorProxyAPIMethodEthCall indicates whether eth_call works or not.
 	IndicatorProxyAPIMethodEthCall = "proxy-api.method.eth-call"
+	// IndicatorProxyAPIMethodEthLogsRange indicates whether eth_logs range is wide or not.
+	IndicatorProxyAPIMethodEthLogsRange = "proxy-api.method.eth-logs-range"
 
 	// IndicatorProxyAPIOffsetScanMean offset information between scan and proxy
 	IndicatorProxyAPIOffsetScanMean    = "proxy-api.offset.scan.mean"
@@ -47,8 +49,9 @@ var (
 		IndicatorProxyAPIAccessible, IndicatorProxyAPIChainID, IndicatorProxyAPIModuleWeb3, IndicatorProxyAPIModuleEth, IndicatorProxyAPIModuleNet,
 		IndicatorProxyAPIHistorySupport, IndicatorProxyAPIIsETH2,
 	}
-	ethCallCheckToAddr = common.HexToAddress(utils.ZeroAddress)
-	ethCallCheckData   = hexutil.MustDecode("0xdeadbeef")
+	ethCallCheckToAddr  = common.HexToAddress(utils.ZeroAddress)
+	ethCallCheckData    = hexutil.MustDecode("0xdeadbeef")
+	inspectedBlockRange = 2000
 )
 
 const (
@@ -135,6 +138,17 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 
 	default:
 		results.Indicators[IndicatorProxyAPIMethodEthCall] = ResultSuccess
+	}
+
+	_, err = proxyClient.FilterLogs(ctx, geth.FilterQuery{
+		FromBlock: big.NewInt(0).SetUint64(currentHeight - uint64(inspectedBlockRange) - 1),
+		ToBlock:   big.NewInt(0).SetUint64(currentHeight - 1),
+	})
+	if err != nil {
+		results.Indicators[IndicatorProxyAPIMethodEthLogsRange] = ResultFailure
+		resultErr = multierror.Append(resultErr, fmt.Errorf("eth_logs range check failed: %v", err))
+	} else {
+		results.Indicators[IndicatorProxyAPIMethodEthLogsRange] = ResultSuccess
 	}
 
 	// get configured block and include hash of the returned as metadata
