@@ -20,21 +20,25 @@ const testBlockHash = "0x4fc0862e76691f5312964883954d5c2db35e2b8f7a4f191775a4f50
 
 var testErr = errors.New("test err")
 
-func initClient(t *testing.T) (*streamEthClient, *mocks.MockRPCClient, *mocks.MockSubscriber, context.Context) {
+func initClient(t *testing.T) (*streamEthClient, *mocks.MockSubscriber, context.Context) {
+	r := require.New(t)
+
 	minBackoff = 1 * time.Millisecond
 	maxBackoff = 1 * time.Millisecond
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
-	client := mocks.NewMockRPCClient(ctrl)
-	subscriber := mocks.NewMockSubscriber(ctrl)
+	client := mocks.NewMockSubscriber(ctrl)
 
-	return &streamEthClient{rpcClient: client, subscriber: subscriber}, client, subscriber, ctx
+	ethClient, err := NewStreamEthClientWithRPCClient(context.Background(), "", true, client)
+	r.NoError(err)
+
+	return ethClient, client, ctx
 }
 
 func TestEthClient_BlockByHash(t *testing.T) {
 	r := require.New(t)
 
-	ethClient, client, _, ctx := initClient(t)
+	ethClient, client, ctx := initClient(t)
 	hash := testBlockHash
 	// verify retry
 	client.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).Return(testErr).Times(1)
@@ -51,10 +55,10 @@ func TestEthClient_BlockByHash(t *testing.T) {
 func TestEthClient_SubscribeToHeader_Err(t *testing.T) {
 	r := require.New(t)
 
-	ethClient, _, subscriber, ctx := initClient(t)
+	ethClient, client, ctx := initClient(t)
 	sub := mock_domain.NewMockClientSubscription(gomock.NewController(t))
 
-	subscriber.EXPECT().Subscribe(gomock.Any(), "eth", gomock.Any(), "newHeads").Return(sub, nil).Times(2)
+	client.EXPECT().Subscribe(gomock.Any(), "eth", gomock.Any(), "newHeads").Return(sub, nil).Times(2)
 	errCh := make(chan error, 1)
 	errCh <- errors.New("subscription encountered some error")
 	sub.EXPECT().Err().Return(errCh).Times(2)

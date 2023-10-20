@@ -442,13 +442,17 @@ func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEth
 	}
 	rClient.SetHeader("Content-Type", "application/json")
 
-	client := &rpcClient{Client: rClient}
+	return NewStreamEthClientWithRPCClient(ctx, apiName, isWebsocket(apiURL), &rpcClient{Client: rClient})
+}
+
+// NewStreamEthClientWithRPCClient creates a new ethereum client
+func NewStreamEthClientWithRPCClient(ctx context.Context, apiName string, isWs bool, rpcClient Subscriber) (*streamEthClient, error) {
 	return &streamEthClient{
 		apiName:       apiName,
-		rpcClient:     client,
-		subscriber:    client,
+		rpcClient:     rpcClient,
+		subscriber:    rpcClient,
 		retryInterval: defaultRetryInterval,
-		isWebsocket:   isWebsocket(apiURL),
+		isWebsocket:   isWs,
 	}, nil
 }
 
