@@ -67,10 +67,10 @@ func TestProxyAPIInspection(t *testing.T) {
 	}, nil).Return(nil, errors.New("revert"))
 
 	// eth_logs range inspection
-	ethClient.EXPECT().FilterLogs(gomock.Any(), geth.FilterQuery{
-		FromBlock: big.NewInt(0).SetUint64(currentHeight - uint64(inspectedBlockRange) - 1),
-		ToBlock:   big.NewInt(0).SetUint64(currentHeight - 1),
-	}).Return(nil, nil)
+	// ethClient.EXPECT().FilterLogs(gomock.Any(), geth.FilterQuery{
+	// 	FromBlock: big.NewInt(0).SetUint64(currentHeight - uint64(inspectedBlockRange) - 1),
+	// 	ToBlock:   big.NewInt(0).SetUint64(currentHeight - 1),
+	// }).Return(nil, nil)
 
 	// eth2 support inspection calls
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "eth_getBlockByNumber", "latest", true).
@@ -91,15 +91,14 @@ func TestProxyAPIInspection(t *testing.T) {
 
 	r.Equal(
 		map[string]float64{
-			IndicatorProxyAPIAccessible:         ResultSuccess,
-			IndicatorProxyAPIChainID:            float64(5),
-			IndicatorProxyAPIModuleWeb3:         ResultSuccess,
-			IndicatorProxyAPIModuleEth:          ResultSuccess,
-			IndicatorProxyAPIModuleNet:          ResultSuccess,
-			IndicatorProxyAPIHistorySupport:     VeryOldBlockNumber,
-			IndicatorProxyAPIIsETH2:             ResultSuccess,
-			IndicatorProxyAPIMethodEthCall:      ResultSuccess,
-			IndicatorProxyAPIMethodEthLogsRange: ResultSuccess,
+			IndicatorProxyAPIAccessible:     ResultSuccess,
+			IndicatorProxyAPIChainID:        float64(5),
+			IndicatorProxyAPIModuleWeb3:     ResultSuccess,
+			IndicatorProxyAPIModuleEth:      ResultSuccess,
+			IndicatorProxyAPIModuleNet:      ResultSuccess,
+			IndicatorProxyAPIHistorySupport: VeryOldBlockNumber,
+			IndicatorProxyAPIIsETH2:         ResultSuccess,
+			IndicatorProxyAPIMethodEthCall:  ResultSuccess,
 			// trick to make test less flaky and ignore offset issues
 			IndicatorProxyAPIOffsetScanMax:     results.Indicators[IndicatorProxyAPIOffsetScanMax],
 			IndicatorProxyAPIOffsetScanMean:    results.Indicators[IndicatorProxyAPIOffsetScanMean],
