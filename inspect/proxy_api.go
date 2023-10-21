@@ -47,7 +47,7 @@ const (
 var (
 	proxyAPIIndicators = []string{
 		IndicatorProxyAPIAccessible, IndicatorProxyAPIChainID, IndicatorProxyAPIModuleWeb3, IndicatorProxyAPIModuleEth, IndicatorProxyAPIModuleNet,
-		IndicatorProxyAPIHistorySupport, IndicatorProxyAPIIsETH2,
+		IndicatorProxyAPIHistorySupport, IndicatorProxyAPIIsETH2, IndicatorProxyAPIMethodEthCall,
 	}
 	ethCallCheckToAddr  = common.HexToAddress(utils.ZeroAddress)
 	ethCallCheckData    = hexutil.MustDecode("0xdeadbeef")
@@ -140,16 +140,16 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIMethodEthCall] = ResultSuccess
 	}
 
-	_, err = proxyClient.FilterLogs(ctx, geth.FilterQuery{
-		FromBlock: big.NewInt(0).SetUint64(currentHeight - uint64(inspectedBlockRange) - 1),
-		ToBlock:   big.NewInt(0).SetUint64(currentHeight - 1),
-	})
-	if err != nil {
-		results.Indicators[IndicatorProxyAPIMethodEthLogsRange] = ResultFailure
-		resultErr = multierror.Append(resultErr, fmt.Errorf("eth_logs range check failed: %v", err))
-	} else {
-		results.Indicators[IndicatorProxyAPIMethodEthLogsRange] = ResultSuccess
-	}
+	// _, err = proxyClient.FilterLogs(ctx, geth.FilterQuery{
+	// 	FromBlock: big.NewInt(0).SetUint64(currentHeight - uint64(inspectedBlockRange) - 1),
+	// 	ToBlock:   big.NewInt(0).SetUint64(currentHeight - 1),
+	// })
+	// if err != nil {
+	// 	results.Indicators[IndicatorProxyAPIMethodEthLogsRange] = ResultFailure
+	// 	resultErr = multierror.Append(resultErr, fmt.Errorf("eth_logs range check failed: %v", err))
+	// } else {
+	// 	results.Indicators[IndicatorProxyAPIMethodEthLogsRange] = ResultSuccess
+	// }
 
 	// get configured block and include hash of the returned as metadata
 	hash, err := GetBlockResponseHash(ctx, proxyRPCClient, inspectionCfg.BlockNumber)

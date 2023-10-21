@@ -3,6 +3,8 @@ package inspect
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/forta-network/forta-core-go/ethereum"
@@ -75,4 +77,49 @@ func TestTraceAPIInspection(t *testing.T) {
 
 	r.NotEmpty(results.Metadata[MetadataTraceAPIBlockByNumberHash])
 	r.NotEmpty(results.Metadata[MetadataTraceAPITraceBlockHash])
+}
+
+func TestTraceFailure(t *testing.T) {
+	if os.Getenv("TRACE_FAILURE_TEST") != "1" {
+		t.Skip("skipping trace failure test")
+	}
+
+	r := require.New(t)
+	ctx := context.Background()
+
+	url := os.Getenv("JSON_RPC_URL")
+
+	proxyClient, err := EthClientDialContext(ctx, url)
+	r.NoError(err)
+
+	currentHeight, err := proxyClient.BlockNumber(ctx)
+	r.NoError(err)
+
+	results, resultErr := (&ScanAPIInspector{}).Inspect(ctx, InspectionConfig{
+		ScanAPIURL:  url,
+		ProxyAPIURL: url,
+		TraceAPIURL: url,
+		BlockNumber: currentHeight,
+		CheckTrace:  true,
+	})
+	fmt.Println(results)
+	fmt.Println(resultErr)
+
+	results, resultErr = (&ProxyAPIInspector{}).Inspect(ctx, InspectionConfig{
+		ScanAPIURL:  url,
+		ProxyAPIURL: url,
+		TraceAPIURL: url,
+		BlockNumber: currentHeight,
+		CheckTrace:  true,
+	})
+	fmt.Println(results)
+	fmt.Println(resultErr)
+
+	results, resultErr = (&TraceAPIInspector{}).Inspect(ctx, InspectionConfig{
+		TraceAPIURL: url,
+		BlockNumber: currentHeight,
+		CheckTrace:  true,
+	})
+	fmt.Println(results)
+	fmt.Println(resultErr)
 }
