@@ -27,10 +27,10 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 	}
 
 	// if required, trace should be supported
-	if results.Inputs.CheckTrace &&
-		results.Indicators[inspect.IndicatorTraceSupported] == inspect.ResultFailure {
-		return 0, nil
-	}
+	// if results.Inputs.CheckTrace &&
+	// 	results.Indicators[inspect.IndicatorTraceSupported] == inspect.ResultFailure {
+	// 	return 0, nil
+	// }
 
 	// scan api should be provided along with required modules
 	if results.Indicators[inspect.IndicatorScanAPIAccessible] == inspect.ResultFailure ||
@@ -48,10 +48,10 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 		return 0, nil
 	}
 
-	// trace api should point to correct chain id
-	if results.Inputs.CheckTrace && results.Indicators[inspect.IndicatorTraceAPIChainID] != float64(c.config.ChainID) {
-		return 0, nil
-	}
+	// // trace api should point to correct chain id
+	// if results.Inputs.CheckTrace && results.Indicators[inspect.IndicatorTraceAPIChainID] != float64(c.config.ChainID) {
+	// 	return 0, nil
+	// }
 
 	// at least 50% of the required memory limit is required
 	if results.Indicators[inspect.IndicatorResourcesMemoryTotal] < c.config.MinTotalMemory {
@@ -62,13 +62,13 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 		return 0, nil
 	}
 
-	if results.Inputs.CheckTrace && results.Inputs.IsETH2 && results.Indicators[inspect.IndicatorTraceAPIIsETH2] == inspect.ResultFailure {
-		return 0, nil
-	}
+	// if results.Inputs.CheckTrace && results.Inputs.IsETH2 && results.Indicators[inspect.IndicatorTraceAPIIsETH2] == inspect.ResultFailure {
+	// 	return 0, nil
+	// }
 
-	if results.Indicators[inspect.IndicatorValidAPIReferences] == inspect.ResultFailure {
-		return 0, nil
-	}
+	// if results.Indicators[inspect.IndicatorValidAPIReferences] == inspect.ResultFailure {
+	// 	return 0, nil
+	// }
 
 	// TODO: Enable this after delegated staking.
 	// if results.Indicators[inspect.IndicatorRegistryAPIAccessible] == inspect.ResultFailure ||
