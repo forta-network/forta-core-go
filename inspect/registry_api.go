@@ -64,6 +64,7 @@ func (sai *RegistryAPIInspector) Inspect(ctx context.Context, inspectionCfg Insp
 		results.Indicators[IndicatorRegistryAPIAssignments] = ResultFailure
 		return
 	} else {
+		defer regClient.Close()
 		results.Indicators[IndicatorRegistryAPIENS] = ResultSuccess
 	}
 

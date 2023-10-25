@@ -32,6 +32,9 @@ func TestRegistryAPIInspection(t *testing.T) {
 		return regClient, nil
 	}
 
+	ethClient.EXPECT().Close()
+	regClient.EXPECT().Close()
+
 	regClient.EXPECT().GetAssignmentHash(scannerAddr).Return(&registry.AssignmentHash{}, nil)
 
 	inspector := &RegistryAPIInspector{}
