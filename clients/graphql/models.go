@@ -17,11 +17,15 @@ type GetAlertsResponse struct {
 
 type IntermediateStruct struct {
 	Alerts struct {
-		PageInfo *PageInfo `json:"pageInfo"`
-		Alerts   []*struct {
-			Source SourceAlertEvent
-		} `json:"alerts"`
+		PageInfo *PageInfo            `json:"pageInfo"`
+		Alerts   []*IntermediateAlert `json:"alerts"`
 	}
+}
+type IntermediateAlert struct {
+	Source *IntermediateSource `json:"source"`
+}
+type IntermediateSource struct {
+	SourceAlert *SourceAlertEvent `json:"sourceAlert"`
 }
 
 type SourceAlertEvent struct {

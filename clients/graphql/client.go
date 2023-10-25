@@ -93,9 +93,6 @@ func fetchAlerts(
 	}
 	var err error
 
-	var data GetAlertsResponse
-	resp := &graphql.Response{Data: &data}
-
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -154,30 +151,44 @@ func fetchAlerts(
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(respBody, resp)
+
+	resp, data, err := parseResponse(respBody)
 	if err != nil {
 		return nil, err
-	}
-
-	var temp IntermediateStruct
-	err = json.Unmarshal(respBody, &temp)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := range data.Alerts.Alerts {
-		tmpAlert := temp.Alerts.Alerts[i]
-		data.Alerts.Alerts[i].Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
-			AlertHash: tmpAlert.Source.Hash,
-			ChainId:   fmt.Sprintf("%d", tmpAlert.Source.ChainId),
-			Timestamp: tmpAlert.Source.Timestamp,
-			BotId:     tmpAlert.Source.BotId,
-		}
 	}
 
 	if len(resp.Errors) > 0 {
 		return nil, resp.Errors
 	}
 
-	return &data, err
+	return data, err
+}
+
+func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, error) {
+	var data GetAlertsResponse
+	resp := &graphql.Response{Data: &data}
+
+	err := json.Unmarshal(responseBody, resp)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var temp IntermediateStruct
+	intermediateResp := &graphql.Response{Data: &temp}
+	err = json.Unmarshal(responseBody, intermediateResp)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for i := range data.Alerts.Alerts {
+		tmpAlert := temp.Alerts.Alerts[i].Source.SourceAlert
+		data.Alerts.Alerts[i].Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
+			AlertHash: tmpAlert.Hash,
+			ChainId:   fmt.Sprintf("%d", tmpAlert.ChainId),
+			Timestamp: tmpAlert.Timestamp,
+			BotId:     tmpAlert.BotId,
+		}
+	}
+
+	return resp, &data, err
 }
