@@ -53,9 +53,9 @@ var (
 		IndicatorProxyAPIOffsetScanMax,
 		IndicatorProxyAPIOffsetScanSamples,
 	}
-	ethCallCheckToAddr  = common.HexToAddress(utils.ZeroAddress)
-	ethCallCheckData    = hexutil.MustDecode("0xdeadbeef")
-	inspectedBlockRange = 2000
+	ethCallCheckToAddr = common.HexToAddress(utils.ZeroAddress)
+	ethCallCheckData   = hexutil.MustDecode("0xdeadbeef")
+	//inspectedBlockRange = 2000
 )
 
 const (
