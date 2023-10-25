@@ -51,9 +51,11 @@ func collectOffsetData(ctx context.Context, primaryClient, secondaryClient ether
 
 	blockToQuery++
 
+	inspectionContext, cancel := context.WithTimeout(ctx, maxDuration)
+	defer cancel()
 	for {
 		select {
-		case <-ctx.Done():
+		case <-inspectionContext.Done():
 			return dataPoints, nil
 		case <-t.C:
 			// circuit breaker for easier testing
