@@ -173,7 +173,7 @@ func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, 
 		return nil, nil, err
 	}
 
-	var temp IntermediateStruct
+	var temp IntermediateResponse
 	intermediateResp := &graphql.Response{Data: &temp}
 	err = json.Unmarshal(responseBody, intermediateResp)
 	if err != nil {
