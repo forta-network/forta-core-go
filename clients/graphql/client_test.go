@@ -8,8 +8,10 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
-	_, data, err := parseResponse([]byte(testResponse))
+	resp, data, err := parseResponse([]byte(testResponse))
 	assert.NoError(t, err)
+	assert.NotNilf(t, resp,"graphql response can not bi nil")
+	assert.NotNilf(t, data,"data can not bi nil")
 	for i := 0; i < 5; i++ {
 		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.AlertHash, fmt.Sprintf("0x%d", i))
 		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.BotId, "0xbbb")
