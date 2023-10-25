@@ -61,6 +61,9 @@ func (tai *TraceAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorTraceSupported] = ResultFailure
 
 		return
+	} else {
+		defer rpcClient.Close()
+		results.Indicators[IndicatorTraceAccessible] = ResultSuccess
 	}
 
 	id, err := GetChainOrNetworkID(ctx, rpcClient)

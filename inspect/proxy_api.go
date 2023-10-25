@@ -48,6 +48,10 @@ var (
 	proxyAPIIndicators = []string{
 		IndicatorProxyAPIAccessible, IndicatorProxyAPIChainID, IndicatorProxyAPIModuleWeb3, IndicatorProxyAPIModuleEth, IndicatorProxyAPIModuleNet,
 		IndicatorProxyAPIHistorySupport, IndicatorProxyAPIIsETH2, IndicatorProxyAPIMethodEthCall,
+		IndicatorProxyAPIOffsetScanMean,
+		IndicatorProxyAPIOffsetScanMedian,
+		IndicatorProxyAPIOffsetScanMax,
+		IndicatorProxyAPIOffsetScanSamples,
 	}
 	ethCallCheckToAddr  = common.HexToAddress(utils.ZeroAddress)
 	ethCallCheckData    = hexutil.MustDecode("0xdeadbeef")
@@ -84,9 +88,13 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 	proxyClient, clientErr := EthClientDialContext(ctx, inspectionCfg.ProxyAPIURL)
 	if rpcErr != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api: %v", rpcErr))
+	} else {
+		defer proxyRPCClient.Close()
 	}
 	if clientErr != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api: %v", clientErr))
+	} else {
+		defer proxyClient.Close()
 	}
 	if rpcErr != nil || clientErr != nil {
 		results.Indicators[IndicatorProxyAPIAccessible] = ResultFailure
@@ -165,29 +173,31 @@ func (pai *ProxyAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspect
 		results.Indicators[IndicatorProxyAPIIsETH2] = ResultFailure
 	}
 
-	scanClient, err := EthClientDialContext(ctx, inspectionCfg.ScanAPIURL)
-	if err != nil {
-		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset because failed to dial scan api: %w", err))
-		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
-		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
-		results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
-		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
-		return // early return
-	}
+	// NOTE: We thought that we don't need the offset inspection for now and disabled it.
 
-	stats, err := calculateOffsetStats(ctx, proxyClient, scanClient)
-	if err != nil {
-		resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
-		results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
-		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
-		results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
-		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
-	} else {
-		results.Indicators[IndicatorProxyAPIOffsetScanMean] = stats.Mean
-		results.Indicators[IndicatorProxyAPIOffsetScanMedian] = stats.Median
-		results.Indicators[IndicatorProxyAPIOffsetScanMax] = stats.Max
-		results.Indicators[IndicatorProxyAPIOffsetScanSamples] = stats.SampleCount
-	}
+	// scanClient, err := EthClientDialContext(ctx, inspectionCfg.ScanAPIURL)
+	// if err != nil {
+	// 	resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset because failed to dial scan api: %w", err))
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
+	// 	return // early return
+	// }
+
+	// stats, err := calculateOffsetStats(ctx, proxyClient, scanClient)
+	// if err != nil {
+	// 	resultErr = multierror.Append(resultErr, fmt.Errorf("can't calculate scan-proxy offset: %w", err))
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMean] = ResultUnknown
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMedian] = ResultUnknown
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMax] = ResultUnknown
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanSamples] = ResultUnknown
+	// } else {
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMean] = stats.Mean
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMedian] = stats.Median
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanMax] = stats.Max
+	// 	results.Indicators[IndicatorProxyAPIOffsetScanSamples] = stats.SampleCount
+	// }
 
 	return
 }

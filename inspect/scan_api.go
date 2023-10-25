@@ -59,6 +59,7 @@ func (sai *ScanAPIInspector) Inspect(ctx context.Context, inspectionCfg Inspecti
 
 		return
 	} else {
+		defer rpcClient.Close()
 		results.Indicators[IndicatorScanAPIAccessible] = ResultSuccess
 	}
 
