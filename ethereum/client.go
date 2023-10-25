@@ -35,6 +35,7 @@ type EthClient interface {
 	ethereum.ContractCaller
 	BlockNumber(ctx context.Context) (uint64, error)
 	BlockByNumber(ctx context.Context, blockNum *big.Int) (*types.Block, error)
+	Close()
 }
 
 // RPCClient is a wrapper implementation of the RPC client.

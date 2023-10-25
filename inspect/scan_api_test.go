@@ -31,6 +31,8 @@ func TestScanAPIInspection(t *testing.T) {
 		return regClient, nil
 	}
 
+	rpcClient.EXPECT().Close()
+
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "net_version").
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
 			_ = json.Unmarshal([]byte(`"0x5"`), result)

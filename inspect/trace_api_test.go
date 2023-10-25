@@ -3,9 +3,10 @@ package inspect
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/forta-network/forta-core-go/ethereum"
 	mock_ethereum "github.com/forta-network/forta-core-go/ethereum/mocks"
@@ -32,6 +33,8 @@ func TestTraceAPIInspection(t *testing.T) {
 	RegistryNewClient = func(ctx context.Context, cfg registry.ClientConfig) (registry.Client, error) {
 		return regClient, nil
 	}
+
+	rpcClient.EXPECT().Close()
 
 	rpcClient.EXPECT().CallContext(gomock.Any(), gomock.Any(), "net_version").
 		DoAndReturn(func(ctx interface{}, result interface{}, method interface{}, args ...interface{}) error {
@@ -95,31 +98,39 @@ func TestTraceFailure(t *testing.T) {
 	currentHeight, err := proxyClient.BlockNumber(ctx)
 	r.NoError(err)
 
-	results, resultErr := (&ScanAPIInspector{}).Inspect(ctx, InspectionConfig{
-		ScanAPIURL:  url,
-		ProxyAPIURL: url,
-		TraceAPIURL: url,
-		BlockNumber: currentHeight,
-		CheckTrace:  true,
-	})
-	fmt.Println(results)
-	fmt.Println(resultErr)
+	for {
+		results, resultErr := (&ScanAPIInspector{}).Inspect(ctx, InspectionConfig{
+			ScanAPIURL:  url,
+			ProxyAPIURL: url,
+			TraceAPIURL: url,
+			BlockNumber: currentHeight,
+			CheckTrace:  true,
+		})
+		log.Println(results)
+		log.Println(resultErr)
 
-	results, resultErr = (&ProxyAPIInspector{}).Inspect(ctx, InspectionConfig{
-		ScanAPIURL:  url,
-		ProxyAPIURL: url,
-		TraceAPIURL: url,
-		BlockNumber: currentHeight,
-		CheckTrace:  true,
-	})
-	fmt.Println(results)
-	fmt.Println(resultErr)
+		results, resultErr = (&ProxyAPIInspector{}).Inspect(ctx, InspectionConfig{
+			ScanAPIURL:  url,
+			ProxyAPIURL: url,
+			TraceAPIURL: url,
+			BlockNumber: currentHeight,
+			CheckTrace:  true,
+		})
+		log.Println(results)
+		log.Println(resultErr)
 
-	results, resultErr = (&TraceAPIInspector{}).Inspect(ctx, InspectionConfig{
-		TraceAPIURL: url,
-		BlockNumber: currentHeight,
-		CheckTrace:  true,
-	})
-	fmt.Println(results)
-	fmt.Println(resultErr)
+		results, resultErr = (&TraceAPIInspector{}).Inspect(ctx, InspectionConfig{
+			TraceAPIURL: url,
+			BlockNumber: currentHeight,
+			CheckTrace:  true,
+		})
+		log.Println(results)
+		log.Println(resultErr)
+
+		if results.Indicators[IndicatorTraceAPIIsETH2] == ResultFailure {
+			log.Panic("trace api eth2 check failed")
+		}
+
+		time.Sleep(time.Second * 10)
+	}
 }

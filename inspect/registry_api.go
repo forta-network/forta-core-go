@@ -39,7 +39,7 @@ func (sai *RegistryAPIInspector) Inspect(ctx context.Context, inspectionCfg Insp
 	results = NewInspectionResults()
 	results.Indicators = defaultIndicators(registryAPIIndicators)
 
-	_, err := EthClientDialContext(ctx, inspectionCfg.RegistryAPIURL)
+	regEthClient, err := EthClientDialContext(ctx, inspectionCfg.RegistryAPIURL)
 	if err != nil {
 		resultErr = multierror.Append(resultErr, fmt.Errorf("can't dial json-rpc api: %w", err))
 
@@ -48,6 +48,7 @@ func (sai *RegistryAPIInspector) Inspect(ctx context.Context, inspectionCfg Insp
 		results.Indicators[IndicatorRegistryAPIAssignments] = ResultFailure
 		return
 	} else {
+		defer regEthClient.Close()
 		results.Indicators[IndicatorRegistryAPIAccessible] = ResultSuccess
 	}
 
@@ -63,6 +64,7 @@ func (sai *RegistryAPIInspector) Inspect(ctx context.Context, inspectionCfg Insp
 		results.Indicators[IndicatorRegistryAPIAssignments] = ResultFailure
 		return
 	} else {
+		defer regClient.Close()
 		results.Indicators[IndicatorRegistryAPIENS] = ResultSuccess
 	}
 

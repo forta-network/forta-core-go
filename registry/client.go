@@ -57,6 +57,9 @@ const (
 
 // Client retrieves agent, scanner, and assignment information from the registry contracts
 type Client interface {
+	// Close closes the client.
+	Close()
+
 	// RefreshContracts refreshes all contract implementations.
 	RefreshContracts() error
 
@@ -409,6 +412,11 @@ func NewClient(ctx context.Context, cfg ClientConfig) (*client, error) {
 		return nil, fmt.Errorf("failed to dial ens store: %v", err)
 	}
 	return NewClientWithENSStore(ctx, cfg, ensStore)
+}
+
+func (c *client) Close() {
+	c.ec.Close()
+	c.eth.Close()
 }
 
 func (c *client) Contracts() *Contracts {
