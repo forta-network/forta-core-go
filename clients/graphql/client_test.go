@@ -13,12 +13,12 @@ func TestUnmarshal(t *testing.T) {
 	assert.NotNilf(t, resp,"graphql response can not bi nil")
 	assert.NotNilf(t, data,"data can not bi nil")
 	for i := 0; i < 5; i++ {
-		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.AlertHash, fmt.Sprintf("0x%d", i))
-		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.BotId, "0xbbb")
-		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.Timestamp, "2023-01-01T00:00:00Z")
-		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.ChainId, "137")
-		assert.Equal(t, data.Alerts.Alerts[i].Description, "Block height: 17890044")
-		assert.Equal(t, data.Alerts.Alerts[i].Source.Block.Number, uint64(i))
+		assert.Equal(t, fmt.Sprintf("0x%d", i), data.Alerts.Alerts[i].Source.SourceEvent.AlertHash)
+		assert.Equal(t, "0xbbb", data.Alerts.Alerts[i].Source.SourceEvent.BotId)
+		assert.Equal(t, "2023-01-01T00:00:00Z", data.Alerts.Alerts[i].Source.SourceEvent.Timestamp)
+		assert.Equal(t, "137", data.Alerts.Alerts[i].Source.SourceEvent.ChainId)
+		assert.Equal(t, "Block height: 17890044", data.Alerts.Alerts[i].Description)
+		assert.Equal(t, uint64(i), data.Alerts.Alerts[i].Source.Block.Number)
 	}
 }
 
