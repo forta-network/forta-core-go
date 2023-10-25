@@ -150,9 +150,29 @@ func fetchAlerts(
 	}
 
 	// Parse response
-	err = json.NewDecoder(respBodyReader).Decode(resp)
+	respBody, err := io.ReadAll(respBodyReader)
 	if err != nil {
 		return nil, err
+	}
+	err = json.Unmarshal(respBody, resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var temp IntermediateStruct
+	err = json.Unmarshal(respBody, &temp)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range data.Alerts.Alerts {
+		tmpAlert := temp.Alerts.Alerts[i]
+		data.Alerts.Alerts[i].Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
+			AlertHash: tmpAlert.Source.Hash,
+			ChainId:   fmt.Sprintf("%d", tmpAlert.Source.ChainId),
+			Timestamp: tmpAlert.Source.Timestamp,
+			BotId:     tmpAlert.Source.BotId,
+		}
 	}
 
 	if len(resp.Errors) > 0 {

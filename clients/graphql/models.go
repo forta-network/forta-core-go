@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/protocol"
+	"google.golang.org/protobuf/runtime/protoimpl"
 )
 
 type GetAlertsResponse struct {
@@ -12,6 +13,26 @@ type GetAlertsResponse struct {
 		PageInfo *PageInfo                    `json:"pageInfo"`
 		Alerts   []*protocol.AlertEvent_Alert `json:"alerts"`
 	}
+}
+
+type IntermediateStruct struct {
+	Alerts struct {
+		PageInfo *PageInfo `json:"pageInfo"`
+		Alerts   []*struct {
+			Source SourceAlertEvent
+		} `json:"alerts"`
+	}
+}
+
+type SourceAlertEvent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BotId     string `json:"botId,omitempty"`
+	Hash      string `json:"hash,omitempty"`
+	Timestamp string `json:"timestamp,omitempty"`
+	ChainId   uint   `json:"chainId,omitempty"`
 }
 
 // AlertsInput Alert list input
