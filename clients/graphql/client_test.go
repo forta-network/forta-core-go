@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,11 +11,12 @@ func TestUnmarshal(t *testing.T) {
 	_, data, err := parseResponse([]byte(testResponse))
 	assert.NoError(t, err)
 	for i := 0; i < 5; i++ {
-		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.AlertHash, "0xaaa")
+		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.AlertHash, fmt.Sprintf("0x%d", i))
 		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.BotId, "0xbbb")
 		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.Timestamp, "2023-01-01T00:00:00Z")
 		assert.Equal(t, data.Alerts.Alerts[i].Source.SourceEvent.ChainId, "137")
 		assert.Equal(t, data.Alerts.Alerts[i].Description, "Block height: 17890044")
+		assert.Equal(t, data.Alerts.Alerts[i].Source.Block.Number, uint64(i))
 	}
 }
 
@@ -61,13 +63,13 @@ const testResponse = `{
               "version": null
             },
             "block": {
-              "number": 17890044,
+              "number": 0,
               "hash": "0x722436d03af0058ef990e0b6af684a7eb7b4988b4abe90dfb5bbee9b7c93a67b",
               "timestamp": "2023-08-11T07:06:35Z",
               "chainId": 1
             },
             "sourceAlert": {
-              "hash": "0xaaa",
+              "hash": "0x0",
               "botId": "0xbbb",
               "timestamp": "2023-01-01T00:00:00Z",
               "chainId": 137
@@ -122,13 +124,13 @@ const testResponse = `{
               "version": null
             },
             "block": {
-              "number": 17890043,
+              "number": 1,
               "hash": "0x4d78ebd97813fd5118c6629313ddc7e8c9204e064d1ce4a725f6e8e740b28ca5",
               "timestamp": "2023-08-11T07:06:23Z",
               "chainId": 1
             },
            "sourceAlert": {
-              "hash": "0xaaa",
+              "hash": "0x1",
               "botId": "0xbbb",
               "timestamp": "2023-01-01T00:00:00Z",
               "chainId": 137
@@ -172,13 +174,13 @@ const testResponse = `{
               "version": null
             },
             "block": {
-              "number": 17890042,
+              "number": 2,
               "hash": "0x8963c2c1acc0103f4b057cebea81dd332d0d98261ffa2bd808a15426b3e4c56e",
               "timestamp": "2023-08-11T07:06:11Z",
               "chainId": 1
             },
            "sourceAlert": {
-              "hash": "0xaaa",
+              "hash": "0x2",
               "botId": "0xbbb",
               "timestamp": "2023-01-01T00:00:00Z",
               "chainId": 137
@@ -222,13 +224,13 @@ const testResponse = `{
               "version": null
             },
             "block": {
-              "number": 17890041,
+              "number": 3,
               "hash": "0x957b15c7d26e7079b361b877343c8999a1c8cea472469eb95d3aa669bab61669",
               "timestamp": "2023-08-11T07:05:59Z",
               "chainId": 1
             },
            "sourceAlert": {
-              "hash": "0xaaa",
+              "hash": "0x3",
               "botId": "0xbbb",
               "timestamp": "2023-01-01T00:00:00Z",
               "chainId": 137
@@ -272,13 +274,13 @@ const testResponse = `{
               "version": null
             },
             "block": {
-              "number": 17890041,
+              "number": 4,
               "hash": "0x957b15c7d26e7079b361b877343c8999a1c8cea472469eb95d3aa669bab61669",
               "timestamp": "2023-08-11T07:05:59Z",
               "chainId": 1
             },
            "sourceAlert": {
-              "hash": "0xaaa",
+              "hash": "0x4",
               "botId": "0xbbb",
               "timestamp": "2023-01-01T00:00:00Z",
               "chainId": 137
