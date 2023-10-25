@@ -180,6 +180,9 @@ func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, 
 		return nil, nil, err
 	}
 
+	if len(data.Alerts.Alerts) != len(temp.Alerts.Alerts) {
+		return nil, nil, fmt.Errorf("incorrect unmarshal for intermediate graphql struct")
+	}
 	for i := range data.Alerts.Alerts {
 		tmpAlert := temp.Alerts.Alerts[i].Source.SourceAlert
 		data.Alerts.Alerts[i].Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
