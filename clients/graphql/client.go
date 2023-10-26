@@ -93,9 +93,6 @@ func fetchAlerts(
 	}
 	var err error
 
-	var data GetAlertsResponse
-	resp := &graphql.Response{Data: &data}
-
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -150,7 +147,12 @@ func fetchAlerts(
 	}
 
 	// Parse response
-	err = json.NewDecoder(respBodyReader).Decode(resp)
+	respBody, err := io.ReadAll(respBodyReader)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, data, err := parseResponse(respBody)
 	if err != nil {
 		return nil, err
 	}
@@ -159,5 +161,17 @@ func fetchAlerts(
 		return nil, resp.Errors
 	}
 
-	return &data, err
+	return data, err
+}
+
+func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, error) {
+	var data GetAlertsResponse
+	resp := &graphql.Response{Data: &data}
+
+	err := json.Unmarshal(responseBody, resp)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return resp, &data, err
 }
