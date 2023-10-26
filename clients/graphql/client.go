@@ -86,7 +86,6 @@ func fetchAlerts(
 	input *AlertsInput,
 	headers map[string]string,
 ) (*GetAlertsResponse, error) {
-	client = "http://localhost:8080/graphql"
 	req := &graphql.Request{
 		OpName:    "getAlerts",
 		Query:     getAlertsOperation,
