@@ -13,10 +13,10 @@ func TestUnmarshal(t *testing.T) {
 	assert.NotNilf(t, resp, "graphql response can not be nil")
 	assert.NotNilf(t, data, "data can not be nil")
 	for i := 0; i < 5; i++ {
-		assert.Equal(t, fmt.Sprintf("0x%d", i), data.Alerts.Alerts[i].Source.SourceEvent.AlertHash)
-		assert.Equal(t, "0xbbb", data.Alerts.Alerts[i].Source.SourceEvent.BotId)
-		assert.Equal(t, "2023-01-01T00:00:00Z", data.Alerts.Alerts[i].Source.SourceEvent.Timestamp)
-		assert.Equal(t, "137", data.Alerts.Alerts[i].Source.SourceEvent.ChainId)
+		assert.Equal(t, fmt.Sprintf("0x%d", i), data.Alerts.Alerts[i].Source.SourceAlert.Hash)
+		assert.Equal(t, "0xbbb", data.Alerts.Alerts[i].Source.SourceAlert.BotId)
+		assert.Equal(t, "2023-01-01T00:00:00Z", data.Alerts.Alerts[i].Source.SourceAlert.Timestamp)
+		assert.Equal(t, uint64(137), data.Alerts.Alerts[i].Source.SourceAlert.ChainId)
 		assert.Equal(t, "Block height: 17890044", data.Alerts.Alerts[i].Description)
 		assert.Equal(t, uint64(i), data.Alerts.Alerts[i].Source.Block.Number)
 	}

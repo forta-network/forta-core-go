@@ -86,6 +86,7 @@ func fetchAlerts(
 	input *AlertsInput,
 	headers map[string]string,
 ) (*GetAlertsResponse, error) {
+	client = "http://localhost:8080/graphql"
 	req := &graphql.Request{
 		OpName:    "getAlerts",
 		Query:     getAlertsOperation,
@@ -171,26 +172,6 @@ func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, 
 	err := json.Unmarshal(responseBody, resp)
 	if err != nil {
 		return nil, nil, err
-	}
-
-	var temp IntermediateResponse
-	intermediateResp := &graphql.Response{Data: &temp}
-	err = json.Unmarshal(responseBody, intermediateResp)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if len(data.Alerts.Alerts) != len(temp.Alerts.Alerts) {
-		return nil, nil, fmt.Errorf("incorrect unmarshal for intermediate graphql struct")
-	}
-	for i := range data.Alerts.Alerts {
-		tmpAlert := temp.Alerts.Alerts[i].Source.SourceAlert
-		data.Alerts.Alerts[i].Source.SourceEvent = &protocol.AlertEvent_Alert_SourceAlertEvent{
-			AlertHash: tmpAlert.Hash,
-			ChainId:   fmt.Sprintf("%d", tmpAlert.ChainId),
-			Timestamp: tmpAlert.Timestamp,
-			BotId:     tmpAlert.BotId,
-		}
 	}
 
 	return resp, &data, err

@@ -14,25 +14,6 @@ type GetAlertsResponse struct {
 	}
 }
 
-type IntermediateResponse struct {
-	Alerts struct {
-		PageInfo *PageInfo            `json:"pageInfo"`
-		Alerts   []*IntermediateAlert `json:"alerts"`
-	}
-}
-type IntermediateAlert struct {
-	Source *IntermediateSource `json:"source"`
-}
-type IntermediateSource struct {
-	SourceAlert *IntermediateSourceAlertEvent `json:"sourceAlert"`
-}
-
-type IntermediateSourceAlertEvent struct {
-	BotId     string `json:"botId,omitempty"`
-	Hash      string `json:"hash,omitempty"`
-	Timestamp string `json:"timestamp,omitempty"`
-	ChainId   uint   `json:"chainId,omitempty"`
-}
 
 // AlertsInput Alert list input
 type AlertsInput struct {
