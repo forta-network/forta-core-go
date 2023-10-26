@@ -14,7 +14,6 @@ type GetAlertsResponse struct {
 	}
 }
 
-
 // AlertsInput Alert list input
 type AlertsInput struct {
 	// Indicate a list of addresses.
@@ -211,6 +210,7 @@ query getAlerts ($input: AlertsInput) {
 				entityType
 				remove
 				metadata
+				uniqueKey
 			}
 			addressBloomFilter {
 				bitset
