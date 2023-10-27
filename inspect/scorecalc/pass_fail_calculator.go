@@ -70,6 +70,10 @@ func (c *chainPassFailCalculator) CalculateScore(results *inspect.InspectionResu
 		return 0, nil
 	}
 
+	if results.Indicators[inspect.IndicatorProxyAPIMethodEthCall] == inspect.ResultFailure {
+		return 0, nil
+	}
+
 	// TODO: Enable this after delegated staking.
 	// if results.Indicators[inspect.IndicatorRegistryAPIAccessible] == inspect.ResultFailure ||
 	// 	results.Indicators[inspect.IndicatorRegistryAPIENS] == inspect.ResultFailure ||
