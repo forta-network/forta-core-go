@@ -12,10 +12,7 @@ type ChainSettings struct {
 	EnableTrace         bool
 	JsonRpcRateLimiting *RateLimit
 	InspectionInterval  int // in block number
-
-	DefaultOffset  int
-	SafeOffset     int
-	BlockThreshold int
+	BlockThreshold      int
 }
 
 // RateLimit is token bucket algorithm parameters.
@@ -35,10 +32,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         true,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  50,
-
-		DefaultOffset:  0,
-		SafeOffset:     1,
-		BlockThreshold: 8,
+		BlockThreshold:      8,
 	},
 	{
 		ChainID:             10,
@@ -46,10 +40,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  100,
-
-		DefaultOffset:  0,
-		SafeOffset:     5,
-		BlockThreshold: 8,
+		BlockThreshold:      8,
 	},
 	{
 		ChainID:             56,
@@ -57,10 +48,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  250,
-
-		DefaultOffset:  0,
-		SafeOffset:     3,
-		BlockThreshold: 20,
+		BlockThreshold:      20,
 	},
 	{
 		ChainID:             137,
@@ -68,10 +56,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  70,
-
-		DefaultOffset:  0,
-		SafeOffset:     4,
-		BlockThreshold: 30,
+		BlockThreshold:      30,
 	},
 	{
 		ChainID:             250,
@@ -79,10 +64,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         true,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  750,
-
-		DefaultOffset:  0,
-		SafeOffset:     3,
-		BlockThreshold: 35,
+		BlockThreshold:      35,
 	},
 	{
 		ChainID:             42161,
@@ -90,10 +72,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  1500,
-
-		DefaultOffset:  0,
-		SafeOffset:     20,
-		BlockThreshold: 80,
+		BlockThreshold:      80,
 	},
 	{
 		ChainID:             43114,
@@ -101,27 +80,8 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  350,
-
-		DefaultOffset:  0,
-		SafeOffset:     4,
-		BlockThreshold: 30,
+		BlockThreshold:      30,
 	},
-}
-
-// ValidateChainSettings validates chain settings.
-func ValidateChainSettings(chainID int) bool {
-	settings := GetChainSettings(chainID)
-	if settings.SafeOffset < 1 {
-		return false
-	}
-	if settings.BlockThreshold <= 0 {
-		return false
-	}
-	safeOffsetRate := float64(settings.SafeOffset) / float64(settings.BlockThreshold)
-	if safeOffsetRate < 0.05 || safeOffsetRate > 0.1 {
-		return false
-	}
-	return true
 }
 
 // GetChainSettings returns the settings for the chain.
@@ -136,14 +96,6 @@ func GetChainSettings(chainID int) *ChainSettings {
 		ChainID:             chainID,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  50, // arbitrary value - not reliable
-
-		DefaultOffset:  0,
-		SafeOffset:     2,
-		BlockThreshold: 10,
+		BlockThreshold:      10,
 	}
-}
-
-// GetDefaultBlockOffset returns the block offset for a chain.
-func GetBlockOffset(chainID int) int {
-	return GetChainSettings(chainID).DefaultOffset
 }
