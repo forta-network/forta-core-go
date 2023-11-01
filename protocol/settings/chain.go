@@ -38,7 +38,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     1,
-		BlockThreshold: 10,
+		BlockThreshold: 8,
 	},
 	{
 		ChainID:             10,
@@ -49,7 +49,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     5,
-		BlockThreshold: 60,
+		BlockThreshold: 8,
 	},
 	{
 		ChainID:             56,
@@ -60,7 +60,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     3,
-		BlockThreshold: 40,
+		BlockThreshold: 20,
 	},
 	{
 		ChainID:             137,
@@ -71,7 +71,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     4,
-		BlockThreshold: 60,
+		BlockThreshold: 30,
 	},
 	{
 		ChainID:             250,
@@ -82,7 +82,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     3,
-		BlockThreshold: 48,
+		BlockThreshold: 35,
 	},
 	{
 		ChainID:             42161,
@@ -93,7 +93,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     20,
-		BlockThreshold: 400,
+		BlockThreshold: 80,
 	},
 	{
 		ChainID:             43114,
@@ -104,7 +104,7 @@ var allChainSettings = []ChainSettings{
 
 		DefaultOffset:  0,
 		SafeOffset:     4,
-		BlockThreshold: 40,
+		BlockThreshold: 30,
 	},
 }
 
