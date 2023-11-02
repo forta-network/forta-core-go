@@ -172,20 +172,29 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		lowerBound := DefaultLookbackPeriod
 		upperBound := int64(0)
 
-		// Query all subscriptions and process alerts
-		for _, subscription := range cf.Subscriptions() {
-			logger = logger.WithFields(
-				log.Fields{
-					"subscriberBotId": subscription.Subscriber.BotID,
-					"subscribedBotId": subscription.Subscription.BotId,
-				},
-			)
+		subscriptions := cf.Subscriptions()
+		var wg sync.WaitGroup
+		wg.Add(len(subscriptions))
 
-			err := cf.fetchAlertsAndHandle(cf.ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
-			if err != nil {
-				logger.WithError(err).Warn("failed to fetch alerts and handle")
-			}
+		// Query all subscriptions and process alerts
+		for i := range subscriptions {
+			subscription := subscriptions[i]
+			go func() {
+				defer wg.Done()
+				logger := logger.WithFields(
+					log.Fields{
+						"subscriberBotId": subscription.Subscriber.BotID,
+						"subscribedBotId": subscription.Subscription.BotId,
+					},
+				)
+				err := cf.fetchAlertsAndHandle(cf.ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
+				if err != nil {
+					logger.WithError(err).Warn("failed to process combiner subscription")
+				}
+			}()
 		}
+
+		wg.Wait()
 
 		// Save alert cache to persistent file, if configured
 		if cf.cfg.CombinerCachePath != "" {
