@@ -122,5 +122,5 @@ message InspectionInputs {
 }
 
 message Estimation {
-  double jsonRpcPerformance = 1;
+  double blockScore = 1;
 }
