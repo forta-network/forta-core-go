@@ -60,7 +60,7 @@ message AlertBatch {
   InspectionResults inspectionResults = 13;
   repeated CombinationAlertResults combinationAlerts = 14;
   Provider provider = 15;
-  double jsonRpcEstimation = 16;
+  Estimation estimation = 16;
 }
 
 message BlockResults {
@@ -119,4 +119,8 @@ message InspectionInputs {
   string registryApiHost = 6;
   string ensContractAddress = 7;
   string scannerAddress = 8;
+}
+
+message Estimation {
+  double jsonRpcPerformance = 1;
 }
