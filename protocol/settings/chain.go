@@ -40,7 +40,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  100,
-		BlockThreshold:      8,
+		BlockThreshold:      10,
 	},
 	{
 		ChainID:             56,
@@ -64,7 +64,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         true,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  750,
-		BlockThreshold:      35,
+		BlockThreshold:      37,
 	},
 	{
 		ChainID:             42161,
@@ -80,7 +80,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:         false,
 		JsonRpcRateLimiting: defaultRateLimiting,
 		InspectionInterval:  350,
-		BlockThreshold:      30,
+		BlockThreshold:      32,
 	},
 }
 
