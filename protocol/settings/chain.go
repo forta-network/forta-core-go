@@ -33,7 +33,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 true,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          50,
-		BlockThreshold:              8,
+		BlockThreshold:              4,
 		JSONRPCRetryIntervalSeconds: 8,
 	},
 	{
@@ -51,7 +51,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          250,
-		BlockThreshold:              20,
+		BlockThreshold:              10,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -60,7 +60,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          70,
-		BlockThreshold:              30,
+		BlockThreshold:              10,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -69,7 +69,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 true,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          750,
-		BlockThreshold:              37,
+		BlockThreshold:              10,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -78,7 +78,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          1500,
-		BlockThreshold:              80,
+		BlockThreshold:              20,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -87,7 +87,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          350,
-		BlockThreshold:              32,
+		BlockThreshold:              10,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 }
