@@ -33,7 +33,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 true,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          50,
-		BlockThreshold:              4,
+		BlockThreshold:              20,
 		JSONRPCRetryIntervalSeconds: 8,
 	},
 	{
@@ -42,7 +42,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          100,
-		BlockThreshold:              10,
+		BlockThreshold:              100,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -51,7 +51,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          250,
-		BlockThreshold:              10,
+		BlockThreshold:              50,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -60,7 +60,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          70,
-		BlockThreshold:              10,
+		BlockThreshold:              70,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -69,7 +69,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 true,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          750,
-		BlockThreshold:              10,
+		BlockThreshold:              100,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -78,7 +78,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          1500,
-		BlockThreshold:              20,
+		BlockThreshold:              1200,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
@@ -87,7 +87,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          350,
-		BlockThreshold:              10,
+		BlockThreshold:              70,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 }
