@@ -33,7 +33,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 true,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          50,
-		BlockThreshold:              4,
+		BlockThreshold:              5,
 		JSONRPCRetryIntervalSeconds: 8,
 	},
 	{
@@ -78,7 +78,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          1500,
-		BlockThreshold:              20,
+		BlockThreshold:              40,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
