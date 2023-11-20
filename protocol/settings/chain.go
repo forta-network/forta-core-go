@@ -78,7 +78,7 @@ var allChainSettings = []ChainSettings{
 		EnableTrace:                 false,
 		JsonRpcRateLimiting:         defaultRateLimiting,
 		InspectionInterval:          1500,
-		BlockThreshold:              20,
+		BlockThreshold:              40,
 		JSONRPCRetryIntervalSeconds: 4,
 	},
 	{
