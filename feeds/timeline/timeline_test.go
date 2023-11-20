@@ -64,6 +64,7 @@ func TestTimeline_CalculateLag(t *testing.T) {
 	r := require.New(t)
 
 	blockTimeline := NewBlockTimeline(1, 1000000)
+	blockTimeline.threshold = 10
 
 	start := time.Now().UTC().Truncate(time.Minute)
 
@@ -169,7 +170,7 @@ func TestTimeline_CalculateLag(t *testing.T) {
 	r.Equal(float64(1+5+9+13+15+2)/float64(6), lag)
 	estimate, ok := blockTimeline.EstimateBlockScore()
 	r.True(ok)
-	r.Equal(0.0625, estimate)
+	r.Equal(0.25, estimate)
 
 	testDelay := time.Second
 	blockTimeline.delay = &testDelay
