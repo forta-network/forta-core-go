@@ -8,7 +8,7 @@ import (
 
 // Release defaults
 const (
-	DefaultDeprecationHours = 168 // 1 week
+	DefaultDeprecationHours = 48 // 2 days
 	DefaultAutoUpdateHours  = 24
 )
 
