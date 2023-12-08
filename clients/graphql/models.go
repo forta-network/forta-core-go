@@ -211,6 +211,7 @@ query getAlerts ($input: AlertsInput) {
 				remove
 				metadata
 				uniqueKey
+				embedding
 			}
 			addressBloomFilter {
 				bitset
