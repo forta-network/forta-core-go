@@ -20,6 +20,7 @@ type AgentManifest struct {
 	ChainIDs        []int64                       `json:"chainIds"`
 	ChainSettings   map[string]AgentChainSettings `json:"chainSettings"`
 	External        bool                          `json:"external"`
+	ProtocolVersion int                           `json:"protocolVersion"`
 }
 
 // AgentChainSettings is the per-chain configuration of a bot.
