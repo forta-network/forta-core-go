@@ -170,7 +170,7 @@ func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, 
 
 	err := json.Unmarshal(responseBody, resp)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("failed to unmarshal: %v, body: %s", err, string(responseBody))
 	}
 
 	return resp, &data, err
