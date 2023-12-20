@@ -143,27 +143,25 @@ func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scanne
 		scannersEnd := scannersStart + scannerCount
 		agentScannersCalls := scannerCalls[scannersStart:scannersEnd]
 
-		var (
-			assignedScanners int
-			scannerIndex     int
-		)
+		var scannerIndices ScannerIndices
 		for _, agentScannersCall := range agentScannersCalls {
 			scanner := agentScannersCall.Outputs.(*scannerRefAtOutput)
-			// assignedScanners can be treated as the index before it is incremented
+			// counts can be treated as indices before they are incremented
 			if scanner.ScannerId.Cmp(scannerID) == 0 {
-				scannerIndex = assignedScanners
+				scannerIndices.SameChainScannerIndex = scannerIndices.SameChainAssignedScanners
+				scannerIndices.AllChainsScannerIndex = scannerIndices.AllChainsAssignedScanners
 			}
-			// count scanners that are only assigned for the given chain
+			// count scanners that are assigned for the given chain and total
 			if scanner.ChainId.Cmp(assignedChainID) == 0 {
-				assignedScanners++
+				scannerIndices.SameChainAssignedScanners++
 			}
+			scannerIndices.AllChainsAssignedScanners++
 		}
 		assignments = append(assignments, &Assignment{
-			AgentID:          utils.AgentBigIntToHex(agent.AgentId),
-			AgentManifest:    agent.Metadata,
-			AgentOwner:       agent.Owner.Hex(),
-			AssignedScanners: assignedScanners,
-			ScannerIndex:     scannerIndex,
+			AgentID:        utils.AgentBigIntToHex(agent.AgentId),
+			AgentManifest:  agent.Metadata,
+			AgentOwner:     agent.Owner.Hex(),
+			ScannerIndices: scannerIndices,
 		})
 
 		scannersChecked += int(scannerCount) // move to start of the next portion

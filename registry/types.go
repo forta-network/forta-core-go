@@ -39,11 +39,17 @@ type AssignmentHash struct {
 }
 
 type Assignment struct {
-	AgentID          string
-	AgentManifest    string
-	AssignedScanners int
-	ScannerIndex     int
-	AgentOwner       string
+	AgentID       string
+	AgentManifest string
+	AgentOwner    string
+	ScannerIndices
+}
+
+type ScannerIndices struct {
+	SameChainAssignedScanners int
+	SameChainScannerIndex     int
+	AllChainsAssignedScanners int
+	AllChainsScannerIndex     int
 }
 
 type StakingThreshold contract_scanner_registry.GetStakeThresholdOutput
