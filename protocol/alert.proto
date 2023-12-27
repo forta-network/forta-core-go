@@ -172,9 +172,13 @@ message APIAlert {
   message APIAlertAgent {
     string id = 1;
   }
+  message Source {
+    string scanner = 1;
+  }
   string id = 1;
   AlertType type = 2;
   Finding finding = 3;
   APIAlertAgent agent = 4;
   string timestamp = 5;
+  Source source = 6;
 }
