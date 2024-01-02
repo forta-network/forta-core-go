@@ -20,6 +20,7 @@ type PaymentSubscription struct {
 	Type            string `json:"type"`
 	ContractAddress string `json:"contractAddress"`
 	Active          bool   `json:"active"`
+	ExpiresAt       int64  `json:"expiresAt"`
 }
 
 func (m *UpdatePaymentSubscriptionMessage) LogFields() logrus.Fields {
