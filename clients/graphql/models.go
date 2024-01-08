@@ -123,10 +123,6 @@ type EndCursor struct {
 	BlockNumber uint   `json:"blockNumber"`
 }
 
-type __getAlertsInput struct {
-	Input *AlertsInput `json:"input,omitempty"`
-}
-
 func (g *GetAlertResponseItem) ToAlertEvents() []*protocol.AlertEvent {
 	resp := make([]*protocol.AlertEvent, len(g.Alerts))
 	for i, alert := range g.Alerts {
@@ -146,8 +142,10 @@ func (g *GetAlertResponseItem) ToAlertEvents() []*protocol.AlertEvent {
 	return resp
 }
 
-const defaultInputAlias = "input0"
+// defaultInputAlias is a shorthand for non-batched queries
+var defaultInputAlias = idxToInputAlias(0)
 
+// createGetAlertsQuery creates aliased graphql queries, using alerts${index} and input${index} as aliases.
 func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}) {
 	variables := make(map[string]interface{})
 	var queryBuilder strings.Builder
@@ -155,7 +153,7 @@ func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}
 	// Define the operation with necessary variables
 	queryBuilder.WriteString("query getAlerts(")
 	for i := range inputs {
-		input := fmt.Sprintf("$input%d: AlertsInput", i)
+		input := fmt.Sprintf("$%s: AlertsInput", idxToInputAlias(i))
 		queryBuilder.WriteString(input)
 		if i < len(inputs)-1 {
 			queryBuilder.WriteString(",")
@@ -165,7 +163,7 @@ func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}
 
 	for i, input := range inputs {
 		// Ensure that the alias and query structure match the schema
-		alias := fmt.Sprintf("alerts%d: alerts(input: $input%d) {", i, i)
+		alias := fmt.Sprintf("%s: alerts(input: $%s) {", idxToResponseAlias(i), idxToInputAlias(i))
 		queryBuilder.WriteString(alias)
 
 		// Include subfields for alerts based on the schema (example subfields)
@@ -173,7 +171,7 @@ func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}
 		queryBuilder.WriteString("}")
 
 		// Add the input to the variables map
-		variables[fmt.Sprintf("input%d", i)] = input
+		variables[fmt.Sprintf("%s", idxToInputAlias(i))] = input
 	}
 
 	// End of the query

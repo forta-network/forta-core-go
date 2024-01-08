@@ -16,6 +16,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// paginateBatch processes the response received from the server and extracts the relevant data.
+// It takes an array of AlertsInput objects and a graphql.Response object as input.
+// It then iterates over the inputs and extracts the response item based on the alias.
+// If there is an error for the input, it logs a warning and continues to the next input.
+// If there are more alerts for the input, it adds the input to the list of pagination inputs.
+// The function returns the pagination inputs, the extracted alert events, and any encountered error.
 func paginateBatch(inputs []*AlertsInput, response *graphql.Response) ([]*AlertsInput,
 	[]*protocol.AlertEvent, error) {
 	// type-checking response
@@ -75,6 +81,7 @@ func paginateBatch(inputs []*AlertsInput, response *graphql.Response) ([]*Alerts
 	return pagination, alerts, nil
 }
 
+// fetchAlertsBatch retrieves the alerts in batches from the server using the provided client, inputs, and headers.
 func fetchAlertsBatch(ctx context.Context, client string, inputs []*AlertsInput, headers map[string]string) (*graphql.Response, error) {
 	query, variables := createGetAlertsQuery(inputs)
 	req := &graphql.Request{
@@ -96,6 +103,13 @@ func fetchAlertsBatch(ctx context.Context, client string, inputs []*AlertsInput,
 	return resp, nil
 }
 
+// makeRequest sends a GraphQL request to the specified client and returns the response body.
+// It takes the context, client URL, request, and headers as input parameters.
+// It marshals the request into JSON and creates an HTTP request.
+// It sets the custom headers and executes the query with the default HTTP client.
+// If the response status code is not OK, it returns an error with the status and response body.
+// If the response is gzip compressed, it decompresses the body before parsing.
+// It reads the response body and returns it along with any encountered error.
 func makeRequest(ctx context.Context, client string, req *graphql.Request, headers map[string]string) ([]byte, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
