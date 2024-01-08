@@ -22,6 +22,10 @@ var (
 	ErrBadRequest            = fmt.Errorf("bad public api request")
 )
 
+const (
+	DefaultBatchSize = 10
+)
+
 type cfHandler struct {
 	Handler func(evt *domain.AlertEvent) error
 	ErrCh   chan<- error
@@ -417,6 +421,7 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 	if cfg.QueryInterval > 0 && cfg.QueryInterval < uint64(DefaultRatelimitDuration.Milliseconds()) {
 		rateLimit = time.NewTicker(time.Millisecond * time.Duration(cfg.QueryInterval))
 	}
+
 	bf := &combinerFeed{
 		maxAlertAge:      time.Minute * 20,
 		ctx:              ctx,
@@ -426,7 +431,7 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		botSubscriptions: []*domain.CombinerBotSubscription{},
 		cfg:              cfg,
 		combinerCache:    c,
-		batchSize:        50,
+		batchSize:        DefaultBatchSize,
 	}
 
 	return bf, nil
