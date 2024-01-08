@@ -146,9 +146,6 @@ func (g *GetAlertResponseItem) ToAlertEvents() []*protocol.AlertEvent {
 	return resp
 }
 
-// defaultInputAlias is a shorthand for non-batched queries
-var defaultInputAlias = idxToInputAlias(0)
-
 // createGetAlertsQuery creates aliased graphql queries, using alerts${index} and input${index} as aliases.
 func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}) {
 	variables := make(map[string]interface{})
@@ -175,7 +172,7 @@ func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}
 		queryBuilder.WriteString("}")
 
 		// Add the input to the variables map
-		variables[fmt.Sprintf("%s", idxToInputAlias(i))] = input
+		variables[idxToInputAlias(i)] = input
 	}
 
 	// End of the query

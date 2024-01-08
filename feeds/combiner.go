@@ -199,7 +199,7 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 
 	// handle subscriptions in batches
 	for subscriber, botSubscriptions := range subscriberBatchMap {
-		logger = log.WithFields(
+		logger = logger.WithFields(
 			log.Fields{
 				"subscriberBotId":    subscriber.BotID,
 				"subscriberBotOwner": subscriber.BotOwner,
