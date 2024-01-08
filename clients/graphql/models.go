@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/forta-network/forta-core-go/protocol"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 type GetAlertsResponse struct {
@@ -179,6 +180,24 @@ func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}
 	queryBuilder.WriteString("}")
 
 	return queryBuilder.String(), variables
+}
+
+func idxToInputAlias(idx int) string {
+	return fmt.Sprintf("input%d", idx)
+}
+
+func idxToResponseAlias(idx int) string {
+	return fmt.Sprintf("alerts%d", idx)
+}
+
+func HasError(errors gqlerror.List, idx int) error {
+	for _, e := range errors {
+		if e.Path.String() == idxToResponseAlias(idx) {
+			return fmt.Errorf(e.Error())
+		}
+	}
+
+	return nil
 }
 
 // getAlertsFields
