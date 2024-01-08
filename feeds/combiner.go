@@ -186,21 +186,23 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 }
 
 func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscriptions []*domain.CombinerBotSubscription, lowerBound time.Duration, upperBound int64, logger *log.Entry) {
-	// create a lookup map to batch per subscriber
-	lookupMap := make(map[domain.Subscriber][]*protocol.CombinerBotSubscription)
+	// create a lookup map to batch per subscriber (ie. bot)
+	subscriberBatchMap := make(map[domain.Subscriber][]*protocol.CombinerBotSubscription)
 	for _, subscription := range subscriptions {
-		lookupMap[*subscription.Subscriber] = append(lookupMap[*subscription.Subscriber], subscription.Subscription)
+		subscriber := *subscription.Subscriber
+		subscriberBatchMap[subscriber] = append(subscriberBatchMap[subscriber], subscription.Subscription)
 	}
 
 	// handle subscriptions in batches
-	for subscriber, botSubscriptions := range lookupMap {
-		logger := log.WithFields(
+	for subscriber, botSubscriptions := range subscriberBatchMap {
+		logger = log.WithFields(
 			log.Fields{
 				"subscriberBotId":    subscriber.BotID,
 				"subscriberBotOwner": subscriber.BotOwner,
 				"subscriberBotImage": subscriber.BotImage,
 			})
 
+		// iterate over batches and handle
 		for i := 0; i < len(botSubscriptions); i += cf.batchSize {
 			// Determine the end of the current batch
 			end := i + cf.batchSize

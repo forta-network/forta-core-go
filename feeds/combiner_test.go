@@ -27,7 +27,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	successfulMockClient := mock_graphql.NewMockClient(ctrl)
-	successfulMockClient.EXPECT().GetAlerts(gomock.Any(), gomock.Any(), gomock.Any()).Return(
+	successfulMockClient.EXPECT().GetAlertsBatch(gomock.Any(), gomock.Any(), gomock.Any()).Return(
 		[]*protocol.AlertEvent{
 			{
 				Alert: &protocol.AlertEvent_Alert{
