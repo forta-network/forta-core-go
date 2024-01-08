@@ -1,9 +1,14 @@
 package graphql
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
@@ -51,32 +56,113 @@ func (ac *client) GetAlerts(
 
 	// iterate until there are no more alerts to retrieve
 	for {
-		responses, err := fetchAlertsBatch(ctx, ac.url, []*AlertsInput{input}, headers)
+		response, err := fetchAlerts(ctx, ac.url, input, headers)
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch alerts: %v", err)
 		}
 
-		resp := *responses.Data.(*BatchGetAlertsResponse)
-
-		response := resp[defaultInputAlias]
-		alerts = append(alerts, response.ToAlertEvents()...)
+		alerts = append(alerts, response.Alerts.ToAlertEvents()...)
 
 		// check if there are more alerts
-		if !response.PageInfo.HasNextPage {
+		if !response.Alerts.PageInfo.HasNextPage {
 			break
 		}
 
 		// check if response is ok
-		if response.PageInfo.EndCursor == nil {
+		if response.Alerts.PageInfo.EndCursor == nil {
 			break
 		}
 		input.After = &AlertEndCursorInput{
-			AlertId:     response.PageInfo.EndCursor.AlertId,
-			BlockNumber: response.PageInfo.EndCursor.BlockNumber,
+			AlertId:     response.Alerts.PageInfo.EndCursor.AlertId,
+			BlockNumber: response.Alerts.PageInfo.EndCursor.BlockNumber,
 		}
 	}
 
 	return alerts, nil
+}
+
+func fetchAlerts(
+	ctx context.Context,
+	client string,
+	input *AlertsInput,
+	headers map[string]string,
+) (*GetAlertsResponse, error) {
+	req := &graphql.Request{
+		OpName:    "getAlerts",
+		Query:     getAlertsOperation,
+		Variables: __getAlertsInput{Input: input},
+	}
+	var err error
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	httpReq, err := http.NewRequest(
+		http.MethodPost,
+		client,
+		bytes.NewReader(body),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	httpReq = httpReq.WithContext(ctx)
+
+	// set custom headers
+	for key, val := range headers {
+		httpReq.Header.Set(key, val)
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Accept-Encoding", "gzip")
+
+	queryTime := time.Now().Truncate(time.Minute).UnixMilli()
+	httpReq.Header.Set("Forta-Query-Timestamp", fmt.Sprintf("%d", queryTime))
+
+	// execute query
+	httpResp, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		var respBody []byte
+		respBody, err = io.ReadAll(httpResp.Body)
+		if err != nil {
+			respBody = []byte(fmt.Sprintf("<unreadable: %v>", err))
+		}
+		return nil, fmt.Errorf("returned error %v: %s", httpResp.Status, respBody)
+	}
+
+	// Check if the response is compressed with gzip
+	var respBodyReader = httpResp.Body
+	if strings.Contains(httpResp.Header.Get("Content-Encoding"), "gzip") {
+		respBodyReader, err = gzip.NewReader(httpResp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer respBodyReader.Close()
+	}
+
+	// Parse response
+	respBody, err := io.ReadAll(respBodyReader)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, data, err := parseResponse(respBody)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Errors) > 0 {
+		return nil, resp.Errors
+	}
+
+	return data, err
 }
 
 func parseResponse(responseBody []byte) (*graphql.Response, *GetAlertsResponse, error) {

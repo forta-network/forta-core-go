@@ -123,6 +123,10 @@ type EndCursor struct {
 	BlockNumber uint   `json:"blockNumber"`
 }
 
+type __getAlertsInput struct {
+	Input *AlertsInput `json:"input,omitempty"`
+}
+
 func (g *GetAlertResponseItem) ToAlertEvents() []*protocol.AlertEvent {
 	resp := make([]*protocol.AlertEvent, len(g.Alerts))
 	for i, alert := range g.Alerts {
@@ -197,6 +201,91 @@ func HasError(errors gqlerror.List, idx int) error {
 
 	return nil
 }
+
+// The query or mutation executed by getAlerts.
+const getAlertsOperation = `
+query getAlerts ($input: AlertsInput) {
+	alerts(input: $input) {
+		pageInfo {
+			hasNextPage
+			endCursor {
+				alertId
+				blockNumber
+			}
+		}
+		alerts {
+			alertId
+			addresses
+			contracts {
+				name
+				projectId
+			}
+			createdAt
+			description
+			hash
+			metadata
+			name
+			projects {
+				id
+			}
+			protocol
+			scanNodeCount
+			severity
+			source {
+				transactionHash
+				bot {
+					chainIds
+					createdAt
+					description
+					developer
+					docReference
+					enabled
+					id
+					image
+					name
+					reference
+					repository
+					projects
+					scanNodes
+					version
+				}
+				block {
+					number
+					hash
+					timestamp
+					chainId
+				}
+				sourceAlert {
+					hash
+					botId
+					timestamp
+					chainId
+				}
+			}
+			alertDocumentType
+			findingType
+			relatedAlerts
+			chainId
+			labels {
+				label
+				confidence
+				entity
+				entityType
+				remove
+				metadata
+				uniqueKey
+				embedding
+			}
+			addressBloomFilter {
+				bitset
+				itemCount
+				k
+				m
+			}
+		}
+	}
+}
+`
 
 // getAlertsFields
 const getAlertsFields = `
