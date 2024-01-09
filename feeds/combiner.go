@@ -207,6 +207,7 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 				"subscriberBotImage": subscriber.BotImage,
 			})
 
+		var alertBatchResponse []*protocol.AlertEvent
 		// iterate over batches and handle
 		for i := 0; i < len(botSubscriptions); {
 			currentBatchSize := cf.batchSize
@@ -234,11 +235,12 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 					}
 				}
 
-				cf.processAlerts(cf.ctx, logger, &subscriber, alerts, alertHandlers)
+				alertBatchResponse = append(alertBatchResponse, alerts...)
 				i += currentBatchSize
 				break
 			}
 		}
+		cf.processAlerts(cf.ctx, logger, &subscriber, alertBatchResponse, alertHandlers)
 	}
 }
 
