@@ -56,7 +56,7 @@ func TestGetAlertsBatch(t *testing.T) {
 				// Here's a simple example of what your setup function might do:
 				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
 
-					fmt.Fprintf(w, testResponse)
+					fmt.Fprint(w, testResponse)
 				})
 			},
 			wantAlerts: expectedAlerts,
