@@ -1,32 +1,141 @@
 package graphql
 
 import (
+	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+	"time"
 
+	"github.com/forta-network/forta-core-go/protocol"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUnmarshal(t *testing.T) {
-	resp, data, err := parseResponse([]byte(testResponse))
-	assert.NoError(t, err)
+	resp := parseBatchResponse([]byte(testResponse))
+	data := (*resp.Data.(*BatchGetAlertsResponse))["alerts0"]
+
 	assert.NotNilf(t, resp, "graphql response can not be nil")
-	assert.NotNilf(t, data, "data can not be nil")
 	for i := 0; i < 5; i++ {
-		assert.Equal(t, fmt.Sprintf("0x%d", i), data.Alerts.Alerts[i].Source.SourceAlert.Hash)
-		assert.Equal(t, "0xbbb", data.Alerts.Alerts[i].Source.SourceAlert.BotId)
-		assert.Equal(t, "2023-01-01T00:00:00Z", data.Alerts.Alerts[i].Source.SourceAlert.Timestamp)
-		assert.Equal(t, uint64(137), data.Alerts.Alerts[i].Source.SourceAlert.ChainId)
-		assert.Equal(t, "Block height: 17890044", data.Alerts.Alerts[i].Description)
-		assert.Equal(t, uint64(i), data.Alerts.Alerts[i].Source.Block.Number)
+		assert.Equal(t, fmt.Sprintf("0x%d", i), data.Alerts[i].Source.SourceAlert.Hash)
+		assert.Equal(t, "0xbbb", data.Alerts[i].Source.SourceAlert.BotId)
+		assert.Equal(t, "2023-01-01T00:00:00Z", data.Alerts[i].Source.SourceAlert.Timestamp)
+		assert.Equal(t, uint64(137), data.Alerts[i].Source.SourceAlert.ChainId)
+		assert.Equal(t, "Block height: 17890044", data.Alerts[i].Description)
+		assert.Equal(t, uint64(i), data.Alerts[i].Source.Block.Number)
+	}
+}
+
+func TestGetAlertsBatch(t *testing.T) {
+	batchResp := parseBatchResponse([]byte(testResponse))
+	responseItem := (*batchResp.Data.(*BatchGetAlertsResponse))["alerts0"]
+	expectedAlerts := responseItem.ToAlertEvents()
+	tests := []struct {
+		desc       string
+		inputs     []*AlertsInput
+		headers    map[string]string
+		setupMock  func(mux *http.ServeMux)
+		wantAlerts []*protocol.AlertEvent
+		wantErr    bool
+	}{
+		{
+			desc: "Successful Request",
+			inputs: []*AlertsInput{
+				{
+					BlockSortDirection: "ASC",
+					CreatedSince:       30,
+					First:              3,
+				},
+			},
+			headers: map[string]string{
+				"Authorization": "Bearer: token",
+			},
+			setupMock: func(mux *http.ServeMux) {
+				// Here's a simple example of what your setup function might do:
+				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+
+					fmt.Fprint(w, testResponse)
+				})
+			},
+			wantAlerts: expectedAlerts,
+			wantErr:    false,
+		},
+		{
+			desc: "Failure due to server error",
+			headers: map[string]string{
+				"Authorization": "Bearer: token",
+			},
+			inputs: []*AlertsInput{
+				{
+					Bots: []string{"0xabc"},
+				},
+			},
+			setupMock: func(mux *http.ServeMux) {
+				// Here's a simple example of what your setup function might do:
+				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+					http.Error(w, "server error", http.StatusInternalServerError)
+				})
+			},
+			wantAlerts: nil,
+			wantErr:    true,
+		},
+		{
+			desc: "Failure due to unauthorized",
+			inputs: []*AlertsInput{
+				{
+					Bots: []string{"0xabc"},
+				},
+			},
+			headers: map[string]string{
+				"Authorization": "", // No token
+			},
+			setupMock: func(mux *http.ServeMux) {
+				// Here's a simple example of what your setup function might do:
+				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+					http.Error(w, "unauthorized", http.StatusUnauthorized)
+				})
+			},
+			wantAlerts: nil,
+			wantErr:    true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			mux := http.NewServeMux()
+			ts := httptest.NewUnstartedServer(mux)
+
+			tc.setupMock(mux) // Modify setupMock to accept *http.ServeMux
+			ts.Start()
+			defer ts.Close()
+
+			// Prepare client
+			client := NewClient(fmt.Sprintf("%s/graphql", ts.URL))
+
+			// Get context with timeout
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			// Invoke GetAlertsBatch
+			gotAlerts, gotErr := client.GetAlertsBatch(ctx, tc.inputs, tc.headers)
+
+			if tc.wantErr {
+				require.Error(t, gotErr)
+				return
+			}
+			require.NoError(t, gotErr)
+			require.Equal(t, tc.wantAlerts, gotAlerts)
+		})
 	}
 }
 
 const testResponse = `{
   "data": {
-    "alerts": {
+    "alerts0": {
       "pageInfo": {
-        "hasNextPage": true,
+        "hasNextPage": false,
         "endCursor": {
           "alertId": "0x0baefe6f0be064d7f3637af75a90964e7c231cb6c35266f51af2ce3539558b93",
           "blockNumber": 17890041

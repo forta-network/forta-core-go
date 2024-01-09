@@ -2,6 +2,7 @@ package feeds
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -20,6 +21,10 @@ var (
 	DefaultLookbackPeriod    = time.Minute * 5
 	ErrUnauthorized          = fmt.Errorf("query was not granted")
 	ErrBadRequest            = fmt.Errorf("bad public api request")
+)
+
+const (
+	DefaultBatchSize = 10
 )
 
 type cfHandler struct {
@@ -46,6 +51,7 @@ type combinerFeed struct {
 	handlersMu  sync.Mutex
 	cfg         CombinerFeedConfig
 	maxAlertAge time.Duration
+	batchSize   int
 }
 
 func (cf *combinerFeed) Subscriptions() []*domain.CombinerBotSubscription {
@@ -173,19 +179,7 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 		upperBound := int64(0)
 
 		// Query all subscriptions and process alerts
-		for _, subscription := range cf.Subscriptions() {
-			logger = logger.WithFields(
-				log.Fields{
-					"subscriberBotId": subscription.Subscriber.BotID,
-					"subscribedBotId": subscription.Subscription.BotId,
-				},
-			)
-
-			err := cf.fetchAlertsAndHandle(cf.ctx, alertHandlers, subscription, lowerBound.Milliseconds(), upperBound)
-			if err != nil {
-				logger.WithError(err).Warn("failed to fetch alerts and handle")
-			}
-		}
+		cf.handleSubscriptions(alertHandlers, cf.Subscriptions(), lowerBound, upperBound, logger)
 
 		// Save alert cache to persistent file, if configured
 		if cf.cfg.CombinerCachePath != "" {
@@ -196,58 +190,75 @@ func (cf *combinerFeed) forEachAlert(alertHandlers []cfHandler) error {
 	}
 }
 
-// fetchAlertsAndHandle retrieves alerts from the public API using the given subscription details, filters them by creation date,
-// and processes each alert by calling the alert handlers passed in as an argument.
-// Returns an error if there was an issue fetching or processing alerts.
-// This method is thread-safe, as it acquires a lock on the client and combinerCache mutexes before accessing or modifying them.
-func (cf *combinerFeed) fetchAlertsAndHandle(
-	ctx context.Context, alertHandlers []cfHandler, subscription *domain.CombinerBotSubscription, createdSince int64,
-	createdBefore int64,
-) error {
-	logger := log.WithFields(
-		log.Fields{
-			"subscriberBotId":    subscription.Subscriber.BotID,
-			"subscriberBotOwner": subscription.Subscriber.BotOwner,
-			"subscriberBotImage": subscription.Subscriber.BotImage,
-			"subscribedTo":       subscription.Subscription.BotId,
-		},
-	)
-
-	alerts, err := cf.fetchAlerts(ctx, logger, subscription, createdSince, createdBefore)
-	if err != nil {
-		return err
+func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscriptions []*domain.CombinerBotSubscription, lowerBound time.Duration, upperBound int64, logger *log.Entry) {
+	// create a lookup map to batch per subscriber (ie. bot)
+	subscriberBatchMap := make(map[domain.Subscriber][]*protocol.CombinerBotSubscription)
+	for _, subscription := range subscriptions {
+		subscriber := *subscription.Subscriber
+		subscriberBatchMap[subscriber] = append(subscriberBatchMap[subscriber], subscription.Subscription)
 	}
 
-	cf.processAlerts(ctx, logger, alerts, subscription, alertHandlers)
+	// handle subscriptions in batches
+	for subscriber, botSubscriptions := range subscriberBatchMap {
+		logger = logger.WithFields(
+			log.Fields{
+				"subscriberBotId":    subscriber.BotID,
+				"subscriberBotOwner": subscriber.BotOwner,
+				"subscriberBotImage": subscriber.BotImage,
+			})
 
-	return nil
+		var alertBatchResponse []*protocol.AlertEvent
+		// iterate over batches and handle
+		for i := 0; i < len(botSubscriptions); {
+			currentBatchSize := cf.batchSize
+			for {
+				// Determine the end of the current batch
+				end := i + currentBatchSize
+				if end > len(botSubscriptions) {
+					end = len(botSubscriptions)
+				}
+
+				// Create a batch
+				batch := botSubscriptions[i:end]
+
+				alerts, err := cf.fetchAlertsBatch(cf.ctx, logger, &subscriber, batch, lowerBound.Milliseconds(), upperBound)
+				if err != nil {
+					if errors.Is(err, graphql.ErrResponseSizeTooBig) && currentBatchSize > 1 {
+						// Reduce batch size and retry
+						currentBatchSize /= 2
+						logger.WithError(err).Warnf("Batch too big, reducing size to %d and retrying", currentBatchSize)
+						continue
+					} else {
+						// Other error or batch size already at minimum
+						logger.WithError(err).Warn("failed to fetch alerts")
+						break
+					}
+				}
+
+				alertBatchResponse = append(alertBatchResponse, alerts...)
+				i += currentBatchSize
+				break
+			}
+		}
+		cf.processAlerts(cf.ctx, logger, &subscriber, alertBatchResponse, alertHandlers)
+	}
 }
 
-// fetchAlerts retrieves alerts from the GraphQL API for the given subscription and time range. The method constructs a
-// graphql.AlertsInput object based on the subscription data and passes it to the GraphQL client's GetAlerts method. It uses a
-// retryWithBackoff method to retry the GetAlerts call in case of errors. The method returns a slice of alerts on success and an
-// error on failure.
-func (cf *combinerFeed) fetchAlerts(ctx context.Context, logger *log.Entry, subscription *domain.CombinerBotSubscription, createdSince int64, createdBefore int64) ([]*protocol.AlertEvent, error) {
+func (cf *combinerFeed) fetchAlertsBatch(ctx context.Context, logger *log.Entry, subscriber *domain.Subscriber,
+	subscriptions []*protocol.CombinerBotSubscription, createdSince int64, createdBefore int64) ([]*protocol.AlertEvent,
+	error) {
 	var alerts []*protocol.AlertEvent
 
 	// construct auth headers for the subscriber
-	authHeaders := subscriberInfoToHeaders(subscription.Subscriber)
+	authHeaders := subscriberInfoToHeaders(subscriber)
 
-	// construct the graphql.AlertsInput object based on the subscription data
-	alertsInput := &graphql.AlertsInput{
-		Bots:          []string{subscription.Subscription.BotId},
-		CreatedSince:  uint(createdSince),
-		CreatedBefore: uint(createdBefore),
-		AlertIds:      subscription.Subscription.AlertIds,
-		AlertId:       subscription.Subscription.AlertId,
-		ChainId:       uint(subscription.Subscription.ChainId),
-	}
+	inputs := subscriptionsToAlertInputs(subscriptions, createdSince, createdBefore)
 
 	// call the GraphQL client's GetAlerts method with retries
 	err := cf.retryWithBackoff(
 		ctx, func() error {
 			var cErr error
-			alerts, cErr = cf.client.GetAlerts(cf.ctx, alertsInput, authHeaders)
+			alerts, cErr = cf.client.GetAlertsBatch(cf.ctx, inputs, authHeaders)
 			if cErr != nil {
 				logger.WithError(cErr).Warn("error retrieving alerts")
 
@@ -264,27 +275,44 @@ func (cf *combinerFeed) fetchAlerts(ctx context.Context, logger *log.Entry, subs
 	return alerts, nil
 }
 
+func subscriptionsToAlertInputs(subscriptions []*protocol.CombinerBotSubscription, createdSince int64, createdBefore int64) []*graphql.AlertsInput {
+	inputs := make([]*graphql.AlertsInput, len(subscriptions))
+	for i, subscription := range subscriptions {
+		// construct the graphql.AlertsInput object based on the subscription data
+		inputs[i] = &graphql.AlertsInput{
+			Bots:          []string{subscription.BotId},
+			CreatedSince:  uint(createdSince),
+			CreatedBefore: uint(createdBefore),
+			AlertIds:      subscription.AlertIds,
+			AlertId:       subscription.AlertId,
+			ChainId:       uint(subscription.ChainId),
+		}
+	}
+	return inputs
+}
+
 // processAlerts processes a slice of alerts by filtering out those that are too old or have already been processed and then passing
 // the remaining alerts to the alert handlers passed in as an argument.
 // It uses a cache to prevent duplicate processing of alerts and creates an AlertEvent object to pass to each alert handler.
 // It is thread-safe as it acquires a lock on the combinerCache mutex before accessing or modifying it.
-func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, alerts []*protocol.AlertEvent, subscription *domain.CombinerBotSubscription, alertHandlers []cfHandler) {
+func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, subscriber *domain.Subscriber,
+	alerts []*protocol.AlertEvent,
+	alertHandlers []cfHandler) {
 	for _, alert := range alerts {
-		// check if the alert is too old to process
 		if tooOld, age := alertIsTooOld(alert, cf.maxAlertAge); tooOld {
-			logger.WithField("age", age).Warnf(
+			logger.WithFields(log.Fields{"age": age, "alert": alert.Alert.Hash}).Warnf(
 				"alert is older than %v - setting current alert iterator head to now", cf.maxAlertAge,
 			)
 			continue
 		}
 
 		// check if the alert has already been processed
-		if cf.combinerCache.Exists(subscription, alert) {
+		if cf.combinerCache.Exists(subscriber, alert) {
 			continue
 		}
 
 		// add the alert to the cache to prevent duplicate processing
-		cf.combinerCache.Set(subscription, alert)
+		cf.combinerCache.Set(subscriber, alert)
 
 		// create an AlertEvent object to pass to each alert handler
 		alertCA, err := time.Parse(time.RFC3339, alert.Alert.CreatedAt)
@@ -300,7 +328,7 @@ func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, aler
 				Feed:        time.Now().UTC(),
 				SourceAlert: alertCA,
 			},
-			Subscriber: subscription.Subscriber,
+			Subscriber: subscriber,
 		}
 
 		// call each alert handler with the AlertEvent object
@@ -410,6 +438,7 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 	if cfg.QueryInterval > 0 && cfg.QueryInterval < uint64(DefaultRatelimitDuration.Milliseconds()) {
 		rateLimit = time.NewTicker(time.Millisecond * time.Duration(cfg.QueryInterval))
 	}
+
 	bf := &combinerFeed{
 		maxAlertAge:      time.Minute * 20,
 		ctx:              ctx,
@@ -419,6 +448,7 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		botSubscriptions: []*domain.CombinerBotSubscription{},
 		cfg:              cfg,
 		combinerCache:    c,
+		batchSize:        DefaultBatchSize,
 	}
 
 	return bf, nil

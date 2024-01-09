@@ -53,13 +53,13 @@ func newCombinerCache(path string) (*combinerCache, error) {
 	return &combinerCache{cache: alertCache, path: path}, nil
 }
 
-func (c *combinerCache) Exists(subscription *domain.CombinerBotSubscription, alert *protocol.AlertEvent) bool {
-	_, exists := c.cache.Get(encodeAlertCacheKey(subscription.Subscriber.BotID, subscription.Subscriber.BotImage, alert.Alert.Hash))
+func (c *combinerCache) Exists(subscriber *domain.Subscriber, alert *protocol.AlertEvent) bool {
+	_, exists := c.cache.Get(encodeAlertCacheKey(subscriber.BotID, subscriber.BotImage, alert.Alert.Hash))
 	return exists
 }
 
-func (c *combinerCache) Set(subscription *domain.CombinerBotSubscription, alert *protocol.AlertEvent) {
-	c.cache.Set(encodeAlertCacheKey(subscription.Subscriber.BotID, subscription.Subscriber.BotImage, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration)
+func (c *combinerCache) Set(subscriber *domain.Subscriber, alert *protocol.AlertEvent) {
+	c.cache.Set(encodeAlertCacheKey(subscriber.BotID, subscriber.BotImage, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration)
 }
 
 // DumpToFile dumps the current cache into a file in JSON format, so that the cache can be used in a persistent way.

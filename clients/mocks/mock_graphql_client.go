@@ -50,3 +50,18 @@ func (mr *MockClientMockRecorder) GetAlerts(ctx, input, headers interface{}) *go
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlerts", reflect.TypeOf((*MockClient)(nil).GetAlerts), ctx, input, headers)
 }
+
+// GetAlertsBatch mocks base method.
+func (m *MockClient) GetAlertsBatch(ctx context.Context, input []*graphql.AlertsInput, headers map[string]string) ([]*protocol.AlertEvent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAlertsBatch", ctx, input, headers)
+	ret0, _ := ret[0].([]*protocol.AlertEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAlertsBatch indicates an expected call of GetAlertsBatch.
+func (mr *MockClientMockRecorder) GetAlertsBatch(ctx, input, headers interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlertsBatch", reflect.TypeOf((*MockClient)(nil).GetAlertsBatch), ctx, input, headers)
+}
