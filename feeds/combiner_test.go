@@ -101,6 +101,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 			QueryInterval: rate,
 		}, responseTooBigClient,
 	)
+	assert.NoError(t, err)
 
 	for i := 0; i < 20; i++ {
 		err = cfTooBig.AddSubscription(&domain.CombinerBotSubscription{
