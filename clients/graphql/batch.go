@@ -16,6 +16,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	ErrResponseSizeTooBig = fmt.Errorf("response size too big")
+)
+
 // paginateBatch processes the response received from the server and extracts the relevant data.
 // It takes an array of AlertsInput objects and a graphql.Response object as input.
 // It then iterates over the inputs and extracts the response item based on the alias.
@@ -148,6 +152,10 @@ func makeRequest(ctx context.Context, client string, req *graphql.Request, heade
 		return nil, err
 	}
 	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode == http.StatusInternalServerError {
+		return nil, ErrResponseSizeTooBig
+	}
 
 	if httpResp.StatusCode != http.StatusOK {
 		var respBody []byte

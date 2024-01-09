@@ -2,6 +2,7 @@ package feeds
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -207,22 +208,36 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 			})
 
 		// iterate over batches and handle
-		for i := 0; i < len(botSubscriptions); i += cf.batchSize {
-			// Determine the end of the current batch
-			end := i + cf.batchSize
-			if end > len(botSubscriptions) {
-				end = len(subscriptions)
+		for i := 0; i < len(botSubscriptions); {
+			currentBatchSize := cf.batchSize
+			for {
+				// Determine the end of the current batch
+				end := i + currentBatchSize
+				if end > len(botSubscriptions) {
+					end = len(botSubscriptions)
+				}
+
+				// Create a batch
+				batch := botSubscriptions[i:end]
+
+				alerts, err := cf.fetchAlertsBatch(cf.ctx, logger, &subscriber, batch, lowerBound.Milliseconds(), upperBound)
+				if err != nil {
+					if errors.Is(err, graphql.ErrResponseSizeTooBig) && currentBatchSize > 1 {
+						// Reduce batch size and retry
+						currentBatchSize /= 2
+						logger.WithError(err).Warnf("Batch too big, reducing size to %d and retrying", currentBatchSize)
+						continue
+					} else {
+						// Other error or batch size already at minimum
+						logger.WithError(err).Warn("failed to fetch alerts")
+						break
+					}
+				}
+
+				cf.processAlerts(cf.ctx, logger, &subscriber, alerts, alertHandlers)
+				i += currentBatchSize
+				break
 			}
-
-			// Create a batch
-			batch := botSubscriptions[i:end]
-
-			alerts, err := cf.fetchAlertsBatch(cf.ctx, logger, &subscriber, batch, lowerBound.Milliseconds(), upperBound)
-			if err != nil {
-				logger.WithError(err).Warn("failed to fetch alerts")
-			}
-
-			cf.processAlerts(cf.ctx, logger, &subscriber, alerts, alertHandlers)
 		}
 	}
 }
