@@ -25,6 +25,10 @@ import (
 func paginateBatch(inputs []*AlertsInput, response *graphql.Response) ([]*AlertsInput,
 	[]*protocol.AlertEvent, error) {
 	// type-checking response
+	if response == nil {
+		return nil, nil, fmt.Errorf("nil graphql response")
+	}
+
 	batchAlertsResponseUnsafe, ok := response.Data.(*BatchGetAlertsResponse)
 	if !ok {
 		return nil, nil, fmt.Errorf("invalid pagination response")
