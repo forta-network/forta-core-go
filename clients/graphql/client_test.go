@@ -131,25 +131,6 @@ func TestGetAlertsBatch(t *testing.T) {
 	}
 }
 
-func TestWS(t *testing.T) {
-	ctx := context.Background()
-	client := "http://localhost:8080/graphql"
-	// valid query
-	input1 := AlertsInput{
-		BlockSortDirection: SortAsc,
-		First:              1,
-	}
-	// invalid query
-	input2 := AlertsInput{
-		BlockSortDirection: SortAsc,
-		First:              0,
-	}
-	inputs := []*AlertsInput{&input1, &input2}
-	resp, err := fetchAlertsBatch(ctx, client, inputs, nil)
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-}
-
 const testResponse = `{
   "data": {
     "alerts0": {
