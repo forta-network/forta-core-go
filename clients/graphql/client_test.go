@@ -14,7 +14,7 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
-	resp := parseBatchResponse([]byte(testResponse))
+	resp := parseBatchResponse([]byte(testBatchResponse))
 	data := (*resp.Data.(*BatchGetAlertsResponse))["alerts0"]
 
 	assert.NotNilf(t, resp, "graphql response can not be nil")
