@@ -131,6 +131,103 @@ func TestGetAlertsBatch(t *testing.T) {
 	}
 }
 
+func TestGetAlerts(t *testing.T) {
+	batchResp := parseBatchResponse([]byte(testResponse))
+	responseItem := (*batchResp.Data.(*BatchGetAlertsResponse))["alerts0"]
+	expectedAlerts := responseItem.ToAlertEvents()
+	tests := []struct {
+		desc       string
+		inputs     *AlertsInput
+		headers    map[string]string
+		setupMock  func(mux *http.ServeMux)
+		wantAlerts []*protocol.AlertEvent
+		wantErr    bool
+	}{
+		{
+			desc: "Successful Request",
+			inputs: &AlertsInput{
+				BlockSortDirection: "ASC",
+				CreatedSince:       30,
+				First:              3,
+			},
+			headers: map[string]string{
+				"Authorization": "Bearer: token",
+			},
+			setupMock: func(mux *http.ServeMux) {
+				// Here's a simple example of what your setup function might do:
+				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+
+					fmt.Fprint(w, testResponse)
+				})
+			},
+			wantAlerts: expectedAlerts,
+			wantErr:    false,
+		},
+		{
+			desc: "Failure due to server error",
+			headers: map[string]string{
+				"Authorization": "Bearer: token",
+			},
+			inputs: &AlertsInput{
+				Bots: []string{"0xabc"},
+			},
+			setupMock: func(mux *http.ServeMux) {
+				// Here's a simple example of what your setup function might do:
+				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+					http.Error(w, "server error", http.StatusInternalServerError)
+				})
+			},
+			wantAlerts: nil,
+			wantErr:    true,
+		},
+		{
+			desc: "Failure due to unauthorized",
+			inputs: &AlertsInput{
+				Bots: []string{"0xabc"},
+			},
+			headers: map[string]string{
+				"Authorization": "", // No token
+			},
+			setupMock: func(mux *http.ServeMux) {
+				// Here's a simple example of what your setup function might do:
+				mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+					http.Error(w, "unauthorized", http.StatusUnauthorized)
+				})
+			},
+			wantAlerts: nil,
+			wantErr:    true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			mux := http.NewServeMux()
+			ts := httptest.NewUnstartedServer(mux)
+
+			tc.setupMock(mux) // Modify setupMock to accept *http.ServeMux
+			ts.Start()
+			defer ts.Close()
+
+			// Prepare client
+			client := NewClient(fmt.Sprintf("%s/graphql", ts.URL))
+
+			// Get context with timeout
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			// Invoke GetAlertsBatch
+			gotAlerts, gotErr := client.GetAlerts(ctx, tc.inputs, tc.headers)
+
+			if tc.wantErr {
+				require.Error(t, gotErr)
+				return
+			}
+			require.NoError(t, gotErr)
+			require.Equal(t, tc.wantAlerts, gotAlerts)
+		})
+	}
+}
+
 const testResponse = `{
   "data": {
     "alerts0": {

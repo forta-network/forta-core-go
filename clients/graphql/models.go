@@ -11,7 +11,7 @@ import (
 )
 
 type GetAlertsResponse struct {
-	Alerts GetAlertResponseItem
+	Alerts GetAlertResponseItem `json:"alerts0"`
 }
 
 type BatchGetAlertsResponse map[string]GetAlertResponseItem
