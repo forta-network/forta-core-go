@@ -18,7 +18,7 @@ import (
 func Test_combinerFeed_Start(t *testing.T) {
 	subscriberBot := "0xsubscriber"
 	subscribeeBot := "0xsubscribee"
-	rate := uint64(time.Second.Milliseconds())
+	rate := uint64(20 * time.Second.Milliseconds())
 
 	ctrl := gomock.NewController(t)
 	successfulAlertResponse := []*protocol.AlertEvent{
@@ -121,6 +121,50 @@ func Test_combinerFeed_Start(t *testing.T) {
 	)
 	cfTooBig.Start()
 	assert.Error(t, context.Canceled, <-errChTooBig)
+	//
+	//
+	// Test Case 3: Retries in smaller chunks if there is a response size error, stops at some point
+	// Test Setup: 1 bot with 20 subscriptions
+	// Batch size is 10, there should be 2 requests. However, all requests fail.
+	// Resulting in 80 GetAlertsBatch calls.
+	//
+	//
+	ctrl = gomock.NewController(t)
+	unauthClient := mock_graphql.NewMockClient(ctrl)
+	unauthClient.EXPECT().GetAlertsBatch(gomock.Any(), gomock.Any(), gomock.Any()).Return(
+		nil, fmt.Errorf("unauthorized"),
+	).Times(80)
+
+	ctxUnauth, cancelUnauth := context.WithTimeout(context.Background(), time.Second*50)
+	defer cancelUnauth()
+
+	cfUnauth, err := NewCombinerFeedWithClient(
+		ctxUnauth, CombinerFeedConfig{
+			QueryInterval: rate,
+		}, unauthClient,
+	)
+	assert.NoError(t, err)
+
+	for i := 0; i < 20; i++ {
+		err = cfUnauth.AddSubscription(&domain.CombinerBotSubscription{
+			Subscription: &protocol.CombinerBotSubscription{
+				BotId: fmt.Sprintf("0xbot%d", i),
+			},
+			Subscriber: &domain.Subscriber{BotID: subscriberBot, BotOwner: "0x", BotImage: "0x123"},
+		})
+		assert.NoError(t, err)
+	}
+
+	// ensure no alerts are returned
+	_ = cfTooBig.RegisterHandler(
+		func(evt *domain.AlertEvent) error {
+			t.Error("unexpected alert received")
+			return nil
+		},
+	)
+
+	cfUnauth.Start()
+	time.Sleep(time.Second * 5)
 }
 
 func Test_combinerFeed_AddSubscription(t *testing.T) {

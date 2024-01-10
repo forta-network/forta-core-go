@@ -2,7 +2,6 @@ package feeds
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -207,7 +206,7 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 				"subscriberBotImage": subscriber.BotImage,
 			})
 
-		var alertBatchResponse []*protocol.AlertEvent
+		var subscriberAlerts []*protocol.AlertEvent
 		// iterate over batches and handle
 		for i := 0; i < len(botSubscriptions); {
 			currentBatchSize := cf.batchSize
@@ -223,24 +222,23 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 
 				alerts, err := cf.fetchAlertsBatch(cf.ctx, logger, &subscriber, batch, lowerBound.Milliseconds(), upperBound)
 				if err != nil {
-					if errors.Is(err, graphql.ErrResponseSizeTooBig) && currentBatchSize > 1 {
+					if currentBatchSize > 1 {
 						// Reduce batch size and retry
 						currentBatchSize /= 2
-						logger.WithError(err).Warnf("Batch too big, reducing size to %d and retrying", currentBatchSize)
+						logger.WithError(err).Warnf("error querying batch, reducing size to %d and retrying", currentBatchSize)
 						continue
 					} else {
-						// Other error or batch size already at minimum
+						// batch size at minimum, do not retry
 						logger.WithError(err).Warn("failed to fetch alerts")
-						break
 					}
 				}
 
-				alertBatchResponse = append(alertBatchResponse, alerts...)
+				subscriberAlerts = append(subscriberAlerts, alerts...)
 				i += currentBatchSize
 				break
 			}
 		}
-		cf.processAlerts(cf.ctx, logger, &subscriber, alertBatchResponse, alertHandlers)
+		cf.processAlerts(cf.ctx, logger, &subscriber, subscriberAlerts, alertHandlers)
 	}
 }
 

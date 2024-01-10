@@ -36,6 +36,7 @@ func NewClient(url string) Client {
 	return &client{url: url, client: c}
 }
 
+// Deprecated: Use GetAlertsBatch instead.
 func (ac *client) GetAlerts(
 	ctx context.Context, input *AlertsInput, headers map[string]string,
 ) ([]*protocol.AlertEvent, error) {
