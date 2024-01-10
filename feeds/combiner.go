@@ -228,9 +228,8 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 						logger.WithError(err).Warnf("error querying batch, reducing size to %d and retrying", currentBatchSize)
 						continue
 					} else {
-						// Other error or batch size already at minimum
+						// batch size at minimum, do not retry
 						logger.WithError(err).Warn("failed to fetch alerts")
-						break
 					}
 				}
 
