@@ -23,7 +23,7 @@ var (
 )
 
 const (
-	DefaultBatchSize = 10
+	DefaultBatchSize = 50
 )
 
 type cfHandler struct {
