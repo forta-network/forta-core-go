@@ -129,6 +129,7 @@ type CombinerFeedConfig struct {
 	Start             uint64
 	End               uint64
 	CombinerCachePath string
+	BatchSize         int
 }
 
 func (cf *combinerFeed) Start() {
@@ -437,6 +438,10 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		rateLimit = time.NewTicker(time.Millisecond * time.Duration(cfg.QueryInterval))
 	}
 
+	if cfg.BatchSize == 0 {
+		cfg.BatchSize = DefaultBatchSize
+	}
+
 	bf := &combinerFeed{
 		maxAlertAge:      time.Minute * 20,
 		ctx:              ctx,
@@ -446,7 +451,7 @@ func NewCombinerFeedWithClient(ctx context.Context, cfg CombinerFeedConfig, clie
 		botSubscriptions: []*domain.CombinerBotSubscription{},
 		cfg:              cfg,
 		combinerCache:    c,
-		batchSize:        DefaultBatchSize,
+		batchSize:        cfg.BatchSize,
 	}
 
 	return bf, nil
