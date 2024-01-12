@@ -151,6 +151,9 @@ func createGetAlertsQuery(inputs []*AlertsInput) (string, map[string]interface{}
 	variables := make(map[string]interface{})
 	var queryBuilder strings.Builder
 
+	// Define fragment
+	queryBuilder.WriteString(getAlertsFragment)
+
 	// Define the operation with necessary variables
 	queryBuilder.WriteString("query getAlerts(")
 	for i := range inputs {
@@ -294,73 +297,79 @@ pageInfo {
 	}
 }
 alerts {
-	alertId
-	addresses
-	contracts {
-		name
-		projectId
-	}
-	createdAt
-	description
-	hash
-	metadata
-	name
-	projects {
-		id
-	}
-	protocol
-	scanNodeCount
-	severity
-	source {
-		transactionHash
-		bot {
-			chainIds
-			createdAt
-			description
-			developer
-			docReference
-			enabled
-			id
-			image
-			name
-			reference
-			repository
-			projects
-			scanNodes
-			version
-		}
-		block {
-			number
-			hash
-			timestamp
-			chainId
-		}
-		sourceAlert {
-			hash
-			botId
-			timestamp
-			chainId
-		}
-	}
-	alertDocumentType
-	findingType
-	relatedAlerts
-	chainId
-	labels {
-		label
-		confidence
-		entity
-		entityType
-		remove
-		metadata
-		uniqueKey
-		embedding
-	}
-	addressBloomFilter {
-		bitset
-		itemCount
-		k
-		m
-	}
+	...alertDetails
+}
+`
+
+const getAlertsFragment = `
+fragment alertDetails on Alert {
+  alertId
+  addresses
+  contracts {
+    name
+    projectId
+  }
+  createdAt
+  description
+  hash
+  metadata
+  name
+  projects {
+    id
+  }
+  protocol
+  scanNodeCount
+  severity
+  source {
+    transactionHash
+    bot {
+      chainIds
+      createdAt
+      description
+      developer
+      docReference
+      enabled
+      id
+      image
+      name
+      reference
+      repository
+      projects
+      scanNodes
+      version
+    }
+    block {
+      number
+      hash
+      timestamp
+      chainId
+    }
+    sourceAlert {
+      hash
+      botId
+      timestamp
+      chainId
+    }
+  }
+  alertDocumentType
+  findingType
+  relatedAlerts
+  chainId
+  labels {
+    label
+    confidence
+    entity
+    entityType
+    remove
+    metadata
+    uniqueKey
+    embedding
+  }
+  addressBloomFilter {
+    bitset
+    itemCount
+    k
+    m
+  }
 }
 `
