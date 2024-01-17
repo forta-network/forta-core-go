@@ -19,6 +19,7 @@ message MetricSummary {
   double p95 = 6;
   string details = 7;
   int32 shardId = 8;
+  int64 chainId = 9;
 }
 
 message AgentMetric {
@@ -28,6 +29,7 @@ message AgentMetric {
   double value = 4;
   string details = 5;
   int32 shardId = 6;
+  int64 chainId = 7;
 }
 
 message AgentMetricList {
