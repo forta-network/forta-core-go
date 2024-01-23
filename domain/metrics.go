@@ -1,5 +1,10 @@
 package domain
 
+func IsMetricAllowed(metric string) bool {
+	_, ok := allMetrics[metric]
+	return ok
+}
+
 // Metric names that are allowed for processing by Forta
 const (
 	MetricClientDial  = "agent.client.dial"
@@ -63,7 +68,7 @@ const (
 )
 
 var (
-	Metrics = map[string]interface{}{
+	allMetrics = map[string]interface{}{
 		MetricClientDial:  nil,
 		MetricClientClose: nil,
 
