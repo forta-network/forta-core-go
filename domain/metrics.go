@@ -51,20 +51,33 @@ const (
 	MetricBlockSuccess  = "block.success"
 	MetricBlockDrop     = "block.drop"
 
-	MetricJSONRPCLatency          = "jsonrpc.latency"
-	MetricJSONRPCRequest          = "jsonrpc.request"
-	MetricJSONRPCSuccess          = "jsonrpc.success"
-	MetricJSONRPCThrottled        = "jsonrpc.throttled"
-	MetricPublicAPIProxyLatency   = "publicapi.latency"
-	MetricPublicAPIProxyRequest   = "publicapi.request"
-	MetricPublicAPIProxySuccess   = "publicapi.success"
-	MetricPublicAPIProxyThrottled = "publicapi.throttled"
-	MetricFindingsDropped         = "findings.dropped"
-	MetricCombinerRequest         = "combiner.request"
-	MetricCombinerLatency         = "combiner.latency"
-	MetricCombinerError           = "combiner.error"
-	MetricCombinerSuccess         = "combiner.success"
-	MetricCombinerDrop            = "combiner.drop"
+	MetricJSONRPCLatency                 = "jsonrpc.latency"
+	MetricJSONRPCRequest                 = "jsonrpc.request"
+	MetricJSONRPCSuccess                 = "jsonrpc.success"
+	MetricJSONRPCThrottled               = "jsonrpc.throttled"
+	MetricPublicAPIProxyLatency          = "publicapi.latency"
+	MetricPublicAPIProxyRequest          = "publicapi.request"
+	MetricPublicAPIProxySuccess          = "publicapi.success"
+	MetricPublicAPIProxyThrottled        = "publicapi.throttled"
+	MetricFindingsDropped                = "findings.dropped"
+	MetricCombinerRequest                = "combiner.request"
+	MetricCombinerLatency                = "combiner.latency"
+	MetricCombinerError                  = "combiner.error"
+	MetricCombinerSuccess                = "combiner.success"
+	MetricCombinerDrop                   = "combiner.drop"
+	MetricDockerEventPull                = "docker.image.pull"
+	MetricDockerEventContainerCreate     = "docker.container.create"
+	MetricDockerEventContainerDestroy    = "docker.container.destroy"
+	MetricDockerEventContainerConnect    = "docker.container.connect"
+	MetricDockerEventContainerDisconnect = "docker.container.disconnect"
+	MetricDockerEventNetworkCreate       = "docker.network.create"
+	MetricDockerEventNetworkDestroy      = "docker.network.destroy"
+	MetricDockerEventNetworkConnect      = "docker.network.connect"
+	MetricDockerEventNetworkDisconnect   = "docker.network.disconnect"
+	MetricDockerResourcesCPU             = "docker.resources.cpu"
+	MetricDockerResourcesMemory          = "docker.resources.memory"
+	MetricDockerResourcesNetworkSent     = "docker.resources.network.sent"
+	MetricDockerResourcesNetworkReceive  = "docker.resources.network.receive"
 )
 
 var (
@@ -113,19 +126,32 @@ var (
 		MetricBlockSuccess:  nil,
 		MetricBlockDrop:     nil,
 
-		MetricJSONRPCLatency:          nil,
-		MetricJSONRPCRequest:          nil,
-		MetricJSONRPCSuccess:          nil,
-		MetricJSONRPCThrottled:        nil,
-		MetricPublicAPIProxyLatency:   nil,
-		MetricPublicAPIProxyRequest:   nil,
-		MetricPublicAPIProxySuccess:   nil,
-		MetricPublicAPIProxyThrottled: nil,
-		MetricFindingsDropped:         nil,
-		MetricCombinerRequest:         nil,
-		MetricCombinerLatency:         nil,
-		MetricCombinerError:           nil,
-		MetricCombinerSuccess:         nil,
-		MetricCombinerDrop:            nil,
+		MetricJSONRPCLatency:                 nil,
+		MetricJSONRPCRequest:                 nil,
+		MetricJSONRPCSuccess:                 nil,
+		MetricJSONRPCThrottled:               nil,
+		MetricPublicAPIProxyLatency:          nil,
+		MetricPublicAPIProxyRequest:          nil,
+		MetricPublicAPIProxySuccess:          nil,
+		MetricPublicAPIProxyThrottled:        nil,
+		MetricFindingsDropped:                nil,
+		MetricCombinerRequest:                nil,
+		MetricCombinerLatency:                nil,
+		MetricCombinerError:                  nil,
+		MetricCombinerSuccess:                nil,
+		MetricCombinerDrop:                   nil,
+		MetricDockerEventPull:                nil,
+		MetricDockerEventContainerCreate:     nil,
+		MetricDockerEventContainerDestroy:    nil,
+		MetricDockerEventContainerConnect:    nil,
+		MetricDockerEventContainerDisconnect: nil,
+		MetricDockerEventNetworkCreate:       nil,
+		MetricDockerEventNetworkDestroy:      nil,
+		MetricDockerEventNetworkConnect:      nil,
+		MetricDockerEventNetworkDisconnect:   nil,
+		MetricDockerResourcesCPU:             nil,
+		MetricDockerResourcesMemory:          nil,
+		MetricDockerResourcesNetworkSent:     nil,
+		MetricDockerResourcesNetworkReceive:  nil,
 	}
 )
