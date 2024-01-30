@@ -91,6 +91,7 @@ func SignAlert(key *keystore.Key, alert *protocol.Alert) (*protocol.SignedAlert,
 	if err != nil {
 		return nil, err
 	}
+
 	return &protocol.SignedAlert{
 		Alert:     alert,
 		Signature: signature,
@@ -102,6 +103,7 @@ func VerifyAlertSignature(sa *protocol.SignedAlert) error {
 	if sa.Signature == nil {
 		return ErrMissingSignature
 	}
+
 	hash := alertHash(sa.Alert)
 	return VerifySignature(hash.Bytes(), sa.Signature.Signer, sa.Signature.Signature)
 }
@@ -125,14 +127,30 @@ func SignString(key *keystore.Key, input string) (*protocol.Signature, error) {
 	return SignBytes(key, []byte(input))
 }
 
-func VerifySignature(message []byte, signerAddress string, sigHex string) error {
-	hash := crypto.Keccak256Hash(message)
+func SignerAddressFromSignature(message []byte, sigHex string) (string, error) {
 	sigHex = strings.ReplaceAll(sigHex, "0x", "")
 	signature, err := hex.DecodeString(sigHex)
+	if err != nil {
+		return "", err
+	}
 
+	hash := crypto.Keccak256(message)
+	pubKey, err := crypto.SigToPub(hash, signature)
+	if err != nil {
+		return "", err
+	}
+
+	return crypto.PubkeyToAddress(*pubKey).Hex(), nil
+}
+
+func VerifySignature(message []byte, signerAddress string, sigHex string) error {
+	sigHex = strings.ReplaceAll(sigHex, "0x", "")
+	signature, err := hex.DecodeString(sigHex)
 	if err != nil {
 		return err
 	}
+
+	hash := crypto.Keccak256Hash(message)
 
 	pubKey, err := crypto.SigToPub(hash.Bytes(), signature)
 	if err != nil {
@@ -157,10 +175,12 @@ func signPayload(key *keystore.Key, payloadType protocol.SignedPayload_PayloadTy
 	if err != nil {
 		return nil, err
 	}
+
 	signature, err := SignString(key, encoded)
 	if err != nil {
 		return nil, err
 	}
+
 	return &protocol.SignedPayload{
 		Type:      payloadType,
 		Encoded:   encoded,
