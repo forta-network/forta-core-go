@@ -67,6 +67,10 @@ func Unauthorized(w http.ResponseWriter, msg string) {
 	writeError(w, http.StatusUnauthorized, msg)
 }
 
+func Conflict(w http.ResponseWriter, msg string) {
+	writeError(w, http.StatusConflict, msg)
+}
+
 // ReadBody reads the body and tells if we should continue handling the request.
 func ReadBody(dst interface{}, w http.ResponseWriter, r *http.Request) bool {
 	err := json.NewDecoder(r.Body).Decode(dst)
