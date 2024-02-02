@@ -1,8 +1,20 @@
 package domain
 
+import "strings"
+
 func IsMetricAllowed(metric string) bool {
 	_, ok := allMetrics[metric]
-	return ok
+	if ok {
+		return true
+	}
+
+	for _, prefix := range prefixMetrics {
+		if strings.HasPrefix(metric, prefix) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Metric names that are allowed for processing by Forta
@@ -153,5 +165,11 @@ var (
 		MetricDockerResourcesMemory:          nil,
 		MetricDockerResourcesNetworkSent:     nil,
 		MetricDockerResourcesNetworkReceive:  nil,
+	}
+	prefixMetrics = []string{
+		MetricJSONRPCLatency,
+		MetricJSONRPCRequest,
+		MetricJSONRPCSuccess,
+		MetricJSONRPCThrottled,
 	}
 )
