@@ -53,12 +53,12 @@ func newCombinerCache(path string) (*combinerCache, error) {
 	return &combinerCache{cache: alertCache, path: path}, nil
 }
 
-func (c *combinerCache) Exists(subscriber *domain.Subscriber, alert *protocol.AlertEvent) bool {
+func (c *combinerCache) Exists(subscriber domain.Subscriber, alert *protocol.AlertEvent) bool {
 	_, exists := c.cache.Get(encodeAlertCacheKey(subscriber.BotID, subscriber.BotImage, alert.Alert.Hash))
 	return exists
 }
 
-func (c *combinerCache) Set(subscriber *domain.Subscriber, alert *protocol.AlertEvent) {
+func (c *combinerCache) Set(subscriber domain.Subscriber, alert *protocol.AlertEvent) {
 	c.cache.Set(encodeAlertCacheKey(subscriber.BotID, subscriber.BotImage, alert.Alert.Hash), struct{}{}, cache.DefaultExpiration)
 }
 
