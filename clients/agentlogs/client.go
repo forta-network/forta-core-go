@@ -13,8 +13,9 @@ import (
 
 // Agent contains agent data.
 type Agent struct {
-	ID   string `json:"id"`
-	Logs string `json:"logs"`
+	ID      string `json:"id"`
+	ChainID int64  `json:"chainId"`
+	Logs    string `json:"logs"`
 }
 
 // Agents is a type alias of agent slice.
