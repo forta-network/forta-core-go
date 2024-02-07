@@ -14,7 +14,7 @@ import (
 // Agent contains agent data.
 type Agent struct {
 	ID      string `json:"id"`
-	ChainID int64  `json:"chain_id"`
+	ChainID int64  `json:"chainId"`
 	Logs    string `json:"logs"`
 }
 
