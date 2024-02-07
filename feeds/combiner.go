@@ -326,7 +326,7 @@ func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, subs
 				Feed:        time.Now().UTC(),
 				SourceAlert: alertCA,
 			},
-			Subscriber: subscriber,
+			Subscriber: *subscriber,
 		}
 
 		// call each alert handler with the AlertEvent object
