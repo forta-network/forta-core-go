@@ -74,6 +74,10 @@ func (c *client) CalculateFileHash(payload []byte) (string, error) {
 	}
 
 	splittedPath := strings.Split(path.String(), "/")
+	if len(splittedPath) == 0 {
+		return "", errors.New("invalid path")
+	}
+
 	return splittedPath[len(splittedPath)-1], nil
 }
 
