@@ -6,35 +6,41 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	fortastaking011 "github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
 
 	fortastaking012 "github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+
 )
 
 // FortaStakingCaller is a new type which can multiplex calls to different implementation types.
 type FortaStakingCaller struct {
+
 	typ0 *fortastaking011.FortaStakingCaller
 
 	typ1 *fortastaking012.FortaStakingCaller
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewFortaStakingCaller creates a new merged type.
 func NewFortaStakingCaller(address common.Address, caller bind.ContractCaller) (*FortaStakingCaller, error) {
 	var (
 		mergedType FortaStakingCaller
-		err        error
+		err error
 	)
 	mergedType.currTag = "0.1.2"
+
 
 	mergedType.typ0, err = fortastaking011.NewFortaStakingCaller(address, caller)
 	if err != nil {
@@ -45,6 +51,7 @@ func NewFortaStakingCaller(address common.Address, caller bind.ContractCaller) (
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize fortastaking012.FortaStakingCaller: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -88,12 +95,18 @@ func (merged *FortaStakingCaller) Safe() {
 	merged.unsafe = false
 }
 
+
+
+
 // ActiveSharesToStake multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) ActiveSharesToStake(opts *bind.CallOpts, activeSharesId *big.Int, amount *big.Int) (retVal *big.Int, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ActiveSharesToStake(opts, activeSharesId, amount)
@@ -121,9 +134,12 @@ func (merged *FortaStakingCaller) ActiveSharesToStake(opts *bind.CallOpts, activ
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.ActiveSharesToStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ActiveStakeFor multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) ActiveStakeFor(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -131,6 +147,9 @@ func (merged *FortaStakingCaller) ActiveStakeFor(opts *bind.CallOpts, subjectTyp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ActiveStakeFor(opts, subjectType, subject)
@@ -158,9 +177,12 @@ func (merged *FortaStakingCaller) ActiveStakeFor(opts *bind.CallOpts, subjectTyp
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.ActiveStakeFor not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // AvailableReward multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) AvailableReward(opts *bind.CallOpts, subjectType uint8, subject *big.Int, account common.Address) (retVal *big.Int, err error) {
@@ -168,6 +190,9 @@ func (merged *FortaStakingCaller) AvailableReward(opts *bind.CallOpts, subjectTy
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.AvailableReward(opts, subjectType, subject, account)
@@ -182,9 +207,12 @@ func (merged *FortaStakingCaller) AvailableReward(opts *bind.CallOpts, subjectTy
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.AvailableReward not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // BalanceOf multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) BalanceOf(opts *bind.CallOpts, account common.Address, id *big.Int) (retVal *big.Int, err error) {
@@ -192,6 +220,9 @@ func (merged *FortaStakingCaller) BalanceOf(opts *bind.CallOpts, account common.
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.BalanceOf(opts, account, id)
@@ -219,9 +250,12 @@ func (merged *FortaStakingCaller) BalanceOf(opts *bind.CallOpts, account common.
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.BalanceOf not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // BalanceOfBatch multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) BalanceOfBatch(opts *bind.CallOpts, accounts []common.Address, ids []*big.Int) (retVal []*big.Int, err error) {
@@ -229,6 +263,9 @@ func (merged *FortaStakingCaller) BalanceOfBatch(opts *bind.CallOpts, accounts [
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.BalanceOfBatch(opts, accounts, ids)
@@ -256,9 +293,12 @@ func (merged *FortaStakingCaller) BalanceOfBatch(opts *bind.CallOpts, accounts [
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.BalanceOfBatch not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Exists multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) Exists(opts *bind.CallOpts, id *big.Int) (retVal bool, err error) {
@@ -266,6 +306,9 @@ func (merged *FortaStakingCaller) Exists(opts *bind.CallOpts, id *big.Int) (retV
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Exists(opts, id)
@@ -293,9 +336,12 @@ func (merged *FortaStakingCaller) Exists(opts *bind.CallOpts, id *big.Int) (retV
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.Exists not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // InactiveSharesOf multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) InactiveSharesOf(opts *bind.CallOpts, subjectType uint8, subject *big.Int, account common.Address) (retVal *big.Int, err error) {
@@ -303,6 +349,9 @@ func (merged *FortaStakingCaller) InactiveSharesOf(opts *bind.CallOpts, subjectT
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.InactiveSharesOf(opts, subjectType, subject, account)
@@ -330,9 +379,12 @@ func (merged *FortaStakingCaller) InactiveSharesOf(opts *bind.CallOpts, subjectT
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.InactiveSharesOf not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // InactiveSharesToStake multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) InactiveSharesToStake(opts *bind.CallOpts, inactiveSharesId *big.Int, amount *big.Int) (retVal *big.Int, err error) {
@@ -340,6 +392,9 @@ func (merged *FortaStakingCaller) InactiveSharesToStake(opts *bind.CallOpts, ina
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.InactiveSharesToStake(opts, inactiveSharesId, amount)
@@ -367,9 +422,12 @@ func (merged *FortaStakingCaller) InactiveSharesToStake(opts *bind.CallOpts, ina
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.InactiveSharesToStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // InactiveStakeFor multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) InactiveStakeFor(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -377,6 +435,9 @@ func (merged *FortaStakingCaller) InactiveStakeFor(opts *bind.CallOpts, subjectT
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.InactiveStakeFor(opts, subjectType, subject)
@@ -404,9 +465,12 @@ func (merged *FortaStakingCaller) InactiveStakeFor(opts *bind.CallOpts, subjectT
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.InactiveStakeFor not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsApprovedForAll multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) IsApprovedForAll(opts *bind.CallOpts, account common.Address, operator common.Address) (retVal bool, err error) {
@@ -414,6 +478,9 @@ func (merged *FortaStakingCaller) IsApprovedForAll(opts *bind.CallOpts, account 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.IsApprovedForAll(opts, account, operator)
@@ -441,9 +508,12 @@ func (merged *FortaStakingCaller) IsApprovedForAll(opts *bind.CallOpts, account 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.IsApprovedForAll not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsFrozen multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) IsFrozen(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal bool, err error) {
@@ -451,6 +521,9 @@ func (merged *FortaStakingCaller) IsFrozen(opts *bind.CallOpts, subjectType uint
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.IsFrozen(opts, subjectType, subject)
@@ -478,9 +551,12 @@ func (merged *FortaStakingCaller) IsFrozen(opts *bind.CallOpts, subjectType uint
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.IsFrozen not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsTrustedForwarder multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder common.Address) (retVal bool, err error) {
@@ -488,6 +564,9 @@ func (merged *FortaStakingCaller) IsTrustedForwarder(opts *bind.CallOpts, forwar
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
@@ -502,22 +581,12 @@ func (merged *FortaStakingCaller) IsTrustedForwarder(opts *bind.CallOpts, forwar
 		return
 	}
 
-	if merged.currTag == "0.1.2" {
-		val, methodErr := merged.typ1.IsTrustedForwarder(opts, forwarder)
-
-		if methodErr != nil {
-			err = methodErr
-			return
-		}
-
-		retVal = val
-
-		return
-	}
 
 	err = import_fmt.Errorf("FortaStakingCaller.IsTrustedForwarder not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -525,6 +594,9 @@ func (merged *FortaStakingCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -552,9 +624,12 @@ func (merged *FortaStakingCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SharesOf multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) SharesOf(opts *bind.CallOpts, subjectType uint8, subject *big.Int, account common.Address) (retVal *big.Int, err error) {
@@ -562,6 +637,9 @@ func (merged *FortaStakingCaller) SharesOf(opts *bind.CallOpts, subjectType uint
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.SharesOf(opts, subjectType, subject, account)
@@ -589,9 +667,12 @@ func (merged *FortaStakingCaller) SharesOf(opts *bind.CallOpts, subjectType uint
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.SharesOf not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // StakeToActiveShares multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) StakeToActiveShares(opts *bind.CallOpts, activeSharesId *big.Int, amount *big.Int) (retVal *big.Int, err error) {
@@ -599,6 +680,9 @@ func (merged *FortaStakingCaller) StakeToActiveShares(opts *bind.CallOpts, activ
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.StakeToActiveShares(opts, activeSharesId, amount)
@@ -626,9 +710,12 @@ func (merged *FortaStakingCaller) StakeToActiveShares(opts *bind.CallOpts, activ
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.StakeToActiveShares not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // StakeToInactiveShares multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) StakeToInactiveShares(opts *bind.CallOpts, inactiveSharesId *big.Int, amount *big.Int) (retVal *big.Int, err error) {
@@ -636,6 +723,9 @@ func (merged *FortaStakingCaller) StakeToInactiveShares(opts *bind.CallOpts, ina
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.StakeToInactiveShares(opts, inactiveSharesId, amount)
@@ -663,9 +753,12 @@ func (merged *FortaStakingCaller) StakeToInactiveShares(opts *bind.CallOpts, ina
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.StakeToInactiveShares not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // StakedToken multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) StakedToken(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -673,6 +766,9 @@ func (merged *FortaStakingCaller) StakedToken(opts *bind.CallOpts) (retVal commo
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.StakedToken(opts)
@@ -700,9 +796,12 @@ func (merged *FortaStakingCaller) StakedToken(opts *bind.CallOpts) (retVal commo
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.StakedToken not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SupportsInterface multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) SupportsInterface(opts *bind.CallOpts, interfaceId [4]byte) (retVal bool, err error) {
@@ -710,6 +809,9 @@ func (merged *FortaStakingCaller) SupportsInterface(opts *bind.CallOpts, interfa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.SupportsInterface(opts, interfaceId)
@@ -737,9 +839,12 @@ func (merged *FortaStakingCaller) SupportsInterface(opts *bind.CallOpts, interfa
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.SupportsInterface not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalActiveStake multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) TotalActiveStake(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -747,6 +852,9 @@ func (merged *FortaStakingCaller) TotalActiveStake(opts *bind.CallOpts) (retVal 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalActiveStake(opts)
@@ -774,9 +882,12 @@ func (merged *FortaStakingCaller) TotalActiveStake(opts *bind.CallOpts) (retVal 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.TotalActiveStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalInactiveShares multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) TotalInactiveShares(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -784,6 +895,9 @@ func (merged *FortaStakingCaller) TotalInactiveShares(opts *bind.CallOpts, subje
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalInactiveShares(opts, subjectType, subject)
@@ -811,9 +925,12 @@ func (merged *FortaStakingCaller) TotalInactiveShares(opts *bind.CallOpts, subje
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.TotalInactiveShares not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalInactiveStake multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) TotalInactiveStake(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -821,6 +938,9 @@ func (merged *FortaStakingCaller) TotalInactiveStake(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalInactiveStake(opts)
@@ -848,9 +968,12 @@ func (merged *FortaStakingCaller) TotalInactiveStake(opts *bind.CallOpts) (retVa
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.TotalInactiveStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalShares multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) TotalShares(opts *bind.CallOpts, subjectType uint8, subject *big.Int) (retVal *big.Int, err error) {
@@ -858,6 +981,9 @@ func (merged *FortaStakingCaller) TotalShares(opts *bind.CallOpts, subjectType u
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalShares(opts, subjectType, subject)
@@ -885,9 +1011,12 @@ func (merged *FortaStakingCaller) TotalShares(opts *bind.CallOpts, subjectType u
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.TotalShares not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // TotalSupply multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) TotalSupply(opts *bind.CallOpts, id *big.Int) (retVal *big.Int, err error) {
@@ -895,6 +1024,9 @@ func (merged *FortaStakingCaller) TotalSupply(opts *bind.CallOpts, id *big.Int) 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.TotalSupply(opts, id)
@@ -922,9 +1054,12 @@ func (merged *FortaStakingCaller) TotalSupply(opts *bind.CallOpts, id *big.Int) 
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.TotalSupply not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Treasury multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) Treasury(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -932,6 +1067,9 @@ func (merged *FortaStakingCaller) Treasury(opts *bind.CallOpts) (retVal common.A
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Treasury(opts)
@@ -959,9 +1097,12 @@ func (merged *FortaStakingCaller) Treasury(opts *bind.CallOpts) (retVal common.A
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.Treasury not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Uri multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) Uri(opts *bind.CallOpts, arg0 *big.Int) (retVal string, err error) {
@@ -969,6 +1110,9 @@ func (merged *FortaStakingCaller) Uri(opts *bind.CallOpts, arg0 *big.Int) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Uri(opts, arg0)
@@ -996,9 +1140,12 @@ func (merged *FortaStakingCaller) Uri(opts *bind.CallOpts, arg0 *big.Int) (retVa
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.Uri not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Version multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -1006,6 +1153,9 @@ func (merged *FortaStakingCaller) Version(opts *bind.CallOpts) (retVal string, e
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.1" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -1033,9 +1183,12 @@ func (merged *FortaStakingCaller) Version(opts *bind.CallOpts) (retVal string, e
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.Version not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // MAXSLASHABLEPERCENT multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) MAXSLASHABLEPERCENT(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -1043,6 +1196,9 @@ func (merged *FortaStakingCaller) MAXSLASHABLEPERCENT(opts *bind.CallOpts) (retV
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.MAXSLASHABLEPERCENT(opts)
@@ -1057,9 +1213,12 @@ func (merged *FortaStakingCaller) MAXSLASHABLEPERCENT(opts *bind.CallOpts) (retV
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.MAXSLASHABLEPERCENT not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // MAXWITHDRAWALDELAY multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) MAXWITHDRAWALDELAY(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -1067,6 +1226,9 @@ func (merged *FortaStakingCaller) MAXWITHDRAWALDELAY(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.MAXWITHDRAWALDELAY(opts)
@@ -1081,9 +1243,12 @@ func (merged *FortaStakingCaller) MAXWITHDRAWALDELAY(opts *bind.CallOpts) (retVa
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.MAXWITHDRAWALDELAY not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // MINWITHDRAWALDELAY multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) MINWITHDRAWALDELAY(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -1091,6 +1256,9 @@ func (merged *FortaStakingCaller) MINWITHDRAWALDELAY(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.MINWITHDRAWALDELAY(opts)
@@ -1105,9 +1273,12 @@ func (merged *FortaStakingCaller) MINWITHDRAWALDELAY(opts *bind.CallOpts) (retVa
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.MINWITHDRAWALDELAY not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Allocator multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) Allocator(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -1115,6 +1286,9 @@ func (merged *FortaStakingCaller) Allocator(opts *bind.CallOpts) (retVal common.
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.Allocator(opts)
@@ -1129,9 +1303,12 @@ func (merged *FortaStakingCaller) Allocator(opts *bind.CallOpts) (retVal common.
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.Allocator not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetDelegatedSubjectType multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) GetDelegatedSubjectType(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -1139,6 +1316,9 @@ func (merged *FortaStakingCaller) GetDelegatedSubjectType(opts *bind.CallOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.GetDelegatedSubjectType(opts, subjectType)
@@ -1153,9 +1333,12 @@ func (merged *FortaStakingCaller) GetDelegatedSubjectType(opts *bind.CallOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.GetDelegatedSubjectType not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetDelegatorSubjectType multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) GetDelegatorSubjectType(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -1163,6 +1346,9 @@ func (merged *FortaStakingCaller) GetDelegatorSubjectType(opts *bind.CallOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.GetDelegatorSubjectType(opts, subjectType)
@@ -1177,9 +1363,12 @@ func (merged *FortaStakingCaller) GetDelegatorSubjectType(opts *bind.CallOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.GetDelegatorSubjectType not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetSubjectTypeAgency multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) GetSubjectTypeAgency(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -1187,6 +1376,9 @@ func (merged *FortaStakingCaller) GetSubjectTypeAgency(opts *bind.CallOpts, subj
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.GetSubjectTypeAgency(opts, subjectType)
@@ -1201,9 +1393,12 @@ func (merged *FortaStakingCaller) GetSubjectTypeAgency(opts *bind.CallOpts, subj
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.GetSubjectTypeAgency not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // OpenProposals multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) OpenProposals(opts *bind.CallOpts, arg0 *big.Int) (retVal *big.Int, err error) {
@@ -1211,6 +1406,9 @@ func (merged *FortaStakingCaller) OpenProposals(opts *bind.CallOpts, arg0 *big.I
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.OpenProposals(opts, arg0)
@@ -1225,9 +1423,12 @@ func (merged *FortaStakingCaller) OpenProposals(opts *bind.CallOpts, arg0 *big.I
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.OpenProposals not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SlashDelegatorsPercent multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) SlashDelegatorsPercent(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -1235,6 +1436,9 @@ func (merged *FortaStakingCaller) SlashDelegatorsPercent(opts *bind.CallOpts) (r
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.SlashDelegatorsPercent(opts)
@@ -1249,9 +1453,12 @@ func (merged *FortaStakingCaller) SlashDelegatorsPercent(opts *bind.CallOpts) (r
 		return
 	}
 
+
 	err = import_fmt.Errorf("FortaStakingCaller.SlashDelegatorsPercent not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // SubjectGateway multiplexes to different implementations of the method.
 func (merged *FortaStakingCaller) SubjectGateway(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -1259,6 +1466,9 @@ func (merged *FortaStakingCaller) SubjectGateway(opts *bind.CallOpts) (retVal co
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.2" {
 		val, methodErr := merged.typ1.SubjectGateway(opts)
@@ -1272,6 +1482,7 @@ func (merged *FortaStakingCaller) SubjectGateway(opts *bind.CallOpts) (retVal co
 
 		return
 	}
+
 
 	err = import_fmt.Errorf("FortaStakingCaller.SubjectGateway not implemented (tag=%s)", merged.currTag)
 	return

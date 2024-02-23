@@ -62,7 +62,7 @@ func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scanne
 				)
 			}
 
-			_, err := c.multiCaller.CallChunked(opts, 100, agentCalls...)
+			_, err := c.multiCaller.CallChunked(opts, 100, 0, agentCalls...)
 			if err != nil {
 				return err
 			}
@@ -114,7 +114,7 @@ func (c *client) GetAssignmentList(blockNumber, assignedChainID *big.Int, scanne
 
 			// the amount of scanners can scale up unexpectedly sometimes so this
 			// chunking is a protection against that
-			_, err := c.multiCaller.CallChunked(opts, 100, scannerCalls...)
+			_, err := c.multiCaller.CallChunked(opts, 100, 0, scannerCalls...)
 			if err != nil {
 				return err
 			}
