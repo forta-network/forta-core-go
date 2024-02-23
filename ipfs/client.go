@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/forta-network/forta-core-go/utils/httpclient"
+	files "github.com/ipfs/boxo/files"
 	ipfsapi "github.com/ipfs/go-ipfs-api"
-	files "github.com/ipfs/go-libipfs/files"
 	config "github.com/ipfs/kubo/config"
 	"github.com/ipfs/kubo/core"
 	"github.com/ipfs/kubo/core/coreapi"
