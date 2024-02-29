@@ -17,7 +17,78 @@ func Test_createGetAlertsQuery(t *testing.T) {
 	assert.Equal(t, variable.AlertId, testInput.AlertId)
 }
 
-const mockExpectedQuery = `query getAlerts($input0: AlertsInput) {alerts0: alerts(input: $input0) {
+const mockExpectedQuery = `
+fragment alertDetails on Alert {
+  alertId
+  addresses
+  contracts {
+    name
+    projectId
+  }
+  createdAt
+  description
+  hash
+  metadata
+  name
+  projects {
+    id
+  }
+  protocol
+  scanNodeCount
+  severity
+  source {
+    transactionHash
+    bot {
+      chainIds
+      createdAt
+      description
+      developer
+      docReference
+      enabled
+      id
+      image
+      name
+      reference
+      repository
+      projects
+      scanNodes
+      version
+    }
+    block {
+      number
+      hash
+      timestamp
+      chainId
+    }
+    sourceAlert {
+      hash
+      botId
+      timestamp
+      chainId
+    }
+  }
+  alertDocumentType
+  findingType
+  relatedAlerts
+  chainId
+  labels {
+    label
+    confidence
+    entity
+    entityType
+    remove
+    metadata
+    uniqueKey
+    embedding
+  }
+  addressBloomFilter {
+    bitset
+    itemCount
+    k
+    m
+  }
+}
+query getAlerts($input0: AlertsInput) {alerts0: alerts(input: $input0) {
 pageInfo {
 	hasNextPage
 	endCursor {
@@ -26,73 +97,6 @@ pageInfo {
 	}
 }
 alerts {
-	alertId
-	addresses
-	contracts {
-		name
-		projectId
-	}
-	createdAt
-	description
-	hash
-	metadata
-	name
-	projects {
-		id
-	}
-	protocol
-	scanNodeCount
-	severity
-	source {
-		transactionHash
-		bot {
-			chainIds
-			createdAt
-			description
-			developer
-			docReference
-			enabled
-			id
-			image
-			name
-			reference
-			repository
-			projects
-			scanNodes
-			version
-		}
-		block {
-			number
-			hash
-			timestamp
-			chainId
-		}
-		sourceAlert {
-			hash
-			botId
-			timestamp
-			chainId
-		}
-	}
-	alertDocumentType
-	findingType
-	relatedAlerts
-	chainId
-	labels {
-		label
-		confidence
-		entity
-		entityType
-		remove
-		metadata
-		uniqueKey
-		embedding
-	}
-	addressBloomFilter {
-		bitset
-		itemCount
-		k
-		m
-	}
+	...alertDetails
 }
 }}`
