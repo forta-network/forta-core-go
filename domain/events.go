@@ -289,7 +289,7 @@ type AlertEvent struct {
 	Event      *protocol.AlertEvent
 	Logs       []LogEntry
 	Timestamps *TrackingTimestamps
-	Subscriber *Subscriber
+	Subscriber Subscriber
 }
 
 // ToMessage converts the AlertEvent to the protocol.TransactionEvent message

@@ -238,7 +238,7 @@ func (cf *combinerFeed) handleSubscriptions(alertHandlers []cfHandler, subscript
 				break
 			}
 		}
-		cf.processAlerts(cf.ctx, logger, &subscriber, subscriberAlerts, alertHandlers)
+		cf.processAlerts(cf.ctx, logger, subscriber, subscriberAlerts, alertHandlers)
 	}
 }
 
@@ -293,7 +293,7 @@ func subscriptionsToAlertInputs(subscriptions []*protocol.CombinerBotSubscriptio
 // the remaining alerts to the alert handlers passed in as an argument.
 // It uses a cache to prevent duplicate processing of alerts and creates an AlertEvent object to pass to each alert handler.
 // It is thread-safe as it acquires a lock on the combinerCache mutex before accessing or modifying it.
-func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, subscriber *domain.Subscriber,
+func (cf *combinerFeed) processAlerts(_ context.Context, logger *log.Entry, subscriber domain.Subscriber,
 	alerts []*protocol.AlertEvent,
 	alertHandlers []cfHandler) {
 	for _, alert := range alerts {
