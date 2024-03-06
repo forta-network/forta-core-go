@@ -6,36 +6,43 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	rewardsdistributor010 "github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+
 )
 
 // RewardsDistributorCaller is a new type which can multiplex calls to different implementation types.
 type RewardsDistributorCaller struct {
+
 	typ0 *rewardsdistributor010.RewardsDistributorCaller
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewRewardsDistributorCaller creates a new merged type.
 func NewRewardsDistributorCaller(address common.Address, caller bind.ContractCaller) (*RewardsDistributorCaller, error) {
 	var (
 		mergedType RewardsDistributorCaller
-		err        error
+		err error
 	)
 	mergedType.currTag = "0.1.0"
+
 
 	mergedType.typ0, err = rewardsdistributor010.NewRewardsDistributorCaller(address, caller)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize rewardsdistributor010.RewardsDistributorCaller: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -75,12 +82,18 @@ func (merged *RewardsDistributorCaller) Safe() {
 	merged.unsafe = false
 }
 
+
+
+
 // AvailableReward multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) AvailableReward(opts *bind.CallOpts, subjectType uint8, subjectId *big.Int, epochNumber *big.Int, staker common.Address) (retVal *big.Int, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.AvailableReward(opts, subjectType, subjectId, epochNumber, staker)
@@ -95,9 +108,12 @@ func (merged *RewardsDistributorCaller) AvailableReward(opts *bind.CallOpts, sub
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.AvailableReward not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // ClaimedRewardsPerEpoch multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) ClaimedRewardsPerEpoch(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int, arg2 common.Address) (retVal bool, err error) {
@@ -105,6 +121,9 @@ func (merged *RewardsDistributorCaller) ClaimedRewardsPerEpoch(opts *bind.CallOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ClaimedRewardsPerEpoch(opts, arg0, arg1, arg2)
@@ -119,9 +138,12 @@ func (merged *RewardsDistributorCaller) ClaimedRewardsPerEpoch(opts *bind.CallOp
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.ClaimedRewardsPerEpoch not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // DefaultFeeBps multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) DefaultFeeBps(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -129,6 +151,9 @@ func (merged *RewardsDistributorCaller) DefaultFeeBps(opts *bind.CallOpts) (retV
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.DefaultFeeBps(opts)
@@ -143,15 +168,19 @@ func (merged *RewardsDistributorCaller) DefaultFeeBps(opts *bind.CallOpts) (retV
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.DefaultFeeBps not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // DelegationFeesOutput is a merged return type.
 type DelegationFeesOutput struct {
+
 	FeeBps uint16
 
 	SinceEpoch *big.Int
+
 }
 
 // DelegationFees multiplexes to different implementations of the method.
@@ -161,7 +190,10 @@ func (merged *RewardsDistributorCaller) DelegationFees(opts *bind.CallOpts, arg0
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &DelegationFeesOutput{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.DelegationFees(opts, arg0, arg1)
@@ -171,16 +203,21 @@ func (merged *RewardsDistributorCaller) DelegationFees(opts *bind.CallOpts, arg0
 			return
 		}
 
+
 		retVal.FeeBps = val.FeeBps
 
 		retVal.SinceEpoch = val.SinceEpoch
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("RewardsDistributorCaller.DelegationFees not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // DelegationParamsEpochDelay multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) DelegationParamsEpochDelay(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -188,6 +225,9 @@ func (merged *RewardsDistributorCaller) DelegationParamsEpochDelay(opts *bind.Ca
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.DelegationParamsEpochDelay(opts)
@@ -202,9 +242,12 @@ func (merged *RewardsDistributorCaller) DelegationParamsEpochDelay(opts *bind.Ca
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.DelegationParamsEpochDelay not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetCurrentEpochEndTimestamp multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetCurrentEpochEndTimestamp(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -212,6 +255,9 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochEndTimestamp(opts *bind.C
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetCurrentEpochEndTimestamp(opts)
@@ -226,9 +272,12 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochEndTimestamp(opts *bind.C
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetCurrentEpochEndTimestamp not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetCurrentEpochNumber multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetCurrentEpochNumber(opts *bind.CallOpts) (retVal uint32, err error) {
@@ -236,6 +285,9 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochNumber(opts *bind.CallOpt
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetCurrentEpochNumber(opts)
@@ -250,9 +302,12 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochNumber(opts *bind.CallOpt
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetCurrentEpochNumber not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetCurrentEpochStartTimestamp multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetCurrentEpochStartTimestamp(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -260,6 +315,9 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochStartTimestamp(opts *bind
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetCurrentEpochStartTimestamp(opts)
@@ -274,9 +332,12 @@ func (merged *RewardsDistributorCaller) GetCurrentEpochStartTimestamp(opts *bind
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetCurrentEpochStartTimestamp not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetDelegatedSubjectType multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetDelegatedSubjectType(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -284,6 +345,9 @@ func (merged *RewardsDistributorCaller) GetDelegatedSubjectType(opts *bind.CallO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatedSubjectType(opts, subjectType)
@@ -298,9 +362,12 @@ func (merged *RewardsDistributorCaller) GetDelegatedSubjectType(opts *bind.CallO
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetDelegatedSubjectType not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetDelegationFee multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetDelegationFee(opts *bind.CallOpts, subjectType uint8, subjectId *big.Int, epochNumber *big.Int) (retVal *big.Int, err error) {
@@ -308,6 +375,9 @@ func (merged *RewardsDistributorCaller) GetDelegationFee(opts *bind.CallOpts, su
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegationFee(opts, subjectType, subjectId, epochNumber)
@@ -322,9 +392,12 @@ func (merged *RewardsDistributorCaller) GetDelegationFee(opts *bind.CallOpts, su
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetDelegationFee not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetDelegatorSubjectType multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetDelegatorSubjectType(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -332,6 +405,9 @@ func (merged *RewardsDistributorCaller) GetDelegatorSubjectType(opts *bind.CallO
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetDelegatorSubjectType(opts, subjectType)
@@ -346,9 +422,12 @@ func (merged *RewardsDistributorCaller) GetDelegatorSubjectType(opts *bind.CallO
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetDelegatorSubjectType not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetEpochEndTimestamp multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetEpochEndTimestamp(opts *bind.CallOpts, epochNumber *big.Int) (retVal *big.Int, err error) {
@@ -356,6 +435,9 @@ func (merged *RewardsDistributorCaller) GetEpochEndTimestamp(opts *bind.CallOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetEpochEndTimestamp(opts, epochNumber)
@@ -370,9 +452,12 @@ func (merged *RewardsDistributorCaller) GetEpochEndTimestamp(opts *bind.CallOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetEpochEndTimestamp not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetEpochNumber multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetEpochNumber(opts *bind.CallOpts, timestamp *big.Int) (retVal uint32, err error) {
@@ -380,6 +465,9 @@ func (merged *RewardsDistributorCaller) GetEpochNumber(opts *bind.CallOpts, time
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetEpochNumber(opts, timestamp)
@@ -394,9 +482,12 @@ func (merged *RewardsDistributorCaller) GetEpochNumber(opts *bind.CallOpts, time
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetEpochNumber not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetEpochStartTimestamp multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetEpochStartTimestamp(opts *bind.CallOpts, epochNumber *big.Int) (retVal *big.Int, err error) {
@@ -404,6 +495,9 @@ func (merged *RewardsDistributorCaller) GetEpochStartTimestamp(opts *bind.CallOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetEpochStartTimestamp(opts, epochNumber)
@@ -418,9 +512,12 @@ func (merged *RewardsDistributorCaller) GetEpochStartTimestamp(opts *bind.CallOp
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetEpochStartTimestamp not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // GetSubjectTypeAgency multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) GetSubjectTypeAgency(opts *bind.CallOpts, subjectType uint8) (retVal uint8, err error) {
@@ -428,6 +525,9 @@ func (merged *RewardsDistributorCaller) GetSubjectTypeAgency(opts *bind.CallOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.GetSubjectTypeAgency(opts, subjectType)
@@ -442,9 +542,12 @@ func (merged *RewardsDistributorCaller) GetSubjectTypeAgency(opts *bind.CallOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.GetSubjectTypeAgency not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // IsCurrentEpoch multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) IsCurrentEpoch(opts *bind.CallOpts, timestamp *big.Int) (retVal bool, err error) {
@@ -452,6 +555,9 @@ func (merged *RewardsDistributorCaller) IsCurrentEpoch(opts *bind.CallOpts, time
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.IsCurrentEpoch(opts, timestamp)
@@ -466,33 +572,12 @@ func (merged *RewardsDistributorCaller) IsCurrentEpoch(opts *bind.CallOpts, time
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.IsCurrentEpoch not implemented (tag=%s)", merged.currTag)
 	return
 }
 
-// IsTrustedForwarder multiplexes to different implementations of the method.
-func (merged *RewardsDistributorCaller) IsTrustedForwarder(opts *bind.CallOpts, forwarder common.Address) (retVal bool, err error) {
-	if !merged.unsafe {
-		merged.mu.RLock()
-		defer merged.mu.RUnlock()
-	}
 
-	if merged.currTag == "0.1.0" {
-		val, methodErr := merged.typ0.IsTrustedForwarder(opts, forwarder)
-
-		if methodErr != nil {
-			err = methodErr
-			return
-		}
-
-		retVal = val
-
-		return
-	}
-
-	err = import_fmt.Errorf("RewardsDistributorCaller.IsTrustedForwarder not implemented (tag=%s)", merged.currTag)
-	return
-}
 
 // ProxiableUUID multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) ProxiableUUID(opts *bind.CallOpts) (retVal [32]byte, err error) {
@@ -500,6 +585,9 @@ func (merged *RewardsDistributorCaller) ProxiableUUID(opts *bind.CallOpts) (retV
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ProxiableUUID(opts)
@@ -514,9 +602,12 @@ func (merged *RewardsDistributorCaller) ProxiableUUID(opts *bind.CallOpts) (retV
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.ProxiableUUID not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // RewardedEpochs multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) RewardedEpochs(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (retVal bool, err error) {
@@ -524,6 +615,9 @@ func (merged *RewardsDistributorCaller) RewardedEpochs(opts *bind.CallOpts, arg0
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardedEpochs(opts, arg0, arg1)
@@ -538,9 +632,12 @@ func (merged *RewardsDistributorCaller) RewardedEpochs(opts *bind.CallOpts, arg0
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.RewardedEpochs not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // RewardsPerEpoch multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) RewardsPerEpoch(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (retVal *big.Int, err error) {
@@ -548,6 +645,9 @@ func (merged *RewardsDistributorCaller) RewardsPerEpoch(opts *bind.CallOpts, arg
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardsPerEpoch(opts, arg0, arg1)
@@ -562,9 +662,12 @@ func (merged *RewardsDistributorCaller) RewardsPerEpoch(opts *bind.CallOpts, arg
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.RewardsPerEpoch not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // RewardsToken multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) RewardsToken(opts *bind.CallOpts) (retVal common.Address, err error) {
@@ -572,6 +675,9 @@ func (merged *RewardsDistributorCaller) RewardsToken(opts *bind.CallOpts) (retVa
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.RewardsToken(opts)
@@ -586,9 +692,12 @@ func (merged *RewardsDistributorCaller) RewardsToken(opts *bind.CallOpts) (retVa
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.RewardsToken not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // UnclaimedRewards multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) UnclaimedRewards(opts *bind.CallOpts) (retVal *big.Int, err error) {
@@ -596,6 +705,9 @@ func (merged *RewardsDistributorCaller) UnclaimedRewards(opts *bind.CallOpts) (r
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.UnclaimedRewards(opts)
@@ -610,9 +722,12 @@ func (merged *RewardsDistributorCaller) UnclaimedRewards(opts *bind.CallOpts) (r
 		return
 	}
 
+
 	err = import_fmt.Errorf("RewardsDistributorCaller.UnclaimedRewards not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // Version multiplexes to different implementations of the method.
 func (merged *RewardsDistributorCaller) Version(opts *bind.CallOpts) (retVal string, err error) {
@@ -620,6 +735,9 @@ func (merged *RewardsDistributorCaller) Version(opts *bind.CallOpts) (retVal str
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.Version(opts)
@@ -633,6 +751,7 @@ func (merged *RewardsDistributorCaller) Version(opts *bind.CallOpts) (retVal str
 
 		return
 	}
+
 
 	err = import_fmt.Errorf("RewardsDistributorCaller.Version not implemented (tag=%s)", merged.currTag)
 	return

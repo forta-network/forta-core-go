@@ -19,8 +19,7 @@ const (
 
 // Global flags
 var (
-	DownloadTestSavingMode = false
-	networkIndicators      = []string{
+	networkIndicators = []string{
 		IndicatorNetworkOutboundAccess, IndicatorNetworkDownloadSpeed, IndicatorNetworkUploadSpeed,
 	}
 )
@@ -68,12 +67,8 @@ func (ni *NetworkInspector) Inspect(ctx context.Context, inspectionCfg Inspectio
 // SpeedTest returns download speed, upload speed and error.
 func SpeedTest() (float64, float64, error) {
 	speedTest := speedtest.New()
-	users, err := speedTest.FetchUserInfo()
-	if err != nil {
-		return 0, 0, err
-	}
 
-	servers, err := speedTest.FetchServers(users)
+	servers, err := speedTest.FetchServers()
 	if err != nil {
 		return 0, 0, err
 	}
@@ -85,7 +80,7 @@ func SpeedTest() (float64, float64, error) {
 	// just test with a single server
 	server := servers[0]
 
-	err = server.PingTest()
+	err = server.PingTest(nil)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -93,14 +88,14 @@ func SpeedTest() (float64, float64, error) {
 	logger := log.WithField("inspector", "network")
 
 	logger.Info("started download test")
-	err = server.DownloadTest(DownloadTestSavingMode)
+	err = server.DownloadTest()
 	if err != nil {
 		return 0, 0, err
 	}
 	logger.Info("finished download test")
 
 	logger.Info("started upload test")
-	err = server.UploadTest(DownloadTestSavingMode)
+	err = server.UploadTest()
 	if err != nil {
 		return 0, 0, err
 	}

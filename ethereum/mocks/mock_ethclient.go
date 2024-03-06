@@ -84,18 +84,18 @@ func (mr *MockContractBackendMockRecorder) EstimateGas(ctx, call interface{}) *g
 }
 
 // FilterLogs mocks base method.
-func (m *MockContractBackend) FilterLogs(ctx context.Context, query ethereum.FilterQuery) ([]types.Log, error) {
+func (m *MockContractBackend) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FilterLogs", ctx, query)
+	ret := m.ctrl.Call(m, "FilterLogs", ctx, q)
 	ret0, _ := ret[0].([]types.Log)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FilterLogs indicates an expected call of FilterLogs.
-func (mr *MockContractBackendMockRecorder) FilterLogs(ctx, query interface{}) *gomock.Call {
+func (mr *MockContractBackendMockRecorder) FilterLogs(ctx, q interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterLogs", reflect.TypeOf((*MockContractBackend)(nil).FilterLogs), ctx, query)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterLogs", reflect.TypeOf((*MockContractBackend)(nil).FilterLogs), ctx, q)
 }
 
 // HeaderByNumber mocks base method.
@@ -158,18 +158,18 @@ func (mr *MockContractBackendMockRecorder) SendTransaction(ctx, tx interface{}) 
 }
 
 // SubscribeFilterLogs mocks base method.
-func (m *MockContractBackend) SubscribeFilterLogs(ctx context.Context, query ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error) {
+func (m *MockContractBackend) SubscribeFilterLogs(ctx context.Context, q ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SubscribeFilterLogs", ctx, query, ch)
+	ret := m.ctrl.Call(m, "SubscribeFilterLogs", ctx, q, ch)
 	ret0, _ := ret[0].(ethereum.Subscription)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SubscribeFilterLogs indicates an expected call of SubscribeFilterLogs.
-func (mr *MockContractBackendMockRecorder) SubscribeFilterLogs(ctx, query, ch interface{}) *gomock.Call {
+func (mr *MockContractBackendMockRecorder) SubscribeFilterLogs(ctx, q, ch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeFilterLogs", reflect.TypeOf((*MockContractBackend)(nil).SubscribeFilterLogs), ctx, query, ch)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeFilterLogs", reflect.TypeOf((*MockContractBackend)(nil).SubscribeFilterLogs), ctx, q, ch)
 }
 
 // SuggestGasPrice mocks base method.

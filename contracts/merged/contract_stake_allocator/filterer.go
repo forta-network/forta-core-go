@@ -6,7 +6,10 @@ import (
 	import_fmt "fmt"
 	import_sync "sync"
 
+
 	stakeallocator010 "github.com/forta-network/forta-core-go/contracts/generated/contract_stake_allocator_0_1_0"
+
+
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
@@ -17,29 +20,33 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"math/big"
+
 )
 
 // StakeAllocatorFilterer is a new type which can multiplex calls to different implementation types.
 type StakeAllocatorFilterer struct {
+
 	typ0 *stakeallocator010.StakeAllocatorFilterer
 
 	currTag string
-	mu      import_sync.RWMutex
-	unsafe  bool // default: false
+	mu import_sync.RWMutex
+	unsafe bool // default: false
 }
 
 // NewStakeAllocatorFilterer creates a new merged type.
 func NewStakeAllocatorFilterer(address common.Address, filterer bind.ContractFilterer) (*StakeAllocatorFilterer, error) {
 	var (
 		mergedType StakeAllocatorFilterer
-		err        error
+		err error
 	)
 	mergedType.currTag = "0.1.0"
+
 
 	mergedType.typ0, err = stakeallocator010.NewStakeAllocatorFilterer(address, filterer)
 	if err != nil {
 		return nil, import_fmt.Errorf("failed to initialize stakeallocator010.StakeAllocatorFilterer: %v", err)
 	}
+
 
 	return &mergedType, nil
 }
@@ -79,12 +86,18 @@ func (merged *StakeAllocatorFilterer) Safe() {
 	merged.unsafe = false
 }
 
+
+
+
 // FilterAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterAccessManagerUpdated(opts *bind.FilterOpts, newAddressManager []common.Address) (retVal *stakeallocator010.StakeAllocatorAccessManagerUpdatedIterator, err error) {
 	if !merged.unsafe {
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAccessManagerUpdated(opts, newAddressManager)
@@ -99,9 +112,12 @@ func (merged *StakeAllocatorFilterer) FilterAccessManagerUpdated(opts *bind.Filt
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAccessManagerUpdated multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchAccessManagerUpdated(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorAccessManagerUpdated, newAddressManager []common.Address) (retVal event.Subscription, err error) {
@@ -109,6 +125,9 @@ func (merged *StakeAllocatorFilterer) WatchAccessManagerUpdated(opts *bind.Watch
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAccessManagerUpdated(opts, sink, newAddressManager)
@@ -123,15 +142,19 @@ func (merged *StakeAllocatorFilterer) WatchAccessManagerUpdated(opts *bind.Watch
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorAccessManagerUpdated is a merged return type.
 type StakeAllocatorAccessManagerUpdated struct {
+
 	NewAddressManager common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAccessManagerUpdated multiplexes to different implementations of the method.
@@ -141,7 +164,10 @@ func (merged *StakeAllocatorFilterer) ParseAccessManagerUpdated(log types.Log) (
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorAccessManagerUpdated{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAccessManagerUpdated(log)
@@ -151,16 +177,21 @@ func (merged *StakeAllocatorFilterer) ParseAccessManagerUpdated(log types.Log) (
 			return
 		}
 
+
 		retVal.NewAddressManager = val.NewAddressManager
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseAccessManagerUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterAdminChanged multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterAdminChanged(opts *bind.FilterOpts) (retVal *stakeallocator010.StakeAllocatorAdminChangedIterator, err error) {
@@ -168,6 +199,9 @@ func (merged *StakeAllocatorFilterer) FilterAdminChanged(opts *bind.FilterOpts) 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAdminChanged(opts)
@@ -182,9 +216,12 @@ func (merged *StakeAllocatorFilterer) FilterAdminChanged(opts *bind.FilterOpts) 
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAdminChanged multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchAdminChanged(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorAdminChanged) (retVal event.Subscription, err error) {
@@ -192,6 +229,9 @@ func (merged *StakeAllocatorFilterer) WatchAdminChanged(opts *bind.WatchOpts, si
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAdminChanged(opts, sink)
@@ -206,17 +246,21 @@ func (merged *StakeAllocatorFilterer) WatchAdminChanged(opts *bind.WatchOpts, si
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorAdminChanged is a merged return type.
 type StakeAllocatorAdminChanged struct {
+
 	PreviousAdmin common.Address
 
 	NewAdmin common.Address
 
 	Raw types.Log
+
 }
 
 // ParseAdminChanged multiplexes to different implementations of the method.
@@ -226,7 +270,10 @@ func (merged *StakeAllocatorFilterer) ParseAdminChanged(log types.Log) (retVal *
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorAdminChanged{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAdminChanged(log)
@@ -236,18 +283,23 @@ func (merged *StakeAllocatorFilterer) ParseAdminChanged(log types.Log) (retVal *
 			return
 		}
 
+
 		retVal.PreviousAdmin = val.PreviousAdmin
 
 		retVal.NewAdmin = val.NewAdmin
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseAdminChanged not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterAllocatedStake multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterAllocatedStake(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int) (retVal *stakeallocator010.StakeAllocatorAllocatedStakeIterator, err error) {
@@ -255,6 +307,9 @@ func (merged *StakeAllocatorFilterer) FilterAllocatedStake(opts *bind.FilterOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterAllocatedStake(opts, subjectType, subject)
@@ -269,9 +324,12 @@ func (merged *StakeAllocatorFilterer) FilterAllocatedStake(opts *bind.FilterOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterAllocatedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchAllocatedStake multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchAllocatedStake(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorAllocatedStake, subjectType []uint8, subject []*big.Int) (retVal event.Subscription, err error) {
@@ -279,6 +337,9 @@ func (merged *StakeAllocatorFilterer) WatchAllocatedStake(opts *bind.WatchOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchAllocatedStake(opts, sink, subjectType, subject)
@@ -293,12 +354,15 @@ func (merged *StakeAllocatorFilterer) WatchAllocatedStake(opts *bind.WatchOpts, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchAllocatedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorAllocatedStake is a merged return type.
 type StakeAllocatorAllocatedStake struct {
+
 	SubjectType uint8
 
 	Subject *big.Int
@@ -310,6 +374,7 @@ type StakeAllocatorAllocatedStake struct {
 	TotalAllocated *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseAllocatedStake multiplexes to different implementations of the method.
@@ -319,7 +384,10 @@ func (merged *StakeAllocatorFilterer) ParseAllocatedStake(log types.Log) (retVal
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorAllocatedStake{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseAllocatedStake(log)
@@ -328,6 +396,7 @@ func (merged *StakeAllocatorFilterer) ParseAllocatedStake(log types.Log) (retVal
 			err = methodErr
 			return
 		}
+
 
 		retVal.SubjectType = val.SubjectType
 
@@ -341,12 +410,16 @@ func (merged *StakeAllocatorFilterer) ParseAllocatedStake(log types.Log) (retVal
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseAllocatedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts, beacon []common.Address) (retVal *stakeallocator010.StakeAllocatorBeaconUpgradedIterator, err error) {
@@ -354,6 +427,9 @@ func (merged *StakeAllocatorFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterBeaconUpgraded(opts, beacon)
@@ -368,9 +444,12 @@ func (merged *StakeAllocatorFilterer) FilterBeaconUpgraded(opts *bind.FilterOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchBeaconUpgraded multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorBeaconUpgraded, beacon []common.Address) (retVal event.Subscription, err error) {
@@ -378,6 +457,9 @@ func (merged *StakeAllocatorFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, 
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchBeaconUpgraded(opts, sink, beacon)
@@ -392,15 +474,19 @@ func (merged *StakeAllocatorFilterer) WatchBeaconUpgraded(opts *bind.WatchOpts, 
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorBeaconUpgraded is a merged return type.
 type StakeAllocatorBeaconUpgraded struct {
+
 	Beacon common.Address
 
 	Raw types.Log
+
 }
 
 // ParseBeaconUpgraded multiplexes to different implementations of the method.
@@ -410,7 +496,10 @@ func (merged *StakeAllocatorFilterer) ParseBeaconUpgraded(log types.Log) (retVal
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorBeaconUpgraded{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseBeaconUpgraded(log)
@@ -420,16 +509,21 @@ func (merged *StakeAllocatorFilterer) ParseBeaconUpgraded(log types.Log) (retVal
 			return
 		}
 
+
 		retVal.Beacon = val.Beacon
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseBeaconUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterInitialized multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterInitialized(opts *bind.FilterOpts) (retVal *stakeallocator010.StakeAllocatorInitializedIterator, err error) {
@@ -437,6 +531,9 @@ func (merged *StakeAllocatorFilterer) FilterInitialized(opts *bind.FilterOpts) (
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterInitialized(opts)
@@ -451,9 +548,12 @@ func (merged *StakeAllocatorFilterer) FilterInitialized(opts *bind.FilterOpts) (
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchInitialized multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchInitialized(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorInitialized) (retVal event.Subscription, err error) {
@@ -461,6 +561,9 @@ func (merged *StakeAllocatorFilterer) WatchInitialized(opts *bind.WatchOpts, sin
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchInitialized(opts, sink)
@@ -475,15 +578,19 @@ func (merged *StakeAllocatorFilterer) WatchInitialized(opts *bind.WatchOpts, sin
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorInitialized is a merged return type.
 type StakeAllocatorInitialized struct {
+
 	Version uint8
 
 	Raw types.Log
+
 }
 
 // ParseInitialized multiplexes to different implementations of the method.
@@ -493,7 +600,10 @@ func (merged *StakeAllocatorFilterer) ParseInitialized(log types.Log) (retVal *S
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorInitialized{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseInitialized(log)
@@ -503,16 +613,21 @@ func (merged *StakeAllocatorFilterer) ParseInitialized(log types.Log) (retVal *S
 			return
 		}
 
+
 		retVal.Version = val.Version
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseInitialized not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterRouterUpdated multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterRouterUpdated(opts *bind.FilterOpts, router []common.Address) (retVal *stakeallocator010.StakeAllocatorRouterUpdatedIterator, err error) {
@@ -520,6 +635,9 @@ func (merged *StakeAllocatorFilterer) FilterRouterUpdated(opts *bind.FilterOpts,
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterRouterUpdated(opts, router)
@@ -534,9 +652,12 @@ func (merged *StakeAllocatorFilterer) FilterRouterUpdated(opts *bind.FilterOpts,
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchRouterUpdated multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchRouterUpdated(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorRouterUpdated, router []common.Address) (retVal event.Subscription, err error) {
@@ -544,6 +665,9 @@ func (merged *StakeAllocatorFilterer) WatchRouterUpdated(opts *bind.WatchOpts, s
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchRouterUpdated(opts, sink, router)
@@ -558,15 +682,19 @@ func (merged *StakeAllocatorFilterer) WatchRouterUpdated(opts *bind.WatchOpts, s
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorRouterUpdated is a merged return type.
 type StakeAllocatorRouterUpdated struct {
+
 	Router common.Address
 
 	Raw types.Log
+
 }
 
 // ParseRouterUpdated multiplexes to different implementations of the method.
@@ -576,7 +704,10 @@ func (merged *StakeAllocatorFilterer) ParseRouterUpdated(log types.Log) (retVal 
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorRouterUpdated{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseRouterUpdated(log)
@@ -586,16 +717,21 @@ func (merged *StakeAllocatorFilterer) ParseRouterUpdated(log types.Log) (retVal 
 			return
 		}
 
+
 		retVal.Router = val.Router
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseRouterUpdated not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterUnallocatedStake multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterUnallocatedStake(opts *bind.FilterOpts, subjectType []uint8, subject []*big.Int) (retVal *stakeallocator010.StakeAllocatorUnallocatedStakeIterator, err error) {
@@ -603,6 +739,9 @@ func (merged *StakeAllocatorFilterer) FilterUnallocatedStake(opts *bind.FilterOp
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterUnallocatedStake(opts, subjectType, subject)
@@ -617,9 +756,12 @@ func (merged *StakeAllocatorFilterer) FilterUnallocatedStake(opts *bind.FilterOp
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterUnallocatedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchUnallocatedStake multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchUnallocatedStake(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorUnallocatedStake, subjectType []uint8, subject []*big.Int) (retVal event.Subscription, err error) {
@@ -627,6 +769,9 @@ func (merged *StakeAllocatorFilterer) WatchUnallocatedStake(opts *bind.WatchOpts
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchUnallocatedStake(opts, sink, subjectType, subject)
@@ -641,12 +786,15 @@ func (merged *StakeAllocatorFilterer) WatchUnallocatedStake(opts *bind.WatchOpts
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchUnallocatedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorUnallocatedStake is a merged return type.
 type StakeAllocatorUnallocatedStake struct {
+
 	SubjectType uint8
 
 	Subject *big.Int
@@ -658,6 +806,7 @@ type StakeAllocatorUnallocatedStake struct {
 	TotalAllocated *big.Int
 
 	Raw types.Log
+
 }
 
 // ParseUnallocatedStake multiplexes to different implementations of the method.
@@ -667,7 +816,10 @@ func (merged *StakeAllocatorFilterer) ParseUnallocatedStake(log types.Log) (retV
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorUnallocatedStake{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseUnallocatedStake(log)
@@ -676,6 +828,7 @@ func (merged *StakeAllocatorFilterer) ParseUnallocatedStake(log types.Log) (retV
 			err = methodErr
 			return
 		}
+
 
 		retVal.SubjectType = val.SubjectType
 
@@ -689,12 +842,16 @@ func (merged *StakeAllocatorFilterer) ParseUnallocatedStake(log types.Log) (retV
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseUnallocatedStake not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // FilterUpgraded multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) FilterUpgraded(opts *bind.FilterOpts, implementation []common.Address) (retVal *stakeallocator010.StakeAllocatorUpgradedIterator, err error) {
@@ -702,6 +859,9 @@ func (merged *StakeAllocatorFilterer) FilterUpgraded(opts *bind.FilterOpts, impl
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.FilterUpgraded(opts, implementation)
@@ -716,9 +876,12 @@ func (merged *StakeAllocatorFilterer) FilterUpgraded(opts *bind.FilterOpts, impl
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.FilterUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
+
+
 
 // WatchUpgraded multiplexes to different implementations of the method.
 func (merged *StakeAllocatorFilterer) WatchUpgraded(opts *bind.WatchOpts, sink chan<- *stakeallocator010.StakeAllocatorUpgraded, implementation []common.Address) (retVal event.Subscription, err error) {
@@ -726,6 +889,9 @@ func (merged *StakeAllocatorFilterer) WatchUpgraded(opts *bind.WatchOpts, sink c
 		merged.mu.RLock()
 		defer merged.mu.RUnlock()
 	}
+
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.WatchUpgraded(opts, sink, implementation)
@@ -740,15 +906,19 @@ func (merged *StakeAllocatorFilterer) WatchUpgraded(opts *bind.WatchOpts, sink c
 		return
 	}
 
+
 	err = import_fmt.Errorf("StakeAllocatorFilterer.WatchUpgraded not implemented (tag=%s)", merged.currTag)
 	return
 }
 
+
 // StakeAllocatorUpgraded is a merged return type.
 type StakeAllocatorUpgraded struct {
+
 	Implementation common.Address
 
 	Raw types.Log
+
 }
 
 // ParseUpgraded multiplexes to different implementations of the method.
@@ -758,7 +928,10 @@ func (merged *StakeAllocatorFilterer) ParseUpgraded(log types.Log) (retVal *Stak
 		defer merged.mu.RUnlock()
 	}
 
+
 	retVal = &StakeAllocatorUpgraded{}
+
+
 
 	if merged.currTag == "0.1.0" {
 		val, methodErr := merged.typ0.ParseUpgraded(log)
@@ -768,12 +941,15 @@ func (merged *StakeAllocatorFilterer) ParseUpgraded(log types.Log) (retVal *Stak
 			return
 		}
 
+
 		retVal.Implementation = val.Implementation
 
 		retVal.Raw = val.Raw
 
+
 		return
 	}
+
 
 	err = import_fmt.Errorf("StakeAllocatorFilterer.ParseUpgraded not implemented (tag=%s)", merged.currTag)
 	return

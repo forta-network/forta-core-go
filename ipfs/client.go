@@ -12,13 +12,13 @@ import (
 	"time"
 
 	"github.com/forta-network/forta-core-go/utils/httpclient"
+	files "github.com/ipfs/boxo/files"
 	ipfsapi "github.com/ipfs/go-ipfs-api"
-	files "github.com/ipfs/go-ipfs-files"
-	coreiface "github.com/ipfs/interface-go-ipfs-core"
-	"github.com/ipfs/interface-go-ipfs-core/options"
 	config "github.com/ipfs/kubo/config"
 	"github.com/ipfs/kubo/core"
 	"github.com/ipfs/kubo/core/coreapi"
+	coreiface "github.com/ipfs/kubo/core/coreiface"
+	"github.com/ipfs/kubo/core/coreiface/options"
 	"github.com/ipfs/kubo/repo"
 
 	log "github.com/sirupsen/logrus"
@@ -72,7 +72,13 @@ func (c *client) CalculateFileHash(payload []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return path.Cid().String(), nil
+
+	splittedPath := strings.Split(path.String(), "/")
+	if len(splittedPath) == 0 {
+		return "", errors.New("invalid path")
+	}
+
+	return splittedPath[len(splittedPath)-1], nil
 }
 
 func (c *client) UnmarshalJson(ctx context.Context, reference string, target interface{}) error {

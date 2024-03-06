@@ -4,3 +4,5 @@ forta-contracts
 toolbin
 run.sh
 *coverage.*
+yarn.lock
+node_modules
