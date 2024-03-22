@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package network.forta;
+
+option go_package = "./;protocol";
+
+
+message BlocksData {
+  repeated BlockData blocks = 1;
+}
+
+message BlockData {
+  uint64 chainID = 1;
+  BlockWithTransactions block = 2;
+  repeated LogEntry logs = 3;
+  repeated Trace traces = 4;
+}
+
+message BlockWithTransactions {
+  string baseFeePerGas = 1; 
+  string difficulty = 2;
+  string extraData = 3;
+  string gasLimit = 4;
+  string gasUsed = 5;
+  string hash = 6;
+  string logsBloom = 7;
+  string miner = 8;
+  string mixHash = 9;
+  string nonce = 10;
+  string number = 11;
+  string parentHash = 12;
+  string receiptsRoot = 13;
+  string sha3Uncles = 14;
+  string size = 15;
+  string stateRoot = 16;
+  string timestamp = 17;
+  string totalDifficulty = 18;
+  repeated Transaction transactions = 19;
+  string transactionsRoot = 20;
+  repeated string uncles = 21; 
+  string blobGasUsed = 22;
+  string parentBeaconBlockRoot = 23;
+  string excessBlobGas = 24;
+  repeated Withdrawal withdrawals = 25;
+  string withdrawalsRoot = 26;
+}
+
+message Withdrawal {
+  string index = 1;
+  string validatorIndex = 2;
+  string address = 3;
+  string amount = 4;
+}
+
+message LogEntry {
+  string address = 1;
+  string blockHash = 2;
+  string blockNumber = 3;
+  string data = 4;
+  string logIndex = 5;
+  bool removed = 6;
+  repeated string topics = 7;
+  string transactionHash = 8;
+  string transactionIndex = 9;
+}
+
+message Transaction {
+  string from = 3;
+  string gas = 4;
+  string gasPrice = 5;
+  string hash = 6;
+  string input = 7;
+  string nonce = 8;
+  string to = 9;
+  string transactionIndex = 10;
+  string value = 11;
+  string v = 12;
+  string r = 13;
+  string s = 14;
+  string maxFeePerGas = 15;
+  string maxPriorityFeePerGas = 16;
+  string type = 17;
+  repeated AccessList accessList = 18;
+  string yParity = 19;
+}
+
+message AccessList {
+  string address = 1;
+  repeated string storageKeys = 2;
+}
+
+message TraceAction {
+  string callType = 1;
+  string to = 2;
+  string input = 3;
+  string from = 4;
+  string gas = 5;
+  string value = 6;
+  string init = 7;
+  string address = 8;
+  string balance = 9;
+  string refundAddress = 10;
+}
+
+message TraceResult {
+  string output = 1;
+  string gasUsed = 2;
+  string address = 3;
+  string code = 4;
+}
+
+message Trace {
+  TraceAction action = 1;
+  TraceResult result = 2; 
+  int32 subtraces = 3;
+  repeated int64 traceAddress = 4; 
+  string transactionHash = 5;
+  int64 transactionPosition = 6; 
+  string type = 7;
+  string error = 8;
+}
