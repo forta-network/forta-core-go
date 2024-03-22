@@ -67,6 +67,7 @@ protogen: require-tools
 	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/publisher.proto
 	$(PROTOC) -I=protocol --go_out=protocol/. protocol/batch.proto
 	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/storage.proto
+	$(PROTOC) -I=protocol --go-grpc_out=protocol/. --go_out=protocol/. protocol/dispatcher.proto
 
 .PHONY: mocks
 mocks:

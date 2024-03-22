@@ -67,6 +67,13 @@ const (
 	MetricJSONRPCRequest                 = "jsonrpc.request"
 	MetricJSONRPCSuccess                 = "jsonrpc.success"
 	MetricJSONRPCThrottled               = "jsonrpc.throttled"
+	MetricJSONRPCCacheError              = "jsonrpc.cache.error"
+	MetricJSONRPCCacheHit                = "jsonrpc.cache.hit"
+	MetricJSONRPCCacheMiss               = "jsonrpc.cache.miss"
+	MetricJSONRPCCacheLatency            = "jsonrpc.cache.latency"
+	MetricJSONRPCCacheSize               = "jsonrpc.cache.size"
+	MetricJSONRPCCachePollError          = "jsonrpc.cache.poll.error"
+	MetricJSONRPCCachePollSuccess        = "jsonrpc.cache.poll.success"
 	MetricPublicAPIProxyLatency          = "publicapi.latency"
 	MetricPublicAPIProxyRequest          = "publicapi.request"
 	MetricPublicAPIProxySuccess          = "publicapi.success"
@@ -142,6 +149,13 @@ var (
 		MetricJSONRPCRequest:                 nil,
 		MetricJSONRPCSuccess:                 nil,
 		MetricJSONRPCThrottled:               nil,
+		MetricJSONRPCCacheError:              nil,
+		MetricJSONRPCCacheHit:                nil,
+		MetricJSONRPCCacheMiss:               nil,
+		MetricJSONRPCCacheLatency:            nil,
+		MetricJSONRPCCacheSize:               nil,
+		MetricJSONRPCCachePollError:          nil,
+		MetricJSONRPCCachePollSuccess:        nil,
 		MetricPublicAPIProxyLatency:          nil,
 		MetricPublicAPIProxyRequest:          nil,
 		MetricPublicAPIProxySuccess:          nil,
@@ -171,5 +185,7 @@ var (
 		MetricJSONRPCRequest,
 		MetricJSONRPCSuccess,
 		MetricJSONRPCThrottled,
+		MetricJSONRPCCacheHit,
+		MetricJSONRPCCacheMiss,
 	}
 )
