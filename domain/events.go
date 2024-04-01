@@ -91,6 +91,148 @@ func strPtr(val string) *string {
 	return &val
 }
 
+func (t *BlockEvent) ToBlockData() *protocol.BlockData {
+	combinedBlockEvent := &protocol.BlockData{
+		ChainID: t.ChainID.Uint64(),
+		Block: &protocol.BlockWithTransactions{
+			BaseFeePerGas:         str(t.Block.BaseFeePerGas),
+			Difficulty:            str(t.Block.Difficulty),
+			ExtraData:             str(t.Block.ExtraData),
+			GasLimit:              str(t.Block.GasLimit),
+			GasUsed:               str(t.Block.GasUsed),
+			Hash:                  t.Block.Hash,
+			LogsBloom:             str(t.Block.LogsBloom),
+			Miner:                 str(t.Block.Miner),
+			MixHash:               str(t.Block.MixHash),
+			Nonce:                 str(t.Block.Nonce),
+			Number:                t.Block.Number,
+			ParentHash:            t.Block.ParentHash,
+			ReceiptsRoot:          str(t.Block.ReceiptsRoot),
+			Size:                  str(t.Block.Size),
+			StateRoot:             str(t.Block.StateRoot),
+			Timestamp:             t.Block.Timestamp,
+			TotalDifficulty:       str(t.Block.TotalDifficulty),
+			Transactions:          make([]*protocol.Transaction, 0, len(t.Block.Transactions)),
+			Sha3Uncles:            str(t.Block.Sha3Uncles),
+			BlobGasUsed:           str(t.Block.BlobGasUsed),
+			ParentBeaconBlockRoot: str(t.Block.ParentBeaconBlockRoot),
+			ExcessBlobGas:         str(t.Block.ExcessBlobGas),
+			TransactionsRoot:      str(t.Block.TransactionsRoot),
+			WithdrawalsRoot:       str(t.Block.WithdrawalsRoot),
+			Uncles:                make([]string, 0, len(t.Block.Uncles)),
+			Withdrawals:           make([]*protocol.Withdrawal, 0, len(t.Block.Withdrawals)),
+		},
+		Logs:   make([]*protocol.LogEntry, 0, len(t.Logs)),
+		Traces: make([]*protocol.Trace, 0, len(t.Traces)),
+	}
+
+	for _, uncle := range t.Block.Uncles {
+		combinedBlockEvent.Block.Uncles = append(combinedBlockEvent.Block.Uncles, str(uncle))
+	}
+
+	for _, withdrawal := range t.Block.Withdrawals {
+		combinedBlockEvent.Block.Withdrawals = append(combinedBlockEvent.Block.Withdrawals, &protocol.Withdrawal{
+			Index:          withdrawal.Index,
+			ValidatorIndex: withdrawal.ValidatorIndex,
+			Address:        withdrawal.Address,
+			Amount:         withdrawal.Amount,
+		})
+	}
+
+	for i, tx := range t.Block.Transactions {
+		combinedBlockEvent.Block.Transactions = append(combinedBlockEvent.Block.Transactions, &protocol.Transaction{
+			From:                 tx.From,
+			Gas:                  tx.Gas,
+			GasPrice:             tx.GasPrice,
+			Hash:                 tx.Hash,
+			Input:                str(tx.Input),
+			Nonce:                tx.Nonce,
+			To:                   str(tx.To),
+			AccessList:           make([]*protocol.AccessList, 0, len(tx.AccessList)),
+			TransactionIndex:     tx.TransactionIndex,
+			Value:                str(tx.Value),
+			Type:                 tx.Type,
+			V:                    tx.V,
+			R:                    tx.R,
+			S:                    tx.S,
+			MaxFeePerGas:         str(tx.MaxFeePerGas),
+			MaxPriorityFeePerGas: str(tx.MaxPriorityFeePerGas),
+			YParity:              str(tx.YParity),
+		})
+
+		for _, accessList := range tx.AccessList {
+			combinedBlockEvent.Block.Transactions[i].AccessList = append(combinedBlockEvent.Block.Transactions[i].AccessList, &protocol.AccessList{
+				Address:     accessList.Address,
+				StorageKeys: accessList.StorageKeys,
+			})
+		}
+	}
+
+	for _, log := range t.Logs {
+		combinedBlockEvent.Logs = append(combinedBlockEvent.Logs, &protocol.LogEntry{
+			Address:          str(log.Address),
+			BlockHash:        str(log.BlockHash),
+			BlockNumber:      str(log.BlockNumber),
+			Data:             str(log.Data),
+			LogIndex:         str(log.LogIndex),
+			Removed:          safeBool(log.Removed),
+			Topics:           strArr(log.Topics),
+			TransactionHash:  str(log.TransactionHash),
+			TransactionIndex: str(log.TransactionIndex),
+		})
+	}
+
+	for _, trace := range t.Traces {
+		t := &protocol.Trace{
+			Action: &protocol.TraceAction{
+				CallType:      str(trace.Action.CallType),
+				To:            str(trace.Action.To),
+				Input:         str(trace.Action.Input),
+				From:          str(trace.Action.From),
+				Gas:           str(trace.Action.Gas),
+				Value:         str(trace.Action.Value),
+				Init:          str(trace.Action.Init),
+				Address:       str(trace.Action.Address),
+				Balance:       str(trace.Action.Balance),
+				RefundAddress: str(trace.Action.RefundAddress),
+			},
+			Subtraces:           int32(trace.Subtraces),
+			TraceAddress:        intArr(trace.TraceAddress),
+			TransactionHash:     str(trace.TransactionHash),
+			TransactionPosition: int64(safeInt(trace.TransactionPosition)),
+			Type:                trace.Type,
+			Error:               str(trace.Error),
+		}
+
+		if trace.Result != nil {
+			t.Result = &protocol.TraceResult{
+				Output:  str(trace.Result.Output),
+				GasUsed: str(trace.Result.GasUsed),
+				Address: str(trace.Result.Address),
+				Code:    str(trace.Result.Code),
+			}
+		}
+		combinedBlockEvent.Traces = append(combinedBlockEvent.Traces, t)
+	}
+
+	return combinedBlockEvent
+}
+
+func safeInt(i *int) int {
+	if i == nil {
+		return 0
+	}
+	return *i
+}
+
+func intArr(vals []int) []int64 {
+	result := make([]int64, 0, len(vals))
+	for _, v := range vals {
+		result = append(result, int64(v))
+	}
+	return result
+}
+
 func (t *BlockEvent) ToMessage() (*protocol.BlockEvent, error) {
 	evtType := protocol.BlockEvent_BLOCK
 
