@@ -372,23 +372,20 @@ func TracesFromBlockData(bd *protocol.BlockData) ([]Trace, error) {
 
 	intBlockNumber := int(blockNumber)
 	for i, trace := range bd.Traces {
+		transactionPosition := int(trace.TransactionPosition)
+		traceAddresses := make([]int, len(trace.TraceAddress))
+		for j, address := range trace.TraceAddress {
+			traceAddresses[j] = int(address)
+		}
+
 		traces[i] = Trace{
-			BlockNumber: &intBlockNumber,
-			Subtraces:   int(trace.Subtraces),
-			TraceAddress: func() []int {
-				traceAddress := make([]int, len(trace.TraceAddress))
-				for i, address := range trace.TraceAddress {
-					traceAddress[i] = int(address)
-				}
-				return traceAddress
-			}(),
-			TransactionHash: &trace.TransactionHash,
-			TransactionPosition: func(i int64) *int {
-				res := int(i)
-				return &res
-			}(trace.TransactionPosition),
-			Type:  trace.Type,
-			Error: &trace.Error,
+			BlockNumber:         &intBlockNumber,
+			Subtraces:           int(trace.Subtraces),
+			TraceAddress:        traceAddresses,
+			TransactionHash:     &trace.TransactionHash,
+			TransactionPosition: &transactionPosition,
+			Type:                trace.Type,
+			Error:               &trace.Error,
 		}
 
 		if bd.Block != nil {
