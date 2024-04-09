@@ -246,7 +246,7 @@ var defaultConfig = ClientConfig{
 }
 
 var devConfig = ClientConfig{
-	JsonRpcUrl: "https://rpc-mumbai.matic.today",
+	JsonRpcUrl: "https://sepolia.base.org",
 	ENSAddress: "0x650AFCA8545964064b60ad040F9a09F788F714ed",
 	Name:       "registry-client",
 }
