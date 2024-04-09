@@ -45,9 +45,10 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 func testMumbaiListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
 	l, err := NewListener(
 		ctx, ListenerConfig{
-			Name:           "listener",
-			JsonRpcURL:     "https://rpc.ankr.com/polygon_mumbai",
-			ENSAddress:     devConfig.ENSAddress,
+			Name:       "listener",
+			JsonRpcURL: "https://rpc.ankr.com/polygon_mumbai",
+			// ENSAddress:     devConfig.ENSAddress,
+			ENSAddress:     "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9",
 			ContractFilter: filter,
 			Topics:         []string{topic},
 			Handlers:       handlers,
