@@ -153,7 +153,7 @@ abigen: pull-contracts
 
 .PHONY: pull-contracts
 pull-contracts:
-	./scripts/pull-contracts.sh forta-contracts 9d8e7c3
+	./scripts/pull-contracts.sh forta-contracts 59ae488
 
 .PHONY: swagger
 swagger: require-tools
