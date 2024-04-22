@@ -8,12 +8,12 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_rewards_distributor_0_1_0"
 
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_agent_registry_0_1_4"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_dispatch_0_1_4"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_1"
-	"github.com/forta-network/forta-core-go/contracts/generated/contract_forta_staking_0_1_2"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_node_version_0_1_0"
 	"github.com/forta-network/forta-core-go/contracts/generated/contract_scanner_pool_registry_0_1_0"
 
@@ -42,13 +42,13 @@ func testListener(ctx context.Context, filter *ContractFilter, topic string, han
 	return l
 }
 
-func testMumbaiListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
+func testBaseSepoliaListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
 	l, err := NewListener(
 		ctx, ListenerConfig{
 			Name:       "listener",
-			JsonRpcURL: "https://rpc.ankr.com/polygon_mumbai",
+			JsonRpcURL: "https://rpc.ankr.com/base_sepolia",
 			// ENSAddress:     devConfig.ENSAddress,
-			ENSAddress:     "0x5f7c5bbBa72e1e1fae689120D76D2f334A390Ae9",
+			ENSAddress:     "0x650AFCA8545964064b60ad040F9a09F788F714ed",
 			ContractFilter: filter,
 			Topics:         []string{topic},
 			Handlers:       handlers,
@@ -94,20 +94,20 @@ func TestListener_Listen(t *testing.T) {
 		},
 		{
 			name: "configuration-change",
-			listener: testMumbaiListener(ctx, &ContractFilter{FortaStaking: true},
+			listener: testBaseSepoliaListener(ctx, &ContractFilter{FortaStaking: true},
 				contract_forta_staking_0_1_2.StakeHelpersConfiguredTopic,
 				Handlers{
 					UpgradeHandlers: regmsg.Handlers(
 						func(ctx context.Context, logger *log.Entry, msg *registry.UpgradeMessage) error {
-							assert.Equal(t, int64(31808525), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, int64(8289458), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ConfigurationChange, msg.Action)
-							assert.Equal(t, strings.ToLower("0x64d5192f03bd98db1de2aa8b4abac5419eac32ce"), msg.Proxy)
+							assert.Equal(t, strings.ToLower("0x1ed86971e4c4f3d13b6b8030d80c7d609de7139c"), msg.Proxy)
 							return handledEvent
 						},
 					),
 				},
 			),
-			block: 31808525,
+			block: 8289458,
 		},
 		{
 			name: "agent-enable",
@@ -162,20 +162,20 @@ func TestListener_Listen(t *testing.T) {
 		},
 		{
 			name: "scanner-save",
-			listener: testMumbaiListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
+			listener: testBaseSepoliaListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
 				contract_scanner_pool_registry_0_1_0.ScannerUpdatedTopic,
 				Handlers{
 					SaveScannerHandlers: regmsg.Handlers(
 						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerSaveMessage) error {
-							assert.Equal(t, int64(32910234), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, int64(8456182), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.SaveScanner, msg.Action)
-							assert.Equal(t, strings.ToLower("0x3f88c2b3e267e6b8e9de017cdb47a59ac9ecb284"), msg.ScannerID)
+							assert.Equal(t, strings.ToLower("0xbd3023d9553f38fa27566b5689ecc7da876f7752"), msg.ScannerID)
 							return handledEvent
 						},
 					),
 				},
 			),
-			block: 32910234,
+			block: 8456182,
 		},
 		{
 			name: "agent-save-from-update",
@@ -249,12 +249,12 @@ func TestListener_Listen(t *testing.T) {
 		},
 		{
 			name: "scanner-stake-threshold",
-			listener: testMumbaiListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
+			listener: testBaseSepoliaListener(ctx, &ContractFilter{ScannerPoolRegistry: true},
 				contract_scanner_pool_registry_0_1_0.ManagedStakeThresholdChangedTopic,
 				Handlers{
 					ScannerStakeThresholdHandlers: regmsg.Handlers(
 						func(ctx context.Context, logger *log.Entry, msg *registry.ScannerStakeThresholdMessage) error {
-							assert.Equal(t, int64(32901311), msg.Source.BlockNumberDecimal)
+							assert.Equal(t, int64(8290231), msg.Source.BlockNumberDecimal)
 							assert.Equal(t, registry.ScannerStakeThreshold, msg.Action)
 							assert.Equal(t, "2500000000000000000000", msg.Min)
 							assert.Equal(t, "15000000000000000000000", msg.Max)
@@ -263,7 +263,7 @@ func TestListener_Listen(t *testing.T) {
 					),
 				},
 			),
-			block: 32901311,
+			block: 8290231,
 		},
 		{
 			name: "scanner-stake",
