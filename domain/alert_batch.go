@@ -17,12 +17,6 @@ type AlertBatchRequest struct {
 	SignedBatchSummary *protocol.SignedPayload `json:"signedBatchSummary"`
 }
 
-// AlertBatchResponse is the response from the alerts API
-type AlertBatchResponse struct {
-	ReceiptID     string                  `json:"receiptId"`
-	SignedReceipt *protocol.SignedPayload `json:"signedReceipt"`
-}
-
 // AlertBatchMessage is passed to batch processing asynchronously
 type AlertBatchMessage struct {
 	Scanner       string                  `json:"scanner"`
