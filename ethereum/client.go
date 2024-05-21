@@ -63,19 +63,23 @@ type Client interface {
 	TransactionReceipt(ctx context.Context, txHash string) (*domain.TransactionReceipt, error)
 	ChainID(ctx context.Context) (*big.Int, error)
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
+	TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error)
 	GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
 	SubscribeToHead(ctx context.Context) (domain.HeaderCh, error)
 
 	health.Reporter
 }
 
-const blocksByNumber = "eth_getBlockByNumber"
-const blocksByHash = "eth_getBlockByHash"
-const blockNumber = "eth_blockNumber"
-const getLogs = "eth_getLogs"
-const transactionReceipt = "eth_getTransactionReceipt"
-const traceBlock = "trace_block"
-const chainId = "eth_chainId"
+const (
+	blocksByNumber     = "eth_getBlockByNumber"
+	blocksByHash       = "eth_getBlockByHash"
+	blockNumber        = "eth_blockNumber"
+	getLogs            = "eth_getLogs"
+	transactionReceipt = "eth_getTransactionReceipt"
+	traceBlock         = "trace_block"
+	traceCall          = "trace_call"
+	chainId            = "eth_chainId"
+)
 
 const defaultRetryInterval = time.Second * 15
 
@@ -239,6 +243,29 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 		MaxElapsedTime: pointDur(1 * time.Minute),
 		MaxBackoff:     pointDur(e.retryInterval),
 	}, &e.lastTraceBlockReq, &e.lastTraceBlockErr)
+	return result, err
+}
+
+// TraceCall returns traced call
+func (e *streamEthClient) TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error) {
+	name := fmt.Sprintf("%s(%v)", traceCall, req)
+	log.Debugf(name)
+	var result []domain.Trace
+	err := withBackoff(ctx, name, func(ctx context.Context) error {
+		err := e.rpcClient.CallContext(ctx, &result, traceCall, req, "trace", "latest")
+		if err != nil {
+			return err
+		}
+		if len(result) == 0 {
+			return ErrNotFound
+		}
+		return nil
+	}, RetryOptions{
+		MinBackoff:     pointDur(e.retryInterval),
+		MaxElapsedTime: pointDur(1 * time.Minute),
+		MaxBackoff:     pointDur(e.retryInterval),
+	}, nil, nil)
+
 	return result, err
 }
 

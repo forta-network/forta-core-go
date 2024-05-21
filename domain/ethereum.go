@@ -289,6 +289,16 @@ type TransactionReceipt struct {
 	TransactionIndex  *string    `json:"transactionIndex"`
 }
 
+// TraceCallTransaction The transaction call object which contains the following fields
+type TraceCallTransaction struct {
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Gas      *int64 `json:"gas,omitempty"`
+	GasPrice *int64 `json:"gasPrice,omitempty"`
+	Value    *int64 `json:"value,omitempty"`
+	Data     string `json:"data"`
+}
+
 // TraceAction is an element of a trace_block Trace response
 type TraceAction struct {
 	From          *string `json:"from"`

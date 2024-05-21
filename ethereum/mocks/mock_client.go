@@ -669,6 +669,21 @@ func (mr *MockClientMockRecorder) TraceBlock(ctx, number interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceBlock", reflect.TypeOf((*MockClient)(nil).TraceBlock), ctx, number)
 }
 
+// TraceCall mocks base method.
+func (m *MockClient) TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TraceCall", ctx, req)
+	ret0, _ := ret[0].([]domain.Trace)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TraceCall indicates an expected call of TraceCall.
+func (mr *MockClientMockRecorder) TraceCall(ctx, req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceCall", reflect.TypeOf((*MockClient)(nil).TraceCall), ctx, req)
+}
+
 // TransactionReceipt mocks base method.
 func (m *MockClient) TransactionReceipt(ctx context.Context, txHash string) (*domain.TransactionReceipt, error) {
 	m.ctrl.T.Helper()
