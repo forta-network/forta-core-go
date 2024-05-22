@@ -299,6 +299,13 @@ type TraceCallTransaction struct {
 	Data     string `json:"data"`
 }
 
+type TraceCallResult struct {
+	Trace     []Trace `json:"trace"`
+	Output    string  `json:"output"`
+	StateDiff any     `json:"stateDiff"`
+	VmTrace   any     `json:"vmTrace"`
+}
+
 // TraceAction is an element of a trace_block Trace response
 type TraceAction struct {
 	From          *string `json:"from"`

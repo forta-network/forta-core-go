@@ -250,13 +250,13 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 func (e *streamEthClient) TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error) {
 	name := fmt.Sprintf("%s(%v)", traceCall, req)
 	log.Debugf(name)
-	var result []domain.Trace
+	var result domain.TraceCallResult
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, traceCall, req, "trace", "latest")
+		err := e.rpcClient.CallContext(ctx, &result, traceCall, req, []string{"trace"}, "latest")
 		if err != nil {
 			return err
 		}
-		if len(result) == 0 {
+		if len(result.Trace) == 0 {
 			return ErrNotFound
 		}
 		return nil
@@ -266,7 +266,7 @@ func (e *streamEthClient) TraceCall(ctx context.Context, req domain.TraceCallTra
 		MaxBackoff:     pointDur(e.retryInterval),
 	}, nil, nil)
 
-	return result, err
+	return result.Trace, err
 }
 
 // GetLogs returns the set of logs for a block
