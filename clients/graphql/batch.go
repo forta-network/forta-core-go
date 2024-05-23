@@ -153,10 +153,6 @@ func makeRequest(ctx context.Context, client string, req *graphql.Request, heade
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode == http.StatusInternalServerError {
-		return nil, ErrResponseSizeTooBig
-	}
-
 	if httpResp.StatusCode != http.StatusOK {
 		var respBody []byte
 		respBody, err = io.ReadAll(httpResp.Body)
