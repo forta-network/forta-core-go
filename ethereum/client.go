@@ -63,7 +63,7 @@ type Client interface {
 	TransactionReceipt(ctx context.Context, txHash string) (*domain.TransactionReceipt, error)
 	ChainID(ctx context.Context) (*big.Int, error)
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
-	TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error)
+	CustomDebugTraceCall(ctx context.Context, req domain.DebugTraceCallTransaction, stateOverrides map[string]interface{}) (*domain.CustomDebugTraceCallResult, error)
 	GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
 	SubscribeToHead(ctx context.Context) (domain.HeaderCh, error)
 
@@ -77,7 +77,7 @@ const (
 	getLogs            = "eth_getLogs"
 	transactionReceipt = "eth_getTransactionReceipt"
 	traceBlock         = "trace_block"
-	traceCall          = "trace_call"
+	debugTraceCall     = "debug_traceCall"
 	chainId            = "eth_chainId"
 )
 
@@ -246,19 +246,24 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 	return result, err
 }
 
-// TraceCall returns traced call
-func (e *streamEthClient) TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error) {
-	name := fmt.Sprintf("%s(%v)", traceCall, req)
+// CustomDebugTraceCall returns traced call with custom js tracer
+func (e *streamEthClient) CustomDebugTraceCall(
+	ctx context.Context, req domain.DebugTraceCallTransaction, stateOverrides map[string]interface{},
+) (*domain.CustomDebugTraceCallResult, error) {
+	name := fmt.Sprintf("%s(%v)", debugTraceCall, req)
 	log.Debugf(name)
-	var result domain.TraceCallResult
+	var result domain.CustomDebugTraceCallResult
+	args := []interface{}{req, []string{"trace"}, "latest"}
+	if stateOverrides != nil {
+		args = append(args, stateOverrides)
+	}
+
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, traceCall, req, []string{"trace"}, "latest")
+		err := e.rpcClient.CallContext(ctx, &result, debugTraceCall, args...)
 		if err != nil {
 			return err
 		}
-		if len(result.Trace) == 0 {
-			return ErrNotFound
-		}
+
 		return nil
 	}, RetryOptions{
 		MinBackoff:     pointDur(e.retryInterval),
@@ -266,7 +271,7 @@ func (e *streamEthClient) TraceCall(ctx context.Context, req domain.TraceCallTra
 		MaxBackoff:     pointDur(e.retryInterval),
 	}, nil, nil)
 
-	return result.Trace, err
+	return &result, err
 }
 
 // GetLogs returns the set of logs for a block

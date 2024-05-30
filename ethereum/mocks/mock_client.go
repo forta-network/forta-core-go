@@ -570,6 +570,21 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockClient)(nil).Close))
 }
 
+// CustomDebugTraceCall mocks base method.
+func (m *MockClient) CustomDebugTraceCall(ctx context.Context, req domain.DebugTraceCallTransaction, stateOverrides map[string]interface{}) (*domain.CustomDebugTraceCallResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CustomDebugTraceCall", ctx, req, stateOverrides)
+	ret0, _ := ret[0].(*domain.CustomDebugTraceCallResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CustomDebugTraceCall indicates an expected call of CustomDebugTraceCall.
+func (mr *MockClientMockRecorder) CustomDebugTraceCall(ctx, req, stateOverrides interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CustomDebugTraceCall", reflect.TypeOf((*MockClient)(nil).CustomDebugTraceCall), ctx, req, stateOverrides)
+}
+
 // GetLogs mocks base method.
 func (m *MockClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	m.ctrl.T.Helper()
@@ -667,21 +682,6 @@ func (m *MockClient) TraceBlock(ctx context.Context, number *big.Int) ([]domain.
 func (mr *MockClientMockRecorder) TraceBlock(ctx, number interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceBlock", reflect.TypeOf((*MockClient)(nil).TraceBlock), ctx, number)
-}
-
-// TraceCall mocks base method.
-func (m *MockClient) TraceCall(ctx context.Context, req domain.TraceCallTransaction) ([]domain.Trace, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TraceCall", ctx, req)
-	ret0, _ := ret[0].([]domain.Trace)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TraceCall indicates an expected call of TraceCall.
-func (mr *MockClientMockRecorder) TraceCall(ctx, req interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceCall", reflect.TypeOf((*MockClient)(nil).TraceCall), ctx, req)
 }
 
 // TransactionReceipt mocks base method.
