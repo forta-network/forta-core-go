@@ -255,7 +255,7 @@ func (e *streamEthClient) CustomDebugTraceCall(
 	var result domain.CustomDebugTraceCallResult
 	args := []interface{}{req, []string{"trace"}, "latest"}
 	if stateOverrides != nil {
-		args = append(args, stateOverrides)
+		args = append(args, map[string]interface{}{"stateOverrides": stateOverrides})
 	}
 
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
