@@ -253,11 +253,19 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 // DebugTraceCall returns the traces of a call.
 func (e *streamEthClient) DebugTraceCall(
 	ctx context.Context, req *domain.TraceCallTransaction,
-	block *rpc.BlockNumberOrHash, traceCallConfig domain.TraceCallConfig,
+	block any, traceCallConfig domain.TraceCallConfig,
 	result interface{},
 ) error {
 	name := fmt.Sprintf("%s(%v)", debugTraceCall, req)
 	log.Debugf(name)
+
+	switch block.(type) {
+	case string:
+	case *rpc.BlockNumberOrHash:
+	default:
+		return errors.New("invalid block number type")
+	}
+
 	args := []interface{}{req, block, traceCallConfig}
 
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
