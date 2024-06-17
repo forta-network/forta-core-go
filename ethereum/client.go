@@ -65,7 +65,7 @@ type Client interface {
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
 	DebugTraceCall(
 		ctx context.Context, req *domain.TraceCallTransaction,
-		block *rpc.BlockNumberOrHash, traceCallConfig domain.TraceCallConfig,
+		block any, traceCallConfig domain.TraceCallConfig,
 		result interface{},
 	) error
 	GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)

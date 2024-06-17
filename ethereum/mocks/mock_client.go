@@ -13,7 +13,6 @@ import (
 	ethereum "github.com/ethereum/go-ethereum"
 	common "github.com/ethereum/go-ethereum/common"
 	types "github.com/ethereum/go-ethereum/core/types"
-	rpc "github.com/ethereum/go-ethereum/rpc"
 	health "github.com/forta-network/forta-core-go/clients/health"
 	domain "github.com/forta-network/forta-core-go/domain"
 	gomock "github.com/golang/mock/gomock"
@@ -572,7 +571,7 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 }
 
 // DebugTraceCall mocks base method.
-func (m *MockClient) DebugTraceCall(ctx context.Context, req *domain.TraceCallTransaction, block *rpc.BlockNumberOrHash, traceCallConfig domain.TraceCallConfig, result interface{}) error {
+func (m *MockClient) DebugTraceCall(ctx context.Context, req *domain.TraceCallTransaction, block any, traceCallConfig domain.TraceCallConfig, result interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DebugTraceCall", ctx, req, block, traceCallConfig, result)
 	ret0, _ := ret[0].(error)
