@@ -63,7 +63,11 @@ type Client interface {
 	TransactionReceipt(ctx context.Context, txHash string) (*domain.TransactionReceipt, error)
 	ChainID(ctx context.Context) (*big.Int, error)
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
-	CustomDebugTraceCall(ctx context.Context, req domain.DebugTraceCallTransaction, stateOverrides map[string]interface{}) (*domain.CustomDebugTraceCallResult, error)
+	DebugTraceCall(
+		ctx context.Context, req *domain.TraceCallTransaction,
+		block *rpc.BlockNumberOrHash, traceCallConfig domain.TraceCallConfig,
+		result interface{},
+	) error
 	GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
 	SubscribeToHead(ctx context.Context) (domain.HeaderCh, error)
 
@@ -246,17 +250,15 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 	return result, err
 }
 
-// CustomDebugTraceCall returns traced call with custom js tracer
-func (e *streamEthClient) CustomDebugTraceCall(
-	ctx context.Context, req domain.DebugTraceCallTransaction, stateOverrides map[string]interface{},
-) (*domain.CustomDebugTraceCallResult, error) {
+// DebugTraceCall returns the traces of a call.
+func (e *streamEthClient) DebugTraceCall(
+	ctx context.Context, req *domain.TraceCallTransaction,
+	block *rpc.BlockNumberOrHash, traceCallConfig domain.TraceCallConfig,
+	result interface{},
+) error {
 	name := fmt.Sprintf("%s(%v)", debugTraceCall, req)
 	log.Debugf(name)
-	var result domain.CustomDebugTraceCallResult
-	args := []interface{}{req, []string{"trace"}, "latest"}
-	if stateOverrides != nil {
-		args = append(args, map[string]interface{}{"stateOverrides": stateOverrides})
-	}
+	args := []interface{}{req, block, traceCallConfig}
 
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
 		err := e.rpcClient.CallContext(ctx, &result, debugTraceCall, args...)
@@ -270,8 +272,7 @@ func (e *streamEthClient) CustomDebugTraceCall(
 		MaxElapsedTime: pointDur(1 * time.Minute),
 		MaxBackoff:     pointDur(e.retryInterval),
 	}, nil, nil)
-
-	return &result, err
+	return err
 }
 
 // GetLogs returns the set of logs for a block

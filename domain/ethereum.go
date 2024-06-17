@@ -289,8 +289,8 @@ type TransactionReceipt struct {
 	TransactionIndex  *string    `json:"transactionIndex"`
 }
 
-// DebugTraceCallTransaction The transaction call object which contains the following fields
-type DebugTraceCallTransaction struct {
+// TraceCallTransaction contains the fields of the to-be-simulated transaction.
+type TraceCallTransaction struct {
 	From     string `json:"from"`
 	To       string `json:"to"`
 	Gas      *int64 `json:"gas,omitempty"`
@@ -299,7 +299,18 @@ type DebugTraceCallTransaction struct {
 	Data     string `json:"data"`
 }
 
-type CustomDebugTraceCallResult struct{}
+// TraceCallConfig contains the tracer configuration to be used while simulating the transaction.
+type TraceCallConfig struct {
+	Tracer         string                 `json:"tracer,omitempty"`
+	TracerConfig   *TracerConfig          `json:"tracerConfig,omitempty"`
+	StateOverrides map[string]interface{} `json:"stateOverrides,omitempty"`
+}
+
+// TracerConfig contains some extra tracer parameters.
+type TracerConfig struct {
+	WithLog     bool `json:"withLog,omitempty"`
+	OnlyTopCall bool `json:"onlyTopCall,omitempty"`
+}
 
 // TraceAction is an element of a trace_block Trace response
 type TraceAction struct {

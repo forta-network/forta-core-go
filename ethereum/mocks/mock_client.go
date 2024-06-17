@@ -13,6 +13,7 @@ import (
 	ethereum "github.com/ethereum/go-ethereum"
 	common "github.com/ethereum/go-ethereum/common"
 	types "github.com/ethereum/go-ethereum/core/types"
+	rpc "github.com/ethereum/go-ethereum/rpc"
 	health "github.com/forta-network/forta-core-go/clients/health"
 	domain "github.com/forta-network/forta-core-go/domain"
 	gomock "github.com/golang/mock/gomock"
@@ -570,19 +571,18 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockClient)(nil).Close))
 }
 
-// CustomDebugTraceCall mocks base method.
-func (m *MockClient) CustomDebugTraceCall(ctx context.Context, req domain.DebugTraceCallTransaction, stateOverrides map[string]interface{}) (*domain.CustomDebugTraceCallResult, error) {
+// DebugTraceCall mocks base method.
+func (m *MockClient) DebugTraceCall(ctx context.Context, req *domain.TraceCallTransaction, block *rpc.BlockNumberOrHash, traceCallConfig domain.TraceCallConfig, result interface{}) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CustomDebugTraceCall", ctx, req, stateOverrides)
-	ret0, _ := ret[0].(*domain.CustomDebugTraceCallResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "DebugTraceCall", ctx, req, block, traceCallConfig, result)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// CustomDebugTraceCall indicates an expected call of CustomDebugTraceCall.
-func (mr *MockClientMockRecorder) CustomDebugTraceCall(ctx, req, stateOverrides interface{}) *gomock.Call {
+// DebugTraceCall indicates an expected call of DebugTraceCall.
+func (mr *MockClientMockRecorder) DebugTraceCall(ctx, req, block, traceCallConfig, result interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CustomDebugTraceCall", reflect.TypeOf((*MockClient)(nil).CustomDebugTraceCall), ctx, req, stateOverrides)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugTraceCall", reflect.TypeOf((*MockClient)(nil).DebugTraceCall), ctx, req, block, traceCallConfig, result)
 }
 
 // GetLogs mocks base method.
