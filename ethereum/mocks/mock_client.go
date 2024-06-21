@@ -570,6 +570,20 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockClient)(nil).Close))
 }
 
+// DebugTraceCall mocks base method.
+func (m *MockClient) DebugTraceCall(ctx context.Context, req *domain.TraceCallTransaction, block any, traceCallConfig domain.TraceCallConfig, result interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DebugTraceCall", ctx, req, block, traceCallConfig, result)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DebugTraceCall indicates an expected call of DebugTraceCall.
+func (mr *MockClientMockRecorder) DebugTraceCall(ctx, req, block, traceCallConfig, result interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugTraceCall", reflect.TypeOf((*MockClient)(nil).DebugTraceCall), ctx, req, block, traceCallConfig, result)
+}
+
 // GetLogs mocks base method.
 func (m *MockClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	m.ctrl.T.Helper()
