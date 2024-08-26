@@ -62,6 +62,7 @@ type Client interface {
 	BlockNumber(ctx context.Context) (*big.Int, error)
 	TransactionReceipt(ctx context.Context, txHash string) (*domain.TransactionReceipt, error)
 	ChainID(ctx context.Context) (*big.Int, error)
+	GetTransactionCount(ctx context.Context, address string, blockNumber *big.Int) (*big.Int, error)
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
 	DebugTraceCall(
 		ctx context.Context, req *domain.TraceCallTransaction,
@@ -75,14 +76,15 @@ type Client interface {
 }
 
 const (
-	blocksByNumber     = "eth_getBlockByNumber"
-	blocksByHash       = "eth_getBlockByHash"
-	blockNumber        = "eth_blockNumber"
-	getLogs            = "eth_getLogs"
-	transactionReceipt = "eth_getTransactionReceipt"
-	traceBlock         = "trace_block"
-	debugTraceCall     = "debug_traceCall"
-	chainId            = "eth_chainId"
+	blocksByNumber      = "eth_getBlockByNumber"
+	blocksByHash        = "eth_getBlockByHash"
+	blockNumber         = "eth_blockNumber"
+	getLogs             = "eth_getLogs"
+	transactionReceipt  = "eth_getTransactionReceipt"
+	traceBlock          = "trace_block"
+	debugTraceCall      = "debug_traceCall"
+	chainId             = "eth_chainId"
+	getTransactionCount = "eth_getTransactionCount"
 )
 
 const defaultRetryInterval = time.Second * 15
@@ -382,6 +384,32 @@ func (e *streamEthClient) TransactionReceipt(ctx context.Context, txHash string)
 		MaxElapsedTime: pointDur(5 * time.Minute),
 	}, &e.lastGetTransactionReceiptReq, &e.lastGetTransactionReceiptErr)
 	return &result, err
+}
+
+// GetTransactionCount returns the transaction count for an address
+func (e *streamEthClient) GetTransactionCount(ctx context.Context, address string, blockNumber *big.Int) (*big.Int, error) {
+	name := fmt.Sprintf("%s(%s, %s)", getTransactionCount, address, blockNumber)
+	log.Debugf(name)
+	var result string
+	err := withBackoff(ctx, name, func(ctx context.Context) error {
+		err := e.rpcClient.CallContext(ctx, &result, getTransactionCount, address, blockNumber)
+		if err != nil {
+			return err
+		}
+		if result == "" {
+			return ErrNotFound
+		}
+		return nil
+	}, RetryOptions{
+		MinBackoff:     pointDur(e.retryInterval),
+		MaxElapsedTime: pointDur(12 * time.Hour),
+		MaxBackoff:     pointDur(e.retryInterval),
+	}, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return utils.HexToBigInt(result)
 }
 
 // SubscribeToHead subscribes to the blockchain head and returns a channel which provides
