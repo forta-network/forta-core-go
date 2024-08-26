@@ -599,6 +599,21 @@ func (mr *MockClientMockRecorder) GetLogs(ctx, q interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogs", reflect.TypeOf((*MockClient)(nil).GetLogs), ctx, q)
 }
 
+// GetTransactionCount mocks base method.
+func (m *MockClient) GetTransactionCount(ctx context.Context, address string, blockNumber *big.Int) (*big.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTransactionCount", ctx, address, blockNumber)
+	ret0, _ := ret[0].(*big.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTransactionCount indicates an expected call of GetTransactionCount.
+func (mr *MockClientMockRecorder) GetTransactionCount(ctx, address, blockNumber interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTransactionCount", reflect.TypeOf((*MockClient)(nil).GetTransactionCount), ctx, address, blockNumber)
+}
+
 // Health mocks base method.
 func (m *MockClient) Health() health.Reports {
 	m.ctrl.T.Helper()
