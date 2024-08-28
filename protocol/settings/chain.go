@@ -100,10 +100,11 @@ func GetChainSettings(chainID int) *ChainSettings {
 		}
 	}
 	return &ChainSettings{
-		Name:                "Unknown chain",
-		ChainID:             chainID,
-		JsonRpcRateLimiting: defaultRateLimiting,
-		InspectionInterval:  50, // arbitrary value - not reliable
-		BlockThreshold:      10,
+		Name:                        "Unknown chain",
+		ChainID:                     chainID,
+		JsonRpcRateLimiting:         defaultRateLimiting,
+		InspectionInterval:          50, // arbitrary value - not reliable
+		BlockThreshold:              10,
+		JSONRPCRetryIntervalSeconds: 4,
 	}
 }
