@@ -600,7 +600,7 @@ func (mr *MockClientMockRecorder) GetLogs(ctx, q interface{}) *gomock.Call {
 }
 
 // GetTransactionCount mocks base method.
-func (m *MockClient) GetTransactionCount(ctx context.Context, address string, blockNumber *big.Int) (*big.Int, error) {
+func (m *MockClient) GetTransactionCount(ctx context.Context, address string, blockNumber any) (*big.Int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTransactionCount", ctx, address, blockNumber)
 	ret0, _ := ret[0].(*big.Int)

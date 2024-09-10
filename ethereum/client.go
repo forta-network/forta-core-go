@@ -62,7 +62,7 @@ type Client interface {
 	BlockNumber(ctx context.Context) (*big.Int, error)
 	TransactionReceipt(ctx context.Context, txHash string) (*domain.TransactionReceipt, error)
 	ChainID(ctx context.Context) (*big.Int, error)
-	GetTransactionCount(ctx context.Context, address string, blockNumber *big.Int) (*big.Int, error)
+	GetTransactionCount(ctx context.Context, address string, blockNumber any) (*big.Int, error)
 	TraceBlock(ctx context.Context, number *big.Int) ([]domain.Trace, error)
 	DebugTraceCall(
 		ctx context.Context, req *domain.TraceCallTransaction,
@@ -387,12 +387,20 @@ func (e *streamEthClient) TransactionReceipt(ctx context.Context, txHash string)
 }
 
 // GetTransactionCount returns the transaction count for an address
-func (e *streamEthClient) GetTransactionCount(ctx context.Context, address string, blockNumber *big.Int) (*big.Int, error) {
-	name := fmt.Sprintf("%s(%s, %s)", getTransactionCount, address, blockNumber)
+func (e *streamEthClient) GetTransactionCount(ctx context.Context, address string, block any) (*big.Int, error) {
+	name := fmt.Sprintf("%s(%s, %s)", getTransactionCount, address, block)
+
+	switch block.(type) {
+	case string:
+	case *rpc.BlockNumberOrHash:
+	default:
+		return nil, errors.New("invalid block number type")
+	}
+
 	log.Debugf(name)
 	var result string
 	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, getTransactionCount, address, blockNumber)
+		err := e.rpcClient.CallContext(ctx, &result, getTransactionCount, address, block)
 		if err != nil {
 			return err
 		}
