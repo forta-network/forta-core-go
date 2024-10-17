@@ -58,6 +58,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 	cf, err := NewCombinerFeedWithClient(
 		ctx, CombinerFeedConfig{
 			QueryInterval: rate,
+			BatchSize:     10,
 		}, successfulMockClient,
 	)
 
@@ -99,6 +100,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 	cfTooBig, err := NewCombinerFeedWithClient(
 		ctxTooBig, CombinerFeedConfig{
 			QueryInterval: rate,
+			BatchSize:     10,
 		}, responseTooBigClient,
 	)
 	assert.NoError(t, err)
@@ -141,6 +143,7 @@ func Test_combinerFeed_Start(t *testing.T) {
 	cfUnauth, err := NewCombinerFeedWithClient(
 		ctxUnauth, CombinerFeedConfig{
 			QueryInterval: rate,
+			BatchSize:     10,
 		}, unauthClient,
 	)
 	assert.NoError(t, err)
