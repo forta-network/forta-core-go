@@ -560,7 +560,7 @@ func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEth
 	return NewStreamEthClientWithRPCClient(ctx, apiName, isWebsocket(apiURL), c)
 }
 
-// NewStreamEthClientWithRPCClient creNewStreamEthClientWithRPCClientates a new ethereum client
+// NewStreamEthClientWithRPCClient creates a new ethereum client
 func NewStreamEthClientWithRPCClient(ctx context.Context, apiName string, isWs bool, rpcClient Subscriber) (*streamEthClient, error) {
 	return &streamEthClient{
 		apiName:           apiName,
