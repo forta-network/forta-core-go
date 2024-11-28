@@ -18,4 +18,12 @@ func TestThreadSafeRing(t *testing.T) {
 	r.Equal(2, ring.Current())
 	r.Equal(1, ring.Next())
 	r.Equal(1, ring.Current())
+
+	ring = slicering.NewThreadSafeRing(1)
+	r.Equal(1, ring.Current())
+	r.Equal(1, ring.Current())
+	r.Equal(1, ring.Next())
+	r.Equal(1, ring.Current())
+
+	r.Equal([]int{1}, ring.Elements())
 }

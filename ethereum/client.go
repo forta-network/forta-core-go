@@ -564,7 +564,7 @@ func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEth
 func NewStreamEthClientWithRPCClient(ctx context.Context, apiName string, isWs bool, rpcClient Subscriber) (*streamEthClient, error) {
 	return &streamEthClient{
 		apiName:           apiName,
-		rpcClientProvider: provider.NewStaticProvider(rpcClient),
+		rpcClientProvider: provider.NewRingProvider(rpcClient),
 		retryInterval:     defaultRetryInterval,
 		isWebsocket:       isWs,
 	}, nil

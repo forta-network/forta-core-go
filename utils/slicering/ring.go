@@ -6,6 +6,7 @@ import "sync"
 type Ring[T any] interface {
 	Current() T
 	Next() T
+	Elements() []T
 }
 
 // ThreadSafeRing is a slice-backed ring protected with a mutex.
@@ -25,6 +26,9 @@ func NewThreadSafeRing[T any](elements ...T) *ThreadSafeRing[T] {
 
 // Current returns the current element being pointed at.
 func (r *ThreadSafeRing[T]) Current() T {
+	if len(r.elements) == 1 {
+		return r.elements[0]
+	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.elements[r.curr]
@@ -32,6 +36,9 @@ func (r *ThreadSafeRing[T]) Current() T {
 
 // Next points at the next item and returns it.
 func (r *ThreadSafeRing[T]) Next() T {
+	if len(r.elements) == 1 {
+		return r.elements[0]
+	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.curr += 1
@@ -39,4 +46,9 @@ func (r *ThreadSafeRing[T]) Next() T {
 		r.curr = 0
 	}
 	return r.elements[r.curr]
+}
+
+// Elements returns all elements.
+func (r *ThreadSafeRing[T]) Elements() []T {
+	return r.elements
 }

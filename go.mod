@@ -1,6 +1,6 @@
 module github.com/forta-network/forta-core-go
 
-go 1.23
+go 1.19
 
 require (
 	github.com/Khan/genqlient v0.5.0
