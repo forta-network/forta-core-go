@@ -17,6 +17,7 @@ import (
 
 	"github.com/forta-network/forta-core-go/clients/health"
 	"github.com/forta-network/forta-core-go/domain"
+	"github.com/forta-network/forta-core-go/ethereum/provider"
 	"github.com/forta-network/forta-core-go/utils"
 	"github.com/forta-network/forta-core-go/utils/httpclient"
 
@@ -108,11 +109,10 @@ var maxBackoff = 1 * time.Minute
 
 // streamEthClient wraps a go-ethereum client purpose-built for streaming txs (with long retries/timeouts)
 type streamEthClient struct {
-	apiName       string
-	rpcClient     RPCClient
-	subscriber    Subscriber
-	retryInterval time.Duration
-	isWebsocket   bool
+	apiName           string
+	rpcClientProvider provider.Provider[Subscriber]
+	retryInterval     time.Duration
+	isWebsocket       bool
 
 	lastBlockByNumberReq         health.TimeTracker
 	lastBlockByNumberErr         health.ErrorTracker
@@ -130,7 +130,7 @@ type RetryOptions struct {
 
 // Close invokes close on the underlying client
 func (e *streamEthClient) Close() {
-	e.rpcClient.Close()
+	e.rpcClientProvider.Close()
 }
 
 func (e *streamEthClient) SetRetryInterval(d time.Duration) {
@@ -154,8 +154,9 @@ func isPermanentError(err error) bool {
 }
 
 // withBackoff wraps an operation in an exponential backoff logic
-func withBackoff(
-	ctx context.Context, name string, operation func(ctx context.Context) error, options RetryOptions,
+func (e *streamEthClient) withBackoff(
+	ctx context.Context, name string,
+	operation func(ctx context.Context, rpcClient Subscriber) error, options RetryOptions,
 	timeTracker *health.TimeTracker, errorTracker *health.ErrorTracker,
 ) error {
 	bo := backoff.NewExponentialBackOff()
@@ -176,13 +177,17 @@ func withBackoff(
 		}
 
 		tCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		err := operation(tCtx)
+		err := operation(tCtx, e.rpcClientProvider.Provide())
 		cancel()
 		if timeTracker != nil {
 			timeTracker.Set()
 		}
 		if errorTracker != nil {
 			errorTracker.Set(err)
+		}
+		if err != nil {
+			// Move onto the next provider.
+			e.rpcClientProvider.Next()
 		}
 		if err == nil {
 			//success, returning now avoids failing on context timeouts in certain edge cases
@@ -213,8 +218,8 @@ func (e *streamEthClient) BlockByHash(ctx context.Context, hash string) (*domain
 	name := fmt.Sprintf("%s(%s)", blocksByHash, hash)
 	log.Debugf(name)
 	var result domain.Block
-	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, blocksByHash, hash, true)
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		err := rpcClient.CallContext(ctx, &result, blocksByHash, hash, true)
 		if err != nil {
 			return err
 		}
@@ -235,8 +240,8 @@ func (e *streamEthClient) TraceBlock(ctx context.Context, number *big.Int) ([]do
 	name := fmt.Sprintf("%s(%s)", traceBlock, number)
 	log.Debugf(name)
 	var result []domain.Trace
-	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, traceBlock, utils.BigIntToHex(number))
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		err := rpcClient.CallContext(ctx, &result, traceBlock, utils.BigIntToHex(number))
 		if err != nil {
 			return err
 		}
@@ -270,8 +275,8 @@ func (e *streamEthClient) DebugTraceCall(
 
 	args := []interface{}{req, block, traceCallConfig}
 
-	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, debugTraceCall, args...)
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		err := rpcClient.CallContext(ctx, &result, debugTraceCall, args...)
 		if err != nil {
 			return err
 		}
@@ -296,8 +301,8 @@ func (e *streamEthClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) (
 		return nil, err
 	}
 
-	err = withBackoff(ctx, name, func(ctx context.Context) error {
-		return e.rpcClient.CallContext(ctx, &result, getLogs, args)
+	err = e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		return rpcClient.CallContext(ctx, &result, getLogs, args)
 	}, RetryOptions{
 		MinBackoff:     pointDur(e.retryInterval),
 		MaxElapsedTime: pointDur(12 * time.Hour),
@@ -320,8 +325,8 @@ func (e *streamEthClient) BlockByNumber(ctx context.Context, number *big.Int) (*
 	name := fmt.Sprintf("%s(%s)", blocksByNumber, numDisplay)
 	log.Debugf(name)
 
-	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, blocksByNumber, numArg, true)
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		err := rpcClient.CallContext(ctx, &result, blocksByNumber, numArg, true)
 		if err != nil {
 			return err
 		}
@@ -341,8 +346,8 @@ func (e *streamEthClient) BlockByNumber(ctx context.Context, number *big.Int) (*
 func (e *streamEthClient) BlockNumber(ctx context.Context) (*big.Int, error) {
 	log.Debugf(blockNumber)
 	var result string
-	err := withBackoff(ctx, blockNumber, func(ctx context.Context) error {
-		return e.rpcClient.CallContext(ctx, &result, blockNumber)
+	err := e.withBackoff(ctx, blockNumber, func(ctx context.Context, rpcClient Subscriber) error {
+		return rpcClient.CallContext(ctx, &result, blockNumber)
 	}, RetryOptions{
 		MaxElapsedTime: pointDur(12 * time.Hour),
 	}, nil, nil)
@@ -356,8 +361,8 @@ func (e *streamEthClient) BlockNumber(ctx context.Context) (*big.Int, error) {
 func (e *streamEthClient) ChainID(ctx context.Context) (*big.Int, error) {
 	log.Debugf(chainId)
 	var result string
-	err := withBackoff(ctx, chainId, func(ctx context.Context) error {
-		return e.rpcClient.CallContext(ctx, &result, chainId)
+	err := e.withBackoff(ctx, chainId, func(ctx context.Context, rpcClient Subscriber) error {
+		return rpcClient.CallContext(ctx, &result, chainId)
 	}, RetryOptions{
 		MaxElapsedTime: pointDur(1 * time.Minute),
 	}, nil, nil)
@@ -372,8 +377,8 @@ func (e *streamEthClient) TransactionReceipt(ctx context.Context, txHash string)
 	name := fmt.Sprintf("%s(%s)", transactionReceipt, txHash)
 	log.Debugf(name)
 	var result domain.TransactionReceipt
-	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		if err := e.rpcClient.CallContext(ctx, &result, transactionReceipt, txHash); err != nil {
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		if err := rpcClient.CallContext(ctx, &result, transactionReceipt, txHash); err != nil {
 			return err
 		}
 		if result.TransactionHash == nil {
@@ -399,8 +404,8 @@ func (e *streamEthClient) GetTransactionCount(ctx context.Context, address strin
 
 	log.Debugf(name)
 	var result string
-	err := withBackoff(ctx, name, func(ctx context.Context) error {
-		err := e.rpcClient.CallContext(ctx, &result, getTransactionCount, address, block)
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		err := rpcClient.CallContext(ctx, &result, getTransactionCount, address, block)
 		if err != nil {
 			return err
 		}
@@ -427,7 +432,8 @@ func (e *streamEthClient) SubscribeToHead(ctx context.Context) (domain.HeaderCh,
 	log.Debug("subscribing to blockchain head")
 	recvCh := make(chan *types.Header)
 	sendCh := make(chan *types.Header)
-	sub, err := e.subscriber.Subscribe(ctx, "eth", recvCh, "newHeads")
+	// We currently do not support multiple RPCs here.
+	sub, err := e.rpcClientProvider.Provide().Subscribe(ctx, "eth", recvCh, "newHeads")
 	if err != nil {
 		return nil, fmt.Errorf("failed to subscribe: %v", err)
 	}
@@ -512,25 +518,55 @@ func NewRpcClient(ctx context.Context, url string) (*rpc.Client, error) {
 	return rpc.DialHTTPWithClient(url, &client)
 }
 
-// NewStreamEthClient creates a new ethereum client
-func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEthClient, error) {
+func newInternalRPCClient(ctx context.Context, apiURL string) (*rpcClient, error) {
 	rClient, err := NewRpcClient(ctx, apiURL)
 	if err != nil {
 		return nil, err
 	}
 	rClient.SetHeader("Content-Type", "application/json")
+	return &rpcClient{Client: rClient}, nil
+}
 
-	return NewStreamEthClientWithRPCClient(ctx, apiName, isWebsocket(apiURL), &rpcClient{Client: rClient})
+// NewStreamEthClientMulti creates a new ethereum client with multiple RPCs.
+func NewStreamEthClientMulti(ctx context.Context, apiName string, apiURLs ...string) (*streamEthClient, error) {
+	if apiURLs == nil {
+		return nil, errors.New("no api urls provided")
+	}
+	if len(apiURLs) == 1 {
+		return NewStreamEthClient(ctx, apiName, apiURLs[0])
+	}
+	var rpcClients []Subscriber
+	for _, apiURL := range apiURLs {
+		c, err := newInternalRPCClient(ctx, apiURL)
+		if err != nil {
+			return nil, err
+		}
+		rpcClients = append(rpcClients, c)
+	}
+	return &streamEthClient{
+		apiName:           apiName,
+		rpcClientProvider: provider.NewRingProvider(rpcClients...),
+		retryInterval:     defaultRetryInterval,
+		isWebsocket:       false, // TODO: Support multiple websockets later if necessary.
+	}, nil
+}
+
+// NewStreamEthClient creates a new ethereum client.
+func NewStreamEthClient(ctx context.Context, apiName, apiURL string) (*streamEthClient, error) {
+	c, err := newInternalRPCClient(ctx, apiURL)
+	if err != nil {
+		return nil, err
+	}
+	return NewStreamEthClientWithRPCClient(ctx, apiName, isWebsocket(apiURL), c)
 }
 
 // NewStreamEthClientWithRPCClient creates a new ethereum client
 func NewStreamEthClientWithRPCClient(ctx context.Context, apiName string, isWs bool, rpcClient Subscriber) (*streamEthClient, error) {
 	return &streamEthClient{
-		apiName:       apiName,
-		rpcClient:     rpcClient,
-		subscriber:    rpcClient,
-		retryInterval: defaultRetryInterval,
-		isWebsocket:   isWs,
+		apiName:           apiName,
+		rpcClientProvider: provider.NewRingProvider(rpcClient),
+		retryInterval:     defaultRetryInterval,
+		isWebsocket:       isWs,
 	}, nil
 }
 

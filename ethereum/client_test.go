@@ -14,6 +14,7 @@ import (
 	"github.com/forta-network/forta-core-go/domain"
 	mock_domain "github.com/forta-network/forta-core-go/domain/mocks"
 	mocks "github.com/forta-network/forta-core-go/ethereum/mocks"
+	"github.com/forta-network/forta-core-go/ethereum/provider"
 )
 
 const testBlockHash = "0x4fc0862e76691f5312964883954d5c2db35e2b8f7a4f191775a4f50c69804a8d"
@@ -38,11 +39,22 @@ func initClient(t *testing.T) (*streamEthClient, *mocks.MockSubscriber, context.
 func TestEthClient_BlockByHash(t *testing.T) {
 	r := require.New(t)
 
-	ethClient, client, ctx := initClient(t)
+	minBackoff = 1 * time.Millisecond
+	maxBackoff = 1 * time.Millisecond
+	ctx := context.Background()
+	ctrl := gomock.NewController(t)
+	client1 := mocks.NewMockSubscriber(ctrl)
+	client2 := mocks.NewMockSubscriber(ctrl)
+
+	ethClient := &streamEthClient{
+		rpcClientProvider: provider.NewRingProvider(Subscriber(client1), Subscriber(client2)),
+		retryInterval:     defaultRetryInterval,
+	}
 	hash := testBlockHash
-	// verify retry
-	client.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).Return(testErr).Times(1)
-	client.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).DoAndReturn(func(ctx context.Context, result interface{}, method string, args ...interface{}) error {
+	client1.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).Return(testErr)
+	client2.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).Return(testErr)
+	client1.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).Return(testErr)
+	client2.EXPECT().CallContext(gomock.Any(), gomock.Any(), blocksByHash, testBlockHash).DoAndReturn(func(ctx context.Context, result interface{}, method string, args ...interface{}) error {
 		b, _ := json.Marshal(domain.Block{Hash: hash})
 		return json.Unmarshal(b, result)
 	}).Times(1)

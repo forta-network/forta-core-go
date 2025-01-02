@@ -29,7 +29,7 @@ import (
 func testListener(ctx context.Context, filter *ContractFilter, topic string, handlers Handlers) Listener {
 	l, err := NewListener(ctx, ListenerConfig{
 		Name:           "listener",
-		JsonRpcURL:     "https://rpc.ankr.com/polygon",
+		JsonRpcURL:     "https://polygon-rpc.com",
 		ENSAddress:     defaultEnsAddress,
 		ContractFilter: filter,
 		Topics:         []string{topic},
@@ -46,7 +46,7 @@ func testBaseSepoliaListener(ctx context.Context, filter *ContractFilter, topic 
 	l, err := NewListener(
 		ctx, ListenerConfig{
 			Name:       "listener",
-			JsonRpcURL: "https://rpc.ankr.com/base_sepolia",
+			JsonRpcURL: "https://base-sepolia-rpc.publicnode.com",
 			// ENSAddress:     devConfig.ENSAddress,
 			ENSAddress:     "0x650AFCA8545964064b60ad040F9a09F788F714ed",
 			ContractFilter: filter,
