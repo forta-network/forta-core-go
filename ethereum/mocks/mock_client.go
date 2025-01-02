@@ -584,6 +584,21 @@ func (mr *MockClientMockRecorder) DebugTraceCall(ctx, req, block, traceCallConfi
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugTraceCall", reflect.TypeOf((*MockClient)(nil).DebugTraceCall), ctx, req, block, traceCallConfig, result)
 }
 
+// EstimateGas mocks base method.
+func (m *MockClient) EstimateGas(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EstimateGas", ctx, msg)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// EstimateGas indicates an expected call of EstimateGas.
+func (mr *MockClientMockRecorder) EstimateGas(ctx, msg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EstimateGas", reflect.TypeOf((*MockClient)(nil).EstimateGas), ctx, msg)
+}
+
 // GetLogs mocks base method.
 func (m *MockClient) GetLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	m.ctrl.T.Helper()
