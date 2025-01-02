@@ -58,6 +58,7 @@ type Client interface {
 	SetRetryInterval(time.Duration)
 	IsWebsocket() bool
 
+	EstimateGas(ctx context.Context, msg ethereum.CallMsg) (uint64, error)
 	BlockByHash(ctx context.Context, hash string) (*domain.Block, error)
 	BlockByNumber(ctx context.Context, number *big.Int) (*domain.Block, error)
 	BlockNumber(ctx context.Context) (*big.Int, error)
@@ -77,6 +78,7 @@ type Client interface {
 }
 
 const (
+	estimateGas         = "eth_estimateGas"
 	blocksByNumber      = "eth_getBlockByNumber"
 	blocksByHash        = "eth_getBlockByHash"
 	blockNumber         = "eth_blockNumber"
@@ -211,6 +213,20 @@ func (e *streamEthClient) withBackoff(
 
 func pointDur(d time.Duration) *time.Duration {
 	return &d
+}
+
+func (e *streamEthClient) EstimateGas(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
+	name := estimateGas
+	log.Debugf(name)
+	var result uint64
+	err := e.withBackoff(ctx, name, func(ctx context.Context, rpcClient Subscriber) error {
+		return rpcClient.CallContext(ctx, &result, estimateGas, msg)
+	}, RetryOptions{
+		MinBackoff:     pointDur(e.retryInterval),
+		MaxElapsedTime: pointDur(1 * time.Minute),
+		MaxBackoff:     pointDur(e.retryInterval),
+	}, nil, nil)
+	return result, err
 }
 
 // BlockByHash returns the block by hash
