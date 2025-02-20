@@ -292,7 +292,7 @@ type TransactionReceipt struct {
 // TraceCallTransaction contains the fields of the to-be-simulated transaction.
 type TraceCallTransaction struct {
 	From     string       `json:"from"`
-	To       string       `json:"to"`
+	To       string       `json:"to,omitempty"`
 	Gas      *hexutil.Big `json:"gas,omitempty"`
 	GasPrice *hexutil.Big `json:"gasPrice,omitempty"`
 	Value    *hexutil.Big `json:"value,omitempty"`
