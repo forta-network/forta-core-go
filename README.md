@@ -1,3 +1,5 @@
+⚠️ **WARNING:** _This package is deprecated and is no longer maintained. If you need a package previously available from this repository, please migrate and adapt with a pull request in [core-go](https://github.com/forta-network/core-go)._
+
 ![Go](https://github.com/forta-network/forta-core-go/actions/workflows/merge.yml/badge.svg)
 # forta-core-go
 
